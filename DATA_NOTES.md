@@ -18,6 +18,4 @@
 
 ## Next Steps (Planned)
 - Option A: Use Google Drive API to export Google Docs as `.txt`.
-- Option B: Ask contributors to upload `.txt` versions.
-- Option C: Manually export a small subset for prototyping.
 

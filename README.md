@@ -23,13 +23,13 @@ EssayLens aims to solve this by:
 ## 🧠 High-Level Architecture
 
 Google Drive (raw essays, mostly Google Docs)
-↓
-Data Ingestion Pipeline
-↓
+→
+Data Ingestion (Google Drive API)
+→
 Export Google Docs → .txt
-↓
+→
 Structured JSON Dataset
-↓
+→
 Search / Analysis / AI Feedback
 
 
@@ -37,69 +37,110 @@ Search / Analysis / AI Feedback
 
 ## ✅ Current Progress (Completed)
 
-### 1. Repository & Data Pipeline Setup
-- `.gitignore` configured to prevent raw data from being committed
-- Defined `data/raw` as the canonical data source
-- Implemented a fault-tolerant Google Drive ingestion pipeline using `gdown`
-  - Skips inaccessible or incompatible files without crashing
+### 1. Repository & Project Setup
+- GitHub repository initialized with clear project structure
+- `.gitignore` configured to prevent raw data, API keys, and derived datasets from being committed
+- `DATA_NOTES.md` added to document data-related decisions and constraints
 
-### 2. Data Issues Identified & Documented
+### 2. Google Drive API Integration
+- Google Cloud project created
+- Google Drive API enabled
+- Service Account created and granted Viewer access to the `raw_data` folder
+- API authentication verified via Python scripts
+- Confirmed ability to:
+  - List Google Docs files
+  - Retrieve file metadata and file IDs
+
+### 3. Data Ingestion Pipeline (Foundational)
+- Implemented multiple ingestion-related scripts with clear roles:
+  - **Connection testing** (Drive API authentication)
+  - **File discovery** (listing Google Docs and file IDs)
+  - **Export pipeline prototype** (Google Docs → `.txt`)
+- Established file ID–based tracking to support incremental, non-duplicative exports
+- Confirmed Google Drive as the canonical source of truth
+
+### 4. Data Issues Identified & Documented
 - Confirmed that the majority of essays are **Google Docs**, not physical files
-- Verified that Google Docs cannot be read directly by Python
-- Folder structures can be synced, but document content requires export
-- All known constraints and decisions are documented in `DATA_NOTES.md`
+- Verified that Google Docs cannot be read directly by Python without API-based export
+- Identified that `raw_data` contains:
+  - Deeply nested and inconsistent folder structures
+  - Non-essay documents (drafts, notes, requirements, etc.)
+- All constraints, issues, and design decisions are documented in `DATA_NOTES.md`
 
 ---
 
-## ⚠️ Current Limitation (Important)
+## ⚠️ Current Limitation (Intentional)
 
 At this stage:
-- Essay content **cannot yet be processed**
-- No `.txt`, `.json`, or `.html` essay files exist locally
-- JSON conversion, NLP, and AI analysis are intentionally paused
+- Essay content is **not yet fully processed**
+- Automated recursive export is intentionally paused
+- JSON conversion, NLP, and AI analysis are **deliberately not started**
 
-**This is not a bug.**  
-It is a known limitation caused by Google Docs being cloud-native objects rather than files.
+**This is not a bug.**
+
+The limitation is due to:
+- Google Docs being cloud-native objects
+- High variability and noise in raw data folder structure
+- The decision to prioritize data quality over premature automation
 
 ---
 
 ## 🔴 Current Focus
 
-> Export Google Docs essays from Google Drive into readable `.txt` files using the Google Drive API.
+> **Manual data curation and normalization of `raw_data`**
 
-This step is required before any downstream processing can occur.
+Specifically:
+- Manually filtering raw data to retain only high-quality essays
+- A "good essay" is defined as one that contributed to a successful university acceptance
+- Removing or excluding non-essay documents
+- Reducing excessive folder nesting and structural ambiguity
+
+This step ensures a cleaner, more stable foundation before full automation.
 
 ---
 
 ## 🛠 Planned Next Steps
 
-1. Create a Google Cloud project and enable Google Drive API
-2. Set up a Service Account with access to the `raw_data` folder
-3. Export Google Docs as `.txt`
-4. Store exported files locally under `data/raw_text/`
-5. Convert essays into a structured JSON dataset
-6. Implement semantic search and rubric-based analysis
+1. Complete manual filtering and normalization of `raw_data`
+2. Finalize a recursive Google Drive API export script
+3. Export curated Google Docs essays into `.txt` files
+4. Store exported text under `data/raw_text/`
+5. Convert `.txt` files into a structured JSON dataset
+6. Begin downstream tasks:
+   - Essay metadata tagging
+   - Semantic search
+   - Rubric-based and AI-assisted analysis
 
 ---
 
 ## 👥 Team Structure (Tentative)
 
-- **Project Lead**: System design, data pipeline, AI analysis
-- **Data Engineer**: Google Drive API integration and export logic
-- **NLP Engineer**: Essay tagging, structure analysis, embeddings
-- **Frontend / UX**: Search interface and visualization
+- **Project Lead**  
+  System design, data pipeline architecture, AI analysis strategy
+
+- **Data Engineer**  
+  Google Drive API integration, export logic, data ingestion reliability
+
+- **NLP Engineer**  
+  Essay schema design, tagging, embeddings, structure analysis
+
+- **Frontend / UX**  
+  Search interface, visualization, and user-facing demo
 
 ---
 
 ## 🔐 Ethics & Privacy
 
 - All essays are collected with explicit consent
-- Raw data is never committed to GitHub
+- Raw data and API keys are never committed to GitHub
+- Google Drive remains the canonical data source
 - The platform does **not** generate essays
-- Focus is on learning, comparison, and improvement
+- Focus is on learning, comparison, and improvement—not ghostwriting
 
 ---
 
 ## 📌 Status Summary (TL;DR)
 
-> The project is correctly paused at the data export stage after identifying and documenting a critical data-type constraint. The foundation is stable and ready for the next phase.
+> The project has successfully established a robust Google Drive API–based data ingestion foundation.  
+> Current work intentionally prioritizes manual data curation to reduce noise and complexity before full automation.  
+> The system is stable and well-positioned for scalable export, structuring, and analysis in the next phase.

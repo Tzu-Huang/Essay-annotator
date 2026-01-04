@@ -1,0 +1,37 @@
+{
+  "1uaFC325XEu5jc6H7HP3e3xh8Xq1BH5MqEOhKbC32fTY": {
+    "name": "未命名文件",
+    "exported_at": "2026-01-04T07:23:03.393716",
+    "output": "data\\raw_text\\未命名文件.txt"
+  },
+  "1fITU0dv0dWtkoT8H-I72RfqX8p8Dq4pOr15QuxKYuqg": {
+    "name": "未命名文件",
+    "source_folder": "Data 9 - Celia",
+    "exported_at": "2026-01-04T07:25:30.153211",
+    "output": "data\\raw_text\\未命名文件.txt"
+  },
+  "1ryrs0cExXXRksIkJPcPPhEfKnqWNbKJIJqjziqZKIkA": {
+    "name": "UC",
+    "source_folder": "Data 8 - Eden",
+    "exported_at": "2026-01-04T07:25:31.409752",
+    "output": "data\\raw_text\\UC.txt"
+  },
+  "1zbT1wDTQEj_uOy2SI-OR99OEjgCGmKrF1OoAN_eyxaY": {
+    "name": "Common app",
+    "source_folder": "Data 8 - Eden",
+    "exported_at": "2026-01-04T07:25:32.417267",
+    "output": "data\\raw_text\\Common app.txt"
+  },
+  "17Y8i3c5_ZP_nOXJawtUP3sV9qncaK7bvvszuyWgBhbw": {
+    "name": "未命名文件",
+    "source_folder": "Data 6 - York",
+    "exported_at": "2026-01-04T07:25:34.084954",
+    "output": "data\\raw_text\\未命名文件.txt"
+  },
+  "1dsjZpnGFctt5jKnWkZj_9HrWlWfLyoXRBqV4VhjsAo0": {
+    "name": "UW-Madison",
+    "source_folder": "Data 5 - Zenin",
+    "exported_at": "2026-01-04T07:25:35.439926",
+    "output": "data\\raw_text\\UW-Madison.txt"
+  }
+}

@@ -86,16 +86,12 @@ The limitation is due to:
 ---
 
 ## 🔴 Current Focus
+> **Filter out unnecessary data from the `raw_data` folder and copy the essays accepted by universities to the `raw_curated` folder.**
 
-> **Manual data curation and normalization of `raw_data`**
-
-Specifically:
-- Manually filtering raw data to retain only high-quality essays
-- A "good essay" is defined as one that contributed to a successful university acceptance
-- Removing or excluding non-essay documents
-- Reducing excessive folder nesting and structural ambiguity
-
-This step ensures a cleaner, more stable foundation before full automation.
+Steps:
+1. Complete the `raw_curated` folder by adding all accepted essays from the `raw_data` folder (Current)
+2. Manually remove unnecessary content from each Google Doc, label each document with its corresponding university, and add a topic label if missing (Future)
+3. Convert all the documents to `json` files (Future)
 
 ---
 
@@ -126,17 +122,7 @@ This step ensures a cleaner, more stable foundation before full automation.
 
 - **Frontend / UX**  
   Search interface, visualization, and user-facing demo
-
----
-
-## 🔐 Ethics & Privacy
-
-- All essays are collected with explicit consent
-- Raw data and API keys are never committed to GitHub
-- Google Drive remains the canonical data source
-- The platform does **not** generate essays
-- Focus is on learning, comparison, and improvement—not ghostwriting
-
+  
 ---
 
 ## 📌 Status Summary (TL;DR)

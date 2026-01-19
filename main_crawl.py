@@ -3,4 +3,5 @@ from crawlers.shemmassian import crawl_shemmassian
 
 if __name__ == "__main__":
     # crawl_jhu_essays()
-    crawlers.shemmassian()
+    # crawlers.shemmassian()
+    print("Test")

@@ -63,10 +63,14 @@ Search / Analysis / AI Feedback
 - Identified and handled multiple Drive file types
 - Exported both **Google Docs** and **Word docx** to txt files
 
+### 5. File Conversion
+- Converted all the txt file to jsonl
+
 ---
 
 ## 🔴 Current Focus
 > **Filter out unnecessary data from the `raw_data` folder and copy the essays accepted by universities to the `raw_curated` folder.**
+>**Generalize all the .json to the same schema** (Zack)
 
 Steps:
 1. Complete the `raw_curated` folder by adding all accepted essays from the `raw_data` folder (Current)

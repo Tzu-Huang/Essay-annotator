@@ -1,0 +1,278 @@
+﻿Every person has a creative side, and it can be expressed in many ways: problem solving, original and innovative thinking, and artistically, to name a few. Describe how you express your creative side.  
+
+
+Nicknaming me “Property Destroyer”, my mother perfectly captured the way I manifest my creativity—dismantling things in hopes of salvaging components for my next invention. My imagination runs wild as I reassemble the pieces into something new. So, rather than a destroyer, I see myself as an inventor.
+
+
+As much as I tried to suppress my creative mind to avoid breaking more things, my unconscious mind continued to concoct my next invention. Sitting in AP Biology, I thought about how one might take advantage of hydrogen atoms’ adhesive properties. AP Physics had currents of air swirling around my brain as I pondered how to capitalize on their movements. At home, I saw a sole worn-out air purifier; “Property Destroyer” pounded on the door of her oppressive cell, begging to take a crack at improving its functionality.
+
+
+Most filters are neither cost-efficient nor environmentally-friendly. It then hit me: instead of expensive, disposable filters, why not use water as a natural filter? Its adhesive properties would make for the perfect medium to collect dust particles. I found that this had scarcely been done before, and no designs were elegant or affordably manufactured.
+
+
+Hence began my creative endeavor of inventing a water-based purifier. I ripped apart a small, broken humidifier I had and took out the mist atomizer and circuit board. Next, something had to pull out the air to accelerate the filtering; the mini fan I kept in my box of dismantled items was perfect. For the body of the purifier, I decided to connect a short plastic box–which collects water–to a long, clear one that makes the mist visible. 
+
+
+Prototype after prototype, I added more components: new layers in the body of the purifier to enhance filtration, and even a color-changing LED bulb that illuminated the mist and turned it into a nightlight. Each time the water leaked or the fan stopped, I saw my failure not as a setback but as an opportunity for me to utilize creativity. My biggest gain was not the awards I received for my invention, but my rediscovery of my favorite way of exercising creativity.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Think about an academic subject that inspires you. Describe how you have furthered this interest inside and/or outside of the classroom.
+
+
+As I listened to UC Professor Maloy’s lecture about the wonders of molecular biology, I started to realize just how much I have yet to discover about the brilliant designs of nature.
+
+
+Intrigued by the practical applications of molecular biology, I started interning at a biotechnology startup near my house that was developing a pharmaceutical testing apparatus called PAMPA Dissolution, a novel approach to testing drug permeability in the gastrointestinal tract using artificial membranes. 
+
+
+Contrary to my expectations, I was not greeted with a warm introduction to the lab. Instead, a researcher provided me with seven different daunting studies on PAMPA.  Like a fish out of water, I found myself surrounded by a group of experienced researchers. I knew I had to catch up. I spent weeks going through all the papers, asking for clarifications whenever I visited their lab. 
+
+
+I would spend hours staring intensively at PAMPA Dissolution, trying to figure out how all of its components worked. Never did I feel worn out, because what I was looking at was a piece of art to me, a beautiful product of engineering: it had two compartments, one dedicated to the dissolution of drugs and the other for permeation, both connected to a computer on which a graphing software automatically depicted the data. It was a breath of fresh air: as much as I have studied biology, I have encountered nothing close to this kind of novel technology within the walls of a classroom. 
+
+
+After I finally understood how the instrument worked, I helped with the trials by testing a generic drug called telmisartan repeatedly, and I made alterations to the lipid content of the PAMPA membrane so the results would become more consistent. When we finally achieved satisfactory results, I wrote a research paper on PAMPA Dissolution and had it published in a peer-reviewed journal.
+
+
+This experience opened my eyes to a world of biotechnology that I realized I had only seen a small sliver of. I could only imagine what more I can uncover at the UCs from classes with brilliant professors and peers, research opportunities, and clubs. 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+What have you done to make your school or your community a better place?
+
+
+It pained me to see my mother struggle to prove her identity on her phone and at airports after shaving off part of her fingerprint while preparing dinner. I wondered, was it only her who had this issue?
+
+
+Recalling my knowledge on how fingerprint patterns can degrade overtime with the loss of skin elasticity, I set out to interview the seniors in my community to determine whether they have had difficulties with fingerprint recognition. The problem was more widespread than I had presumed: senior members of my school faculty expressed annoyance over ATM machines failing repeatedly to recognize their fingerprints as they watched younger people withdraw money with ease; my diabetic relatives who have to poke the tips of the fingers to measure blood glucose held the same sentiment. 
+
+
+Staggered by the prevalence of this issue, I joined Professor Hsia’s research team to develop a deep learning model for finger vein recognition. Finger veins are internal biometrics; they cannot be damaged or stolen without penetrating a person’s skin. It occurred to me that finger vein recognition would be much more convenient for the seniors in my community whose fingerprints have eroded with age. 
+
+
+Spending hours with Professor Hsia’s team, I trained a finger vein recognition AI model, hoping to improve its accuracy so that companies, banks, and even airport security would trust it enough to adopt it. As I fed images of finger vein patterns to the AI, it would sometimes fail to correctly identify the person. But thinking of all the people around me who would benefit from this technology, I felt motivated to continue to adjust the parameters in our code.
+
+
+I dreamed for finger vein recognition to be widely adopted, but I understood this cannot happen quickly. Therefore, I presented our research on finger vein recognition at an international conference. This was the next best thing to do: sharing technology with other scientists, and raising awareness that relying on fingerprints can be a burden to many individuals in our communities. At the UCs, I hope to continue to use science for the betterment of different communities.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+What would you say is your greatest talent or skill? How have you developed and demonstrated that talent over time?
+
+
+I watched Anastasiia’s cheeks grow flushed as she clumsily tried to pronounce newly-learned words; I fretted over the struggles I imagined she would face communicating with her new communities in Germany, where she had been displaced due to the Russo-Ukrainian war.
+
+
+It puzzled me. Anastasiia has a charming Ukrainian accent when speaking English–series becomes sayleese, these becomes dees. Yet, despite having a decent command of English, she hesitated to speak both during our tutoring sessions and in Germany, where she needed to speak English more than ever.
+
+
+I knew then that I had to exercise my skill of looking at problems through different angles to find a way to build Anastasiia’s confidence. 
+
+
+Was it the words I had been teaching her? Epitome, phenomenon, obsolete–these were the words that I was told suited Anastasiia’s English abilities. As I thought from her perspective, I realized that she did not have the privilege to speak with carefully wrought sentences; she had to be responsive in real life. But when I started teaching easier words, Anastasiia already knew them all.
+
+
+Was it the mechanics of pronouncing these words? I researched the best ways to break words into syllables and demonstrate tongue movements, but the detailed instructions seemed to help little.
+
+
+Maybe, I realized, the problem was less technical than emotional–a problem of embarrassment, not skill. Hence, I started having her teach me Ukrainian words. There I was, struggling to pronounce a simple farewell, or [proshchavaj] in phonetic notation. She laughed, and I laughed too, in a shared understanding of the intricacies of language learning, of how our lived experiences shaped the phonemes we were accustomed to. 
+
+
+Today, solving problems from different perspectives has become my greatest skill. From Anastasiia, who spoke bravely thereafter, I learned that what we perceive as problems are often entirely different from what we ought to solve. As a student in the University of California school system, I would strive to continue exercising this skill to devise solutions that would not have occurred to me otherwise, whether it be solving problems during classes or challenges faced by the school community.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+The epitome of femininity is perhaps when a woman tenderly and delicately handles everything she touches with love and care. But, to my parents’ dismay, nothing left my hands unscathed when I was young thanks to my habit of dismantling. Hence, I earned the title of “Property Destroyer” from my mom, which, at the time, was anything but affectionate.
+Each time I stealthily snuck off with my dad’s screwdriver set to take something apart, I envisioned myself a brilliant inventor who could reassemble seemingly trivial parts into breathtaking gadgets. A source of endless headaches for my parents, my habit of dismantling objects was really a manifestation of this ambitious dream to become an inventor. But with each failed trial and each scolding I received–deservedly so, especially the time I took apart a brand new, lustrously white toaster–I learned to give up on this dream.
+However, my unconscious mind continued to drift towards my naive dream. As I sat listening to a molecular biology lecture, I inevitably thought about how one might take advantage of hydrogen atoms’ adhesive properties. Physics class had currents of air swirling around my brain as I made sense of how to capitalize on their movements. At home, I saw my family’s sole worn-out air purifier; “Property Destroyer” pounded on the door of her oppressive cell, begging to take a crack at improving its functionality. But I quieted that voice, patiently doing more research before breaking anything.
+ The filters I found were neither cost-efficient nor environmentally friendly. It then hit me: instead of expensive, disposable filters, why not use water as a natural filter? Its adhesive properties would make for the perfect medium to collect dust particles. I quickly researched to see if this had been done before; it had, but the results were unsatisfying. None of the few designs I saw were elegant or could be manufactured affordably.
+ 
+Thus, my endeavor of inventing a water-based purifier began. I ripped apart a small, broken humidifier I had and took out the mist atomizer and circuit board it was attached to.
+ 
+Next, I would need something to pull out the air to speed up the process. I glanced at my closet door. Inside was a box of dismantled items, intended to be kept hidden from my sight—every sight of it only served as a brutal reminder of my unrealistic, childish dream. But today, it had something I needed. I opened the box, taking out a mini-fan that would be perfect for the job. For the physical structure of the air purifier, I decided to connect a short plastic box – which collects water – to a long, clear one that would make the mist visible.
+ 
+With each prototype came new components and mistakes: new layers in the body of the purifier to make filtration more effective, a LED bulb that illuminated the mist into different colors and turned it into a nightlight. The water would leak or the fan would stop from improperly bonded wires. But this was exciting to me: I was just like the inventors and engineers who had come before me, creating perfect designs only after making a million tweaks.
+Eventually, I reached a prototype I was content with and applied for a patent. My patent was granted, and I earned the judges’ approval at international invention fairs! While I pretend to be annoyed whenever my friends jokingly call me Ms. Thomas Edison, I cannot help but ignore the rush of fulfillment each time I hear it.
+I wear my title of “Property Destroyer” proudly now. Innovation will always be a clumsy process filled with failed attempts and discarded pieces for me, but I know I can fearlessly confront the challenges ahead. And along the way, my feats of engineering may even improve the quality of life for others.
+Micro psychology art
+
+
+Exam name
+	Date taken
+	Score
+	Planned date
+	Action
+	Biology
+	05/2022
+	5
+	
+
+	Delete Edit
+	Calculus AB Subscore (from the BC sitting)
+	05/2022
+	5
+	
+
+	Delete Edit
+	Calculus BC
+	05/2022
+	5
+	
+
+	Delete Edit
+	Chemistry
+	05/2023
+	5
+	
+
+	Delete Edit
+	Chinese Language and Culture
+	05/2022
+	5
+	
+
+	Delete Edit
+	Computer Science A
+	
+
+	
+
+	05/2024
+	Delete Edit
+	Computer Science Principles
+	05/2022
+	5
+	
+
+	Delete Edit
+	Economics: Macroeconomics
+	
+
+	
+
+	05/2024
+	Delete Edit
+	English Language and Composition
+	05/2023
+	5
+	
+
+	Delete Edit
+	English Literature and Composition
+	
+
+	
+
+	05/2024
+	Delete Edit
+	Human Geography
+	05/2021
+	5
+	
+
+	Delete Edit
+	Music Theory
+	05/2023
+	5
+	
+
+	Delete Edit
+	Physics 1
+	05/2022
+	5
+	
+
+	Delete Edit
+	Physics C: Electricity and Magnetism
+	05/2022
+	5
+	
+
+	Delete Edit
+	Physics C: Mechanics
+	05/2023
+	4
+	
+
+	Delete Edit
+	Statistics
+	05/2023
+	5
+	
+
+	Delete Edit
+	U.S. History
+	05/2023
+	5
+	
+
+	Delete Edit
+	World History: Modern (formerly World History)
+	05/2022

@@ -3,7 +3,7 @@ list_raw_docs.py
 
 Purpose:
 This script lists all Google Docs files that are DIRECTLY located under
-the specified `raw_data` folder in Google Drive.
+the specified `raw_curated` folder in Google Drive.
 
 Important notes:
 - This script does NOT export or download any files.
@@ -28,7 +28,7 @@ from googleapiclient.discovery import build
 # ====== CONFIG ======
 # TODO: Change this to your own path
 KEY_PATH = r"C:\Users\USER\Desktop\key\essay-project-key.json"
-RAW_FOLDER_ID = "1RDLXJNR8Ol4uwmTE2yyym6mevdC84Xnr"
+RAW_FOLDER_ID = "1-_zkDQMHxtNVeIQsXsKTa6NYgNqEF8qO"
 
 SCOPES = ["https://www.googleapis.com/auth/drive.readonly"]
 DOC_MIME = "application/vnd.google-apps.document"

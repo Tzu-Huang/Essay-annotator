@@ -2,16 +2,12 @@
 export_docs_to_txt.py
 
 Purpose:
-This script exports Google Docs essays from Google Drive into local `.txt` files
-using the Google Drive API and a Service Account.
-
-It is the core data ingestion step of the project.
+This program export Google doc or word docx to txt file
 
 What this script does:
 1. Connects to Google Drive via a Service Account.
-2. Scans folders under the designated `raw_data` directory.
-3. Identifies Google Docs files (cloud-native documents).
-4. Exports each Google Doc as plain text (`.txt`).
+2. Scans folders under the designated `raw_curated` directory.
+4. Exports each Google Doc or docx file as plain text (`.txt`).
 5. Tracks exported files using Google Drive file IDs to avoid duplicates.
 
 What this script does NOT do:
@@ -40,21 +36,29 @@ from googleapiclient.discovery import build
 # ====== CONFIG ======
 #TODO: change this to your own path
 KEY_PATH = r"C:\Users\USER\Desktop\key\essay-project-key.json"
-RAW_FOLDER_ID = "1RDLXJNR8Ol4uwmTE2yyym6mevdC84Xnr"
+RAW_FOLDER_ID = "1-_zkDQMHxtNVeIQsXsKTa6NYgNqEF8qO"
 
 SCOPES = ["https://www.googleapis.com/auth/drive.readonly"]
-DOC_MIME = "application/vnd.google-apps.document"
+# File Type. Current: Google Docs
 
-OUT_DIR = Path("data/raw_text")
+DOC_MIME = "application/vnd.google-apps.document"
+DOCX_MIME = "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+ALLOWED_MIME_TYPE = {DOCX_MIME, DOC_MIME}
+
+OUT_DIR = Path("data/raw_curated")
 STATE_FILE = Path("data/processed/exported_ids.json")
 # ====================
 
-
 def load_state():
+    """
+    Load the state file that tracks exported Google Drive file IDs.
+
+    Returns:
+        dict: Mapping of file_id -> metadata for already-exported documents.
+    """
     if STATE_FILE.exists():
         return json.loads(STATE_FILE.read_text(encoding="utf-8"))
     return {}
-
 
 def save_state(state):
     STATE_FILE.parent.mkdir(parents=True, exist_ok=True)
@@ -64,83 +68,114 @@ def save_state(state):
     )
 
 
-def list_subfolders(service, parent_id):
-    query = f"'{parent_id}' in parents and mimeType = 'application/vnd.google-apps.folder' and trashed = false"
+# def list_subfolders(service, parent_id):
+#     query = f"'{parent_id}' in parents and mimeType = 'application/vnd.google-apps.folder' and trashed = false"
+#     results = service.files().list(
+#         q=query,
+#         fields="files(id, name)"
+#     ).execute()
+#     return results.get("files", [])
+
+def list_all_files_in_folder(service, folder_id):
+    query = f"'{folder_id}' in parents and trashed = false"
     results = service.files().list(
         q=query,
-        fields="files(id, name)"
+        fields="files(id, name, mimeType)"
     ).execute()
+
+    # Return nothing if the folder is empty
     return results.get("files", [])
 
-
-def list_docs_in_folder(service, folder_id):
-    query = (
-        f"'{folder_id}' in parents "
-        f"and mimeType = '{DOC_MIME}' "
-        f"and trashed = false"
-    )
-    results = service.files().list(
-        q=query,
-        fields="files(id, name)"
-    ).execute()
-    return results.get("files", [])
-
+# def list_docs_in_folder(service, folder_id):
+#     query = (
+#         f"'{folder_id}' in parents "
+#         f"and mimeType = '{DOC_MIME}' "
+#         f"and trashed = false"
+#     )
+#     results = service.files().list(
+#         q=query,
+#         fields="files(id, name)"
+#     ).execute()
+#     return results.get("files", [])
 
 def main():
     creds = service_account.Credentials.from_service_account_file(
         KEY_PATH, scopes=SCOPES
     )
+
+    # Build Google Drive API client
     service = build("drive", "v3", credentials=creds)
 
+    # Load previously exported file IDs
     state = load_state()
     OUT_DIR.mkdir(parents=True, exist_ok=True)
 
-    subfolders = list_subfolders(service, RAW_FOLDER_ID)
+    print("\nScanning...")
 
-    if not subfolders:
-        print("No subfolders found under raw_data.")
+    # List all files in the folder
+    files = list_all_files_in_folder(service, RAW_FOLDER_ID)
+
+    if not files:
+        print("No files found")
         return
 
     exported_count = 0
+    skipped_count = 0
 
-    for folder in subfolders:
-        folder_name = folder["name"]
-        folder_id = folder["id"]
+    for f in files:
+        file_id = f["id"]
+        name = f["name"]
+        mime = f["mimeType"]
 
-        print(f"\nScanning folder: {folder_name}")
+        # Skip files that have already been processed
+        if file_id in state:
+            continue
+        
+        print(f" Exporting Google Doc:  {name}")
 
-        docs = list_docs_in_folder(service, folder_id)
-
-        for f in docs:
-            file_id = f["id"]
-            name = f["name"]
-
-            if file_id in state:
-                continue
-
-            print(f"  Exporting: {name}")
-
+        # Case 1: Google Docs -> export to txt
+        if mime == DOC_MIME:
+            # Export Google Doc as plain text
             request = service.files().export(
                 fileId=file_id,
                 mimeType="text/plain"
             )
             content = request.execute().decode("utf-8")
 
-            safe_name = "".join(c for c in name if c.isalnum() or c in " _-").strip()
-            out_path = OUT_DIR / f"{safe_name}.txt"
-            out_path.write_text(content, encoding="utf-8")
+        # Case 2: .docx -> download bytes
+        elif mime == DOCX_MIME:
 
-            state[file_id] = {
-                "name": name,
-                "source_folder": folder_name,
-                "exported_at": datetime.utcnow().isoformat(),
-                "output": str(out_path)
-            }
-            exported_count += 1
+            # Download the actual content
+            request = service.files().get_media(fileId=file_id)
+            docx_bytes = request.execute()
 
-    save_state(state)
-    print(f"\nExported {exported_count} new documents.")
+            # Convert docx - > text
+            from io import BytesIO
+            import docx 
+            doc = docx.Document(BytesIO(docx_bytes))
+            content = "\n".join(p.text for p in doc.paragraphs) 
 
+        else:
+            skipped_count += 1
+            print(f"unspport type {name}")
+            continue
+
+        # Save as .txt (same as your existing code)
+        safe_name = "".join(c for c in name if c.isalnum() or c in " _-").strip()
+        out_path = OUT_DIR / f"{safe_name}.txt"
+        out_path.write_text(content, encoding="utf-8")
+
+        state[file_id] = {
+            "name": name,
+            "source_folder": "raw_curated",
+            "mimeType": mime,
+            "exported_at": datetime.utcnow().isoformat(),
+            "output": str(out_path)
+        }
+        exported_count += 1
+
+        print(f"\nExported {exported_count} Google Docs and google docx.")
+        print(f"Skipped {skipped_count} non-Google-Docs files.")
 
 if __name__ == "__main__":
     main()

@@ -1,0 +1,4 @@
+﻿Briefly discuss your reasons for pursuing the major you have selected
+
+
+My concerns about privacy arose in grade six when I discovered my school could view my laptop's activity history. Not only did I circumvent this by dual-booting Ubuntu, but I also convinced the IT department to let students use their own laptops in school. Later, reflecting on my experience making web applications, I noticed that few coding documentations taught security practices. This propelled me to conduct research last summer with cybersecurity professor Dr. Hanan Hibshi on XSS defenses. Having strong opinions about making online data more private and secure, I hope to gain relevant knowledge in Purdue's Security Track.

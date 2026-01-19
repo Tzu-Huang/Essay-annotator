@@ -59,29 +59,9 @@ Search / Analysis / AI Feedback
 - Established file ID–based tracking to support incremental, non-duplicative exports
 - Confirmed Google Drive as the canonical source of truth
 
-### 4. Data Issues Identified & Documented
-- Confirmed that the majority of essays are **Google Docs**, not physical files
-- Verified that Google Docs cannot be read directly by Python without API-based export
-- Identified that `raw_data` contains:
-  - Deeply nested and inconsistent folder structures
-  - Non-essay documents (drafts, notes, requirements, etc.)
-- All constraints, issues, and design decisions are documented in `DATA_NOTES.md`
-
----
-
-## ⚠️ Current Limitation (Intentional)
-
-At this stage:
-- Essay content is **not yet fully processed**
-- Automated recursive export is intentionally paused
-- JSON conversion, NLP, and AI analysis are **deliberately not started**
-
-**This is not a bug.**
-
-The limitation is due to:
-- Google Docs being cloud-native objects
-- High variability and noise in raw data folder structure
-- The decision to prioritize data quality over premature automation
+### 4. File Type Handling
+- Identified and handled multiple Drive file types
+- Exported both **Google Docs** and **Word docx** to txt files
 
 ---
 
@@ -107,22 +87,6 @@ Steps:
    - Semantic search
    - Rubric-based and AI-assisted analysis
 
----
-
-## 👥 Team Structure (Tentative)
-
-- **Project Lead**  
-  System design, data pipeline architecture, AI analysis strategy
-
-- **Data Engineer**  
-  Google Drive API integration, export logic, data ingestion reliability
-
-- **NLP Engineer**  
-  Essay schema design, tagging, embeddings, structure analysis
-
-- **Frontend / UX**  
-  Search interface, visualization, and user-facing demo
-  
 ---
 
 ## 📌 Status Summary (TL;DR)

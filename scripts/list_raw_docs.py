@@ -27,7 +27,7 @@ from googleapiclient.discovery import build
 
 # ====== CONFIG ======
 # TODO: Change this to your own path
-KEY_PATH = r"C:\Users\USER\Desktop\key\essay-project-key.json"
+KEY_PATH = r"C:\Users\USER\Desktop\key\essay-project-key.json" #Zack's API key
 RAW_FOLDER_ID = "1-_zkDQMHxtNVeIQsXsKTa6NYgNqEF8qO"
 
 SCOPES = ["https://www.googleapis.com/auth/drive.readonly"]

@@ -1,4 +1,4 @@
-# EssayLens (Working Title)
+# Essay-Annotator
 
 EssayLens is a data-driven platform designed to help students learn how to write effective U.S. college application essays by analyzing real examples and providing structural, non-ghostwriting feedback.
 

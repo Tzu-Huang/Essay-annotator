@@ -1,0 +1,9 @@
+The Stanford community is deeply curious and driven to learn in and out of the classroom. Reflect on an idea or experience that makes you genuinely excited about learning.
+
+I love cracking life’s hidden codes. Whether it’s hunting for the optimal badminton footwork or analyzing how street lights time their cycles, I found joy in uncovering the formulas that govern the world around me.  
+
+Human language, though, was a wilder puzzle I encountered. Could machines truly understand meaning? Is there even a formula? Hungry for answers, I delved into research studies and YouTube videos. There, I discovered how words like tokenizer and embedding matrix weren’t simply buzzwords. Each played a crucial role in teaching models to separate a 19th-century king from a chess king.
+
+Now, at Academia Sinica, I apply my new insights into building translation models for endangered languages. Specifically, I design custom tokenizers that enable translation models to split and process Austronesian languages more easily. Because of the languages’ endangered nature and scarce data, I also turned to specialized algorithms like Direct Preference Optimization, a form of reinforcement learning that lets machines discover their own ways of structuring translation through trial-and-error. To further improve precision, I designed frameworks that combined dictionary searches and grammar-rule prompts. 
+
+Watching my model outperform past benchmarks, I couldn’t contain my excitement. It never fails to amaze me how languages, nuanced and delicately chaotic, can be translated and deciphered by structured machines. The formulas that I once chased had become a way for me to contribute towards preservation, keeping cultures alive! At Stanford, I’ll continue this pursuit, creating systems that safeguard endangered languages while advancing the technology that makes it happen.

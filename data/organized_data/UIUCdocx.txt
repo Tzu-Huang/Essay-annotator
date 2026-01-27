@@ -1,0 +1,10 @@
+Explain, in detail, an experience you've had in the past 3 to 4 years related to your first-choice major. This can be an experience from an extracurricular activity, in a class you've taken, or through something else.
+
+Joining the Aspiring Scholars Directed Research Program gave me a chance to work with a PhD advisor specializing in lipid studies to achieve biosensing, as we aimed to address early diagnosis and detection of infected cells for diseases. Utilizing the diffusion model we made, we allowed the fluorescein solution to diffuse through a semi-permeable lipid-coated paper. Then, we used the fluorescein plate reader to identify the number of fluorescence molecules that passed through the lipid-coated paper; the lower, the better. Moreover, as a group leader, I mentored new members on lab techniques and safety guidelines while advocating the importance of biosensing.
+
+Our findings showed that based on the molecules the biosensing model detects, biosensing can be applied to finding and devising new personalized medicine. Intrigued by biosensing’s profound application and biology’s intricacies, I was inspired to pursue biology at UIUC. 
+
+
+
+
+

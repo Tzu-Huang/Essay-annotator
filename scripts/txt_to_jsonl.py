@@ -14,7 +14,7 @@ How to use:
 import os
 import json
 
-INPUT_DIR = "data/raw_curated"
+INPUT_DIR = "data/organized_data"
 OUTPUT_FILE = "data/essays_json/essays.json"
 
 os.makedirs(os.path.dirname(OUTPUT_FILE), exist_ok=True)

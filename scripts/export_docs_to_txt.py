@@ -48,7 +48,7 @@ ALLOWED_MIME_TYPE = {DOCX_MIME, DOC_MIME}
 
 OUT_DIR = Path("data/organized_data")
 
-STATE_DIR = Path("data/processed")
+STATE_DIR = Path("data/processed襖")
 STATE_PREFIX = "exported_ids_part_"
 STATE_GLOB = f"{STATE_PREFIX}*.json"
 

@@ -27,6 +27,7 @@ Expected output:
 """
 
 import json
+import re
 from pathlib import Path
 from datetime import datetime
 
@@ -46,136 +47,190 @@ DOCX_MIME = "application/vnd.openxmlformats-officedocument.wordprocessingml.docu
 ALLOWED_MIME_TYPE = {DOCX_MIME, DOC_MIME}
 
 OUT_DIR = Path("data/organized_data")
-STATE_FILE = Path("data/processed/exported_ids.json")
+
+STATE_DIR = Path("data/processed")
+STATE_PREFIX = "exported_ids_part_"
+STATE_GLOB = f"{STATE_PREFIX}*.json"
+
+PAGE_SIZE = 100
+#OUT_DIR = Path("data/organized_data")
+#STATE_FILE = Path("data/processed/exported_ids.json")
 # ====================
 
-def load_state():
-    """
-    Load the state file that tracks exported Google Drive file IDs.
 
+def sanitize_filename(name: str) -> str:
+    # Keep letters/numbers/space/_/-
+    safe = "".join(c for c in name if c.isalnum() or c in " _-").strip()
+    # Avoid empty filenames
+    return safe if safe else "untitled"
+
+
+def state_file_for_batch(batch_idx: int) -> Path:
+    return STATE_DIR / f"{STATE_PREFIX}{batch_idx:03d}.json"
+
+
+def load_all_processed_ids() -> set[str]:
+    """
+    Load all processed file IDs from existing state part files.
     Returns:
-        dict: Mapping of file_id -> metadata for already-exported documents.
+        set of file_ids already processed.
     """
-    if STATE_FILE.exists():
-        return json.loads(STATE_FILE.read_text(encoding="utf-8"))
-    return {}
+    processed = set()
+    if not STATE_DIR.exists():
+        return processed
 
-def save_state(state):
-    STATE_FILE.parent.mkdir(parents=True, exist_ok=True)
-    STATE_FILE.write_text(
-        json.dumps(state, indent=2, ensure_ascii=False),
-        encoding="utf-8"
-    )
+    for p in sorted(STATE_DIR.glob(STATE_GLOB)):
+        try:
+            data = json.loads(p.read_text(encoding="utf-8"))
+            if isinstance(data, dict):
+                processed.update(data.keys())
+        except Exception:
+            # If a state file is corrupted, skip it (but you might want to inspect it)
+            continue
+    return processed
 
 
-# def list_subfolders(service, parent_id):
-#     query = f"'{parent_id}' in parents and mimeType = 'application/vnd.google-apps.folder' and trashed = false"
-#     results = service.files().list(
-#         q=query,
-#         fields="files(id, name)"
-#     ).execute()
-#     return results.get("files", [])
+def next_batch_index() -> int:
+    """
+    Find the next available batch index based on existing part files.
+    """
+    if not STATE_DIR.exists():
+        return 1
+    max_idx = 0
+    pattern = re.compile(rf"^{re.escape(STATE_PREFIX)}(\d+)\.json$")
+    for p in STATE_DIR.glob(STATE_GLOB):
+        m = pattern.match(p.name)
+        if m:
+            try:
+                max_idx = max(max_idx, int(m.group(1)))
+            except ValueError:
+                pass
+    return max_idx + 1
 
-def list_all_files_in_folder(service, folder_id):
-    query = f"'{folder_id}' in parents and trashed = false"
-    results = service.files().list(
-        q=query,
-        fields="files(id, name, mimeType)"
-    ).execute()
 
-    # Return nothing if the folder is empty
-    return results.get("files", [])
+def export_google_doc_to_text(service, file_id: str) -> str:
+    request = service.files().export(fileId=file_id, mimeType="text/plain")
+    return request.execute().decode("utf-8")
 
-# def list_docs_in_folder(service, folder_id):
-#     query = (
-#         f"'{folder_id}' in parents "
-#         f"and mimeType = '{DOC_MIME}' "
-#         f"and trashed = false"
-#     )
-#     results = service.files().list(
-#         q=query,
-#         fields="files(id, name)"
-#     ).execute()
-#     return results.get("files", [])
+
+def export_docx_to_text(service, file_id: str) -> str:
+    request = service.files().get_media(fileId=file_id)
+    docx_bytes = request.execute()
+
+    from io import BytesIO
+    import docx
+    doc = docx.Document(BytesIO(docx_bytes))
+    return "\n".join(p.text for p in doc.paragraphs)
+
 
 def main():
-    creds = service_account.Credentials.from_service_account_file(
-        KEY_PATH, scopes=SCOPES
-    )
-
-    # Build Google Drive API client
+    creds = service_account.Credentials.from_service_account_file(KEY_PATH, scopes=SCOPES)
     service = build("drive", "v3", credentials=creds)
 
-    # Load previously exported file IDs
-    state = load_state()
     OUT_DIR.mkdir(parents=True, exist_ok=True)
+    STATE_DIR.mkdir(parents=True, exist_ok=True)
+
+    processed_ids = load_all_processed_ids()
+    batch_idx = next_batch_index()
 
     print("\nScanning...")
 
-    # List all files in the folder
-    files = list_all_files_in_folder(service, RAW_FOLDER_ID)
+    page_token = None
+    total_seen = 0
+    total_exported = 0
+    total_skipped_unupported = 0
+    total_skipped_processed = 0
+    pages_processed = 0
 
-    if not files:
-        print("No files found")
-        return
+    while True:
+        results = service.files().list(
+            q=f"'{RAW_FOLDER_ID}' in parents and trashed = false",
+            fields="nextPageToken, files(id, name, mimeType)",
+            pageSize=PAGE_SIZE,
+            pageToken=page_token
+        ).execute()
 
-    exported_count = 0
-    skipped_count = 0
+        files = results.get("files", [])
+        page_token = results.get("nextPageToken")
 
-    for f in files:
-        file_id = f["id"]
-        name = f["name"]
-        mime = f["mimeType"]
+        if not files:
+            if pages_processed == 0:
+                print("No files found")
+            break
 
-        # Skip files that have already been processed
-        if file_id in state:
-            continue
-        
-        print(f" Exporting Google Doc:  {name}")
+        pages_processed += 1
+        total_seen += len(files)
 
-        # Case 1: Google Docs -> export to txt
-        if mime == DOC_MIME:
-            # Export Google Doc as plain text
-            request = service.files().export(
-                fileId=file_id,
-                mimeType="text/plain"
-            )
-            content = request.execute().decode("utf-8")
+        # NEW: state per page (100)
+        current_batch_state = {}
 
-        # Case 2: .docx -> download bytes
-        elif mime == DOCX_MIME:
+        print(f"\n--- Page {pages_processed} (up to {PAGE_SIZE} files) ---")
 
-            # Download the actual content
-            request = service.files().get_media(fileId=file_id)
-            docx_bytes = request.execute()
+        for f in files:
+            file_id = f.get("id")
+            name = f.get("name", "untitled")
+            mime = f.get("mimeType", "")
 
-            # Convert docx - > text
-            from io import BytesIO
-            import docx 
-            doc = docx.Document(BytesIO(docx_bytes))
-            content = "\n".join(p.text for p in doc.paragraphs) 
+            # Skip already processed
+            if file_id in processed_ids:
+                total_skipped_processed += 1
+                continue
 
-        else:
-            skipped_count += 1
-            print(f"unspport type {name}")
-            continue
+            if mime not in ALLOWED_MIME_TYPE:
+                total_skipped_unupported += 1
+                # still record? usually no. We'll not record unsupported.
+                continue
 
-        # Save as .txt (same as your existing code)
-        safe_name = "".join(c for c in name if c.isalnum() or c in " _-").strip()
-        out_path = OUT_DIR / f"{safe_name}.txt"
-        out_path.write_text(content, encoding="utf-8")
+            print(f" Exporting: {name}")
 
-        state[file_id] = {
-            "name": name,
-            "source_folder": "raw_curated",
-            "mimeType": mime,
-            "exported_at": datetime.utcnow().isoformat(),
-            "output": str(out_path)
-        }
-        exported_count += 1
+            try:
+                if mime == DOC_MIME:
+                    content = export_google_doc_to_text(service, file_id)
+                else:  # DOCX_MIME
+                    content = export_docx_to_text(service, file_id)
+            except Exception as e:
+                # If export fails, don't mark as processed; just show error and continue
+                print(f"  [ERROR] Failed to export {name}: {e}")
+                continue
 
-        print(f"\nExported {exported_count} Google Docs and google docx.")
-        print(f"Skipped {skipped_count} non-Google-Docs files.")
+            safe_name = sanitize_filename(name)
+            out_path = OUT_DIR / f"{safe_name}.txt"
+            out_path.write_text(content, encoding="utf-8")
+
+            current_batch_state[file_id] = {
+                "name": name,
+                "source_folder": "raw_curated",
+                "mimeType": mime,
+                "exported_at": datetime.utcnow().isoformat(),
+                "output": str(out_path)
+            }
+
+            processed_ids.add(file_id)
+            total_exported += 1
+
+        # Save this page's state as its own json file
+        state_path = state_file_for_batch(batch_idx)
+        state_path.write_text(
+            json.dumps(current_batch_state, indent=2, ensure_ascii=False),
+            encoding="utf-8"
+        )
+
+        print(f"Saved state: {state_path} (records: {len(current_batch_state)})")
+        batch_idx += 1
+
+        # If no more pages, stop
+        if not page_token:
+            break
+
+    print("\n===== Summary =====")
+    print(f"Pages processed: {pages_processed}")
+    print(f"Total files seen (listed): {total_seen}")
+    print(f"Exported (new): {total_exported}")
+    print(f"Skipped (already processed): {total_skipped_processed}")
+    print(f"Skipped (unsupported mimeType): {total_skipped_unupported}")
+    print(f"TXT output dir: {OUT_DIR}")
+    print(f"State dir: {STATE_DIR}")
+
 
 if __name__ == "__main__":
     main()

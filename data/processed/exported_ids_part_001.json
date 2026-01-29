@@ -1,0 +1,702 @@
+{
+  "1u2IoSzSXZ9yz1iHyB6ut8rX_JpZky9xi": {
+    "name": "Virginia Tech-1.docx",
+    "source_folder": "raw_curated",
+    "mimeType": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+    "exported_at": "2026-01-29T05:26:22.483880",
+    "output": "data\\organized_data\\Virginia Tech-1docx.txt"
+  },
+  "1YEJ0ufTD3l8mfsAIOBWbqKatrrsdgZA5": {
+    "name": "UW Madisons- 2.docx",
+    "source_folder": "raw_curated",
+    "mimeType": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+    "exported_at": "2026-01-29T05:26:23.104312",
+    "output": "data\\organized_data\\UW Madisons- 2docx.txt"
+  },
+  "1P3sNVJjBzkgqfNv8dYIV8afrubFd1bRY": {
+    "name": "UW Seattle -1.docx",
+    "source_folder": "raw_curated",
+    "mimeType": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+    "exported_at": "2026-01-29T05:26:23.637892",
+    "output": "data\\organized_data\\UW Seattle -1docx.txt"
+  },
+  "1bgJ-XeRDF5Ca7zYde6iujvFw1uX7YR9k": {
+    "name": "UC - 1.docx",
+    "source_folder": "raw_curated",
+    "mimeType": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+    "exported_at": "2026-01-29T05:26:24.220373",
+    "output": "data\\organized_data\\UC - 1docx.txt"
+  },
+  "1Bqti4HZITL2O-zHiR3KPtigDGfGntUSFgB1w6bd3jIo": {
+    "name": "UC - 2",
+    "source_folder": "raw_curated",
+    "mimeType": "application/vnd.google-apps.document",
+    "exported_at": "2026-01-29T05:26:25.126134",
+    "output": "data\\organized_data\\UC - 2.txt"
+  },
+  "1eU_iJ9posp1rSpZaIKpBrweKpyBwdQiEW49AUv4QyTo": {
+    "name": "UC - 4",
+    "source_folder": "raw_curated",
+    "mimeType": "application/vnd.google-apps.document",
+    "exported_at": "2026-01-29T05:26:25.919248",
+    "output": "data\\organized_data\\UC - 4.txt"
+  },
+  "1XbiEofbKc221L-fybXj4IscdJGyn4zYVW_EJnF3y3kY": {
+    "name": "UC - 5",
+    "source_folder": "raw_curated",
+    "mimeType": "application/vnd.google-apps.document",
+    "exported_at": "2026-01-29T05:26:26.757981",
+    "output": "data\\organized_data\\UC - 5.txt"
+  },
+  "1nx9rqKM1xOrPzK-WMfq4tO6mr0U_ID24": {
+    "name": "The Stanford.docx",
+    "source_folder": "raw_curated",
+    "mimeType": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+    "exported_at": "2026-01-29T05:26:27.545449",
+    "output": "data\\organized_data\\The Stanforddocx.txt"
+  },
+  "1VYqEJts7adtADEy7mNwRk_8wIPvxpyN2": {
+    "name": "Stanford-1.docx",
+    "source_folder": "raw_curated",
+    "mimeType": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+    "exported_at": "2026-01-29T05:26:28.342660",
+    "output": "data\\organized_data\\Stanford-1docx.txt"
+  },
+  "1ExmMVkh5dqdevJbKtekf33i776wrA0MZ": {
+    "name": "Santa Clara-1.docx",
+    "source_folder": "raw_curated",
+    "mimeType": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+    "exported_at": "2026-01-29T05:26:28.993576",
+    "output": "data\\organized_data\\Santa Clara-1docx.txt"
+  },
+  "1fpV1uDF01knly3H2aynUCpuKRZ2oppLt": {
+    "name": "UW Madison 2.docx",
+    "source_folder": "raw_curated",
+    "mimeType": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+    "exported_at": "2026-01-29T05:26:29.993240",
+    "output": "data\\organized_data\\UW Madison 2docx.txt"
+  },
+  "1oTwAvyTUct76gaP4l8MH42KRt2zYgSI3": {
+    "name": "University of Maryland Supplemental Essay.docx",
+    "source_folder": "raw_curated",
+    "mimeType": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+    "exported_at": "2026-01-29T05:26:30.396840",
+    "output": "data\\organized_data\\University of Maryland Supplemental Essaydocx.txt"
+  },
+  "1Xy6TQjhVEmsm4mB-KGjJpO5VCdohf9aA": {
+    "name": "UIUC 3.docx",
+    "source_folder": "raw_curated",
+    "mimeType": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+    "exported_at": "2026-01-29T05:26:30.869197",
+    "output": "data\\organized_data\\UIUC 3docx.txt"
+  },
+  "1NaxyEBfYbk3FhjmrP9dHScW0HaS7p2vo": {
+    "name": "UIUC 2.docx",
+    "source_folder": "raw_curated",
+    "mimeType": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+    "exported_at": "2026-01-29T05:26:31.365253",
+    "output": "data\\organized_data\\UIUC 2docx.txt"
+  },
+  "1J482SSrYktfP9_p62mM-I8miUsgQfvsF": {
+    "name": "UC 3.docx",
+    "source_folder": "raw_curated",
+    "mimeType": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+    "exported_at": "2026-01-29T05:26:31.826986",
+    "output": "data\\organized_data\\UC 3docx.txt"
+  },
+  "1ub3CmB6EvRA6KO_zCnRW7DC9-VSYofdJeuItSZhCSSM": {
+    "name": "UC-Supple",
+    "source_folder": "raw_curated",
+    "mimeType": "application/vnd.google-apps.document",
+    "exported_at": "2026-01-29T05:26:34.250832",
+    "output": "data\\organized_data\\UC-Supple.txt"
+  },
+  "1ZK7rXEsJ1Z2yci8_H3g7Cab-G7z9nONb": {
+    "name": "Stanford_Short Answer.docx",
+    "source_folder": "raw_curated",
+    "mimeType": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+    "exported_at": "2026-01-29T05:26:34.878220",
+    "output": "data\\organized_data\\Stanford_Short Answerdocx.txt"
+  },
+  "15kXbSzVh9_VjWZv-gch5MuW31JQbrm6v": {
+    "name": "Purdue 1.docx",
+    "source_folder": "raw_curated",
+    "mimeType": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+    "exported_at": "2026-01-29T05:26:35.344478",
+    "output": "data\\organized_data\\Purdue 1docx.txt"
+  },
+  "13YJwf4Qcdn4_t4-QItsy_tIY5w8-F6NM": {
+    "name": "purdue 3.docx",
+    "source_folder": "raw_curated",
+    "mimeType": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+    "exported_at": "2026-01-29T05:26:35.783199",
+    "output": "data\\organized_data\\purdue 3docx.txt"
+  },
+  "10dhFdgBmg4y0ZAqY5aWUm_BSdT9DTCKw": {
+    "name": "Purdue 2.docx",
+    "source_folder": "raw_curated",
+    "mimeType": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+    "exported_at": "2026-01-29T05:26:36.386914",
+    "output": "data\\organized_data\\Purdue 2docx.txt"
+  },
+  "14Tmf5lcokEk_dMLpTQaMCnnb-_wauqKE": {
+    "name": "Common app 11.docx",
+    "source_folder": "raw_curated",
+    "mimeType": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+    "exported_at": "2026-01-29T05:26:36.811798",
+    "output": "data\\organized_data\\Common app 11docx.txt"
+  },
+  "1F9t__96_5uDIiVjir3GeSH4NLFk7pueo": {
+    "name": "OSU.docx",
+    "source_folder": "raw_curated",
+    "mimeType": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+    "exported_at": "2026-01-29T05:26:37.458597",
+    "output": "data\\organized_data\\OSUdocx.txt"
+  },
+  "1NSLxP0kz6lPsVxrcmK_xVxH-2dYvM7p7": {
+    "name": "Emory 1.docx",
+    "source_folder": "raw_curated",
+    "mimeType": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+    "exported_at": "2026-01-29T05:26:38.119813",
+    "output": "data\\organized_data\\Emory 1docx.txt"
+  },
+  "17c_uTHZXrBDxjo-MFa87_oiYmRZN43SR": {
+    "name": "Additional Info Essay.docx",
+    "source_folder": "raw_curated",
+    "mimeType": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+    "exported_at": "2026-01-29T05:26:38.598933",
+    "output": "data\\organized_data\\Additional Info Essaydocx.txt"
+  },
+  "1s_tRmSf0oL1HDDIwHG_wRmcZGwNF33ap": {
+    "name": "Common app 10.docx",
+    "source_folder": "raw_curated",
+    "mimeType": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+    "exported_at": "2026-01-29T05:26:39.081198",
+    "output": "data\\organized_data\\Common app 10docx.txt"
+  },
+  "1JUY-vSX_Brt7_TEh_ZRJ2bj7IwuCsfst": {
+    "name": "Common app 9.docx",
+    "source_folder": "raw_curated",
+    "mimeType": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+    "exported_at": "2026-01-29T05:26:40.710186",
+    "output": "data\\organized_data\\Common app 9docx.txt"
+  },
+  "1JkFS3py2hSmmhMldbgE78VEIsj31eWjO": {
+    "name": "Common app 8.docx",
+    "source_folder": "raw_curated",
+    "mimeType": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+    "exported_at": "2026-01-29T05:26:41.119095",
+    "output": "data\\organized_data\\Common app 8docx.txt"
+  },
+  "1rdnJpumqE4iwIgC_L0dhhuk67VKsq2g0": {
+    "name": "Common App 7.docx",
+    "source_folder": "raw_curated",
+    "mimeType": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+    "exported_at": "2026-01-29T05:26:41.817826",
+    "output": "data\\organized_data\\Common App 7docx.txt"
+  },
+  "1d38VB_zWbL6sWP-Of6GBNaJJVMDnbetx": {
+    "name": "Common App 6.docx",
+    "source_folder": "raw_curated",
+    "mimeType": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+    "exported_at": "2026-01-29T05:26:42.220815",
+    "output": "data\\organized_data\\Common App 6docx.txt"
+  },
+  "1iWG-y1j4d-XEz943SeNPgpUnaimV3D0H": {
+    "name": "Common app 5.docx",
+    "source_folder": "raw_curated",
+    "mimeType": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+    "exported_at": "2026-01-29T05:26:42.700068",
+    "output": "data\\organized_data\\Common app 5docx.txt"
+  },
+  "17XXmeDoyEzGTdip5mdImpzqcuy11hK58": {
+    "name": "Common app 4.docx",
+    "source_folder": "raw_curated",
+    "mimeType": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+    "exported_at": "2026-01-29T05:26:43.270174",
+    "output": "data\\organized_data\\Common app 4docx.txt"
+  },
+  "18MCIuPK7nYkFLOqEshY0IGI72dlgv0da": {
+    "name": "Common App 3.docx",
+    "source_folder": "raw_curated",
+    "mimeType": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+    "exported_at": "2026-01-29T05:26:44.062960",
+    "output": "data\\organized_data\\Common App 3docx.txt"
+  },
+  "1p0DfE_0Qlb__sjDBPYKJBH8OYXpGmHE2": {
+    "name": "Common App 2.docx",
+    "source_folder": "raw_curated",
+    "mimeType": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+    "exported_at": "2026-01-29T05:26:44.623768",
+    "output": "data\\organized_data\\Common App 2docx.txt"
+  },
+  "1TASAvIrQs393vdpWazh1I96klMufK39Y": {
+    "name": "University of Rochester.docx",
+    "source_folder": "raw_curated",
+    "mimeType": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+    "exported_at": "2026-01-29T05:26:45.288837",
+    "output": "data\\organized_data\\University of Rochesterdocx.txt"
+  },
+  "1kwKcZSjnO7jKgBc-YYLULQAdlMC_VHFVX1KiaUxpMzs": {
+    "name": "UMD_SHort",
+    "source_folder": "raw_curated",
+    "mimeType": "application/vnd.google-apps.document",
+    "exported_at": "2026-01-29T05:26:45.851871",
+    "output": "data\\organized_data\\UMD_SHort.txt"
+  },
+  "15i_CP3stTRDKMqKZWuNb_V9q-uvJbYi4QRDHHO9tQgg": {
+    "name": "UMD_S2",
+    "source_folder": "raw_curated",
+    "mimeType": "application/vnd.google-apps.document",
+    "exported_at": "2026-01-29T05:26:47.010339",
+    "output": "data\\organized_data\\UMD_S2.txt"
+  },
+  "1BnOHNo86Pj1-cZJ5xii2Wyl4v8ewY-0FL_jYSjY1A5w": {
+    "name": "UMDSS",
+    "source_folder": "raw_curated",
+    "mimeType": "application/vnd.google-apps.document",
+    "exported_at": "2026-01-29T05:26:47.712570",
+    "output": "data\\organized_data\\UMDSS.txt"
+  },
+  "1hs3doyFOFsMarIJCYAcztCizAwOl5GXTy3uEJu162tA": {
+    "name": "UMD_S",
+    "source_folder": "raw_curated",
+    "mimeType": "application/vnd.google-apps.document",
+    "exported_at": "2026-01-29T05:26:48.360929",
+    "output": "data\\organized_data\\UMD_S.txt"
+  },
+  "1cw7y3Tbh8uONlimOTWTy-YZaHL2HM_Yl2JJ4KCGuP0o": {
+    "name": "UMD",
+    "source_folder": "raw_curated",
+    "mimeType": "application/vnd.google-apps.document",
+    "exported_at": "2026-01-29T05:26:48.996654",
+    "output": "data\\organized_data\\UMD.txt"
+  },
+  "193AdpWplcvT-o44QW2kuTbfOuLxhDQRDs40GHmf_LNA": {
+    "name": "UIUC_SU",
+    "source_folder": "raw_curated",
+    "mimeType": "application/vnd.google-apps.document",
+    "exported_at": "2026-01-29T05:26:49.584971",
+    "output": "data\\organized_data\\UIUC_SU.txt"
+  },
+  "1p1Kpgl6ubYmGyqMMieDjcY0z20gqGldRg0KS8kQyL74": {
+    "name": "UIUC_Supple",
+    "source_folder": "raw_curated",
+    "mimeType": "application/vnd.google-apps.document",
+    "exported_at": "2026-01-29T05:26:50.189049",
+    "output": "data\\organized_data\\UIUC_Supple.txt"
+  },
+  "1lohrOGkQSshS5Nb494lkNlIeDlkxlpEXkz0bQrT-Zvg": {
+    "name": "UIUC_JW",
+    "source_folder": "raw_curated",
+    "mimeType": "application/vnd.google-apps.document",
+    "exported_at": "2026-01-29T05:26:50.745547",
+    "output": "data\\organized_data\\UIUC_JW.txt"
+  },
+  "1kaOLng7KExmQIIMY9wNS1T05WXt4lXxZ": {
+    "name": "UIUC Supplemental Essays.docx",
+    "source_folder": "raw_curated",
+    "mimeType": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+    "exported_at": "2026-01-29T05:26:51.363059",
+    "output": "data\\organized_data\\UIUC Supplemental Essaysdocx.txt"
+  },
+  "1HhzeUrblg6t3VnBpbln0uHGb6A6lTmBvXNWnaNw1ft4": {
+    "name": "UIUC -J",
+    "source_folder": "raw_curated",
+    "mimeType": "application/vnd.google-apps.document",
+    "exported_at": "2026-01-29T05:26:52.040017",
+    "output": "data\\organized_data\\UIUC -J.txt"
+  },
+  "1t7q3M9kjUHI9e4O8JPhZS6zhoyJm2p9J7MqzyMgC1s4": {
+    "name": "UIIUC",
+    "source_folder": "raw_curated",
+    "mimeType": "application/vnd.google-apps.document",
+    "exported_at": "2026-01-29T05:26:52.650915",
+    "output": "data\\organized_data\\UIIUC.txt"
+  },
+  "18gUe2rjp6zTT_zTbiGPRVAsLfISqcGWG": {
+    "name": "UW Essay.docx",
+    "source_folder": "raw_curated",
+    "mimeType": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+    "exported_at": "2026-01-29T05:26:53.365869",
+    "output": "data\\organized_data\\UW Essaydocx.txt"
+  },
+  "1z4VKB6BJSkHkkZFqYzA_ygbR6v7Ibh1kK13ogQ5nB7s": {
+    "name": "UW_E",
+    "source_folder": "raw_curated",
+    "mimeType": "application/vnd.google-apps.document",
+    "exported_at": "2026-01-29T05:26:54.225818",
+    "output": "data\\organized_data\\UW_E.txt"
+  },
+  "1VIhJTwoW9DOlgbEO2sMj0M7xMoHUpFHE": {
+    "name": "Wisconsin Supplemental Essay.docx .docx",
+    "source_folder": "raw_curated",
+    "mimeType": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+    "exported_at": "2026-01-29T05:26:54.670908",
+    "output": "data\\organized_data\\Wisconsin Supplemental Essaydocx docx.txt"
+  },
+  "1FKOufzuV0yqUdR1FWYSuph1fxikhL6Rt": {
+    "name": "WIsconsin-Madison.docx .docx",
+    "source_folder": "raw_curated",
+    "mimeType": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+    "exported_at": "2026-01-29T05:26:55.576943",
+    "output": "data\\organized_data\\WIsconsin-Madisondocx docx.txt"
+  },
+  "1CCDwHnzUY0NRMgiILyNAbPtHOQMtlilc": {
+    "name": "BU_S.docx",
+    "source_folder": "raw_curated",
+    "mimeType": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+    "exported_at": "2026-01-29T05:26:56.095535",
+    "output": "data\\organized_data\\BU_Sdocx.txt"
+  },
+  "1YehVi0Y9pWqKcUHjH7cbKj5PjWHRJcIj_A3m2RG4txs": {
+    "name": "Stanford_ss",
+    "source_folder": "raw_curated",
+    "mimeType": "application/vnd.google-apps.document",
+    "exported_at": "2026-01-29T05:26:56.683310",
+    "output": "data\\organized_data\\Stanford_ss.txt"
+  },
+  "1-hT-CdMYP0e9x7aOnOsVYUCHf0ldxC46igNYPouq1i4": {
+    "name": "stanford_s",
+    "source_folder": "raw_curated",
+    "mimeType": "application/vnd.google-apps.document",
+    "exported_at": "2026-01-29T05:26:57.812313",
+    "output": "data\\organized_data\\stanford_s.txt"
+  },
+  "1L1x6gBz6CXSCP9mmXjw4y0BQRT1IfqcmCka4LxrQ3jQ": {
+    "name": "Santa_c",
+    "source_folder": "raw_curated",
+    "mimeType": "application/vnd.google-apps.document",
+    "exported_at": "2026-01-29T05:26:58.437118",
+    "output": "data\\organized_data\\Santa_c.txt"
+  },
+  "1j4i1HB3V0XKPcZ-w_M3UbNWR0oFueu2R": {
+    "name": "Santa Clara University.docx",
+    "source_folder": "raw_curated",
+    "mimeType": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+    "exported_at": "2026-01-29T05:26:58.874321",
+    "output": "data\\organized_data\\Santa Clara Universitydocx.txt"
+  },
+  "1FEuXImnejhTu6eSkSDLsD819p2Aazxfw-DDAilrXjmk": {
+    "name": "SC",
+    "source_folder": "raw_curated",
+    "mimeType": "application/vnd.google-apps.document",
+    "exported_at": "2026-01-29T05:26:59.618129",
+    "output": "data\\organized_data\\SC.txt"
+  },
+  "18B3ZCxgrawFI9IDcnf-Dq-pvb6kaTBGO": {
+    "name": "Santa Clara Supplementary essay.docx",
+    "source_folder": "raw_curated",
+    "mimeType": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+    "exported_at": "2026-01-29T05:27:00.196169",
+    "output": "data\\organized_data\\Santa Clara Supplementary essaydocx.txt"
+  },
+  "1e943VQHAf20F275F1lSSnSB0piNdKNkV2KUKXyYDR0Y": {
+    "name": "Santa_clara",
+    "source_folder": "raw_curated",
+    "mimeType": "application/vnd.google-apps.document",
+    "exported_at": "2026-01-29T05:27:00.979169",
+    "output": "data\\organized_data\\Santa_clara.txt"
+  },
+  "1p0EMf017L4KB1DQIPJuoWSPT7OSW5afN": {
+    "name": "Rensselaer Supplemental Essay.docx .docx",
+    "source_folder": "raw_curated",
+    "mimeType": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+    "exported_at": "2026-01-29T05:27:01.533210",
+    "output": "data\\organized_data\\Rensselaer Supplemental Essaydocx docx.txt"
+  },
+  "1i6KjHgxUTQHfbUHiNjVHS8n2W6pgEJ3YGjP2ZovlXWo": {
+    "name": "Ren",
+    "source_folder": "raw_curated",
+    "mimeType": "application/vnd.google-apps.document",
+    "exported_at": "2026-01-29T05:27:02.213123",
+    "output": "data\\organized_data\\Ren.txt"
+  },
+  "1BzUmQ6jblgn39aiYummJnXgwh0pIyvQgg7VqE5GSNb0": {
+    "name": "PD",
+    "source_folder": "raw_curated",
+    "mimeType": "application/vnd.google-apps.document",
+    "exported_at": "2026-01-29T05:27:02.873687",
+    "output": "data\\organized_data\\PD.txt"
+  },
+  "1tisV8JDpa3oG1p7jWGmUBUE2imYzZhBc": {
+    "name": "Purdue.docx",
+    "source_folder": "raw_curated",
+    "mimeType": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+    "exported_at": "2026-01-29T05:27:03.285460",
+    "output": "data\\organized_data\\Purduedocx.txt"
+  },
+  "1XcTbblGb1V0xjj4zlUsGcRQyk_lsOi4HENrA8niNeGg": {
+    "name": "Pur",
+    "source_folder": "raw_curated",
+    "mimeType": "application/vnd.google-apps.document",
+    "exported_at": "2026-01-29T05:27:04.125007",
+    "output": "data\\organized_data\\Pur.txt"
+  },
+  "12XHCoZQVQvoTMmFG73bAyW5swyA9i8Y7gaEoGREUfB8": {
+    "name": "Purduee",
+    "source_folder": "raw_curated",
+    "mimeType": "application/vnd.google-apps.document",
+    "exported_at": "2026-01-29T05:27:05.029271",
+    "output": "data\\organized_data\\Purduee.txt"
+  },
+  "1SZSzWARAn5KzsMJbcF_IF1NBXoVDxN1K": {
+    "name": "NW - background (optional).docx",
+    "source_folder": "raw_curated",
+    "mimeType": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+    "exported_at": "2026-01-29T05:27:05.459313",
+    "output": "data\\organized_data\\NW - background optionaldocx.txt"
+  },
+  "1vTSRw62LpZIpPldI_N7jXa_6NM1vHwdrA3grnijgbUA": {
+    "name": "Maryland - S5",
+    "source_folder": "raw_curated",
+    "mimeType": "application/vnd.google-apps.document",
+    "exported_at": "2026-01-29T05:27:06.077278",
+    "output": "data\\organized_data\\Maryland - S5.txt"
+  },
+  "1M_W_gopPPdmtU8kTmJGrlQN8xkHqO1kv": {
+    "name": "Maryland.docx",
+    "source_folder": "raw_curated",
+    "mimeType": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+    "exported_at": "2026-01-29T05:27:06.510010",
+    "output": "data\\organized_data\\Marylanddocx.txt"
+  },
+  "1_tOyXsdMk2FKw_hMCXcaTMunEz6aiRvcCcuaN9zDHUE": {
+    "name": "Maryland - S4",
+    "source_folder": "raw_curated",
+    "mimeType": "application/vnd.google-apps.document",
+    "exported_at": "2026-01-29T05:27:07.131833",
+    "output": "data\\organized_data\\Maryland - S4.txt"
+  },
+  "1FfN0gf_2xPjZYRmFjwtbUOV-ylGcQ-Jlz4iaOWKZJD8": {
+    "name": "Maryland - S3",
+    "source_folder": "raw_curated",
+    "mimeType": "application/vnd.google-apps.document",
+    "exported_at": "2026-01-29T05:27:07.709324",
+    "output": "data\\organized_data\\Maryland - S3.txt"
+  },
+  "1ty4EAROhEc6D_DwYuhF6Mzwk-fIBp6fW7zLnE0cAI7c": {
+    "name": "Maryland - S2",
+    "source_folder": "raw_curated",
+    "mimeType": "application/vnd.google-apps.document",
+    "exported_at": "2026-01-29T05:27:08.302991",
+    "output": "data\\organized_data\\Maryland - S2.txt"
+  },
+  "1xvcmCTQZIeRXJaz-CSo6aOLr2f1iOEqU": {
+    "name": "Jim Wang - UC essays.docx",
+    "source_folder": "raw_curated",
+    "mimeType": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+    "exported_at": "2026-01-29T05:27:09.109406",
+    "output": "data\\organized_data\\Jim Wang - UC essaysdocx.txt"
+  },
+  "1CbSTLAFD5E7w5HnWe2OCjkwXIYqPQXXP8ZiVznHPhU8": {
+    "name": "UC - JW",
+    "source_folder": "raw_curated",
+    "mimeType": "application/vnd.google-apps.document",
+    "exported_at": "2026-01-29T05:27:09.795525",
+    "output": "data\\organized_data\\UC - JW.txt"
+  },
+  "1H1DSBD2WpOZQWPcZtUYCeZagaPBowfYgHdk0rOx3Mks": {
+    "name": "Jim Wang",
+    "source_folder": "raw_curated",
+    "mimeType": "application/vnd.google-apps.document",
+    "exported_at": "2026-01-29T05:27:10.932236",
+    "output": "data\\organized_data\\Jim Wang.txt"
+  },
+  "1v0zu_jx0qv6hoqVnXy6GYcbnKu9vSvnUuQaINdIFTGA": {
+    "name": "UCs - Jim",
+    "source_folder": "raw_curated",
+    "mimeType": "application/vnd.google-apps.document",
+    "exported_at": "2026-01-29T05:27:11.727919",
+    "output": "data\\organized_data\\UCs - Jim.txt"
+  },
+  "1rkoX2FuY4VHsQ_V19x_046AxvvMAnlx9UfBwTNvT0cw": {
+    "name": "UC - Jim",
+    "source_folder": "raw_curated",
+    "mimeType": "application/vnd.google-apps.document",
+    "exported_at": "2026-01-29T05:27:12.360420",
+    "output": "data\\organized_data\\UC - Jim.txt"
+  },
+  "14ieKu9L1Jg1JRokBgfSUFmLA9h4ICyFr": {
+    "name": "Fordham - community prompt.docx",
+    "source_folder": "raw_curated",
+    "mimeType": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+    "exported_at": "2026-01-29T05:27:12.860140",
+    "output": "data\\organized_data\\Fordham - community promptdocx.txt"
+  },
+  "1tKlKJsGCROc3OszRTrmdX1sbqcUYHnG8tBOqTDamaCM": {
+    "name": "Fordhame",
+    "source_folder": "raw_curated",
+    "mimeType": "application/vnd.google-apps.document",
+    "exported_at": "2026-01-29T05:27:13.622142",
+    "output": "data\\organized_data\\Fordhame.txt"
+  },
+  "1v_XL9VyDnPamAggYss7aWtkDko-U6gTBcsalXxywHOA": {
+    "name": "supples",
+    "source_folder": "raw_curated",
+    "mimeType": "application/vnd.google-apps.document",
+    "exported_at": "2026-01-29T05:27:14.299853",
+    "output": "data\\organized_data\\supples.txt"
+  },
+  "1YS3cVrin8bYSHPxENgem_0iTI7D2jDMKZiOEHAqtjVI": {
+    "name": "supple",
+    "source_folder": "raw_curated",
+    "mimeType": "application/vnd.google-apps.document",
+    "exported_at": "2026-01-29T05:27:15.015312",
+    "output": "data\\organized_data\\supple.txt"
+  },
+  "1VwJTd1G-Mw5jJ4dra5UchLbI9Di3llJutqZsDHgKgJc": {
+    "name": "Emory",
+    "source_folder": "raw_curated",
+    "mimeType": "application/vnd.google-apps.document",
+    "exported_at": "2026-01-29T05:27:18.542129",
+    "output": "data\\organized_data\\Emory.txt"
+  },
+  "1BFTzApnNDaWH89jX0ZH3LyiFCXvLXm2K": {
+    "name": "Emory - why academic interests.docx",
+    "source_folder": "raw_curated",
+    "mimeType": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+    "exported_at": "2026-01-29T05:27:18.959516",
+    "output": "data\\organized_data\\Emory - why academic interestsdocx.txt"
+  },
+  "17sz0CFsDe5vt7ve4_mX06ospLUHC7p0r": {
+    "name": "Eden UW Seattle v1.docx",
+    "source_folder": "raw_curated",
+    "mimeType": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+    "exported_at": "2026-01-29T05:27:19.444941",
+    "output": "data\\organized_data\\Eden UW Seattle v1docx.txt"
+  },
+  "1WKTgXd0fLBOJ_LsaIitmIWSW4ViZI7-7N0PtH7Vjzfs": {
+    "name": "Additional Information",
+    "source_folder": "raw_curated",
+    "mimeType": "application/vnd.google-apps.document",
+    "exported_at": "2026-01-29T05:27:20.230406",
+    "output": "data\\organized_data\\Additional Information.txt"
+  },
+  "1WVurShtCCw0wO33HltQWgJ7aWgh_MhAL": {
+    "name": "Common App Personal Statemnt.docx .docx",
+    "source_folder": "raw_curated",
+    "mimeType": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+    "exported_at": "2026-01-29T05:27:20.680246",
+    "output": "data\\organized_data\\Common App Personal Statemntdocx docx.txt"
+  },
+  "1kK9fL_l5W9y8Fx-1VVz62jZteRpUR1X7": {
+    "name": "Celia_everything.docx",
+    "source_folder": "raw_curated",
+    "mimeType": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+    "exported_at": "2026-01-29T05:27:21.715663",
+    "output": "data\\organized_data\\Celia_everythingdocx.txt"
+  },
+  "1PBoDRlg555xdZznObAKNx4o7mkR6On0R2PL28Fnei5M": {
+    "name": "PS",
+    "source_folder": "raw_curated",
+    "mimeType": "application/vnd.google-apps.document",
+    "exported_at": "2026-01-29T05:27:22.615882",
+    "output": "data\\organized_data\\PS.txt"
+  },
+  "1L4TJNIFBHVXkKM9iWBXlo9IVm2g_eU6vaisgoKjabwM": {
+    "name": "C",
+    "source_folder": "raw_curated",
+    "mimeType": "application/vnd.google-apps.document",
+    "exported_at": "2026-01-29T05:27:23.577031",
+    "output": "data\\organized_data\\C.txt"
+  },
+  "1nAgSes6VnECXKV7-rhkY0uwfhEmYWlafnoax3OH8Xs4": {
+    "name": "Celia",
+    "source_folder": "raw_curated",
+    "mimeType": "application/vnd.google-apps.document",
+    "exported_at": "2026-01-29T05:27:24.248846",
+    "output": "data\\organized_data\\Celia.txt"
+  },
+  "1_0hwPTiSmReB9Auo_bPbNpvT7l6lFeyk": {
+    "name": "Commonapp - prompt 5.docx",
+    "source_folder": "raw_curated",
+    "mimeType": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+    "exported_at": "2026-01-29T05:27:26.018256",
+    "output": "data\\organized_data\\Commonapp - prompt 5docx.txt"
+  },
+  "1Sflkg1dUAWvmvu2KbeqKwNP5pmmf0B8a": {
+    "name": "common app essay.docx",
+    "source_folder": "raw_curated",
+    "mimeType": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+    "exported_at": "2026-01-29T05:27:26.334268",
+    "output": "data\\organized_data\\common app essaydocx.txt"
+  },
+  "1AVGF4oJQJkIwkWic6JmjNIbBolKJx7pu": {
+    "name": "BU.docx",
+    "source_folder": "raw_curated",
+    "mimeType": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+    "exported_at": "2026-01-29T05:27:26.703438",
+    "output": "data\\organized_data\\BUdocx.txt"
+  },
+  "1B0UgMa9YDIgQ0_iSpEipBo3bKSXLgCZX": {
+    "name": "Boston University.docx",
+    "source_folder": "raw_curated",
+    "mimeType": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+    "exported_at": "2026-01-29T05:27:27.139330",
+    "output": "data\\organized_data\\Boston Universitydocx.txt"
+  },
+  "1JZ6pUlL5eniNpEbpZtNJD4gWuqx05a4q": {
+    "name": "Common app (1).docx",
+    "source_folder": "raw_curated",
+    "mimeType": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+    "exported_at": "2026-01-29T05:27:28.635131",
+    "output": "data\\organized_data\\Common app 1docx.txt"
+  },
+  "1VKqv3YREgKQCYUYmc1NIBL29BvfZsa4A": {
+    "name": "USF.docx",
+    "source_folder": "raw_curated",
+    "mimeType": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+    "exported_at": "2026-01-29T05:27:29.652195",
+    "output": "data\\organized_data\\USFdocx.txt"
+  },
+  "1t6ERB_2NLyvQ8bInuMoEUuhbNWcspqx9": {
+    "name": "University of Washington.docx",
+    "source_folder": "raw_curated",
+    "mimeType": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+    "exported_at": "2026-01-29T05:27:30.163988",
+    "output": "data\\organized_data\\University of Washingtondocx.txt"
+  },
+  "1qFUjMC_bMceNTLpBvYua5xqbzJWrUBWx": {
+    "name": "UW madison.docx",
+    "source_folder": "raw_curated",
+    "mimeType": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+    "exported_at": "2026-01-29T05:27:31.310698",
+    "output": "data\\organized_data\\UW madisondocx.txt"
+  },
+  "1y_0lStQJBSVJjElSFzlqdtx0nrecDj14": {
+    "name": "Texas A&M.docx",
+    "source_folder": "raw_curated",
+    "mimeType": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+    "exported_at": "2026-01-29T05:27:32.040112",
+    "output": "data\\organized_data\\Texas AMdocx.txt"
+  },
+  "1y7kG25djQESC9IP6DtsXpXDyH8wIvo3p": {
+    "name": "UW Seattle.docx",
+    "source_folder": "raw_curated",
+    "mimeType": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+    "exported_at": "2026-01-29T05:27:32.686770",
+    "output": "data\\organized_data\\UW Seattledocx.txt"
+  },
+  "1b3cHy1fkTP7p6gFYJpR5EeA57JZQA8Hr": {
+    "name": "UC.docx",
+    "source_folder": "raw_curated",
+    "mimeType": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+    "exported_at": "2026-01-29T05:27:33.549937",
+    "output": "data\\organized_data\\UCdocx.txt"
+  },
+  "1EuLJEaiD3-S38v1BYE5blkRPp5kPKaYZ": {
+    "name": "UC .docx",
+    "source_folder": "raw_curated",
+    "mimeType": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+    "exported_at": "2026-01-29T05:27:34.139628",
+    "output": "data\\organized_data\\UC docx.txt"
+  },
+  "1eu_HaiiJMeql92NJEoEv8Ecc7uZ5rcfb": {
+    "name": "UW Madison(1).docx",
+    "source_folder": "raw_curated",
+    "mimeType": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+    "exported_at": "2026-01-29T05:27:34.698717",
+    "output": "data\\organized_data\\UW Madison1docx.txt"
+  }
+}

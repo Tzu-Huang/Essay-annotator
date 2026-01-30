@@ -1,3 +1,7 @@
+"""
+This is a testing .py file that ensure api key and basic cosine similarity calculation works as expected
+
+"""
 from openai import OpenAI
 import os
 

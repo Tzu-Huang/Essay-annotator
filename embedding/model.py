@@ -10,10 +10,11 @@ client = OpenAI(api_key = os.environ["OPENAI_API_KEY"])
 
 response = client.embeddings.create(
     model="text-embedding-3-small",
-    input= "This is a very easy test"
+    input= "This"
     
 )#.data[0].embedding # This is the only information we need 
 doc = response.data[0].embedding
+print(doc)
 
 # Input 
 query = "This test should be very easy"

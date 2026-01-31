@@ -108,7 +108,7 @@ def main():
     contents = []
 
     # Step 2: sanity check (print first few)
-    for i, r in enumerate(records[:len(records)], start=1):
+    for r in enumerate(records[:len(records)]):
         # print(f"--- Record {i} ---")
         # print("ID:", r["id"])
         # print("Topic:", r["topic"])
@@ -119,8 +119,12 @@ def main():
         contents.append(r["content"])
 
     # Step 3: Embedding
-    # embedding(client, contents)
-    # embedding(client, topics))
+
+    content_vecs = embedding(client, contents)
+    topic_vecs = embedding(client, topics)
+    
+    # Step 4: Store and export
+    # for i in records:
 
 
 if __name__ == "__main__":

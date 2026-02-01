@@ -1,4 +1,0 @@
-﻿In addition to my major, my academic interests include… (650 characters)
-
-
-My passion for Robotics & Autonomous Systems started with my engagement in VEX Robotics in my sophomore year. I delved into robot construction and autonomous programming, particularly in concepts like PID control, motion profiles, and odometry. VEX Robotics taught me the vital role these techniques play in achieving precision and smooth robot movement. Looking ahead to college, I hope to pursue a minor in this field to deepen my knowledge and skills. My goal is to then return to my high school and share these skills with those Robotics members, serving as a mentor to guide them towards greater achievements in this exciting field.

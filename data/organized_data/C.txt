@@ -1,0 +1,16 @@
+﻿What have you done to make your school or your community a better place?
+
+
+It pained me to see my mother struggle to prove her identity on her phone and at airports after shaving off part of her fingerprint while preparing dinner. I wondered, was it only her who had this issue?
+
+
+Recalling my knowledge on how fingerprint patterns can degrade overtime with the loss of skin elasticity, I set out to interview the seniors in my community to determine whether they have had difficulties with fingerprint recognition. The problem was more widespread than I had presumed: senior members of my school faculty expressed annoyance over ATM machines failing repeatedly to recognize their fingerprints as they watched younger people withdraw money with ease; my diabetic relatives who have to poke the tips of the fingers to measure blood glucose held the same sentiment. 
+
+
+Staggered by the prevalence of this issue, I joined Professor Hsia’s research team to develop a deep learning model for finger vein recognition. Finger veins are internal biometrics; they cannot be damaged or stolen without penetrating a person’s skin. It occurred to me that finger vein recognition would be much more convenient for the seniors in my community whose fingerprints have eroded with age. 
+
+
+Spending hours with Professor Hsia’s team, I trained a finger vein recognition AI model, hoping to improve its accuracy so that companies, banks, and even airport security would trust it enough to adopt it. As I fed images of finger vein patterns to the AI, it would sometimes fail to correctly identify the person. But thinking of all the people around me who would benefit from this technology, I felt motivated to continue to adjust the parameters in our code.
+
+
+I dreamed for finger vein recognition to be widely adopted, but I understood this cannot happen quickly. Therefore, I presented our research on finger vein recognition at an international conference. This was the next best thing to do: sharing technology with other scientists, and raising awareness that relying on fingerprints can be a burden to many individuals in our communities. At the UCs, I hope to continue to use science for the betterment of different communities.

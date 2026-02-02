@@ -36,7 +36,7 @@ Thumbs.db
 # *.jsonl
 
 # Optional: If you want to keep downloaded datasets but not track them:
-data/
+# data/
 output/
 
 # ---------------------------------------------------------

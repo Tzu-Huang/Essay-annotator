@@ -32,8 +32,11 @@ def main():
             commonapp_data.append(essay)
 
 
-    with open("commonapp.json", "w", encoding="utf-8") as f:
-        json.dump(commonapp_data, f, ensure_ascii=False, indent = 2)
+    output_path = Path("../data/essays_json/commonapp.jsonl")
+    
+    with open(output_path, "w", encoding="utf-8") as f:
+        for essay in commonapp_data:
+            f.write(json.dumps(essay, ensure_ascii=False) + "\n")
 
 
 def split_topic_content(text):
@@ -47,7 +50,7 @@ def split_topic_content(text):
         prompt = re.search(r'prompt:\s*(.*)', info, re.IGNORECASE)
         content = re.search(r'content:\s*(.*)', info, re.IGNORECASE | re.DOTALL)
 
-        # check if both exits then put each text into its category
+        # check if both exit then put each text into its category
         if prompt and content:
             list.append({
                 "topic": prompt.group(1).strip(),

@@ -5,7 +5,7 @@ __pycache__/
 *.pyc
 *.pyo
 *.pyd
-*.json
+# *.json
 
 # C extensions
 *.so
@@ -33,7 +33,7 @@ Thumbs.db
 # Your data outputs (generated essay datasets)
 # ---------------------------------------------------------
 # All .jsonl files produced by crawlers
-*.jsonl
+# *.jsonl
 
 # Optional: If you want to keep downloaded datasets but not track them:
 data/

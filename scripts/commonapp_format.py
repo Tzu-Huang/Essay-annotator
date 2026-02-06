@@ -3,8 +3,8 @@ from itertools import count
 import json
 import re
 
-
-commonapp_dir = Path("../data/organized_data/commonapp")
+commonapp_dir = Path("../data/organized_data/commonapp/")
+output_path = Path("../data/finalized_data_json/commonapp.jsonl")
 
 def main():
     if not commonapp_dir.exists() or not commonapp_dir.is_dir(): 
@@ -24,15 +24,16 @@ def main():
         for section in sections:
             essay = {
                 "id": f"essay_{next(id_counter):04d}", 
-                "type": "commonapp", 
+                "type": "personal statement", 
                 "topic": section["topic"],
                 "content": section["content"], 
+                "public": False,
                 "source_file": file_path.name
             }
             commonapp_data.append(essay)
 
 
-    output_path = Path("../data/essays_json/commonapp.jsonl")
+    
     
     with open(output_path, "w", encoding="utf-8") as f:
         for essay in commonapp_data:

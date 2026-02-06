@@ -3,8 +3,9 @@ from itertools import count
 import json
 import re
 
-commonapp_dir = Path("../data/organized_data/commonapp/")
-output_path = Path("../data/finalized_data_json/commonapp.jsonl")
+script_dir = Path(__file__).parent
+commonapp_dir = script_dir / "../data/organized_data/commonapp/"
+output_path = script_dir / "../data/finalized_data_json/commonapp.jsonl"
 
 def main():
     if not commonapp_dir.exists() or not commonapp_dir.is_dir(): 
@@ -31,13 +32,11 @@ def main():
                 "source_file": file_path.name
             }
             commonapp_data.append(essay)
-
-
-    
     
     with open(output_path, "w", encoding="utf-8") as f:
         for essay in commonapp_data:
             f.write(json.dumps(essay, ensure_ascii=False) + "\n")
+    print("Saved all essays to commonapp.jsonl")
 
 
 def split_topic_content(text):
@@ -58,7 +57,6 @@ def split_topic_content(text):
                 "content": content.group(1).strip()
             })
     return list
-
 
 if __name__ == "__main__" :
     main()

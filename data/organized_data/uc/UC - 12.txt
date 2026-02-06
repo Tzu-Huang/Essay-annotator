@@ -1,0 +1,13 @@
+Prompt: What have you done to make your school or your community a better place?
+
+Content: “There’s a lot of ways to learn. Even seemingly simple things can be difficult with the wrong approach.”
+
+This remark by Mr. Hong stuck with me since I was young when I believed that the secret ingredient to academic success resided in rigid discipline, with pristine notes and perfectly structured study guides.
+
+His words not only improved my studies but also sparked my journey into teaching and mentorship. I wanted to uncover the secret ingredient for helping others learn. I became a tutor through my school’s service club, teaching English to a Ukrainian student. I meticulously crafted lesson plans using the essential concepts from my first forays into English. Nothing seemed to stick, however, and my student struggled to keep up. My so-called “secret ingredient” was making her anxious.
+
+Observing her discomfort when asked to speak for long periods, I asked about her favorite movies and used clips from those films to craft new lessons. From then on, I iterated on a hybrid approach, which quickly bore fruit as my student became more engaged and her voice grew steadier. The real solution only emerged when I learned to adapt to her needs.
+
+I carried this lesson into my internship at NaoNow, an EdTech startup focused on customized English learning. Now, with hundreds of students, a one-size-fits-all curriculum was not feasible. I trained chatbots to create lesson plans tailored to different proficiency levels. We implemented AI systems that provided personalized feedback on speaking skills, offering detailed insights into each student’s learning styles. I realized the potential for AI to improve education; I could help make learning more accessible by embracing different styles of learning and focusing on progression, not perfection. 
+
+I am currently expanding on my AI knowledge with my internship at TAMEE, gaining crucial exposure to databases and attending seminars on natural language processing. Throughout college and beyond, I am committed to building upon these experiences, helping to empower people around the world to discover their own secret ingredient to language learning.

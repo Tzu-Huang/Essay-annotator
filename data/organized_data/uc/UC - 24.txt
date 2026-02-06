@@ -1,0 +1,17 @@
+Prompt: Describe how you have taken advantage of a significant educational opportunity or worked to overcome an educational barrier you have faced.
+
+Content: 2:23 am on Friday. I gazed at the bright computer screen, displaying my first app: a rudimentary school tour. Every tap, every successful screen transition felt like a triumph. This first computer science project hooked me like a rush of caffeine, and I was eager to keep going. 
+
+Feeling emboldened by this experience and confident in my ability to write my best code even in odd hours, I was excited to enroll in the summer program “Data Science Lab with R” at UC Berkeley and practice cutting-edge analysis methods on real-world datasets. There was just one hitch–living in Taiwan, I needed to wake up at 3:30 am each day to attend class. Some days, it took all of my willpower not to smash my alarm clock as the jarring buzz reverberated around my dark room, yet, with the intrigue of the challenging tasks my professor assigned, I would be revitalized.
+
+Two weeks until the final project deadline, my head swirled with all the concepts. I chose to work on analyzing the relationships between sleep, health, and lifestyle. I pictured the 24-hour time block every day in my head, puzzling over where I could find time. 
+
+“It might be possible to work while eating.”
+
+However, issues started popping up. Weird graphs appeared on the screen, with data points scattered randomly. Columns of the data summary were properly organized but unexpectedly showed zero accuracy.
+
+While there wasn’t a clear solution to my problem, I pieced together various suggestions from multiple help forums I researched online. While everyone had different issues, I could find the connecting points between them to apply to my own. 
+
+As I put each piece of the puzzle together, the model aligned like constellations on the scatter plot with accurate estimations. In just a few weeks, I finally established a sense of control over what initially seemed an uninterpretable language. 
+
+Hitting that submission button felt like taking a big step to another level. By succeeding in this early morning class, I am confident that I have gained the determination to face the academic rigors of college. 

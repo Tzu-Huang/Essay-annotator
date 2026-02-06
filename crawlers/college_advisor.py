@@ -1,36 +1,53 @@
 import requests
 from bs4 import BeautifulSoup
+from common import fetch_html
+from itertools import count
+from pathlib import Path
 import json
+import re
 
 url = "https://www.collegeadvisor.com/resources/common-app-essay-examples/"
-html = requests.get(url).text
+
+default_topic = "Share an essay on any topic of your choice. It can be one you've already written, one that responds to a different prompt, or one of your own design"
+html = fetch_html(url)
 soup = BeautifulSoup(html, "html.parser")
+output_path = Path("../data/finalized_data_json/collegeadvisor.jsonl")
 
-# find text markers instead of tags
-headers = soup.find_all(string=lambda t: t and "Sample Common App Essay" in t)
+# Find h3 headers with essay numbers (e.g., "#1", "#2", etc.)
+# Use a function to check get_text() since some have nested tags
+essay_headers = [h for h in soup.find_all("h3") if re.search(r"#\d+", h.get_text())]
 
-with open("collegeadvisor.jsonl", "w", encoding="utf-8") as f:
-    sample_num = 1
+with open(output_path, "w", encoding="utf-8") as f:
+    count = count(1)
 
-    for header in headers:
+    for header in essay_headers:
         essay_lines = []
 
-        for node in header.parent.find_next_siblings():
-            text = node.get_text(strip=True)
-
-            if "Sample Common App Essay" in text:
+        for node in header.find_next_siblings():
+            # Stop at next heading or div
+            if node.name in ["h2", "h3", "div"]:
                 break
-            if text.startswith("Why this essay"):
+            text = node.get_text(strip=True)
+            # Stop at "Why this essay" analysis section
+            if "Why this" in text:
                 break
             if node.name == "p" and text:
                 essay_lines.append(text)
 
         if essay_lines:
+            essay_id = next(count)
+            if essay_id == 2:
+                topic = "Reflect on a time when you questioned or challenged a belief or idea. What prompted your thinking? What was the outcome?"
+            else:
+                topic = default_topic
+            
             f.write(json.dumps({
-                "sample": f"Sample {sample_num}",
-                "essay": "\n".join(essay_lines)
+                "id": f"essay_{essay_id:02d}",
+                "type": "personal statement", 
+                "topic": topic,
+                "content": "\n".join(essay_lines), 
+                "public": True, 
+                "url": url
             }, ensure_ascii=False) + "\n")
-            sample_num += 1
 
 print("Saved all essays to collegeadvisor.jsonl")
-

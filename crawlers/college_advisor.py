@@ -7,47 +7,59 @@ import json
 import re
 
 url = "https://www.collegeadvisor.com/resources/common-app-essay-examples/"
+script_dir = Path(__file__).parent
+output_path = script_dir / "../data/finalized_data_json/collegeadvisor.jsonl"
 
 default_topic = "Share an essay on any topic of your choice. It can be one you've already written, one that responds to a different prompt, or one of your own design"
-html = fetch_html(url)
-soup = BeautifulSoup(html, "html.parser")
-output_path = Path("../data/finalized_data_json/collegeadvisor.jsonl")
 
-# Find h3 headers with essay numbers (e.g., "#1", "#2", etc.)
-# Use a function to check get_text() since some have nested tags
-essay_headers = [h for h in soup.find_all("h3") if re.search(r"#\d+", h.get_text())]
+prompt_three = "Reflect on a time when you questioned or challenged a belief or idea. What prompted your thinking? What was the outcome?"
 
-with open(output_path, "w", encoding="utf-8") as f:
-    count = count(1)
+def main():
+    html = fetch_html(url)
+    soup = BeautifulSoup(html, "html.parser")
 
-    for header in essay_headers:
-        essay_lines = []
+    # Find h3 headers with essay numbers
+    essay_headers = [h for h in soup.find_all("h3") if re.search(r"#\d+", h.get_text())]
 
-        for node in header.find_next_siblings():
-            # Stop at next heading or div
-            if node.name in ["h2", "h3", "div"]:
-                break
-            text = node.get_text(strip=True)
-            # Stop at "Why this essay" analysis section
-            if "Why this" in text:
-                break
-            if node.name == "p" and text:
-                essay_lines.append(text)
+    with open(output_path, "w", encoding="utf-8") as f:
+        counter = count(1)
 
-        if essay_lines:
-            essay_id = next(count)
-            if essay_id == 2:
-                topic = "Reflect on a time when you questioned or challenged a belief or idea. What prompted your thinking? What was the outcome?"
-            else:
-                topic = default_topic
-            
-            f.write(json.dumps({
-                "id": f"essay_{essay_id:02d}",
-                "type": "personal statement", 
-                "topic": topic,
-                "content": "\n".join(essay_lines), 
-                "public": True, 
-                "url": url
-            }, ensure_ascii=False) + "\n")
+        for header in essay_headers:
 
-print("Saved all essays to collegeadvisor.jsonl")
+            essay_lines = get_content(header)
+
+            if essay_lines:
+                essay_id = next(counter)
+                if essay_id == 2:  # handle an exception in the file
+                    topic = prompt_three
+                else:
+                    topic = default_topic
+                
+                f.write(json.dumps({
+                    "id": f"essay_{essay_id:02d}",
+                    "type": "personal statement", 
+                    "topic": topic,
+                    "content": "\n".join(essay_lines), 
+                    "public": True, 
+                    "url": url
+                }, ensure_ascii=False) + "\n")
+
+    print("Saved all essays to collegeadvisor.jsonl")
+
+def get_content(header):
+    essay_lines = []
+    for node in header.find_next_siblings():
+        # Stop at next heading or div
+        if node.name in ["h2", "h3", "div"]:
+            break
+        text = node.get_text(strip=True)
+        # Stop at "Why this essay" analysis section
+        if "Why this" in text:
+            break
+        if node.name == "p" and text:
+            essay_lines.append(text)
+    return essay_lines
+
+
+if __name__ == "__main__":
+    main()

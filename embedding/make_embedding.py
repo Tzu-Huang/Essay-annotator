@@ -8,7 +8,7 @@ from openai import OpenAI
 # =========================
 
 # Input JSONL file (finalized schema)
-Input_file = 'data/finalized_data_json/corpus.jsonl'
+Input_file = 'data/finalized_data_json/collegeadvisor.jsonl'
 Output_file = 'data/embed_output/embed.jsonl'
 
 Batch_size = 64 # This is the size that you want to embed and store at once
@@ -82,6 +82,7 @@ def embedding(client, text):
     )
     return [item.embedding for item in response.data]
 
+
 # =========================
 # Main logic
 # =========================
@@ -139,7 +140,7 @@ def main():
                     rec["topic_embedding"] = tvec
                     rec["content_embedding"] = cvec
 
-                    #Convert a complete record to a line and store in embed.jsonl
+                    # Convert a complete record to a line and store in embed.jsonl
                     out.write(json.dumps(rec, ensure_ascii=False) + "\n")
 
                 total_written += len(batch_records)

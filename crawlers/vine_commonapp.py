@@ -65,7 +65,7 @@ def main():
 
             if essay_lines:
                 obj = {
-                    "id": f"essay_{next(counter):02d}",
+                    "id": f"essay_{next(counter):04d}",
                     "type": "personal statement",
                     "topic": prompt_text,
                     "content": "\n".join(essay_lines),

@@ -64,12 +64,12 @@ def main():
         prompt_text, essay_text = get_essay_content(label)
         
         essays.append({
-            "id": f"essay_{i+1:02d}",
+            "id": f"essay_{i+1:04d}",
             "type": "personal statement",
             "topic": prompt_text,
             "content": essay_text,
             "public": True,
-            "url": url
+            "source_file": "online",
         })
 
     # Write to file

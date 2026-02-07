@@ -128,7 +128,7 @@ def crawl_jhu_essays():
                 # 👉 Filter out extremely short pages (not real essays).
                 if len(essay["content"]) > 300:
                     # Put id first in the dictionary
-                    format_essay = {"id": f"essay_{next(counter):02d}", **essay}
+                    format_essay = {"id": f"essay_{next(counter):04d}", **essay}
                     all_essays.append(format_essay)
             except Exception as e:
                 print(f"      Failed: {e}")

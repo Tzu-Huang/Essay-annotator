@@ -1,18 +1,17 @@
-# Input: jsonl file 
-# Output:
-
 import os
 import json
 from pathlib import Path
-from openai import OpenAI   # 之後做 embedding 會用到（先留著）
+from openai import OpenAI  
 
 # =========================
 # Config
 # =========================
 
 # Input JSONL file (finalized schema)
-file_path = 'data/finalized_data_json/corpus.jsonl'
+Input_file = 'data/finalized_data_json/corpus.jsonl'
+Output_file = 'data/embed_output/embed.jsonl'
 
+Batch_size = 64 # This is the size that you want to embed and store at once
 
 # =========================
 # Helper functions
@@ -35,13 +34,14 @@ def read_jsonl(path):
 
             try:
                 obj = json.loads(line)
-                yield obj
-                # print(obj)
+                # print("obj in read_jsonl(): ")
+                yield obj # Yield one record at a time for streaming processing
+
+
             except json.JSONDecodeError as e:
                 # Very important for debugging bad lines
                 print(f"[JSON ERROR] line {idx}: {e}")
                 print("Preview:", line[:120])
-
 
 def extract_text_fields(obj):
     """
@@ -82,50 +82,99 @@ def embedding(client, text):
     )
     return [item.embedding for item in response.data]
 
-  
-
 # =========================
 # Main logic
 # =========================
 
 def main():
-    print("Loading data from JSONL...\n")
 
-    records = []
+    # LOADING
+    try:
+        print("Loading data from JSONL...\n")
 
-    # Step 1: read jsonl line by line
-    for obj in read_jsonl(file_path):
-        record = extract_text_fields(obj)
-        if record is None:
-            continue
-        records.append(record)
+        client = OpenAI(api_key = os.environ["OPENAI_API_KEY"])
+        os.makedirs(os.path.dirname(Output_file), exist_ok=True)
+    except:
+        print("Unexpected issue happened during the loading process")
+        return
 
-    print(f"Loaded {len(records)} valid records.\n")
+    batch_records = []   # list[dict]
+    batch_topics = []    # list[str]
+    batch_contents = []  # list[str]
 
-    # Step 2: Embedding
-    client = OpenAI(api_key = os.environ["OPENAI_API_KEY"])
-    topics = []
-    contents = []
+    total_written = 0
+    total_seen = 0
 
-    # Step 2: sanity check (print first few)
-    for r in enumerate(records[:len(records)]):
-        # print(f"--- Record {i} ---")
-        # print("ID:", r["id"])
-        # print("Topic:", r["topic"])
-        # print("Content preview:", r["content"][:80])
-        # print()
+    with open(Output_file, "w", encoding="utf-8") as out:
 
-        topics.append(r["topic"])
-        contents.append(r["content"])
+        # Step 1: read jsonl line by line
+        for obj in read_jsonl(Input_file):
+            total_seen += 1
+            record = extract_text_fields(obj)
 
-    # Step 3: Embedding
+            if record is None:
+                continue
+            
+            batch_records.append(record)
+            batch_topics.append(record["topic"])
+            batch_contents.append(record["content"])
 
-    content_vecs = embedding(client, contents)
-    topic_vecs = embedding(client, topics)
-    
-    # Step 4: Store and export
-    # for i in records:
+            # When batch is full, do embedding and output
+            if (len(batch_records) >= Batch_size):
+                try:
+                    topic_vecs = embedding(client, batch_topics)
+                    content_vecs = embedding(client, batch_contents)
+                except Exception as e:
+                    print(e)
+                    print("Batch Size: ", len(batch_records))
 
+                    # Clear batch to avoid crash
+                    batch_records.clear()
+                    batch_topics.clear()
+                    batch_contents.clear()
+                    continue
+
+                for rec, tvec, cvec in zip(batch_records, topic_vecs, content_vecs):
+                    # rec: record, tvec: topic_vector, cvec: content_vec
+                    rec["topic_embedding"] = tvec
+                    rec["content_embedding"] = cvec
+
+                    #Convert a complete record to a line and store in embed.jsonl
+                    out.write(json.dumps(rec, ensure_ascii=False) + "\n")
+
+                total_written += len(batch_records)
+                print(f"Written {total_written} records.. ")
+
+                # Clear batch
+                batch_records.clear()
+                batch_topics.clear()
+                batch_contents.clear()
+
+        # This is for the case when there are no enough batch_recrods that is >= 64
+        if batch_records:
+            topic_vecs = embedding(client, batch_topics)
+            content_vecs = embedding(client, batch_contents)
+
+            for rec, tvec, cvec in zip(batch_records, topic_vecs, content_vecs):
+                # rec: record, tvec: topic_vector, cvec: content_vec
+                rec["topic_embedding"] = tvec
+                rec["content_embedding"] = cvec
+
+                #Convert a complete record to a line and store in embed.jsonl
+                out.write(json.dumps(rec, ensure_ascii=False) + "\n")
+
+            total_written += len(batch_records)
+            print(f"Written {total_written} records.. ")
+
+            # Clear batch
+            batch_records.clear()
+            batch_topics.clear()
+            batch_contents.clear()
+
+    print("\n DONE! ")
+    print(f"Total seen lines: {total_seen}")
+    print(f"Total embedded+written: {total_written}")
+    print(f"Output: {Output_file}")
 
 if __name__ == "__main__":
     main()

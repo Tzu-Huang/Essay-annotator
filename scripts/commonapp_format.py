@@ -50,7 +50,7 @@ def split_topic_content(text):
         prompt = re.search(r'prompt:\s*(.*)', info, re.IGNORECASE)
         content = re.search(r'content:\s*(.*)', info, re.IGNORECASE | re.DOTALL)
 
-        # check if both exit then put each text into its category
+        # check if both exist then put each text into its category
         if prompt and content:
             list.append({
                 "topic": prompt.group(1).strip(),

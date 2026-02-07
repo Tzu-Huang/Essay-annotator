@@ -11,7 +11,6 @@ script_dir = Path(__file__).parent
 output_path = script_dir / "../data/finalized_data_json/collegeadvisor.jsonl"
 
 default_topic = "Share an essay on any topic of your choice. It can be one you've already written, one that responds to a different prompt, or one of your own design"
-
 prompt_three = "Reflect on a time when you questioned or challenged a belief or idea. What prompted your thinking? What was the outcome?"
 
 def main():
@@ -36,12 +35,12 @@ def main():
                     topic = default_topic
                 
                 f.write(json.dumps({
-                    "id": f"essay_{essay_id:02d}",
+                    "id": f"essay_{essay_id:04d}",
                     "type": "personal statement", 
                     "topic": topic,
                     "content": "\n".join(essay_lines), 
                     "public": True, 
-                    "url": url
+                    "source_file": "online"
                 }, ensure_ascii=False) + "\n")
 
     print("Saved all essays to collegeadvisor.jsonl")

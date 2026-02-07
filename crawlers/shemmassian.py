@@ -107,7 +107,7 @@ def parse_shemmassian_college_examples(
                     "type": essay_type,
                     "school_info": school_info,
                     "text": essay_text,
-                    "source": url,
+                    "source_file": "online",
                 }
             )
 

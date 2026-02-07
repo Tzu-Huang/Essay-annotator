@@ -4,11 +4,11 @@ from __future__ import annotations
 
 from pathlib import Path
 from typing import List, Dict
-
+from itertools import count
 from bs4 import BeautifulSoup
 import json
 
-from .common import fetch_html
+from common import fetch_html
 
 # This page contains all 14 essay examples in one single article.
 BASE_URL = "https://www.shemmassianconsulting.com/blog/college-essay-examples"
@@ -48,6 +48,8 @@ def parse_shemmassian_college_examples(
     # If not found, use the entire soup.
     article = soup.find("article") or soup
 
+    counter = count(1)
+
     # Collect all <h2> elements whose text begins with "College essay example".
     h2_list = []
     for h in article.find_all("h2"):
@@ -57,12 +59,11 @@ def parse_shemmassian_college_examples(
 
     examples: List[Dict[str, str]] = []
 
-    for idx, h2 in enumerate(h2_list, start=1):
-        label = h2.get_text(strip=True)
+    for idx, h2 in enumerate(h2_list):
         example_id = idx
 
         school_info = ""
-        essay_type = "personal"  # default type
+        essay_type = "personal statement"  # default type
         paragraphs: List[str] = []
 
         # Start scanning paragraph nodes after the current <h2>
@@ -102,13 +103,11 @@ def parse_shemmassian_college_examples(
         if essay_text:
             examples.append(
                 {
-                    "source": "shemmassian",
-                    "url": url,
-                    "example_id": example_id,
-                    "label": label,
+                    "id": f"essay_{example_id:02d}",
+                    "type": essay_type,
                     "school_info": school_info,
-                    "essay_type": essay_type,
                     "text": essay_text,
+                    "source": url,
                 }
             )
 
@@ -134,8 +133,8 @@ def crawl_shemmassian(output_path: str | Path | None = None) -> int:
 
     # If no output path is provided, save to the project root.
     if output_path is None:
-        project_root = Path(__file__).resolve().parent.parent
-        output_path = project_root / "shemmassian_college_essays.jsonl"
+        project_root = Path(__file__).parent
+        output_path = project_root / "../data/essays_json/shemmassian_college_essays.jsonl"
     else:
         output_path = Path(output_path)
 

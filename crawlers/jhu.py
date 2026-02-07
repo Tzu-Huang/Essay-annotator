@@ -2,11 +2,12 @@ import time
 import json
 import requests
 from bs4 import BeautifulSoup
-from .common import fetch_html
+from itertools import count
+from pathlib import Path
+from common import fetch_html
 
-import os
-print("Current working directory:", os.getcwd())
-
+script_dir = Path(__file__).parent
+output_path = script_dir / "../data/finalized_data_json/jhu_essays.jsonl"
 
 
 """
@@ -81,12 +82,11 @@ def parse_jhu_essay(url):
         date = date_tag.get_text().strip()
 
     return {
-        "source": "johns_hopkins",
-        "url": url,
-        "title": title,
+        "type": "personal statement",
+        "topic": title, 
+        "content": body_text,
         "author": author,
-        "date": date,
-        "text": body_text,
+        "url": url,
     }
 
 def crawl_jhu_essays():
@@ -105,6 +105,7 @@ def crawl_jhu_essays():
     ]
 
     all_essays = []
+    counter = count(1)  # Counter starts fresh each run
 
     for index_url in index_urls:
         print(f"[Index] {index_url}")
@@ -125,17 +126,17 @@ def crawl_jhu_essays():
                 essay = parse_jhu_essay(url)
 
                 # 👉 Filter out extremely short pages (not real essays).
-                if len(essay["text"]) > 300:
-                    all_essays.append(essay)
+                if len(essay["content"]) > 300:
+                    # Put id first in the dictionary
+                    format_essay = {"id": f"essay_{next(counter):02d}", **essay}
+                    all_essays.append(format_essay)
             except Exception as e:
                 print(f"      Failed: {e}")
 
             # 👉 Sleep to avoid overloading the website.
-            time.sleep(1)
+            time.sleep(0.3)
 
     # 👉 Save to JSONL format (one JSON per line).
-    output_path = r"C:\Users\USER\Desktop\Essay Project\jhu_essays.jsonl"
-
     with open(output_path, "w", encoding="utf-8") as f:
         for essay in all_essays:
             f.write(json.dumps(essay, ensure_ascii=False) + "\n")

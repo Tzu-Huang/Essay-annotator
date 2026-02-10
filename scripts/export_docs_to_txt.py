@@ -1,73 +1,54 @@
-"""
-export_docs_to_txt.py
-
-Purpose:
-This program export Google doc or word docx to txt file
-
-What this script does:
-1. Connects to Google Drive via a Service Account.
-2. Scans folders under the designated `raw_curated` directory.
-4. Exports each Google Doc or docx file as plain text (`.txt`).
-5. Tracks exported files using Google Drive file IDs to avoid duplicates.
-
-What this script does NOT do:
-- It does not modify or delete files in Google Drive.
-- It does not convert text into JSON.
-- It does not perform any NLP or AI analysis.
-
-How to use:
-1. Set KEY_PATH to the local path of the Service Account JSON key.
-2. Run:
-   python scripts/export_docs_to_txt.py
-
-Expected output:
-- New `.txt` files created under `data/raw_text/`
-- A state file (`data/processed/exported_ids.json`) recording processed file IDs
-
-"""
+# Name: Zackery Liu
+# Input: Google Drive folder (RAW_FOLDER_ID) that contains Google Docs / .docx files
+# Output: Exported .txt files stored under OUT_DIR
 
 import json
 import re
 from pathlib import Path
 from datetime import datetime
-
 from google.oauth2 import service_account
 from googleapiclient.discovery import build
 
-# ====== CONFIG ======
-#TODO: change this to your own path
-KEY_PATH = r"C:\Users\USER\Desktop\key\essay-project-key.json" #Zack's API key
-RAW_FOLDER_ID = "1YZgNi_MTzNa1pgFpmexKXpw2ymN2gIVn" #Google drive folder id
+# =========================
+# Config
+# =========================
 
-SCOPES = ["https://www.googleapis.com/auth/drive.readonly"]
+# Zack's API key location
+KEY_PATH = r"C:\Users\USER\Desktop\key\essay-project-key.json" 
+# Google drive folder id
+RAW_FOLDER_ID = "1YZgNi_MTzNa1pgFpmexKXpw2ymN2gIVn" 
+
 # File Type. Current: Google Docs
+SCOPES = ["https://www.googleapis.com/auth/drive.readonly"]
 
 DOC_MIME = "application/vnd.google-apps.document"
 DOCX_MIME = "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
 ALLOWED_MIME_TYPE = {DOCX_MIME, DOC_MIME}
 
 OUT_DIR = Path("data/organized_data")
-
 STATE_DIR = Path("data/processed")
 STATE_PREFIX = "exported_ids_part_"
 STATE_GLOB = f"{STATE_PREFIX}*.json"
 
 PAGE_SIZE = 100
-#OUT_DIR = Path("data/organized_data")
-#STATE_FILE = Path("data/processed/exported_ids.json")
-# ====================
 
-
+# =========================
+# Helper functions
+# =========================
 def sanitize_filename(name: str) -> str:
+    """
+    Notes:
+    - Keeps only letters, numbers, spaces, '_' and '-'
+    - Ensures filename is not empty
+    """
+
     # Keep letters/numbers/space/_/-
     safe = "".join(c for c in name if c.isalnum() or c in " _-").strip()
     # Avoid empty filenames
     return safe if safe else "untitled"
 
-
 def state_file_for_batch(batch_idx: int) -> Path:
     return STATE_DIR / f"{STATE_PREFIX}{batch_idx:03d}.json"
-
 
 def load_all_processed_ids() -> set[str]:
     """
@@ -107,11 +88,9 @@ def next_batch_index() -> int:
                 pass
     return max_idx + 1
 
-
 def export_google_doc_to_text(service, file_id: str) -> str:
     request = service.files().export(fileId=file_id, mimeType="text/plain")
     return request.execute().decode("utf-8")
-
 
 def export_docx_to_text(service, file_id: str) -> str:
     request = service.files().get_media(fileId=file_id)
@@ -122,6 +101,9 @@ def export_docx_to_text(service, file_id: str) -> str:
     doc = docx.Document(BytesIO(docx_bytes))
     return "\n".join(p.text for p in doc.paragraphs)
 
+# =========================
+# Main logic
+# =========================
 
 def main():
     creds = service_account.Credentials.from_service_account_file(KEY_PATH, scopes=SCOPES)

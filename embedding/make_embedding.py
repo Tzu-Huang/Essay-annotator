@@ -1,3 +1,15 @@
+# Name: Zackery Liu
+# Input: JSONL file that contains fields such as
+#        id, topic, content, type, school, public, source_file
+# Output: Export a new JSONL file ('embed.jsonl') where each record
+#         includes embedding vectors for both topic and content
+
+"""
+This program reads a finalized JSONL corpus, extracts text fields,
+generates OpenAI embeddings in batches, and writes the enriched
+records (with embeddings) back to a JSONL output file.
+"""
+
 import os
 import json
 from pathlib import Path

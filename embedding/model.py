@@ -7,7 +7,6 @@ import os
 
 client = OpenAI(api_key = os.environ["OPENAI_API_KEY"])
 
-
 response = client.embeddings.create(
     model="text-embedding-3-small",
     input= "This"

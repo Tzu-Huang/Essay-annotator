@@ -85,13 +85,13 @@ def main():
 
         # Set the value for essay_type and school
         if folder_name == "commonapp":
-            essay_type = "Personal statement"
+            essay_type = "personal statement"
             school = "none"
         elif folder_name == "uc":
             essay_type = "UC PIQ"
-            school = "University of California"
+            school = "university of california"
         elif folder_name == "supplementals":
-            essay_type = "Supplementals"
+            essay_type = "supplementals"
             filename = file_path.stem # .stem refers to the file name
 
             # Deal with file names if there is - 
@@ -120,7 +120,7 @@ def main():
     with open(output_path, "w", encoding="utf-8") as f:
         for essay in data:
             f.write(json.dumps(essay, ensure_ascii=False) + "\n")
-    print(f"Saved {id_counter} essays to organized_essays.jsonl")
     print(f"Saved {len(data)} essays to organized_essays.jsonl")
+
 if __name__ == "__main__" :
     main()

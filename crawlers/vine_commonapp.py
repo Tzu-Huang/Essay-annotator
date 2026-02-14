@@ -1,6 +1,5 @@
 import requests
 from pathlib import Path
-from itertools import count
 from bs4 import BeautifulSoup
 import json
 import re
@@ -51,7 +50,7 @@ def main():
     example_headers = [h for h in soup.find_all("h3") if "Example" in h.get_text()]
 
     with open(output_path, "w", encoding="utf-8") as f:
-        counter = count(1)
+        essays_count = 0
         for header in example_headers:
             header_text = header.get_text(strip=True)
 
@@ -64,17 +63,18 @@ def main():
             essay_lines = get_content(header)
 
             if essay_lines:
+                essays_count += 1
                 obj = {
-                    "id": f"essay_{next(counter):04d}",
-                    "type": "personal statement",
+                    "id": f"essay_{essays_count:04d}",
                     "topic": prompt_text,
                     "content": "\n".join(essay_lines),
+                    "type": "personal statement",
                     "public": True,
                     "source_file": url
                 }
                 f.write(json.dumps(obj, ensure_ascii=False) + "\n")
 
-    print("Saved all essays to vine_commonapp.jsonl")
+    print(f"Saved {essays_count} essays to vine_commonapp.jsonl")
 
 
 if __name__ == "__main__":

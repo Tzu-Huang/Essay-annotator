@@ -1,7 +1,5 @@
-import requests
 from bs4 import BeautifulSoup
 from common import fetch_html
-from itertools import count
 from pathlib import Path
 import json
 import re
@@ -21,29 +19,29 @@ def main():
     essay_headers = [h for h in soup.find_all("h3") if re.search(r"#\d+", h.get_text())]
 
     with open(output_path, "w", encoding="utf-8") as f:
-        counter = count(1)
+        essays_count = 0
 
         for header in essay_headers:
 
             essay_lines = get_content(header)
 
             if essay_lines:
-                essay_id = next(counter)
-                if essay_id == 2:  # handle an exception in the file
+                essays_count += 1
+                if essays_count == 2:  # handle an exception in the file
                     topic = prompt_three
                 else:
                     topic = default_topic
                 
                 f.write(json.dumps({
-                    "id": f"essay_{essay_id:04d}",
-                    "type": "personal statement", 
+                    "id": f"essay_{essays_count:04d}",
                     "topic": topic,
                     "content": "\n".join(essay_lines), 
+                    "type": "personal statement", 
                     "public": True, 
                     "source_file": "online"
                 }, ensure_ascii=False) + "\n")
 
-    print("Saved all essays to collegeadvisor.jsonl")
+    print(f"Saved {essays_count} essays to collegeadvisor.jsonl")
 
 def get_content(header):
     essay_lines = []

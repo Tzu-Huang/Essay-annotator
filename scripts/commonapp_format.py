@@ -1,49 +1,37 @@
+# Name: Amanda
+# Input: get raw txt files from the organized_data/commonapp
+# Output: output a jsonl file that clears out the information of each essay, 
+#         including id, topic, content, type, public, source_file
+
+
 from pathlib import Path
 from itertools import count
 import json
 import re
 
+# =========================
+# Config
+# =========================
+
+# File parent path, input path, output path
 script_dir = Path(__file__).parent
-commonapp_dir = script_dir / "../data/organized_data/commonapp/"
+input_dir = script_dir / "../data/organized_data/commonapp/"
 output_path = script_dir / "../data/finalized_data_json/commonapp.jsonl"
 
-def main():
-    if not commonapp_dir.exists() or not commonapp_dir.is_dir(): 
-        print(f"The folder {commonapp_dir} does not exist or is not a folder.")
-        return
-    
-    commonapp_data = []
-
-    id_counter = count(1)
-
-    for file_path in commonapp_dir.glob("*.txt"):
-        with file_path.open(encoding="utf-8-sig") as f: 
-             text = f.read();
-        
-        sections = split_topic_content(text)
-        
-        for section in sections:
-            essay = {
-                "id": f"essay_{next(id_counter):04d}", 
-                "type": "personal statement", 
-                "topic": section["topic"],
-                "content": section["content"], 
-                "public": False,
-                "source_file": file_path.name
-            }
-            commonapp_data.append(essay)
-    
-    with open(output_path, "w", encoding="utf-8") as f:
-        for essay in commonapp_data:
-            f.write(json.dumps(essay, ensure_ascii=False) + "\n")
-    print("Saved all essays to commonapp.jsonl")
-
+# =========================
+# Helper functions
+# =========================
 
 def split_topic_content(text):
+    """
+    Read the file and split the prompt and content by identifying the target 
+    text that are included in each file. 
+    """
     section = re.split(r'(prompt:)', text, flags=re.IGNORECASE)
     list = []
 
-    for i in range(1, len(section), 2):
+    # starting from index 1 (prompt: ...), index 0 = ""
+    for i in range(1, len(section) - 1, 2):
         info = section[i] + section[i+1]
 
         # extract all the words after each target label
@@ -57,6 +45,48 @@ def split_topic_content(text):
                 "content": content.group(1).strip()
             })
     return list
+
+
+# =========================
+# Main logic
+# =========================
+
+def main():
+    if not input_dir.exists() or not input_dir.is_dir(): 
+        print(f"The folder {input_dir} does not exist or is not a folder.")
+        return
+    
+    commonapp_data = []
+
+    id_counter = count(1) # Counter for the id
+
+    # Load all of the files in the folder
+    for file_path in input_dir.glob("*.txt"):
+        with file_path.open(encoding="utf-8-sig") as f: 
+             text = f.read();
+        
+        # Record the splitted prompt and content list
+        sections = split_topic_content(text)
+        
+        # Merge the collected info in to the final dict
+        for section in sections:
+            essay = {
+                "id": f"essay_{next(id_counter):04d}", 
+                "topic": section["topic"],
+                "content": section["content"], 
+                "type": "personal statement", 
+                "public": False,
+                "source_file": file_path.name
+            }
+            commonapp_data.append(essay)
+    
+    # dump all the json string(from dict) and write it 
+    # in the commonapp.jsonl file 
+    with open(output_path, "w", encoding="utf-8") as f:
+        for essay in commonapp_data:
+            f.write(json.dumps(essay, ensure_ascii=False) + "\n")
+    print("Saved all essays to commonapp.jsonl")
+
 
 if __name__ == "__main__" :
     main()

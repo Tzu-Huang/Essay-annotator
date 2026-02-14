@@ -1,4 +1,5 @@
-What academic areas are you interested in exploring at Emory University and why? (200 words)
+What academic areas are you interested in exploring at Emory University and why?
+
 Money interests me because I want to be a doctor. Not a doctor of the human body, but of organizations. A nugget of wisdom from my favorite movie, The Big Short, imparts that the flow of money reflects the economic health of firms or even nations. Many of the “patients” do not know that they are ill, and those who do often find themselves lacking professional guidance. This is why I am committed to filling the gaps using the hard truths that finance reveals.
 	However, finance does not always tell the full story, just as there is no universal cure for all diseases. Therefore, I aspire to put more types of medicine in my kit. An important one is Data Science, as it is essential to interpreting and modeling macroeconomic trends. Another is Psychology, because cognitive and social factors influence financial decisions on individual and societal levels.
 	At Emory, I can not only explore career potential as a “doctor” with the resources of a research university, but also sustain my commitment to the “Hippocratic Oath” with Emory’s liberal arts education and its emphasis on the purpose as well as the outcome of work.

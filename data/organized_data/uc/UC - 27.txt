@@ -1,6 +1,6 @@
-﻿Content: What have you done to make your school or your community a better place?
+﻿What have you done to make your school or your community a better place?
 
-It pained me to see my mother struggle to prove her identity on her phone and at airports after shaving off part of her fingerprint while preparing dinner. I wondered, was it only her who had this issue?
+Content: It pained me to see my mother struggle to prove her identity on her phone and at airports after shaving off part of her fingerprint while preparing dinner. I wondered, was it only her who had this issue?
 
 Recalling my knowledge on how fingerprint patterns can degrade overtime with the loss of skin elasticity, I set out to interview the seniors in my community to determine whether they have had difficulties with fingerprint recognition. The problem was more widespread than I had presumed: senior members of my school faculty expressed annoyance over ATM machines failing repeatedly to recognize their fingerprints as they watched younger people withdraw money with ease; my diabetic relatives who have to poke the tips of the fingers to measure blood glucose held the same sentiment. 
 

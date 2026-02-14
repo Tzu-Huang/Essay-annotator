@@ -6,7 +6,7 @@ import re
 
 url = "https://blog.collegevine.com/common-app-essay-examples"
 script_dir = Path(__file__).parent
-output_path = script_dir / "../data/finalized_data_json/vine_commonapp.jsonl"
+output_path = script_dir / "../data/essays_jsonl/vine_commonapp.jsonl"
 
 def search_prompt(soup):
     prompt_descriptions = {}
@@ -67,10 +67,11 @@ def main():
                 obj = {
                     "id": f"essay_{essays_count:04d}",
                     "topic": prompt_text,
-                    "content": "\n".join(essay_lines),
+                    "content": "\n\n".join(essay_lines),
                     "type": "personal statement",
+                    "school": "none",
                     "public": True,
-                    "source_file": url
+                    "source_file": "online"
                 }
                 f.write(json.dumps(obj, ensure_ascii=False) + "\n")
 

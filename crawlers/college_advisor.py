@@ -6,7 +6,7 @@ import re
 
 url = "https://www.collegeadvisor.com/resources/common-app-essay-examples/"
 script_dir = Path(__file__).parent
-output_path = script_dir / "../data/finalized_data_json/collegeadvisor.jsonl"
+output_path = script_dir / "../data/essays_jsonl/collegeadvisor.jsonl"
 
 default_topic = "Share an essay on any topic of your choice. It can be one you've already written, one that responds to a different prompt, or one of your own design"
 prompt_three = "Reflect on a time when you questioned or challenged a belief or idea. What prompted your thinking? What was the outcome?"
@@ -35,8 +35,9 @@ def main():
                 f.write(json.dumps({
                     "id": f"essay_{essays_count:04d}",
                     "topic": topic,
-                    "content": "\n".join(essay_lines), 
+                    "content": "\n\n".join(essay_lines), 
                     "type": "personal statement", 
+                    "school": "none",
                     "public": True, 
                     "source_file": "online"
                 }, ensure_ascii=False) + "\n")

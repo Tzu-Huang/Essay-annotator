@@ -4,7 +4,6 @@ from __future__ import annotations
 
 from pathlib import Path
 from typing import List, Dict
-from itertools import count
 from bs4 import BeautifulSoup
 import json
 
@@ -23,6 +22,21 @@ STOP_PHRASES = [
     "Struggling to write your college essays",
 ]
 
+PROMPTS = [
+    "Some students have a background, identity, interest, or talent that is so meaningful they believe their application would be incomplete without it. If this sounds like you, then please share your story.",
+    "The lessons we take from obstacles we encounter can be fundamental to later success. Recount a time when you faced a challenge, setback, or failure. How did it affect you, and what did you learn from the experience?",
+    "Reflect on a time when you questioned or challenged a belief or idea. What prompted your thinking? What was the outcome?",
+    "Reflect on something that someone has done for you that has made you happy or thankful in a surprising way. How has this gratitude affected or motivated you?",
+    "Discuss an accomplishment, event, or realization that sparked a period of personal growth and a new understanding of yourself or others.",
+    "Describe a topic, idea, or concept you find so engaging that it makes you lose all track of time. Why does it captivate you? What or who do you turn to when you want to learn more?",
+    "Share an essay on any topic of your choice. It can be one you've already written, one that responds to a different prompt, or one of your own design"
+]
+special_case_prompt = "The Stanford community is deeply curious and driven to learn in and out of the classroom. Reflect on an idea or experience that makes you genuinely excited about learning."
+prompt_by_essay = [
+    PROMPTS[5], PROMPTS[6], PROMPTS[4], special_case_prompt, PROMPTS[4], 
+    PROMPTS[0], PROMPTS[0], PROMPTS[5], PROMPTS[1], 
+    PROMPTS[1], PROMPTS[1], PROMPTS[3], PROMPTS[2], PROMPTS[0]
+]
 
 def parse_shemmassian_college_examples(
     url: str = BASE_URL,
@@ -48,8 +62,6 @@ def parse_shemmassian_college_examples(
     # If not found, use the entire soup.
     article = soup.find("article") or soup
 
-    counter = count(1)
-
     # Collect all <h2> elements whose text begins with "College essay example".
     h2_list = []
     for h in article.find_all("h2"):
@@ -62,9 +74,17 @@ def parse_shemmassian_college_examples(
     for idx, h2 in enumerate(h2_list):
         example_id = idx
 
+        topic = prompt_by_essay[idx-1]
+        if idx == 4:
+            school = "Stanford"
+        else:
+            school = "none"
         school_info = ""
         essay_type = "personal statement"  # default type
         paragraphs: List[str] = []
+        started = False
+
+        
 
         # Start scanning paragraph nodes after the current <h2>
         node = h2.next_sibling
@@ -82,9 +102,10 @@ def parse_shemmassian_college_examples(
                 text = node.get_text(strip=True)
                 if not text:
                     pass  # ignore empty paragraphs
-                # First paragraph containing "worked for" is the school info
-                elif "worked for" in text.lower() and not school_info:
+                # First paragraph containing "worked for" or "this student" is the school info
+                elif ("worked for" in text.lower() or "this student" in text.lower()) and not school_info:
                     school_info = text
+                    started = True
                     if "supplemental essay" in text.lower():
                         essay_type = "supplemental"
                 # Skip "(Suggested reading: ...)" lines
@@ -94,7 +115,8 @@ def parse_shemmassian_college_examples(
                 elif any(phrase in text for phrase in STOP_PHRASES):
                     break
                 else:
-                    paragraphs.append(text)
+                    if started or not school_info:
+                        paragraphs.append(text)
 
             node = node.next_sibling
 
@@ -103,10 +125,12 @@ def parse_shemmassian_college_examples(
         if essay_text:
             examples.append(
                 {
-                    "id": f"essay_{example_id:02d}",
+                    "id": f"essay_{example_id:04d}",
+                    "topic": topic,
+                    "content": essay_text,
                     "type": essay_type,
-                    "school_info": school_info,
-                    "text": essay_text,
+                    "school": school, 
+                    "public": True,
                     "source_file": "online",
                 }
             )
@@ -134,7 +158,7 @@ def crawl_shemmassian(output_path: str | Path | None = None) -> int:
     # If no output path is provided, save to the project root.
     if output_path is None:
         project_root = Path(__file__).parent
-        output_path = project_root / "../data/essays_json/shemmassian_college_essays.jsonl"
+        output_path = project_root / "../data/essays_jsonl/shemmassian_college_essays.jsonl"
     else:
         output_path = Path(output_path)
 
@@ -146,7 +170,7 @@ def crawl_shemmassian(output_path: str | Path | None = None) -> int:
         for e in essays:
             f.write(json.dumps(e, ensure_ascii=False) + "\n")
 
-    print(f"✅ Saved {len(essays)} essays to {output_path}")
+    print(f"Saved {len(essays)} essays to {output_path}")
     return len(essays)
 
 

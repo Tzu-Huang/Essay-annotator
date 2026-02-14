@@ -211,7 +211,7 @@ def main():
                 rec["topic_embedding"] = tvec
                 rec["content_embedding"] = cvec
 
-                #Convert a complete record to a line and store in embed.jsonl
+                # Convert a complete record to a line and store in embed.jsonl
                 out.write(json.dumps(rec, ensure_ascii=False) + "\n")
                 seen_ids.add(rec["id"])
 

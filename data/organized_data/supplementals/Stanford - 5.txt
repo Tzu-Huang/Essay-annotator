@@ -1,6 +1,6 @@
-The Stanford community is deeply curious and driven to learn in and out of the classroom. Reflect on an idea or experience that makes you genuinely excited about learning.
+Prompt: The Stanford community is deeply curious and driven to learn in and out of the classroom. Reflect on an idea or experience that makes you genuinely excited about learning.
 
-I love cracking life’s hidden codes. Whether it’s hunting for the optimal badminton footwork or analyzing how street lights time their cycles, I found joy in uncovering the formulas that govern the world around me.  
+Content: I love cracking life’s hidden codes. Whether it’s hunting for the optimal badminton footwork or analyzing how street lights time their cycles, I found joy in uncovering the formulas that govern the world around me.  
 
 Human language, though, was a wilder puzzle I encountered. Could machines truly understand meaning? Is there even a formula? Hungry for answers, I delved into research studies and YouTube videos. There, I discovered how words like tokenizer and embedding matrix weren’t simply buzzwords. Each played a crucial role in teaching models to separate a 19th-century king from a chess king.
 

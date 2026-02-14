@@ -1,6 +1,6 @@
-1. Describe how you plan to pursue your academic interests at USC. Please feel free to address your first- and second-choice major selections. (250 word limit)
+Prompt: Describe how you plan to pursue your academic interests at USC. Please feel free to address your first- and second-choice major selections.
 
-I believe that the most important trend in business, both short- and long-term, is the integration of AI into everything. How can businesses use AI to pursue efficiency and profitability without sacrificing customer experience? What kind of role can AIs play in business strategy? And how can we minimize the impact on sustainability given the requirements of large-scale computation? 
+Content: I believe that the most important trend in business, both short- and long-term, is the integration of AI into everything. How can businesses use AI to pursue efficiency and profitability without sacrificing customer experience? What kind of role can AIs play in business strategy? And how can we minimize the impact on sustainability given the requirements of large-scale computation? 
 
 To answer these questions, I plan to pursue USC’s unique AI for Business program (BUAI). The integrative classes on digital transformation and technology strategy, such as BUAD 112 and DSO 429, provide contact and experience with industry professionals at the forefront of this constantly evolving sector. I am also drawn to the major’s emphasis on Data Science, which is my second choice major. As Viterbi focuses heavily on engineering, I appreciate that business classes and peer discussions there are infused with a strong technological perspective. 
 

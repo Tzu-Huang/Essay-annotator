@@ -65,9 +65,9 @@ def main():
         for section in sections:
             essay = {
                 "id": f"essay_{next(id_counter):04d}", 
-                "type": "UC PIQ", 
                 "topic": section["topic"],
                 "content": section["content"], 
+                "type": "UC PIQ", 
                 "public": False,
                 "source_file": file_path.name
             }

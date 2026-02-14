@@ -65,9 +65,9 @@ def main():
         
         essays.append({
             "id": f"essay_{i+1:04d}",
-            "type": "personal statement",
             "topic": prompt_text,
             "content": essay_text,
+            "type": "personal statement",
             "public": True,
             "source_file": "online",
         })

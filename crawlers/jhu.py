@@ -82,11 +82,11 @@ def parse_jhu_essay(url):
         date = date_tag.get_text().strip()
 
     return {
-        "type": "personal statement",
         "topic": title, 
         "content": body_text,
+        "type": "personal statement",
         "author": author,
-        "url": url,
+        "url": "online",
     }
 
 def crawl_jhu_essays():
@@ -134,7 +134,7 @@ def crawl_jhu_essays():
                 print(f"      Failed: {e}")
 
             # 👉 Sleep to avoid overloading the website.
-            time.sleep(0.3)
+            time.sleep(0.1)
 
     # 👉 Save to JSONL format (one JSON per line).
     with open(output_path, "w", encoding="utf-8") as f:

@@ -41,7 +41,7 @@ def sanitize_filename(name: str) -> str:
     - Keeps only letters, numbers, spaces, '_' and '-'
     - Ensures filename is not empty
     """
-
+    
     # Keep letters/numbers/space/_/-
     safe = "".join(c for c in name if c.isalnum() or c in " _-").strip()
     # Avoid empty filenames

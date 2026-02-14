@@ -1,24 +1,21 @@
-"""
-txt_to_jsonl.py
-
-Purpose:
-This program convert .txt file to JSONL form
-
-How to use:
-1. Set INPUT_DIR and OUTPUT_FILE to target folders
-2. Run:
-   python scripts/txt_to_jsonl.py
-
-"""
+# Name: Zackery Liu
+# Input: txt folder
+# Output: jsonl files
 
 import os
 import json
 
+# =========================
+# Config
+# =========================
 INPUT_DIR = "data/organized_data"
 OUTPUT_FILE = "data/essays_json/essays.json"
 
 os.makedirs(os.path.dirname(OUTPUT_FILE), exist_ok=True)
 
+# =========================
+# Helper functions
+# =========================
 def clean_text(text: str) -> str:
     """
     Clean the raw essay text.
@@ -29,6 +26,9 @@ def clean_text(text: str) -> str:
     """
     return text.strip()
 
+# =========================
+# Main 
+# =========================
 def main():
     with open(OUTPUT_FILE, "w", encoding="utf-8") as out:
         for i, filename in enumerate(sorted(os.listdir(INPUT_DIR)), start=1):

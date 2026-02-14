@@ -7,15 +7,32 @@ from pathlib import Path
 from common import fetch_html
 
 script_dir = Path(__file__).parent
-output_path = script_dir / "../data/finalized_data_json/jhu_essays.jsonl"
+output_path = script_dir / "../data/essays_jsonl/jhu_essays.jsonl"
 
+PROMPTS = [
+    "Some students have a background, identity, interest, or talent that is so meaningful they believe their application would be incomplete without it. If this sounds like you, then please share your story.",
+    "The lessons we take from obstacles we encounter can be fundamental to later success. Recount a time when you faced a challenge, setback, or failure. How did it affect you, and what did you learn from the experience?",
+    "Reflect on a time when you questioned or challenged a belief or idea. What prompted your thinking? What was the outcome?",
+    "Reflect on something that someone has done for you that has made you happy or thankful in a surprising way. How has this gratitude affected or motivated you?",
+    "Discuss an accomplishment, event, or realization that sparked a period of personal growth and a new understanding of yourself or others.",
+    "Describe a topic, idea, or concept you find so engaging that it makes you lose all track of time. Why does it captivate you? What or who do you turn to when you want to learn more?",
+    "Share an essay on any topic of your choice. It can be one you've already written, one that responds to a different prompt, or one of your own design"
+]
 
-"""
-Extract all essay URLs from a Johns Hopkins 'Essays That Worked' index page.
-- index_url: URL of the listing page.
-- Returns: list of essay URLs (strings).
-"""
+prompt_by_essay = [
+    PROMPTS[5], PROMPTS[0], PROMPTS[5], PROMPTS[0], 
+    PROMPTS[1], PROMPTS[2], PROMPTS[5], PROMPTS[4], 
+    PROMPTS[4], PROMPTS[4], PROMPTS[4], PROMPTS[0], 
+    PROMPTS[4], PROMPTS[4], PROMPTS[4], PROMPTS[4], 
+    PROMPTS[4], PROMPTS[1]
+]
+
 def get_jhu_essay_links(index_url): #John Hopkins Essay
+    """
+    Extract all essay URLs from a Johns Hopkins 'Essays That Worked' index page.
+    - index_url: URL of the listing page.
+    - Returns: list of essay URLs (strings).
+    """
     html = fetch_html(index_url)
     soup = BeautifulSoup(html, "html.parser")
 
@@ -34,6 +51,7 @@ def get_jhu_essay_links(index_url): #John Hopkins Essay
     links = sorted(set(links))
     return links
 
+
 def parse_jhu_essay(url):
     """
     Parse a single JHU essay page.
@@ -46,10 +64,6 @@ def parse_jhu_essay(url):
     """
     html = fetch_html(url)
     soup = BeautifulSoup(html, "html.parser")
-
-    # 👉 The main title is usually inside the <h1> tag.
-    title_tag = soup.find("h1")
-    title = title_tag.get_text().strip() if title_tag else ""
 
     # 👉 Extract essay paragraphs.
     paragraphs = []
@@ -68,25 +82,15 @@ def parse_jhu_essay(url):
 
     # Join paragraphs into a single text with spacing.
     body_text = "\n\n".join(paragraphs)
-
-    # 👉 Attempt to locate author information.
-    author = ""
-    date = ""
-    author_tag = soup.find(attrs={"class": lambda c: c and "author" in c.lower()})
-    if author_tag:
-        author = author_tag.get_text().strip()
-
-    # 👉 Attempt to extract <time> tag for dates.
-    date_tag = soup.find("time")
-    if date_tag:
-        date = date_tag.get_text().strip()
+    body_text.strip()
 
     return {
-        "topic": title, 
+        "topic": None,
         "content": body_text,
         "type": "personal statement",
-        "author": author,
-        "url": "online",
+        "school": "none",
+        "public": True,
+        "source_file": "online",
     }
 
 def crawl_jhu_essays():
@@ -106,6 +110,7 @@ def crawl_jhu_essays():
 
     all_essays = []
     counter = count(1)  # Counter starts fresh each run
+    prompt_index = 0
 
     for index_url in index_urls:
         print(f"[Index] {index_url}")
@@ -127,6 +132,10 @@ def crawl_jhu_essays():
 
                 # 👉 Filter out extremely short pages (not real essays).
                 if len(essay["content"]) > 300:
+                    if prompt_index < len(prompt_by_essay):
+                        essay["topic"] = prompt_by_essay[prompt_index]
+                    prompt_index += 1
+
                     # Put id first in the dictionary
                     format_essay = {"id": f"essay_{next(counter):04d}", **essay}
                     all_essays.append(format_essay)

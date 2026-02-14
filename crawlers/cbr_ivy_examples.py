@@ -8,7 +8,7 @@ LABEL_PATTERNS = ["Common App Essay Prompt:", "Common App Prompt:"]
 url = "https://collegeboundreview.com/ivy-league-essay-examples"
 
 script_dir = Path(__file__).parent
-output_path = script_dir / "../data/finalized_data_json/collegeBound_commonapp.jsonl"
+output_path = script_dir / "../data/essays_jsonl/collegeBound_commonapp.jsonl"
 
 # find prompt labels in the page, with tag <strong>
 def find_labels(soup):
@@ -68,6 +68,7 @@ def main():
             "topic": prompt_text,
             "content": essay_text,
             "type": "personal statement",
+            "school": "none",
             "public": True,
             "source_file": "online",
         })

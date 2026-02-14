@@ -20,7 +20,7 @@ from openai import OpenAI
 # =========================
 
 # Input JSONL file (finalized schema)
-Input_file = 'data/finalized_data_json/collegeadvisor.jsonl'
+Input_file = 'data/essays_jsonl/organized_essays.jsonl'
 Output_file = 'data/embed_output/embed.jsonl'
 
 Batch_size = 64 # This is the size that you want to embed and store at once

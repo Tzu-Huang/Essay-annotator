@@ -55,6 +55,30 @@ def read_jsonl(path):
                 print(f"[JSON ERROR] line {idx}: {e}")
                 print("Preview:", line[:120])
 
+def load_processed_ids(output_path: str) -> set:
+    """
+    Read exisiting output JSONL (embed.jsonl) and collect processed records IDs
+    """
+
+    processed = set()
+
+    if not os.path.exists(output_path):
+        return processed
+
+    with open(output_path, "r", encoding="utf-8-sig") as f:
+        for idx, line in enumerate(f, start= 1):
+            line = line.strip()
+            if not line:
+                continue
+            try:
+                obj = json.loads(line)
+                rid = obj.get("id")
+                if rid:
+                    processed.add(rid)
+            except Exception as e:
+                print(e)
+    return processed
+
 def extract_text_fields(obj):
     """
     Given one JSON object, extract topic and content.
@@ -117,23 +141,36 @@ def main():
 
     total_written = 0
     total_seen = 0
+    total_skipped = 0
 
-    with open(Output_file, "w", encoding="utf-8") as out:
+    seen_ids = load_processed_ids(Output_file) # Check load status
+    print(f"Found {len(seen_ids)} already embedded records in output")
+
+    # We use "a" instead of "w" because we only need to append instead of rewite
+    with open(Output_file, "a", encoding="utf-8-sig") as out:
 
         # Step 1: read jsonl line by line
         for obj in read_jsonl(Input_file):
             total_seen += 1
-            record = extract_text_fields(obj)
 
+            record = extract_text_fields(obj)
             if record is None:
                 continue
             
+            rid = record.get("id")
+            if not rid:
+                continue
+            
+            if rid in seen_ids:
+                total_skipped += 1
+                continue
             batch_records.append(record)
             batch_topics.append(record["topic"])
             batch_contents.append(record["content"])
 
             # When batch is full, do embedding and output
             if (len(batch_records) >= Batch_size):
+                print("records >= Batch size! Embedding now")
                 try:
                     topic_vecs = embedding(client, batch_topics)
                     content_vecs = embedding(client, batch_contents)
@@ -154,6 +191,7 @@ def main():
 
                     # Convert a complete record to a line and store in embed.jsonl
                     out.write(json.dumps(rec, ensure_ascii=False) + "\n")
+                    seen_ids.add(rec["id"])
 
                 total_written += len(batch_records)
                 print(f"Written {total_written} records.. ")
@@ -175,6 +213,7 @@ def main():
 
                 #Convert a complete record to a line and store in embed.jsonl
                 out.write(json.dumps(rec, ensure_ascii=False) + "\n")
+                seen_ids.add(rec["id"])
 
             total_written += len(batch_records)
             print(f"Written {total_written} records.. ")
@@ -187,6 +226,7 @@ def main():
     print("\n DONE! ")
     print(f"Total seen lines: {total_seen}")
     print(f"Total embedded+written: {total_written}")
+    print(f"Total skipped (already embedded): {total_skipped}")
     print(f"Output: {Output_file}")
 
 if __name__ == "__main__":

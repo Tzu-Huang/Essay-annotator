@@ -9,7 +9,7 @@ import json
 # Config
 # =========================
 INPUT_DIR = "data/organized_data"
-OUTPUT_FILE = "data/essays_json/essays.json"
+OUTPUT_FILE = "data/essays_json/essays.jsonl"
 
 os.makedirs(os.path.dirname(OUTPUT_FILE), exist_ok=True)
 

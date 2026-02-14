@@ -59,3 +59,6 @@ def load_db_embeddings(db_path: str):
 
     for obj in read_jsonl(db_path):
         rid = obj.get("id")
+        emb = 
+
+string = "t"

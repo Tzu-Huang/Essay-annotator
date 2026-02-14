@@ -143,8 +143,9 @@ def main():
     query, q_V = (load_query_embeddings(QUERY_JSONL))
 
     # print(q_V)
-    for q_vec in q_V:
-        print(cosine_search(ids, V, q_vec, 2))
+    if (check_shape):
+        for q_vec in q_V:
+            print(cosine_search(ids, V, q_vec, 2))
 
 
 if __name__ == "__main__":

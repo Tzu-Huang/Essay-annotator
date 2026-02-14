@@ -68,7 +68,7 @@ def main():
         # Record the splitted prompt and content list
         sections = split_topic_content(text)
         
-        # Merge the collected info in to the final dict
+        # Merge the collected info in to the final list
         for section in sections:
             essay = {
                 "id": f"essay_{next(id_counter):04d}", 

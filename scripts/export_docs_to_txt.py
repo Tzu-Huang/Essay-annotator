@@ -70,7 +70,6 @@ def load_all_processed_ids() -> set[str]:
             continue
     return processed
 
-
 def next_batch_index() -> int:
     """
     Find the next available batch index based on existing part files.

@@ -9,7 +9,7 @@ Output: return top-k reuslts, including
         2. id
         3. score
 """
-
+from __future__ import annotations
 import json
 from pathlib import Path
 import numpy as np
@@ -99,12 +99,19 @@ def load_query_embeddings(q_path: str):
     q_V = np.array(q_emb, dtype=np.float32)
 
     # return: shape=(number of queries, dimension of embedding)
-    return query, q_V
+    return query, q_V # text and vector (embedding numbers)
 
 def check_shape(V, q_V):
-    print("DB shape: ", V.shape[1])
-    print("Query shape: ", q_V.shape[1])
-
+    if V.size == 0:
+        print("[ERROR] DB embedding matrix is empty. Check DB_JSONL / embedding key.")
+        return False
+    if q_V.size == 0:
+        print("[ERROR] Query embedding matrix is empty. Check QUERY_JSONL / embedding key.")
+        return False
+    if V.ndim != 2 or q_V.ndim != 2:
+        print("[ERROR] Embedding arrays must be 2D matrices.")
+        return False
+     
     return V.shape[1] == q_V.shape[1]
 
 def cosine_search(ids, V, q_vec, TOP_K):
@@ -137,15 +144,33 @@ def cosine_search(ids, V, q_vec, TOP_K):
         })
 
     return results
-    
+
+def write_jsonl(path: str, records: list[dict]):
+    Path(path).parent.mkdir(parents=True, exist_ok=True)
+
+    with open(path, "w", encoding="utf-8") as f:
+        for r in records:
+            f.write(json.dumps(r, ensure_ascii=False) + "\n")
+
 def main():
     ids, V = (load_db_embeddings(DB_JSONL))
-    query, q_V = (load_query_embeddings(QUERY_JSONL))
+    queries, q_V = (load_query_embeddings(QUERY_JSONL))
+    # print()
+    print(q_V)
+    if not check_shape(V, q_V):
+        return
+    
+    outputs = []
+    for q_text, q_vec, in zip(queries, q_V):
+        hits = cosine_search(ids, V, q_vec, TOP_K)
+        outputs.append({
+            "query": q_text,
+            "top_k": TOP_K,
+            "results": hits
+        })
 
-    # print(q_V)
-    if (check_shape):
-        for q_vec in q_V:
-            print(cosine_search(ids, V, q_vec, 2))
+    write_jsonl(OUT_JSONL, outputs)
+    print(f"[OK] Wrote {len(outputs)} query results -> {OUT_JSONL}")
 
 
 if __name__ == "__main__":

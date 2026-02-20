@@ -4,10 +4,12 @@ import requests
 from bs4 import BeautifulSoup
 from itertools import count
 from pathlib import Path
-from common import fetch_html
 
 script_dir = Path(__file__).parent
 output_path = script_dir / "../data/essays_jsonl/jhu_essays.jsonl"
+HEADERS = {
+    "User-Agent": "Mozilla/5.0 (compatible; EssayCrawler/0.1; +https://example.com/your-contact)"
+}
 
 PROMPTS = [
     "Some students have a background, identity, interest, or talent that is so meaningful they believe their application would be incomplete without it. If this sounds like you, then please share your story.",
@@ -26,6 +28,11 @@ prompt_by_essay = [
     PROMPTS[4], PROMPTS[4], PROMPTS[4], PROMPTS[4], 
     PROMPTS[4], PROMPTS[1]
 ]
+
+def fetch_html(url):
+    resp = requests.get(url, headers=HEADERS, timeout=10) # Sending request
+    resp.raise_for_status()    
+    return resp.text 
 
 def get_jhu_essay_links(index_url): #John Hopkins Essay
     """

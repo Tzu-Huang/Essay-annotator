@@ -1,0 +1,1 @@
+{"query": "This is a sample test", "top_k": 5, "results": [{"rank": 1, "id": "essay_0077", "score": 0.3127569258213043}, {"rank": 2, "id": "essay_0085", "score": 0.2606547772884369}, {"rank": 3, "id": "essay_0054", "score": 0.2583182454109192}, {"rank": 4, "id": "essay_0075", "score": 0.2569235563278198}, {"rank": 5, "id": "essay_0102", "score": 0.2447723150253296}]}

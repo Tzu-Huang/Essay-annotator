@@ -2,7 +2,7 @@
 > **A Modular Dense Retrieval Framework for College Essay Semantic Search**
 
 <p align="center">
-  <img src='pic.jpg'>
+  <img src='pic.png'>
 </p>
 
 EssayLens is a data-driven platform designed to help students learn how to write effective U.S. college application essays by analyzing real examples and providing structural, non-ghostwriting feedback.
@@ -26,11 +26,22 @@ The system constructs an end-to-end pipeline that:
 
 4. Performs cosine-based top-K retrieval over the vector database.
 
+This repository serves as a research prototype for studying semantic similarity, narrative structure alignment, and thematic clustering in long-form student writing.
+
+
 ---
 
-## 🏗️ System Architecture
-The framework follows a layered architecture to ensure modularity and extensibility across the data pipeline.
 
+## Motivation
+
+College application essays present unique challenges for retrieval systems:
+- They are long-form, reflective narratives.
+- Themes are often implicit rather than keyword-driven.
+- Emotional progression and growth arcs matter.
+- Prompt alignment is semantically nuanced.
+- Traditional keyword-based retrieval (e.g., BM25) struggles to capture narrative similarity and thematic resonance.
+
+This project explores whether dense vector representations can provide a more semantically meaningful retrieval mechanism for long-form essays.
 
 
 1.  **Data Sources**: Heterogeneous collection from Google Drive and public web crawlers.

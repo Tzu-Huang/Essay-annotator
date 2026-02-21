@@ -1,100 +1,65 @@
-# Essay-Annotator
+# Essay-Annotator 
+> **A Modular Dense Retrieval Framework for College Essay Semantic Search**
+
+<p align="center">
+  <img src='Semantic-Search.webp'>
+</p>
 
 EssayLens is a data-driven platform designed to help students learn how to write effective U.S. college application essays by analyzing real examples and providing structural, non-ghostwriting feedback.
 
-This project focuses on **learning and analysis**, not essay generation.
 
 ---
 
-## 🎯 Project Goal
 
-Many students struggle with college essays because they:
-- Cannot see real, authentic examples
-- Do not understand why certain essays work
-- Receive vague or unhelpful feedback
+## Abstract
+**Essay-Annotator** implements an end-to-end pipeline covering heterogeneous data ingestion, document normalization, dense vector generation, and optimized similarity search. 
 
-EssayLens aims to solve this by:
-- Collecting real college essays (with consent)
-- Structuring them into a searchable dataset
-- Providing AI-assisted structural analysis and feedback (not full rewriting)
+As a research prototype, this system facilitates the study of **semantic similarity**, **narrative structure alignment**, and **thematic clustering** in long-form reflective student writing.
+
+The system constructs an end-to-end pipeline that:
+
+1. 
 
 ---
 
-## 🧠 High-Level Architecture
+## 🏗️ System Architecture
+The framework follows a layered architecture to ensure modularity and extensibility across the data pipeline.
 
-Google Drive (raw essays, mostly Google Docs)
-→
-Data Ingestion (Google Drive API)
-→
-Export Google Docs → .txt
-→
-Structured JSON Dataset
-→
-Search / Analysis / AI Feedback
 
+
+1.  **Data Sources**: Heterogeneous collection from Google Drive and public web crawlers.
+2.  **Ingestion & Normalization**: Standardizing raw text into a unified JSONL schema with deterministic state tracking.
+3.  **Embedding**: Generating 1536-dimensional vectors using `text-embedding-3-small`.
+4.  **Vector Store**: Memory-efficient streaming storage for high-dimensional vectors.
+5.  **Retrieval Engine**: Optimized matrix-based similarity computation.
 
 ---
 
-## ✅ Current Progress (Completed)
+## 🚀 Getting Started
 
-### 1. Repository & Project Setup
-- GitHub repository initialized with clear project structure
-- `.gitignore` configured to prevent raw data, API keys, and derived datasets from being committed
-- `DATA_NOTES.md` added to document data-related decisions and constraints
+### Prerequisites
+- Python 3.10+
+- OpenAI API Key
+- Google Cloud Service Account (for private Drive access)
 
-### 2. Google Drive API Integration
-- Google Cloud project created
-- Google Drive API enabled
-- Service Account created and granted Viewer access to the `raw_data` folder
-- API authentication verified via Python scripts
-- Confirmed ability to:
-  - List Google Docs files
-  - Retrieve file metadata and file IDs
+### Installation
+```bash
+git clone [https://github.com/zackeryliu/essay-annotator.git](https://github.com/zackeryliu/essay-annotator.git)
+cd essay-annotator
+pip install -r requirements.txt
+Usage PipelineTo regenerate the full semantic index and perform a search:Bash# 1. Synchronize and normalize data
+python scripts/sync_data.py
 
-### 3. Data Ingestion Pipeline (Foundational)
-- Implemented multiple ingestion-related scripts with clear roles:
-  - **Connection testing** (Drive API authentication)
-  - **File discovery** (listing Google Docs and file IDs)
-  - **Export pipeline prototype** (Google Docs → `.txt`)
-- Established file ID–based tracking to support incremental, non-duplicative exports
-- Confirmed Google Drive as the canonical source of truth
+# 2. Generate dense embeddings
+python embedding/make_embedding.py
 
-### 4. File Type Handling
-- Identified and handled multiple Drive file types
-- Exported both **Google Docs** and **Word docx** to txt files
-
-### 5. File Conversion
-- Converted all the txt file to jsonl
-
----
-
-## 🔴 Current Focus
-> **Filter out unnecessary data from the `raw_data` folder and copy the essays accepted by universities to the `raw_curated` folder.**
->**Generalize all the .json to the same schema** (Zack)
-
-Steps:
-1. Complete the `raw_curated` folder by adding all accepted essays from the `raw_data` folder (Current)
-2. Manually remove unnecessary content from each Google Doc, label each document with its corresponding university, and add a topic label if missing (Future)
-3. Convert all the documents to `json` files (Future)
-
----
-
-## 🛠 Planned Next Steps
-
-1. Complete manual filtering and normalization of `raw_data`
-2. Finalize a recursive Google Drive API export script
-3. Export curated Google Docs essays into `.txt` files
-4. Store exported text under `data/raw_text/`
-5. Convert `.txt` files into a structured JSON dataset
-6. Begin downstream tasks:
-   - Essay metadata tagging
-   - Semantic search
-   - Rubric-based and AI-assisted analysis
-
----
-
-## 📌 Status Summary (TL;DR)
-
-> The project has successfully established a robust Google Drive API–based data ingestion foundation.  
-> Current work intentionally prioritizes manual data curation to reduce noise and complexity before full automation.  
-> The system is stable and well-positioned for scalable export, structuring, and analysis in the next phase.
+# 3. Execute semantic search
+python embedding/search_similar.py --query "overcoming personal challenges in STEM"
+🛠️ Technical Implementation1. Corpus NormalizationDocuments are normalized into a unified schema to ensure metadata traceability and consistent retrieval:JSON{
+  "id": "essay_0001",
+  "topic": "Personal Statement",
+  "content": "Narrative text...",
+  "school": "UW-Madison",
+  "source_file": "..."
+}
+2. Retrieval MethodologyGiven a database matrix $$V \in \mathbb{R}^{N \times d}$$ and a query vector $$q \in \mathbb{R}^{d}$$:Similarity Computation: Calculated via $$s = Vq$$. When vectors are L2-normalized, this is mathematically equivalent to Cosine Similarity.Top-K Selection: Implemented using numpy.argpartition, achieving a complexity of $O(N)$, which is significantly more efficient than full $O(N \log N)$ sorting for medium-scale corpora.3. Computational ComplexityOperationComplexitySimilarity Computation$O(N \cdot d)$Top-K Selection$O(N)$Total Query Latency$O(N \cdot d)$🔬 Research DirectionsThis framework enables empirical experimentation in:Narrative Similarity Modeling: Identifying growth arcs and emotional progression.Thematic Clustering: Uncovering latent themes using UMAP or T-SNE on high-dimensional embeddings.Cross-Prompt Alignment: Measuring how different university prompts elicit semantically similar responses.⚠️ Limitations & Future WorkScalability: Current brute-force search is suitable for $N < 10^5$. Future iterations will integrate FAISS or HNSW for approximate nearest neighbor (ANN) search.Domain Specificity: Pretrained models are used without fine-tuning; future work includes evaluating domain-specific encoders for student writing.Evaluation: Currently lacks a human-labeled "Gold Standard" relevance dataset for quantitative Benchmarking (MAP/NDCG).👤 AuthorZackery Liu University of Wisconsin–Madison Computer Science & Data Science ---Generated by Essay-Annotator Framework v1.0

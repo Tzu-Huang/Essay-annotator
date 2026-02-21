@@ -9,7 +9,7 @@ client = OpenAI(api_key = os.environ["OPENAI_API_KEY"])
 
 response = client.embeddings.create(
     model="text-embedding-3-small",
-    input= "This"
+    input= "Music"
     
 )#.data[0].embedding # This is the only information we need 
 doc = response.data[0].embedding

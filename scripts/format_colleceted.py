@@ -1,7 +1,7 @@
 # Name: Amanda
 # Input: get raw txt files from the organized_data
-# Output: output a single jsonl file that contains all the essays, with labels:
-#         id, topic, content, type, school, public, source_file
+# Output: output a single jsonl file that contains all the collected essays, 
+#         with labels: id, topic, content, type, school, public, source_file
 
 
 """
@@ -55,6 +55,10 @@ def split_topic_content(text):
     return list
 
 
+# =========================
+# Main (funciton/logic)
+# =========================
+
 def main():
     # Check if the directory exists
     if not input_dir.exists():
@@ -74,8 +78,7 @@ def main():
         # Clean up the text: strip whitespace and inconsistent newlines
         text = text.strip()  # Remove leading/trailing whitespace
 
-        text = re.sub(r'\n', '\n\n', text)
-        text = re.sub(r'\n\n+', '\n\n', text)
+        text = re.sub(r'\n\n+', '\n', text)
 
         # Record the splitted prompt and content section
         sections = split_topic_content(text)
@@ -88,7 +91,7 @@ def main():
             essay_type = "personal statement"
             school = "none"
         elif folder_name == "uc":
-            essay_type = "UC PIQ"
+            essay_type = "uc piq"
             school = "university of california"
         elif folder_name == "supplementals":
             essay_type = "supplementals"

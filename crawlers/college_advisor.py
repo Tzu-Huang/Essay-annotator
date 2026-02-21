@@ -1,19 +1,23 @@
 from bs4 import BeautifulSoup
-from common import fetch_html
 from pathlib import Path
 import json
+import requests
 import re
 
 url = "https://www.collegeadvisor.com/resources/common-app-essay-examples/"
 script_dir = Path(__file__).parent
 output_path = script_dir / "../data/essays_jsonl/collegeadvisor.jsonl"
 
+HEADERS = {
+    "User-Agent": "Mozilla/5.0 (compatible; EssayCrawler/0.1; +https://example.com/your-contact)"
+}
+
 default_topic = "Share an essay on any topic of your choice. It can be one you've already written, one that responds to a different prompt, or one of your own design"
 prompt_three = "Reflect on a time when you questioned or challenged a belief or idea. What prompted your thinking? What was the outcome?"
 
 def main():
-    html = fetch_html(url)
-    soup = BeautifulSoup(html, "html.parser")
+    response = requests.get(url, headers=HEADERS)
+    soup = BeautifulSoup(response.text, "html.parser")
 
     # Find h3 headers with essay numbers
     essay_headers = [h for h in soup.find_all("h3") if re.search(r"#\d+", h.get_text())]

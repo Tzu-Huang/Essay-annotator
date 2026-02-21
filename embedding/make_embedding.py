@@ -12,8 +12,8 @@ records (with embeddings) back to a JSONL output file.
 
 import os
 import json
-from pathlib import Path
-from openai import OpenAI  
+from openai import OpenAI
+import numpy as np
 
 # =========================
 # Config
@@ -118,6 +118,19 @@ def embedding(client, text):
     )
     return [item.embedding for item in response.data]
 
+def normalize(vec):
+    """
+    Normalize our vector embeddings = vector / ||vector||
+    """
+    v = np.array(vec, dtype=np.float32)
+
+    # euclidean length: the straight-line distance between two points
+    norm = np.linalg.norm(v)
+
+    # cannot divide by 0
+    if norm == 0:
+        return v.tolist()
+    return (v / norm).tolist()
 
 # =========================
 # Main logic
@@ -186,8 +199,8 @@ def main():
 
                 for rec, tvec, cvec in zip(batch_records, topic_vecs, content_vecs):
                     # rec: record, tvec: topic_vector, cvec: content_vec
-                    rec["topic_embedding"] = tvec
-                    rec["content_embedding"] = cvec
+                    rec["topic_embedding"] = normalize(tvec)
+                    rec["content_embedding"] = normalize(cvec)
 
                     # Convert a complete record to a line and store in embed.jsonl
                     out.write(json.dumps(rec, ensure_ascii=False) + "\n")
@@ -208,8 +221,8 @@ def main():
 
             for rec, tvec, cvec in zip(batch_records, topic_vecs, content_vecs):
                 # rec: record, tvec: topic_vector, cvec: content_vec
-                rec["topic_embedding"] = tvec
-                rec["content_embedding"] = cvec
+                rec["topic_embedding"] = normalize(tvec)
+                rec["content_embedding"] = normalize(cvec)
 
                 # Convert a complete record to a line and store in embed.jsonl
                 out.write(json.dumps(rec, ensure_ascii=False) + "\n")

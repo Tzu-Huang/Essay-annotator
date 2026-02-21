@@ -6,8 +6,7 @@ from pathlib import Path
 from typing import List, Dict
 from bs4 import BeautifulSoup
 import json
-
-from common import fetch_html
+import requests
 
 # This page contains all 14 essay examples in one single article.
 BASE_URL = "https://www.shemmassianconsulting.com/blog/college-essay-examples"
@@ -31,6 +30,7 @@ PROMPTS = [
     "Describe a topic, idea, or concept you find so engaging that it makes you lose all track of time. Why does it captivate you? What or who do you turn to when you want to learn more?",
     "Share an essay on any topic of your choice. It can be one you've already written, one that responds to a different prompt, or one of your own design"
 ]
+
 special_case_prompt = "The Stanford community is deeply curious and driven to learn in and out of the classroom. Reflect on an idea or experience that makes you genuinely excited about learning."
 prompt_by_essay = [
     PROMPTS[5], PROMPTS[6], PROMPTS[4], special_case_prompt, PROMPTS[4], 
@@ -55,8 +55,8 @@ def parse_shemmassian_college_examples(
         "text": "Full essay text..."
     }
     """
-    html = fetch_html(url)
-    soup = BeautifulSoup(html, "html.parser")
+    response = requests.get(url)
+    soup = BeautifulSoup(response.text, "html.parser")
 
     # The main content is typically inside an <article> element.
     # If not found, use the entire soup.

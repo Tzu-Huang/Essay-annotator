@@ -78,7 +78,8 @@ def main():
         # Clean up the text: strip whitespace and inconsistent newlines
         text = text.strip()  # Remove leading/trailing whitespace
 
-        text = re.sub(r'\n\n+', '\n', text)
+        text = re.sub(r'\n', '\n\n', text)
+        text = re.sub(r'\n\n+', '\n\n', text)
 
         # Record the splitted prompt and content section
         sections = split_topic_content(text)

@@ -14,6 +14,7 @@ import os
 import json
 from openai import OpenAI
 import numpy as np
+import tiktoken 
 
 # =========================
 # Config
@@ -107,13 +108,14 @@ def extract_text_fields(obj):
         "source_file": obj.get("source_file"),
     }
 
+# TODO
 def embedding(client, text):
     """
     input: array (list[str])
     output: vectors
     """
     response = client.embeddings.create(
-        model="text-embedding-3-small",
+        model="text-embedding-3-small", # Max tokens: around 8000
         input= text
     )
     return [item.embedding for item in response.data]
@@ -124,13 +126,43 @@ def normalize(vec):
     """
     v = np.array(vec, dtype=np.float32)
 
-    # euclidean length: the straight-line distance between two points
+    # Euclidean length: the straight-line distance between two points
     norm = np.linalg.norm(v)
 
-    # cannot divide by 0
+    # Cannot divide by 0
     if norm == 0:
         return v.tolist()
     return (v / norm).tolist()
+
+def chunk_text(text, max_tokens=400, overlap=50):
+    """
+    We are splitting the essay into chunks, max 300 tokens. 
+    We set a overlapping of 50 tokens to allow "window sliding" to avoid
+    from missing content or not capturing the chunk's meaning
+
+    input: text from the essay
+    output: list[str]
+    """
+
+    # Load the encoding system used by the embedding models(openai)
+    encodings = tiktoken.get_encoding("cl100k_base")
+
+    # text to tokens
+    tokens = encodings.encode(text)
+
+    chunks = []
+    start = 0
+
+    while start < len(tokens):
+        end = start + max_tokens
+        chunk_tokens = tokens[start:end]
+        chunk_str = encodings.decode(chunk_tokens)
+        chunks.append(chunk_str)
+
+        # move start forward, but consider overlapping
+        start += max_tokens - overlap
+
+    return chunks
 
 # =========================
 # Main logic
@@ -174,12 +206,32 @@ def main():
             if not rid:
                 continue
             
-            if rid in seen_ids:
-                total_skipped += 1
-                continue
-            batch_records.append(record)
-            batch_topics.append(record["topic"])
-            batch_contents.append(record["content"])
+            # splitting into chunks
+            chunks = chunk_text(record["content"])
+
+            # go through each chunks
+            for i, chunk in enumerate(chunks):
+                chunk_record = record.copy()
+
+                # keep record of its parent id
+                chunk_record["parent_id"] = record["id"]
+
+                # new unique id for the chunked ones
+                chunk_id = f"{record['id']}_{i:02d}"
+
+                # skip seen chunk_id
+                if chunk_id in seen_ids:
+                    total_seen += chunk_id
+                    continue
+
+                chunk_record["id"] = chunk_id
+                
+                # replace content with chunk
+                chunk_record["content"] = chunk
+
+                batch_records.append(chunk_record)
+                batch_topics.append(chunk_record["topic"])
+                batch_contents.append(chunk)
 
             # When batch is full, do embedding and output
             if (len(batch_records) >= Batch_size):

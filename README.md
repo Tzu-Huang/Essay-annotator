@@ -10,12 +10,10 @@ EssayLens is a data-driven platform designed to help students learn how to write
 
 ---
 ## 📖 Table of Contents
-- [Abstract](#-abstract)
-- [Installation](#%EF%B8%8F-installation)
-- [Quick Start](#-quick-Start)
-- [Architecture](#-architecture)
-- [License](#-License)
-- [Contributors](#-contributors)
+- [Abstract](#abstract)
+- [Motivation](#motivation)
+- [Architecture](#architecture)
+- [Contributors](#contributors)
 
 ## Abstract
 **Essay-Annotator** implements an end-to-end pipeline covering heterogeneous data ingestion, document normalization, dense vector generation, and optimized similarity search. 
@@ -59,11 +57,74 @@ This project explores whether dense vector representations can provide a more se
 ---
 
 
-## 🏗️ Architecture
-Data Sources → Ingestion → Embedding & Normalization → Vector Database → Similarity Search
+## Architecture
+<p align="center">
+  <img src='picture/flow.png'>
+</p>
 
-Each layer is modularized to support reproducibility and experimentation.
+**Implementation Details**
+1. Data Ingestion Pipeline
 
+The system begins with raw essay documents collected from multiple sources (e.g., Google Docs, .docx, .pdf, public online essays).
+
+- Google Drive API is used to export documents into plain text format.
+- Each document is parsed and transformed into a structured JSONL schema.
+- Every record contains standardized metadata fields:
+```bash
+{
+  "id": "essay_0001",
+  "topic": "...",
+  "content": "...",
+  "type": "personal_statement",
+  "school": "Stanford",
+  "public": "yes",
+  "source_file": "..."
+}
+```
+
+2. Embedding Generation
+
+We convert textual fields into dense vector representations using OpenAI’s embedding model.
+
+- Model: text-embedding-3-large (or configured alternative)
+- Batch processing is used to improve efficiency.
+- Both topic and content fields are embedded.
+- Embeddings are L2-normalized before storage.
+
+Each enriched record is saved into:
+```bash
+data/embed_output/embed.jsonl
+```
+
+Example stored structure:
+```bash
+{
+  "id": "essay_0001",
+  "topic": "...",
+  "content": "...",
+  "embedding": [0.0123, -0.9382, ...]
+}
+```
+
+3. Vector Search (Cosine Similarity)
+For semantic retrieval:
+
+The user query is embedded using the same model.
+
+The query vector is normalized.
+
+Cosine similarity is computed against all stored embeddings.
+
+Top-K highest scoring essays are returned.
+
+Similarity formula:
+$$
+cosine(q,d)=∣∣q∣∣∣∣d∣∣q⋅d​
+$$
+Since vectors are normalized:
+$$
+cosine(q,d)=q⋅d
+$$
 
 ---
 

@@ -115,9 +115,10 @@ For semantic retrieval:
 - Cosine similarity is computed against all stored embeddings.
 - Top-K highest scoring essays are returned.
 
-**Similarity formula:**\
-$$text{cosine}(q, d) = \frac{q \cdot d}{\|q\| \|d\|}$$
-
+**Similarity formula:**
+$${cosine}(q, d) = \frac{q \cdot d}{\|q\| \cdot \|d\|}$$ \
+Because all vectors are L2-normalized:
+$${cosine}(q, d) = q \cdot d $$
 ---
 
 

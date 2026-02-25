@@ -64,11 +64,11 @@ This project explores whether dense vector representations can provide a more se
 </p>
 
 **Implementation Details**
-1. **Data Ingestion Pipeline**
-  
-**Goal:** Convert heterogeneous documents into a structured schema.
-- Raw_data (Hand Collection from past students applying to US colleges) 
-- Public Examples
+1.**Data Ingestion Pipeline**
+    
+  **Goal:** Convert heterogeneous document into a structured schema.
+  - Raw_data (Hand Collection from past students applying to US colleges) 
+  - Public Essays Examples (Essays-That-Worked)
 
 **Output Schema (JSONL)**
 ```bash
@@ -83,7 +83,7 @@ This project explores whether dense vector representations can provide a more se
 }
 ```
 
-2. **Embedding Generation**
+2.**Embedding Generation**
 
 We convert textual fields into dense vector representations using OpenAI’s embedding model.
 
@@ -92,7 +92,7 @@ We convert textual fields into dense vector representations using OpenAI’s emb
 - Both topic and content fields are embedded.
 - Embeddings are L2-normalized before storage.
 
-Each enriched record is saved into:
+**Each enriched record is saved into:**
 ```bash
 data/embed_output/embed.jsonl
 ```
@@ -107,7 +107,7 @@ Example stored structure:
 }
 ```
 
-3. Vector Search (Cosine Similarity)
+3.**Vector Search (Cosine Similarity)**
 
 For semantic retrieval:
 
@@ -116,9 +116,9 @@ For semantic retrieval:
 - Top-K highest scoring essays are returned.
 
 **Similarity formula:**
-$${cosine}(q, d) = \frac{q \cdot d}{\|q\| \cdot \|d\|}$$ \
-Because all vectors are L2-normalized:
-$${cosine}(q, d) = q \cdot d $$
+$$\text{cosine}(q, d) = \frac{q \cdot d}{\|q\| \cdot\ d\|} $$
+**But because all vectors are L2-normalized:**
+$$\text{cosine}(q, d) = q \cdot d $$
 ---
 
 

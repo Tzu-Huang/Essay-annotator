@@ -65,11 +65,12 @@ This project explores whether dense vector representations can provide a more se
 
 **Implementation Details**
 1. **Data Ingestion Pipeline**
-  **Goal:** Convert heterogeneous documents into a structured schema.
-  - Raw_data (Hand Collection from past students applying to US colleges) 
-  - Public Examples
+  
+**Goal:** Convert heterogeneous documents into a structured schema.
+- Raw_data (Hand Collection from past students applying to US colleges) 
+- Public Examples
 
-  **Output Schema (JSONL)**
+**Output Schema (JSONL)**
 ```bash
 {
   "id": "essay_0001",
@@ -107,24 +108,15 @@ Example stored structure:
 ```
 
 3. Vector Search (Cosine Similarity)
+
 For semantic retrieval:
 
-The user query is embedded using the same model.
+- The user query is embedded using the same model.
+- Cosine similarity is computed against all stored embeddings.
+- Top-K highest scoring essays are returned.
 
-The query vector is normalized.
-
-Cosine similarity is computed against all stored embeddings.
-
-Top-K highest scoring essays are returned.
-
-Similarity formula:
-$$
-cosine(q,d)=∣∣q∣∣∣∣d∣∣q⋅d​
-$$
-Since vectors are normalized:
-$$
-cosine(q,d)=q⋅d
-$$
+**Similarity formula:**\
+$$text{cosine}(q, d) = \frac{q \cdot d}{\|q\| \|d\|}$$
 
 ---
 

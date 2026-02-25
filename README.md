@@ -59,17 +59,17 @@ This project explores whether dense vector representations can provide a more se
 
 ## Architecture
 <p align="center">
-  <img src='picture/flow.png'>
+  <img src='picture/flow.png' width = "700">
+  
 </p>
 
 **Implementation Details**
-1. Data Ingestion Pipeline
+1. **Data Ingestion Pipeline**
+  **Goal:** Convert heterogeneous documents into a structured schema.
+  - Raw_data (Hand Collection from past students applying to US colleges) 
+  - Public Examples
 
-The system begins with raw essay documents collected from multiple sources (e.g., Google Docs, .docx, .pdf, public online essays).
-
-- Google Drive API is used to export documents into plain text format.
-- Each document is parsed and transformed into a structured JSONL schema.
-- Every record contains standardized metadata fields:
+  **Output Schema (JSONL)**
 ```bash
 {
   "id": "essay_0001",
@@ -82,7 +82,7 @@ The system begins with raw essay documents collected from multiple sources (e.g.
 }
 ```
 
-2. Embedding Generation
+2. **Embedding Generation**
 
 We convert textual fields into dense vector representations using OpenAI’s embedding model.
 

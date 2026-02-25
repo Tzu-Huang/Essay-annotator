@@ -10,12 +10,12 @@ EssayLens is a data-driven platform designed to help students learn how to write
 
 ---
 ## 📖 Table of Contents
-- [Abstract](#-Abstract)
+- [Abstract](#-abstract)
 - [Installation](#%EF%B8%8F-installation)
 - [Quick Start](#-quick-Start)
-- [Architecture](#-Architecture)
+- [Architecture](#-architecture)
 - [License](#-License)
-- [Citation](#-citation)
+- [Contributors](#-contributors)
 
 ## Abstract
 **Essay-Annotator** implements an end-to-end pipeline covering heterogeneous data ingestion, document normalization, dense vector generation, and optimized similarity search. 

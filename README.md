@@ -9,7 +9,13 @@ EssayLens is a data-driven platform designed to help students learn how to write
 
 
 ---
-
+## 📖 Table of Contents
+- [Abstract](#-Abstract)
+- [Installation](#%EF%B8%8F-installation)
+- [Quick Start](#-quick-Start)
+- [Architecture](#-Architecture)
+- [License](#-License)
+- [Citation](#-citation)
 
 ## Abstract
 **Essay-Annotator** implements an end-to-end pipeline covering heterogeneous data ingestion, document normalization, dense vector generation, and optimized similarity search. 
@@ -53,7 +59,7 @@ This project explores whether dense vector representations can provide a more se
 ---
 
 
-## System Architecture
+## 🏗️ Architecture
 Data Sources → Ingestion → Embedding & Normalization → Vector Database → Similarity Search
 
 Each layer is modularized to support reproducibility and experimentation.
@@ -87,7 +93,7 @@ Technical Implementation1. Corpus NormalizationDocuments are normalized into a u
 }
 ```
 
-## Author:
+## Contributors:
 1. Zackery Liu (UW-Madison)
 2. Amanda Tsai (UCSD)
 3. Olivia Chu (UW-Madison)

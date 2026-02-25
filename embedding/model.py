@@ -4,6 +4,8 @@ This is a testing .py file that ensure api key and basic cosine similarity calcu
 """
 from openai import OpenAI
 import os
+from make_embedding import normalize
+
 
 client = OpenAI(api_key = os.environ["OPENAI_API_KEY"])
 
@@ -13,6 +15,8 @@ response = client.embeddings.create(
     
 )#.data[0].embedding # This is the only information we need 
 doc = response.data[0].embedding
+
+normalize(doc)
 print(doc)
 
 # Input 

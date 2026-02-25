@@ -64,6 +64,7 @@ This project explores whether dense vector representations can provide a more se
 </p>
 
 **Implementation Details**
+
 1.**Data Ingestion Pipeline**
     
   **Goal:** Convert heterogeneous document into a structured schema.
@@ -116,9 +117,13 @@ For semantic retrieval:
 - Top-K highest scoring essays are returned.
 
 **Similarity formula:**
+
 $$\text{cosine}(q, d) = \frac{q \cdot d}{\|q\| \cdot\ d\|} $$
+
 **But because all vectors are L2-normalized:**
+
 $$\text{cosine}(q, d) = q \cdot d $$
+
 ---
 
 

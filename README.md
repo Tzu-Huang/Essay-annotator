@@ -68,7 +68,7 @@ This project explores whether dense vector representations can provide a more se
 1.**Data Ingestion Pipeline**
     
   **Goal:** Convert heterogeneous document into a structured schema.
-  - Raw_data (Hand Collection from past students applying to US colleges) 
+  - raw_data (Hand Collection from past students applying to US colleges) 
   - Public Essays Examples (Essays-That-Worked)
 
 **Output Schema (JSONL)**

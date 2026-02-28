@@ -134,7 +134,21 @@ def normalize(vec):
         return v.tolist()
     return (v / norm).tolist()
 
-def chunk_text(text, max_tokens=400, overlap=50):
+def determine_chunk_length(token_len):
+    """
+    Determine the max_chunk length and the overlapping length according to 
+    the length of the essay
+    """
+
+    if token_len <= 300:
+        return -1, -1
+    elif token_len <= 800:
+        return 300, 50
+    else:
+        return 400, 60
+
+
+def chunk_text(text):
     """
     We are splitting the essay into chunks, max 300 tokens. 
     We set a overlapping of 50 tokens to allow "window sliding" to avoid
@@ -150,8 +164,18 @@ def chunk_text(text, max_tokens=400, overlap=50):
     # text to tokens
     tokens = encodings.encode(text)
 
+
+    max_tokens, overlap = determine_chunk_length(len(tokens))
+
     chunks = []
     start = 0
+
+    # if no splitting required, essay too short
+    if max_tokens == -1:
+        chunks_str = encodings.decode(tokens)
+        chunks.append(chunks_str)
+        return chunks
+
 
     while start < len(tokens):
         end = start + max_tokens
@@ -187,6 +211,7 @@ def main():
     total_written = 0
     total_seen = 0
     total_skipped = 0
+    chunk_recorded = 0
 
     seen_ids = load_processed_ids(Output_file) # Check load status
     print(f"Found {len(seen_ids)} already embedded records in output")
@@ -209,7 +234,7 @@ def main():
             # splitting into chunks
             chunks = chunk_text(record["content"])
 
-            # go through each chunks
+            # go through each chunk
             for i, chunk in enumerate(chunks):
                 chunk_record = record.copy()
 
@@ -221,7 +246,7 @@ def main():
 
                 # skip seen chunk_id
                 if chunk_id in seen_ids:
-                    total_seen += chunk_id
+                    total_skipped += 1
                     continue
 
                 chunk_record["id"] = chunk_id

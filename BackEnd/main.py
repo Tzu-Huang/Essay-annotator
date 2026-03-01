@@ -47,7 +47,7 @@ def preview():
     pass
 
 def get_essay_info():
-
+    pass
 # -----------------------------
 # Routes
 # ----------------------------

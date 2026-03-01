@@ -1,5 +1,4 @@
 # Essay-Annotator 
-> **A Modular Dense Retrieval Framework for College Essay Semantic Search**
 
 <p align="center">
   <img src='BackEnd/picture/summary.png'>
@@ -10,12 +9,12 @@ EssayLens is a data-driven platform designed to help students learn how to write
 
 ---
 ## 📖 Table of Contents
-- [Abstract](#abstract)
+- [Introduction](#introduction)
 - [Motivation](#motivation)
 - [Architecture](#architecture)
 - [Contributors](#contributors)
 
-## Abstract
+## Introduction
 **Essay-Annotator** implements an end-to-end pipeline covering heterogeneous data ingestion, document normalization, dense vector generation, and optimized similarity search. 
 
 As a research prototype, this system facilitates the study of **semantic similarity**, **narrative structure alignment**, and **thematic clustering** in long-form reflective student writing.
@@ -59,7 +58,7 @@ This project explores whether dense vector representations can provide a more se
 
 ## Architecture
 <p align="center">
-  <img src='BackEnd/picture/flow.png' width = "700">
+  <img src='BackEnd/picture/system.png' width = "700">
   
 </p>
 

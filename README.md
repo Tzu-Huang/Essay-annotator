@@ -2,7 +2,7 @@
 > **A Modular Dense Retrieval Framework for College Essay Semantic Search**
 
 <p align="center">
-  <img src='picture/pic.png'>
+  <img src='Backend/picture/pic.png'>
 </p>
 
 EssayLens is a data-driven platform designed to help students learn how to write effective U.S. college application essays by analyzing real examples and providing structural, non-ghostwriting feedback.
@@ -59,7 +59,7 @@ This project explores whether dense vector representations can provide a more se
 
 ## Architecture
 <p align="center">
-  <img src='picture/flow.png' width = "700">
+  <img src='Backend/picture/flow.png' width = "700">
   
 </p>
 

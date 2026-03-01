@@ -128,8 +128,6 @@ $$\text{cosine}(q, d) = q \cdot d $$
 
 ### Prerequisites
 - Python 3.10+
-- OpenAI API Key
-- Google Cloud Service Account (for private Drive access)
 
 --- 
 
@@ -137,21 +135,14 @@ $$\text{cosine}(q, d) = q \cdot d $$
 ### Instructions
 ```bash
 
-# 2. Generate dense embeddings
-python embedding/make_embedding.py
+in progress..
 
-# 3. Execute semantic search
-python embedding/search_similar.py --query "overcoming personal challenges in STEM"
-Technical Implementation1. Corpus NormalizationDocuments are normalized into a unified schema to ensure metadata traceability and consistent retrieval:JSON{
-  "id": "essay_0001",
-  "topic": "Personal Statement",
-  "content": "Narrative text...",
-  "school": "UW-Madison",
-  "source_file": "..."
-}
 ```
 
 ## Contributors:
-1. Zackery Liu (UW-Madison)
-2. Amanda Tsai (UCSD)
-3. Olivia Chu (UW-Madison)
+**Backend**
+1. Zackery Liu (University of Wisconsin-Madison)
+2. Amanda Tsai (University of California San Diego)
+
+**Frontend**
+1. Olivia Chu (University of Wisconsin-Madison)

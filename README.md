@@ -2,7 +2,7 @@
 > **A Modular Dense Retrieval Framework for College Essay Semantic Search**
 
 <p align="center">
-  <img src='BackEnd/picture/pic.png'>
+  <img src='BackEnd/picture/summary.png'>
 </p>
 
 EssayLens is a data-driven platform designed to help students learn how to write effective U.S. college application essays by analyzing real examples and providing structural, non-ghostwriting feedback.

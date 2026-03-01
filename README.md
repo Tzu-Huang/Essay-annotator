@@ -59,7 +59,7 @@ This project explores whether dense vector representations can provide a more se
 
 ## Architecture
 <p align="center">
-  <img src='Backend/picture/flow.png' width = "700">
+  <img src='BackEnd/picture/flow.png' width = "700">
   
 </p>
 

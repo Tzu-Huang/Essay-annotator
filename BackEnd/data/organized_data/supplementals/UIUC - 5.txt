@@ -1,5 +1,0 @@
-Prompt: Explain, in detail, an experience you've had in the past 3 to 4 years related to your first-choice major. This can be an experience from an extracurricular activity, in a class you’ve taken, or through something else.
-Content: My first encounter with engineering dates back to eighth grade, with my attempt to fix my mom’s dead laptop. Throughout that week, my screen was constantly filled with YouTube videos that introduced complex hardware functions inside computers. Day and night, I disassembled and reassembled the device, digging into the root cause. In fact, it didn’t take me long to figure out that the malfunction of the device was due to a dead hard disk drive (HDD). Yet, I wasn’t satisfied with simply replacing the old HDD, especially after learning the features of a solid-state drive (SSD)—a more robust and effective type of storage component—from online tutorials. To carry out my intended upgrade, I investigated if an SSD could be used with an HDD adapter and eventually bought an SSD-to-HDD converter, leading to a “life-saving” moment for my mom’s laptop while fueling my passion for hands-on problem-solving as an engineer.
- 
-
- 

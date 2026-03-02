@@ -17,6 +17,7 @@ venv/
 env/
 .venv/
 .env
+.env.*
 
 # ---------------------------------------------------------
 # Jupyter notebooks checkpoints (if any)
@@ -30,10 +31,10 @@ env/
 Thumbs.db
 
 # ---------------------------------------------------------
-# Your data outputs (generated essay datasets)
+# Your data 
 # ---------------------------------------------------------
-# All .jsonl files produced by crawlers
-# *.jsonl
+BackEnd/data/
+BackEnd/**/*.jsonl
 
 # Optional: If you want to keep downloaded datasets but not track them:
 # data/

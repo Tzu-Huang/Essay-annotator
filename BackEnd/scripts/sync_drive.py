@@ -13,7 +13,7 @@ from google.auth.transport.requests import Request
 
 SCOPES = ["https://www.googleapis.com/auth/drive.readonly"]
 CLIENT_SECRET_FILE = "client_secret.json"
-TOKEN_FILE = "BackEnd/scripts/token.json"
+TOKEN_FILE = "token.json"
 
 def get_creds():
     creds = None

@@ -21,7 +21,7 @@ import tiktoken
 # =========================
 
 # Input JSONL file (finalized schema)
-Input_file = 'data/finalized_data_jsonl/database.jsonl'
+Input_file = 'drive_data/finalized_data_jsonl/database.jsonl'
 Output_file = 'data/embed_output/embed.jsonl'
 
 Batch_size = 64 # This is the size that you want to embed and store at once
@@ -146,7 +146,6 @@ def determine_chunk_length(token_len):
         return 300, 50
     else:
         return 400, 60
-
 
 def chunk_text(text):
     """

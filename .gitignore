@@ -34,11 +34,12 @@ Thumbs.db
 # Your data 
 # ---------------------------------------------------------
 BackEnd/data/
+BackEnd/drive_data/
 BackEnd/**/*.jsonl
-
-# Optional: If you want to keep downloaded datasets but not track them:
-# data/
-output/
+client_secret*.json
+token.json
+*.jsonl
+*.json
 
 # ---------------------------------------------------------
 # VS Code settings (optional)

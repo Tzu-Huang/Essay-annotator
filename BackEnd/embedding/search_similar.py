@@ -58,9 +58,11 @@ def load_db_embeddings(db_path: str):
     
     ids = []
     vecs = []
+    parent = []
 
     for obj in read_jsonl(db_path):
         rid = obj.get("id")
+        pid = obj.get("parent_id")
         emb = obj.get("content_embedding")
 
         if not isinstance(rid, str):
@@ -73,10 +75,11 @@ def load_db_embeddings(db_path: str):
 
         ids.append(rid)
         vecs.append(emb)
+        parent.append(pid)
 
     # Convert vecs to Numpy matrix in order to do the dot product
     V = np.array(vecs, dtype=np.float32)
-    return ids, V
+    return ids, parent, V
 
 def load_query_embeddings(q_path: str):
 
@@ -114,14 +117,14 @@ def check_shape(V, q_V):
      
     return V.shape[1] == q_V.shape[1]
 
-def cosine_search(ids, V, q_vec, TOP_K):
+def cosine_search(ids, parent, V, q_vec, TOP_K):
     """
     Compute Cosine similarity for one query against entire DB.
     """
     scores = V @ q_vec
     # print(scores.shape[0])
 
-    k = min(TOP_K, scores.shape[0])
+    k = min(TOP_K * 2, scores.shape[0])
 
     # argpartition(): find the lowest k index
     # -scores: reverse so that we get the highest k index
@@ -136,12 +139,24 @@ def cosine_search(ids, V, q_vec, TOP_K):
     idx = idx[np.argsort(-scores[idx])]
 
     results = []
-    for rank, i in enumerate(idx, start=1):
+    seen_parents = set()  # stores unique values, average runtime O(1)
+    for i in idx: 
+        pid = parent[i]
+
+        if pid in seen_parents:
+            continue
+        
         results.append({
-            "rank": rank,
+            "rank": len(results)+1,
+            "parent_id": pid,
             "id": ids[i],
             "score": float(scores[i])
         })
+
+        seen_parents.add(pid)
+
+        if len(results) == TOP_K:
+            break
 
     return results
 
@@ -153,7 +168,7 @@ def write_jsonl(path: str, records: list[dict]):
             f.write(json.dumps(r, ensure_ascii=False) + "\n")
 
 def main():
-    ids, V = (load_db_embeddings(DB_JSONL))
+    ids, parent, V = (load_db_embeddings(DB_JSONL))
     queries, q_V = (load_query_embeddings(QUERY_JSONL))
     # print()
     print(q_V)
@@ -162,7 +177,7 @@ def main():
     
     outputs = []
     for q_text, q_vec, in zip(queries, q_V):
-        hits = cosine_search(ids, V, q_vec, TOP_K)
+        hits = cosine_search(ids, parent, V, q_vec, TOP_K)
         outputs.append({
             "query": q_text,
             "top_k": TOP_K,
@@ -171,8 +186,6 @@ def main():
 
     write_jsonl(OUT_JSONL, outputs)
     print(f"[OK] Wrote {len(outputs)} query results -> {OUT_JSONL}")
-
-
 
 
 if __name__ == "__main__":

@@ -19,7 +19,7 @@ import os
 # =========================
 # Config
 # =========================
-DB_JSONL = "data/drive_data/finalized_data_jsonl/database.jsonl"
+DB_JSONL = "data/embed_output/embed.jsonl"
 QUERY_JSONL = "data/testing/queries.jsonl"
 OUT_JSONL = "data/results/results.jsonl"
 TOP_K = 5

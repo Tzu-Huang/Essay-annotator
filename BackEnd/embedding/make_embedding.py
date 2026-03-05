@@ -12,13 +12,15 @@ records (with embeddings) back to a JSONL output file.
 
 import os
 import json
-from openai import OpenAI
 import numpy as np
 import tiktoken 
+from openai import OpenAI
+from dotenv import load_dotenv
 
 # =========================
 # Config
 # =========================
+load_dotenv()
 
 # Input JSONL file (finalized schema)
 Input_file = 'drive_data/finalized_data_jsonl/database.jsonl'

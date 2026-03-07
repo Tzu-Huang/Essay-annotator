@@ -12,7 +12,7 @@ pull:
 	git pull
 
 sync:
-	python BackEnd/scripts/sync_drive.py --folder_id $(FOLDER_ID) --out drive_data/
+	cd BackEnd && python BackEnd/scripts/sync_drive.py --folder_id $(FOLDER_ID) --out drive_data/
 
 embed:
 	cd BackEnd && python embedding/make_embedding.py

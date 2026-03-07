@@ -1,5 +1,5 @@
 # Run this in the terminal: 
-# python scripts/sync_drive.py --folder_id 1AhKLsQJaAQF-tJ5q6y5ajGsEb9mA0jgw --out drive_data/
+# python scripts/sync_drive_aws.py --folder_id 1AhKLsQJaAQF-tJ5q6y5ajGsEb9mA0jgw --out drive_data/
 
 import os
 import io
@@ -16,20 +16,21 @@ CLIENT_SECRET_FILE = "client_secret.json"
 TOKEN_FILE = "token.json"
 
 def get_creds():
-    creds = None
-    if os.path.exists(TOKEN_FILE):
-        creds = Credentials.from_authorized_user_file(TOKEN_FILE, SCOPES)
+    flow = InstalledAppFlow.from_client_secrets_file(CLIENT_SECRET_FILE, SCOPES)
 
-    if not creds or not creds.valid:
-        if creds and creds.expired and creds.refresh_token:
-            creds.refresh(Request())
-        else:
-            flow = InstalledAppFlow.from_client_secrets_file(CLIENT_SECRET_FILE, SCOPES)
-            creds = flow.run_local_server(port=0)
-            # creds = flow.run_console() # This one is for aws
-        with open(TOKEN_FILE, "w", encoding="utf-8") as f:
-            f.write(creds.to_json())
-    return creds
+    auth_url, _ = flow.authorization_url(
+        access_type="offline",
+        prompt="consent"
+    )
+
+    print("\nOpen this URL in your browser:\n")
+    print(auth_url)
+    print()
+
+    code = input("Paste the authorization code here: ").strip()
+
+    flow.fetch_token(code=code)
+    return flow.credentials
 
 def list_children(service, folder_id):
     results = service.files().list(

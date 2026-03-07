@@ -1,42 +1,110 @@
-#root {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
+/* Reset */
+body {
+  margin: 0;
+}
+
+/* Navbar */
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 40px;
+  border-bottom: 1px solid #eee;
+  height: 60px;
+}
+
+/* Search */
+.search-section {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.search-section input {
+  width: 300px;
+  padding: 8px 14px;
+  font-size: 16px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+}
+
+/* Login page */
+.login-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: calc(100vh - 60px);
+  background-color: #f3f3f3;
+}
+
+.login-card {
+  width: 320px;
+  padding: 40px;
+  border-radius: 12px;
+  background: white;
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.login-card input {
+  padding: 10px;
+}
+
+/* Buttons */
+.primary-btn {
+  margin-top: 30px;
+  padding: 12px 24px;
+  background: black;
+  color: white;
+  border: none;
+  cursor: pointer;
+}
+
+.google-btn {
+  padding: 10px;
+  background: #f1f1f1;
+  border: 1px solid #ddd;
+  cursor: pointer;
+}
+
+/* Home */
+.home {
   text-align: center;
+  padding-top: 120px;
 }
 
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
-}
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
-}
-.logo.react:hover {
-  filter: drop-shadow(0 0 2em #61dafbaa);
+/* Hero section */
+.hero h1 {
+  font-size: 40px;
+  max-width: 700px;
+  margin: auto;
 }
 
-@keyframes logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+.hero p {
+  margin-top: 20px;
+  font-size: 18px;
+  color: #555;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  a:nth-of-type(2) .logo {
-    animation: logo-spin infinite 20s linear;
-  }
+/* How it works */
+.how-it-works {
+  margin-top: 120px;
 }
 
-.card {
-  padding: 2em;
+.steps {
+  display: flex;
+  justify-content: center;
+  gap: 60px;
+  margin-top: 40px;
 }
 
-.read-the-docs {
-  color: #888;
+.step {
+  width: 180px;
+}
+
+.logo-img {
+  height: 300px;
+  width: auto;
 }

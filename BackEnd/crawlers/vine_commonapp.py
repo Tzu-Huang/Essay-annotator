@@ -6,7 +6,7 @@ import re
 
 url = "https://blog.collegevine.com/common-app-essay-examples"
 script_dir = Path(__file__).parent
-output_path = script_dir / "../data/essays_jsonl/vine_commonapp.jsonl"
+output_path = script_dir / "../drive_data/essays_jsonl/online_essays/vine_commonapp.jsonl"
 
 def search_prompt(soup):
     prompt_descriptions = {}

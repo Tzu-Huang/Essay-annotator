@@ -1,9 +1,13 @@
 from fastapi import FastAPI, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
+from embedding.search_similar import load_db_embeddings
 from pydantic import BaseModel
 from typing import Optional, List
 import json
 import time
+
+DB_JSONL = "data/drive_data/finalized_data_jsonl/database.jsonl"
+
 # -----------------------------
 # Request/Response Schemas
 # -----------------------------
@@ -23,7 +27,12 @@ async def lifespan(app: FastAPI):
                 essay = json.loads(line)
                 essays[essay["id"]] = essay
 
+        ids, parent, V = load_db_embeddings(DB_JSONL)
+        
         app.state.essays = essays
+        app.state.ids = ids
+        app.state.parent = parent
+        app.state.V = V
         app.state.essay_count = len(essays)
         app.state.data_path = "data_drive/finalized_data_jsonl/database.jsonl"
         app.state.ready = True

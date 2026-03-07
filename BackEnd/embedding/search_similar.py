@@ -13,16 +13,19 @@ from __future__ import annotations
 import json
 from pathlib import Path
 import numpy as np
-from openai import OpenAI
-import os
 
 # =========================
 # Config
 # =========================
-DB_JSONL = "data/embed_output/embed.jsonl"
-QUERY_JSONL = "data/testing/queries.jsonl"
-OUT_JSONL = "data/results/results.jsonl"
-TOP_K = 10
+DB_JSONL = "drive_data/embed_output/embed.jsonl"
+QUERY_JSONL = "drive_data/testing/queries.jsonl"
+OUT_JSONL = "drive_data/results/results.jsonl"
+TOP_K = 5
+
+
+def first_200_chars(text: str) -> str:
+    clean = (text or "").replace("\n", " ").strip()
+    return clean[:200]
 
 def read_jsonl(path):
     """
@@ -56,35 +59,44 @@ def load_db_embeddings(db_path: str):
       - V: np.ndarray shape (N, d) float32
     """
     
-    ids = []
-    vecs = []
+    ids, parent, vecs, previews = [], [], [], []
 
     for obj in read_jsonl(db_path):
         rid = obj.get("id")
+        pid = obj.get("parent_id")
         emb = obj.get("content_embedding")
 
         if not isinstance(rid, str):
-            print("Invalid id")
+            print("[WARN] Invalid id, skipping record")
             continue
 
         if not isinstance(emb, list) or len(emb) == 0:
-            print("Invalid embedding for id:", rid)
+            print(f"[WARN] Invalid embedding for id: {rid}")
             continue
 
         ids.append(rid)
         vecs.append(emb)
+        parent.append(pid)
+        previews.append(first_200_chars(obj.get("content", "")))
 
     # Convert vecs to Numpy matrix in order to do the dot product
     V = np.array(vecs, dtype=np.float32)
-    return ids, V
+    return ids, parent, previews, V
 
 def load_query_embeddings(q_path: str):
 
     query = []
     q_emb = []
 
+    # NOTE: from front end, we should get two inputs, and save it in dict, 
+    # so we can get it here
     for obj in read_jsonl(q_path):
-        content = obj.get("query")
+        # topic = obj.get("topic")
+        # paragraph = obj.get("paragraph")
+
+        # topic_emb = 
+        # Accept either key name based on producer format.
+        content = obj.get("essay") or obj.get("query")
         emb = obj.get("query_embedding")
 
         if not isinstance(content, str):
@@ -114,34 +126,36 @@ def check_shape(V, q_V):
      
     return V.shape[1] == q_V.shape[1]
 
-def cosine_search(ids, V, q_vec, TOP_K):
+def cosine_search(ids, parent, previews, V, q_vec, TOP_K):
     """
     Compute Cosine similarity for one query against entire DB.
     """
     scores = V @ q_vec
-    # print(scores.shape[0])
 
-    k = min(TOP_K, scores.shape[0])
-
-    # argpartition(): find the lowest k index
-    # -scores: reverse so that we get the highest k index
-    # k-1: we aim to divide the array into two parts: the first k smallest elements and the remaining 
-    # O(N) instead of O(N log N)
-    idx = np.argpartition(-scores, k-1)[:k] # Order is not guarantee
-
-    # scores[idx]: [0.77, 0.91]
-    # -scores[idx]: [-0.77, -0.91]
-    # argsort(): [1, 0]
-    # idx[]: [0.91, 0.77]
-    idx = idx[np.argsort(-scores[idx])]
+    # full sort, all candidates, handle too many duplicates
+    sorted_idx = np.argsort(-scores)
 
     results = []
-    for rank, i in enumerate(idx, start=1):
+    seen_parents = set()  # stores unique values, average runtime O(1)
+    
+    for i in sorted_idx: 
+        pid = parent[i]
+
+        if pid in seen_parents:
+            continue
+        
         results.append({
-            "rank": rank,
+            "rank": len(results)+1,
+            "parent_id": pid,
             "id": ids[i],
-            "score": float(scores[i])
+            "score": float(scores[i]),
+            "content_preview": previews[i]
         })
+
+        seen_parents.add(pid)
+
+        if len(results) == TOP_K:
+            break
 
     return results
 
@@ -153,18 +167,20 @@ def write_jsonl(path: str, records: list[dict]):
             f.write(json.dumps(r, ensure_ascii=False) + "\n")
 
 def main():
-    ids, V = (load_db_embeddings(DB_JSONL))
+    ids, parent, previews, V = (load_db_embeddings(DB_JSONL))
     queries, q_V = (load_query_embeddings(QUERY_JSONL))
-    # print()
-    print(q_V)
+
     if not check_shape(V, q_V):
         return
     
     outputs = []
     for q_text, q_vec, in zip(queries, q_V):
-        hits = cosine_search(ids, V, q_vec, TOP_K)
+        hits = cosine_search(ids, parent, previews, V, q_vec, TOP_K)
         outputs.append({
-            "query": q_text,
+            # TODO
+            # "topic": 
+            # "paragraph"
+            "query": q_text, # split this
             "top_k": TOP_K,
             "results": hits
         })
@@ -172,8 +188,10 @@ def main():
     write_jsonl(OUT_JSONL, outputs)
     print(f"[OK] Wrote {len(outputs)} query results -> {OUT_JSONL}")
 
+
 if __name__ == "__main__":
     main()
    
     
+
 

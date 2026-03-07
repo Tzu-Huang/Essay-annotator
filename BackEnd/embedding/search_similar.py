@@ -18,7 +18,7 @@ import numpy as np
 # Config
 # =========================
 DB_JSONL = "drive_data/embed_output/embed.jsonl"
-QUERY_JSONL = "drive_data/testing/queries.jsonl"
+QUERY_JSONL = "drive_data/query_embed/query_embeddings.jsonl"
 OUT_JSONL = "drive_data/results/results.jsonl"
 TOP_K = 5
 

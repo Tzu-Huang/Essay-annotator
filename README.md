@@ -1,8 +1,7 @@
 # Essay-Annotator 
-> **A Modular Dense Retrieval Framework for College Essay Semantic Search**
 
 <p align="center">
-  <img src='picture/pic.png'>
+  <img src='BackEnd/picture/summary.png'>
 </p>
 
 EssayLens is a data-driven platform designed to help students learn how to write effective U.S. college application essays by analyzing real examples and providing structural, non-ghostwriting feedback.
@@ -10,12 +9,12 @@ EssayLens is a data-driven platform designed to help students learn how to write
 
 ---
 ## 📖 Table of Contents
-- [Abstract](#abstract)
+- [Introduction](#introduction)
 - [Motivation](#motivation)
 - [Architecture](#architecture)
 - [Contributors](#contributors)
 
-## Abstract
+## Introduction
 **Essay-Annotator** implements an end-to-end pipeline covering heterogeneous data ingestion, document normalization, dense vector generation, and optimized similarity search. 
 
 As a research prototype, this system facilitates the study of **semantic similarity**, **narrative structure alignment**, and **thematic clustering** in long-form reflective student writing.
@@ -59,7 +58,7 @@ This project explores whether dense vector representations can provide a more se
 
 ## Architecture
 <p align="center">
-  <img src='picture/flow.png' width = "700">
+  <img src='BackEnd/picture/system.png' width = "700">
   
 </p>
 
@@ -129,8 +128,6 @@ $$\text{cosine}(q, d) = q \cdot d $$
 
 ### Prerequisites
 - Python 3.10+
-- OpenAI API Key
-- Google Cloud Service Account (for private Drive access)
 
 --- 
 
@@ -138,21 +135,14 @@ $$\text{cosine}(q, d) = q \cdot d $$
 ### Instructions
 ```bash
 
-# 2. Generate dense embeddings
-python embedding/make_embedding.py
+in progress..
 
-# 3. Execute semantic search
-python embedding/search_similar.py --query "overcoming personal challenges in STEM"
-Technical Implementation1. Corpus NormalizationDocuments are normalized into a unified schema to ensure metadata traceability and consistent retrieval:JSON{
-  "id": "essay_0001",
-  "topic": "Personal Statement",
-  "content": "Narrative text...",
-  "school": "UW-Madison",
-  "source_file": "..."
-}
 ```
 
 ## Contributors:
-1. Zackery Liu (UW-Madison)
-2. Amanda Tsai (UCSD)
-3. Olivia Chu (UW-Madison)
+**Backend**
+1. Zackery Liu (University of Wisconsin-Madison)
+2. Amanda Tsai (University of California San Diego)
+
+**Frontend**
+1. Olivia Chu (University of Wisconsin-Madison)

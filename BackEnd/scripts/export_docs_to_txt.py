@@ -16,7 +16,7 @@ from googleapiclient.discovery import build
 # Zack's API key location
 KEY_PATH = r"C:\Users\USER\Desktop\key\essay-project-key.json" 
 # Google drive folder id
-RAW_FOLDER_ID = "1YZgNi_MTzNa1pgFpmexKXpw2ymN2gIVn" 
+RAW_FOLDER_ID = "1V8f7xIBHylcmHGuFQBuVU57sSVHfbN4p" 
 
 # File Type. Current: Google Docs
 SCOPES = ["https://www.googleapis.com/auth/drive.readonly"]
@@ -25,7 +25,7 @@ DOC_MIME = "application/vnd.google-apps.document"
 DOCX_MIME = "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
 ALLOWED_MIME_TYPE = {DOCX_MIME, DOC_MIME}
 
-OUT_DIR = Path("data/organized_data")
+OUT_DIR = Path("data/new_input")
 STATE_DIR = Path("data/processed")
 STATE_PREFIX = "exported_ids_part_"
 STATE_GLOB = f"{STATE_PREFIX}*.json"

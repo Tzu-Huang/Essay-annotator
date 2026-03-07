@@ -6,7 +6,7 @@ from itertools import count
 from pathlib import Path
 
 script_dir = Path(__file__).parent
-output_path = script_dir / "../data/essays_jsonl/jhu_essays.jsonl"
+output_path = script_dir / "../drive_data/essays_jsonl/jhu_essays.jsonl"
 HEADERS = {
     "User-Agent": "Mozilla/5.0 (compatible; EssayCrawler/0.1; +https://example.com/your-contact)"
 }

@@ -12,17 +12,19 @@ records (with embeddings) back to a JSONL output file.
 
 import os
 import json
-from openai import OpenAI
 import numpy as np
 import tiktoken 
+from openai import OpenAI
+from dotenv import load_dotenv
 
 # =========================
 # Config
 # =========================
+load_dotenv()
 
 # Input JSONL file (finalized schema)
-Input_file = 'data/finalized_data_jsonl/database.jsonl'
-Output_file = 'data/embed_output/embed.jsonl'
+Input_file = 'drive_data/finalized_data_jsonl/database.jsonl'
+Output_file = 'drive_data/embed_output/embed.jsonl'
 
 Batch_size = 64 # This is the size that you want to embed and store at once
 
@@ -108,7 +110,6 @@ def extract_text_fields(obj):
         "source_file": obj.get("source_file"),
     }
 
-# TODO
 def embedding(client, text):
     """
     input: array (list[str])
@@ -141,18 +142,16 @@ def determine_chunk_length(token_len):
     """
 
     if token_len <= 300:
-        return -1, -1
+        return -1
     elif token_len <= 800:
-        return 300, 50
+        return 300
     else:
-        return 400, 60
-
+        return 400
 
 def chunk_text(text):
     """
-    We are splitting the essay into chunks, max 300 tokens. 
-    We set a overlapping of 50 tokens to allow "window sliding" to avoid
-    from missing content or not capturing the chunk's meaning
+    We are splitting the essay into chunks by paragraphs, 
+    which its max tokens depends on the number of tokens of that essay.
 
     input: text from the essay
     output: list[str]
@@ -164,27 +163,58 @@ def chunk_text(text):
     # text to tokens
     tokens = encodings.encode(text)
 
-
-    max_tokens, overlap = determine_chunk_length(len(tokens))
+    max_tokens = determine_chunk_length(len(tokens))
 
     chunks = []
-    start = 0
 
     # if no splitting required, essay too short
     if max_tokens == -1:
-        chunks_str = encodings.decode(tokens)
-        chunks.append(chunks_str)
-        return chunks
+        return [text.strip()]
 
+    # splits by paragraph
+    paragraphs = text.split("\n\n")
+    paragraphs = [p.strip() for p in paragraphs if p.strip()]
+    
+    current_chunk = ""
+    current_token_count = 0
 
-    while start < len(tokens):
-        end = start + max_tokens
-        chunk_tokens = tokens[start:end]
-        chunk_str = encodings.decode(chunk_tokens)
-        chunks.append(chunk_str)
+    for para in paragraphs:
+        para_tokens = encodings.encode(para)
+        para_len = len(para_tokens)
 
-        # move start forward, but consider overlapping
-        start += max_tokens - overlap
+        # if it exceeds the max tokens determined, then chunk
+        if para_len > max_tokens:
+            if current_chunk != "":  # Clean out current chunk if not empty
+                chunks.append(current_chunk.strip())
+                current_chunk = ""
+                current_token_count = 0
+
+            start = 0
+            while start < para_len:
+                end = start + max_tokens
+                chunk_tokens = para_tokens[start:end]
+                chunk_str = encodings.decode(chunk_tokens)
+                chunks.append(chunk_str.strip())
+                start = end
+
+            continue
+
+        # if paragraph can fit in the current chunk
+        # or like the next paragraph can fit into the previous chunk
+        if current_token_count + para_len <= max_tokens:
+            if current_chunk == "":
+                current_chunk = para
+            else:
+                current_chunk += '\n\n' + para
+            current_token_count += para_len
+        else: 
+            # if the next para exceeds the limit
+            chunks.append(current_chunk.strip())
+            current_chunk = para
+            current_token_count = para_len
+
+    if current_chunk != "":
+        chunks.append(current_chunk.strip())
 
     return chunks
 
@@ -211,7 +241,6 @@ def main():
     total_written = 0
     total_seen = 0
     total_skipped = 0
-    chunk_recorded = 0
 
     seen_ids = load_processed_ids(Output_file) # Check load status
     print(f"Found {len(seen_ids)} already embedded records in output")

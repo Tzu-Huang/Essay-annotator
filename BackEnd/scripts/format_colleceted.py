@@ -21,8 +21,8 @@ from pathlib import Path
 
 # Source file
 script_dir = Path(__file__).parent
-input_dir = script_dir / "../data/organized_data/"
-output_path = script_dir / "../data/essays_jsonl/collected_essays.jsonl"
+input_dir = script_dir / "../drive_data/organized_data/"
+output_path = script_dir / "../drive_data/essays_jsonl/collected_essays.jsonl"
 
 
 # =========================

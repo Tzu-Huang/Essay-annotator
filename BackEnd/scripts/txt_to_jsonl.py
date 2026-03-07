@@ -8,8 +8,8 @@ import json
 # =========================
 # Config
 # =========================
-INPUT_DIR = "data/new_input"
-OUTPUT_FILE = "data/essays_jsonl/essays_new.jsonl"
+INPUT_DIR = "drive_data/new_input"
+OUTPUT_FILE = "drive_data/essays_jsonl/essays_new.jsonl"
 
 os.makedirs(os.path.dirname(OUTPUT_FILE), exist_ok=True)
 

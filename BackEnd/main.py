@@ -6,7 +6,7 @@ from typing import Optional, List
 import json
 import time
 
-DB_JSONL = "data/drive_data/finalized_data_jsonl/database.jsonl"
+DB_JSONL = "Backend/drive_data/finalized_data_jsonl/database.jsonl"
 
 # -----------------------------
 # Request/Response Schemas
@@ -22,7 +22,7 @@ async def lifespan(app: FastAPI):
     
     try:
         # Loads our essays into a dict, shorter runtime, just load once
-        with open("data/finalized_data_jsonl/database.jsonl", "r", encoding="utf-8") as f:
+        with open("drive_data/finalized_data_jsonl/database.jsonl", "r", encoding="utf-8") as f:
             for line in f:
                 essay = json.loads(line)
                 essays[essay["id"]] = essay
@@ -34,7 +34,7 @@ async def lifespan(app: FastAPI):
         app.state.parent = parent
         app.state.V = V
         app.state.essay_count = len(essays)
-        app.state.data_path = "data_drive/finalized_data_jsonl/database.jsonl"
+        app.state.data_path = "drive_data/finalized_data_jsonl/database.jsonl"
         app.state.ready = True
 
         print(f"loaded {app.state.essay_count} essays")
@@ -62,9 +62,7 @@ app.add_middleware(CORSMiddleware,
 # -----------------------------
 # Request/Response Schemas
 # -----------------------------
-def preview(text: str, max_chars: int) -> str:
-    # Preview text
-    pass
+
 
 # -----------------------------
 # Data loading / indexing functions
@@ -73,8 +71,9 @@ def load_essays_jsonl_as_dict():
     pass
 
 def preview(text: str, max_chars: int = 200):
-    pass
-
+    if not text:
+        return ""
+    return text[:max_chars] + ("..." if len(text) > max_chars else "")
 
 # -----------------------------
 # Formatting / utility functions
@@ -140,8 +139,8 @@ def get_essay(
 
     if fields is None:
         selected = set(DEFAULT_FIELDS)
-    if include_content:
-            selected.add("content")
+        if include_content:
+                selected.add("content")
     else:
         selected = {f.strip() for f in fields.split(",") if f.strip()}
         unknown = selected - ALLOWED_FIELDS

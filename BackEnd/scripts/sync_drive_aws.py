@@ -16,7 +16,12 @@ CLIENT_SECRET_FILE = "client_secret.json"
 TOKEN_FILE = "token.json"
 
 def get_creds():
-    flow = InstalledAppFlow.from_client_secrets_file(CLIENT_SECRET_FILE, SCOPES)
+    flow = InstalledAppFlow.from_client_secrets_file(
+        CLIENT_SECRET_FILE,
+        SCOPES
+    )
+
+    flow.redirect_uri = "http://localhost"
 
     auth_url, _ = flow.authorization_url(
         access_type="offline",
@@ -28,8 +33,8 @@ def get_creds():
     print()
 
     code = input("Paste the authorization code here: ").strip()
-
     flow.fetch_token(code=code)
+
     return flow.credentials
 
 def list_children(service, folder_id):

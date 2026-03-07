@@ -24,7 +24,7 @@ load_dotenv()
 
 # Input JSONL file (finalized schema)
 Input_file = 'drive_data/finalized_data_jsonl/database.jsonl'
-Output_file = 'data/embed_output/embed.jsonl'
+Output_file = 'drive_data/embed_output/embed.jsonl'
 
 Batch_size = 64 # This is the size that you want to embed and store at once
 

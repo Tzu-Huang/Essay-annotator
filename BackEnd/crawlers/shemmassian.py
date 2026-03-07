@@ -158,7 +158,7 @@ def crawl_shemmassian(output_path: str | Path | None = None) -> int:
     # If no output path is provided, save to the project root.
     if output_path is None:
         project_root = Path(__file__).parent
-        output_path = project_root / "../data/essays_jsonl/shemmassian_college_essays.jsonl"
+        output_path = project_root / "../drive_data/essays_jsonl/shemmassian_college_essays.jsonl"
     else:
         output_path = Path(output_path)
 

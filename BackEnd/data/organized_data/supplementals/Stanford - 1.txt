@@ -1,3 +1,0 @@
-﻿Prompt: Briefly elaborate on one of your extracurricular activities, a job you hold, or responsibilities you have for your family.
-
-Content: At Ross, our motto was to “think deeply about simple things.” When we finally proved prime factorization, I realized the theorems we took for granted actually involved deeper truths like Bezout’s identity and Euclid’s Lemma. Now, I probe “simple” moments in life, knowing even the obvious can hide something profound.

@@ -6,7 +6,7 @@ import re
 
 url = "https://www.collegeadvisor.com/resources/common-app-essay-examples/"
 script_dir = Path(__file__).parent
-output_path = script_dir / "../data/essays_jsonl/collegeadvisor.jsonl"
+output_path = script_dir / "../drive_data/essays_jsonl/collegeadvisor.jsonl"
 
 HEADERS = {
     "User-Agent": "Mozilla/5.0 (compatible; EssayCrawler/0.1; +https://example.com/your-contact)"

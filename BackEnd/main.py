@@ -1,12 +1,17 @@
 from fastapi import FastAPI, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
 from embedding.search_similar import load_db_embeddings
+from embedding.make_embedding import embedding, normalize
 from pydantic import BaseModel
 from typing import Optional, List
+from openai import OpenAI
+import numpy as np
 import json
+import os
 import time
 
 DB_JSONL = "Backend/drive_data/finalized_data_jsonl/database.jsonl"
+EMBED_JSONL = "Backend/drive_data/embed_output/embed.jsonl"
 
 # -----------------------------
 # Request/Response Schemas
@@ -27,7 +32,8 @@ async def lifespan(app: FastAPI):
                 essay = json.loads(line)
                 essays[essay["id"]] = essay
 
-        ids, parent, V = load_db_embeddings(DB_JSONL)
+        # load embeddings to do cosine similarity
+        ids, parent, V = load_db_embeddings(EMBED_JSONL)
         
         app.state.essays = essays
         app.state.ids = ids
@@ -38,6 +44,7 @@ async def lifespan(app: FastAPI):
         app.state.ready = True
 
         print(f"loaded {app.state.essay_count} essays")
+
     except Exception as e:
         app.state.essays = {}
         app.state.essay_count = 0
@@ -58,29 +65,23 @@ app.add_middleware(CORSMiddleware,
     allow_headers=["*"]
 )
 
-
 # -----------------------------
-# Request/Response Schemas
+# Helper functions
 # -----------------------------
-
-
-# -----------------------------
-# Data loading / indexing functions
-# -----------------------------
-def load_essays_jsonl_as_dict():
-    pass
 
 def preview(text: str, max_chars: int = 200):
     if not text:
         return ""
     return text[:max_chars] + ("..." if len(text) > max_chars else "")
 
-# -----------------------------
-# Formatting / utility functions
-# -----------------------------
+def get_essay_info(essay):
+    return {
+        "id": essay["id"], 
+        "title": essay["title"], 
+        "preview": preview(essay["content"])
+    }
 
-def get_essay_info():
-    pass
+
 # -----------------------------
 # Routes
 # ----------------------------
@@ -120,6 +121,7 @@ def ready():
 def read_root():
     return {"message": "EssayLens API is running"}
 
+
 DEFAULT_FIELDS = ["id", "topic", "type", "school", "public"]
 ALLOWED_FIELDS = set(DEFAULT_FIELDS + ["content", "source_file", "metadata"])
 
@@ -156,10 +158,23 @@ def get_essay(
     result["id"] = essay.get("id", essay_id)
     return result
 
+
+def embed_query(query: str):
+    """
+    Create a normalized embedding for a single query.
+    """
+    client = OpenAI(api_key = os.environ["OPENAI_API_KEY"])
+    
+    vec = embedding(client, query)
+    V = normalize(vec)
+    return V
+
+# ===========================
+# Search endpoint
+# ===========================
 @app.post("/search")
 def search():
     # TODO
     # make a search function at search_similar / user_interface that integrates everything
+    
     return
-
-

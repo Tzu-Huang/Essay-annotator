@@ -60,7 +60,13 @@ app = FastAPI(lifespan=lifespan)
 
 # Allow frontend to make requests
 app.add_middleware(CORSMiddleware,
-    allow_origins=["http:/44.201.62:8000"],  # your frontend URL
+    allow_origins=["http://44.201.62.0:8000",
+        "http://127.0.0.1:3000",
+        "http://localhost:5173",   # Vite 常見
+        "http://127.0.0.1:5173",         
+                   
+    ],  # your frontend URL
+    
     allow_methods=["*"],
     allow_headers=["*"]
 )

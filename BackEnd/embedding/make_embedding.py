@@ -23,8 +23,8 @@ from dotenv import load_dotenv
 load_dotenv()
 
 # Input JSONL file (finalized schema)
-Input_file = 'drive_data/finalized_data_jsonl/database.jsonl'
-Output_file = 'drive_data/embed_output/embed.jsonl'
+Input_file = 'BackEnd/drive_data/finalized_data_jsonl/database.jsonl'
+Output_file = 'BackEnd/drive_data/embed_output/embed.jsonl'
 
 Batch_size = 64 # This is the size that you want to embed and store at once
 
@@ -218,6 +218,35 @@ def chunk_text(text):
 
     return chunks
 
+def build_output_record(rec):
+    """
+    Return a dict with stable key order so parent_id appears first in JSONL.
+    """
+    key_order = [
+        "parent_id",
+        "id",
+        "topic",
+        "content",
+        "type",
+        "school",
+        "public",
+        "source_file",
+        "topic_embedding",
+        "content_embedding",
+    ]
+
+    ordered = {}
+    for key in key_order:
+        if key in rec:
+            ordered[key] = rec[key]
+
+    # Preserve any additional fields after the known schema
+    for key, value in rec.items():
+        if key not in ordered:
+            ordered[key] = value
+
+    return ordered
+
 # =========================
 # Main logic
 # =========================
@@ -309,7 +338,7 @@ def main():
                     rec["content_embedding"] = normalize(cvec)
 
                     # Convert a complete record to a line and store in embed.jsonl
-                    out.write(json.dumps(rec, ensure_ascii=False) + "\n")
+                    out.write(json.dumps(build_output_record(rec), ensure_ascii=False) + "\n")
                     seen_ids.add(rec["id"])
 
                 total_written += len(batch_records)
@@ -331,7 +360,7 @@ def main():
                 rec["content_embedding"] = normalize(cvec)
 
                 # Convert a complete record to a line and store in embed.jsonl
-                out.write(json.dumps(rec, ensure_ascii=False) + "\n")
+                out.write(json.dumps(build_output_record(rec), ensure_ascii=False) + "\n")
                 seen_ids.add(rec["id"])
 
             total_written += len(batch_records)

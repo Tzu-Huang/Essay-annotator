@@ -1,6 +1,6 @@
 from fastapi import FastAPI, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
-from embedding.search_similar import load_db_embeddings
+from embedding.search_similar import load_db_embeddings, cosine_search
 from embedding.make_embedding import embedding, normalize
 from pydantic import BaseModel
 from typing import Optional, List
@@ -8,10 +8,13 @@ from openai import OpenAI
 import numpy as np
 import json
 import os
+from pathlib import Path
 import time
 
-DB_JSONL = "Backend/drive_data/finalized_data_jsonl/database.jsonl"
-EMBED_JSONL = "Backend/drive_data/embed_output/embed.jsonl"
+BASE = Path(__file__).parent
+
+DB_JSONL   = BASE / "drive_data/finalized_data_jsonl/database.jsonl"
+EMBED_JSONL = BASE / "drive_data/embed_output/embed.jsonl"
 
 # -----------------------------
 # Request/Response Schemas
@@ -24,21 +27,26 @@ async def lifespan(app: FastAPI):
     app.state.startup_error = None
 
     essays = {}
+    types = []
     
     try:
         # Loads our essays into a dict, shorter runtime, just load once
-        with open("drive_data/finalized_data_jsonl/database.jsonl", "r", encoding="utf-8") as f:
+        with open(DB_JSONL, "r", encoding="utf-8") as f:
             for line in f:
                 essay = json.loads(line)
                 essays[essay["id"]] = essay
 
         # load embeddings to do cosine similarity
-        ids, parent, V = load_db_embeddings(EMBED_JSONL)
+        ids, parent, previews, V = load_db_embeddings(EMBED_JSONL)
+        types = [essays[pid]["type"] if pid in essays else "unknown" for pid in parent]
         
         app.state.essays = essays
         app.state.ids = ids
         app.state.parent = parent
         app.state.V = V
+        app.state.previews = previews
+        app.state.types = types
+
         app.state.essay_count = len(essays)
         app.state.data_path = "drive_data/finalized_data_jsonl/database.jsonl"
         app.state.ready = True
@@ -48,6 +56,11 @@ async def lifespan(app: FastAPI):
     except Exception as e:
         app.state.essays = {}
         app.state.essay_count = 0
+        app.state.ids = []          
+        app.state.parent = []       
+        app.state.previews = []     
+        app.state.V = None          
+        app.state.types = []        
         app.state.ready = False
         app.state.startup_error = str(e)
         print(f"startup failed: {e}")
@@ -165,13 +178,14 @@ def get_essay(
     return result
 
 
-def embed_query(query: str):
+def embed_input(query: str):
     """
     Create a normalized embedding for a single query.
     """
     client = OpenAI(api_key = os.environ["OPENAI_API_KEY"])
     
-    vec = embedding(client, query)
+    vecs = embedding(client, query)
+    vec = vecs[0]
     V = normalize(vec)
     return V
 
@@ -179,8 +193,39 @@ def embed_query(query: str):
 # Search endpoint
 # ===========================
 @app.post("/search")
-def search():
-    # TODO
-    # make a search function at search_similar / user_interface that integrates everything
+def search(topK: int, essay_type, topic, content):
+
+    if not getattr(app.state, "ready", False):
+        raise HTTPException(status_code=503, detail="Server not ready")
     
-    return
+    topic_vec = np.array(embed_input(topic))
+    content_vec = np.array(embed_input(content))
+    types = app.state.types
+    essay_type = essay_type.lower()
+
+    # filter out essay types with their corresponding ids
+    if essay_type == "all":
+        # arange generates a numpy array up to the length of the object  
+        allowed_idx = np.arange(len(types))
+    else:
+        allowed_idx = [i for i, t in enumerate(types) if t == essay_type]
+    
+    V_filtered = app.state.V[allowed_idx]
+
+    ids_filtered = [app.state.ids[i] for i in allowed_idx]
+    parent_filtered = [app.state.parent[i] for i in allowed_idx]
+    previews_filtered = [app.state.previews[i] for i in allowed_idx]
+    
+    # cosine search: 
+    # handles dot product, sorting, get top K, remove duplicate parent id
+    results = cosine_search(
+        ids_filtered, 
+        parent_filtered, 
+        previews_filtered,  # can be removed in the future
+        V_filtered,
+        topic_vec,
+        content_vec, 
+        topK
+    )
+    
+    return results

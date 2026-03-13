@@ -126,11 +126,14 @@ def check_shape(V, q_V):
      
     return V.shape[1] == q_V.shape[1]
 
-def cosine_search(ids, parent, previews, V, q_vec, TOP_K):
+def cosine_search(ids, parent, previews, V, topic_vec, content_vec, TOP_K):
     """
     Compute Cosine similarity for one query against entire DB.
     """
-    scores = V @ q_vec
+    topic_scores = V @ topic_vec
+    content_scores = V @ content_vec
+
+    scores = 0.3 * topic_scores + 0.7 * content_scores
 
     # full sort, all candidates, handle too many duplicates
     sorted_idx = np.argsort(-scores)

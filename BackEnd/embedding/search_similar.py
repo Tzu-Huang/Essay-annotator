@@ -203,7 +203,7 @@ def load_db_embeddings(db_path: str):
 
         ids.append(rid)
         parent.append(pid)
-        previews.append(first_200_chars(obj.get("content", "")))
+        previews.append(first_150_chars(obj.get("content", "")))
         topic_vecs.append(topic_emb)
         content_vecs.append(content_emb)
 

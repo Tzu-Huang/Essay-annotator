@@ -42,7 +42,7 @@ async def lifespan(app: FastAPI):
 
         # load embeddings to do cosine similarity
         # TODO add topic
-        ids, parent, previews, topics, V = load_db_embeddings(EMBED_JSONL)
+        ids, parent, previews, topic_texts, topics, V = load_db_embeddings(EMBED_JSONL)
         types = [essays[pid]["type"] if pid in essays else "unknown" for pid in parent]
         
         app.state.essays = essays
@@ -51,6 +51,7 @@ async def lifespan(app: FastAPI):
         app.state.V = V
         app.state.topics = topics
         app.state.previews = previews
+        app.state.topic_texts = topic_texts
         app.state.types = types
 
         app.state.essay_count = len(essays)
@@ -65,6 +66,7 @@ async def lifespan(app: FastAPI):
         app.state.ids = []          
         app.state.parent = []       
         app.state.previews = []     
+        app.state.topic_texts = []
         app.state.V = None          
         app.state.types = []        
         app.state.ready = False
@@ -105,6 +107,19 @@ def get_essay_info(essay):
         "title": essay["title"], 
         "preview": preview(essay["content"])
     }
+
+def normalize_essay_type(value: Optional[str]) -> str:
+    if not isinstance(value, str):
+        return ""
+
+    normalized = value.strip().lower()
+    aliases = {
+        "uc": "uc piq",
+        "piq": "uc piq",
+        "ucpiq": "uc piq",
+        "supplemental": "supplementals",
+    }
+    return aliases.get(normalized, normalized)
 
 
 # -----------------------------
@@ -226,14 +241,25 @@ def search(topK: int, essay_type, topic, content):
     print(f"DEBUG content_vec[:5]: {content_vec[:5]}")
 
     types = app.state.types
-    essay_type = essay_type.lower()
+    essay_type = normalize_essay_type(essay_type)
 
     # filter out essay types with their corresponding ids
     if essay_type == "all":
         # arange generates a numpy array up to the length of the object  
         allowed_idx = np.arange(len(types))
     else:
-        allowed_idx = [i for i, t in enumerate(types) if t == essay_type]
+        allowed_idx = [i for i, t in enumerate(types) if normalize_essay_type(t) == essay_type]
+
+    if len(allowed_idx) == 0:
+        available_types = sorted(list({normalize_essay_type(t) for t in types if isinstance(t, str) and t.strip()}))
+        raise HTTPException(
+            status_code=400,
+            detail={
+                "error": "No essays found for essay_type",
+                "essay_type": essay_type,
+                "available_types": available_types,
+            },
+        )
     
     V_filtered = app.state.V[allowed_idx]
     topic_V_filtered = app.state.topics[allowed_idx]
@@ -241,10 +267,10 @@ def search(topK: int, essay_type, topic, content):
     ids_filtered = [app.state.ids[i] for i in allowed_idx]
     parent_filtered = [app.state.parent[i] for i in allowed_idx]
     previews_filtered = [app.state.previews[i] for i in allowed_idx]
-    
+    topic_texts_filtered = [app.state.topic_texts[i] for i in allowed_idx]
     # cosine search: 
     # handles dot product, sorting, get top K, remove duplicate parent id
-    mode, results = cosine_search(
+    _, results = cosine_search(
         ids_filtered, 
         parent_filtered, 
         previews_filtered,
@@ -253,7 +279,8 @@ def search(topK: int, essay_type, topic, content):
         topic_vec,
         content_vec, 
         mode,
-        topK
+        topK,
+        topic_texts=topic_texts_filtered,
     )
     
     return results

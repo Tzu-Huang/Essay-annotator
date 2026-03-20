@@ -164,6 +164,7 @@ def read_root():
 
 DEFAULT_FIELDS = ["id", "topic", "type", "school", "public"]
 ALLOWED_FIELDS = set(DEFAULT_FIELDS + ["content", "source_file", "metadata"])
+
 @app.get("/essays/{essay_id}")
 def get_essay(
     essay_id: str,
@@ -196,6 +197,7 @@ def get_essay(
 
     result["id"] = essay.get("id", essay_id)
     return result
+
 
 def embed_input(query: str):
     """

@@ -1,6 +1,6 @@
 from fastapi import FastAPI, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
-from embedding.search_similar import load_db_embeddings, cosine_search
+from embedding.search_similar import load_db_embeddings, cosine_search, classify_query_input
 from embedding.make_embedding import embedding, normalize
 from pydantic import BaseModel
 from dotenv import load_dotenv
@@ -41,13 +41,15 @@ async def lifespan(app: FastAPI):
                 essays[essay["id"]] = essay
 
         # load embeddings to do cosine similarity
-        ids, parent, previews, V = load_db_embeddings(EMBED_JSONL)
+        # TODO add topic
+        ids, parent, previews, topics, V = load_db_embeddings(EMBED_JSONL)
         types = [essays[pid]["type"] if pid in essays else "unknown" for pid in parent]
         
         app.state.essays = essays
         app.state.ids = ids
         app.state.parent = parent
         app.state.V = V
+        app.state.topics = topics
         app.state.previews = previews
         app.state.types = types
 
@@ -199,11 +201,30 @@ def embed_input(query: str):
 @app.post("/search")
 def search(topK: int, essay_type, topic, content):
 
+    print(f"INPUT: topK={topK}, essay_type={essay_type}, topic={topic}, content={content}")
+
     if not getattr(app.state, "ready", False):
-        raise HTTPException(status_code=503, detail="Server not ready")
+        raise HTTPException(
+            status_code=503,
+            detail={
+                "error": "Server not ready",
+                "startup_error": getattr(app.state, "startup_error", None),
+            },
+        )
+
+    mode = classify_query_input(topic, content)
+    if mode == "invalid":
+        raise HTTPException(
+            status_code=400,
+            detail="Provide at least one non-empty input: topic or content",
+        )
     
-    topic_vec = np.array(embed_input(topic))
-    content_vec = np.array(embed_input(content))
+    topic_vec = np.array(embed_input(topic)) if (isinstance(topic, str) and topic.strip()) else np.zeros(app.state.topics.shape[1], dtype=np.float32)
+    content_vec = np.array(embed_input(content)) if (isinstance(content, str) and content.strip()) else np.zeros(app.state.V.shape[1], dtype=np.float32)
+
+    print(f"DEBUG topic_vec[:5]: {topic_vec[:5]}")    # first 5 values
+    print(f"DEBUG content_vec[:5]: {content_vec[:5]}")
+
     types = app.state.types
     essay_type = essay_type.lower()
 
@@ -215,6 +236,7 @@ def search(topK: int, essay_type, topic, content):
         allowed_idx = [i for i, t in enumerate(types) if t == essay_type]
     
     V_filtered = app.state.V[allowed_idx]
+    topic_V_filtered = app.state.topics[allowed_idx]
 
     ids_filtered = [app.state.ids[i] for i in allowed_idx]
     parent_filtered = [app.state.parent[i] for i in allowed_idx]
@@ -222,13 +244,15 @@ def search(topK: int, essay_type, topic, content):
     
     # cosine search: 
     # handles dot product, sorting, get top K, remove duplicate parent id
-    results = cosine_search(
+    mode, results = cosine_search(
         ids_filtered, 
         parent_filtered, 
-        previews_filtered,  # can be removed in the future
+        previews_filtered,
+        topic_V_filtered,
         V_filtered,
         topic_vec,
         content_vec, 
+        mode,
         topK
     )
     

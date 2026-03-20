@@ -20,12 +20,15 @@ import numpy as np
 DB_JSONL = "drive_data/embed_output/embed.jsonl"
 QUERY_JSONL = "drive_data/query_embed/query_embeddings.jsonl"
 OUT_JSONL = "drive_data/results/results.jsonl"
+
 TOP_K = 5
+TOPIC_WEIGHT = 0.3
+CONTENT_WEIGHT = 0.7
 
 
-def first_200_chars(text: str) -> str:
+def first_150_chars(text: str) -> str:
     clean = (text or "").replace("\n", " ").strip()
-    return clean[:200]
+    return clean[:150]
 
 def read_jsonl(path):
     """
@@ -51,107 +54,245 @@ def read_jsonl(path):
                 print(f"[JSON ERROR] line {idx}: {e}")
                 print("Preview:", line[:120])
 
+def classify_query_input(q_topic, q_content):
+    topic_ok = isinstance(q_topic, str) and q_topic.strip() != ""
+    content_ok = isinstance(q_content, str) and q_content.strip() != ""
+
+    if not topic_ok and not content_ok:
+        return "invalid"
+    elif topic_ok and not content_ok:
+        return "topic_only"
+    elif not topic_ok and content_ok:
+        return "content_only"
+    else:
+        return "hybrid"
+
+def load_query_embeddings(q_path: str):
+
+    queries = []
+    topic_q_emb = []
+    content_q_emb = []
+
+    dim = None
+
+    for obj in read_jsonl(q_path):
+        q_topic = obj.get("q_topic")
+        q_content = obj.get("q_content")
+
+        topic_emb = obj.get("topic_embedding")
+        content_emb = obj.get("content_embedding")
+
+        # 🔥 NEW: classify input
+        mode = classify_query_input(q_topic, q_content)
+
+        # ❌ no input → skip
+        if mode == "invalid":
+            print("[ERROR] Query input empty. Need topic or content.")
+            continue
+
+        has_topic_emb = isinstance(topic_emb, list) and len(topic_emb) > 0
+        has_content_emb = isinstance(content_emb, list) and len(content_emb) > 0
+
+        if dim is None:
+            if has_topic_emb:
+                dim = len(topic_emb)
+            elif has_content_emb:
+                dim = len(content_emb)
+
+        if dim is None:
+            print("[ERROR] No embeddings found in query.")
+            continue
+
+        if has_topic_emb and len(topic_emb) != dim:
+            print("[WARN] topic embedding dimension mismatch")
+            continue
+
+        if has_content_emb and len(content_emb) != dim:
+            print("[WARN] content embedding dimension mismatch")
+            continue
+
+        # 🔥 ensure embedding matches mode
+        if mode in ("topic_only", "hybrid") and not has_topic_emb:
+            print("[ERROR] topic exists but embedding missing")
+            continue
+
+        if mode in ("content_only", "hybrid") and not has_content_emb:
+            print("[ERROR] content exists but embedding missing")
+            continue
+
+        if not has_topic_emb:
+            topic_emb = [0.0] * dim
+
+        if not has_content_emb:
+            content_emb = [0.0] * dim
+
+        queries.append({
+            "q_topic": q_topic,
+            "q_content": q_content,
+            "mode": mode   # 🔥 NEW
+        })
+
+        topic_q_emb.append(topic_emb)
+        content_q_emb.append(content_emb)
+
+    if len(topic_q_emb) == 0 or len(content_q_emb) == 0:
+        return queries, None, None
+
+    topic_q_V = np.array(topic_q_emb, dtype=np.float32)
+    content_q_V = np.array(content_q_emb, dtype=np.float32)
+
+    return queries, topic_q_V, content_q_V
+ 
 def load_db_embeddings(db_path: str):
     """
     Input: db jsonl
+
     Output:
-      - ids: list[str] length N
-      - V: np.ndarray shape (N, d) float32
+      - ids: list[str]
+      - parent: list[str | None]
+      - previews: list[str]
+      - topic_V: np.ndarray shape (N, d)
+      - content_V: np.ndarray shape (N, d)
     """
-    
-    ids, parent, vecs, previews = [], [], [], []
+
+    ids = []
+    parent = []
+    previews = []
+    topic_vecs = []
+    content_vecs = []
+
+    dim = None
 
     for obj in read_jsonl(db_path):
         rid = obj.get("id")
         pid = obj.get("parent_id")
-        emb = obj.get("content_embedding")
+
+        topic_emb = obj.get("topic_embedding")
+        content_emb = obj.get("content_embedding")
 
         if not isinstance(rid, str):
             print("[WARN] Invalid id, skipping record")
             continue
 
-        if not isinstance(emb, list) or len(emb) == 0:
-            print(f"[WARN] Invalid embedding for id: {rid}")
+        has_topic = isinstance(topic_emb, list) and len(topic_emb) > 0
+        has_content = isinstance(content_emb, list) and len(content_emb) > 0
+
+        if not has_topic and not has_content:
+            print(f"[WARN] Invalid embeddings for id: {rid}")
             continue
+
+        if dim is None:
+            if has_topic:
+                dim = len(topic_emb)
+            elif has_content:
+                dim = len(content_emb)
+
+        if has_topic and len(topic_emb) != dim:
+            print(f"[WARN] topic embedding dimension mismatch for id: {rid}")
+            continue
+
+        if has_content and len(content_emb) != dim:
+            print(f"[WARN] content embedding dimension mismatch for id: {rid}")
+            continue
+
+        if not has_topic:
+            topic_emb = [0.0] * dim
+
+        if not has_content:
+            content_emb = [0.0] * dim
 
         ids.append(rid)
-        vecs.append(emb)
         parent.append(pid)
         previews.append(first_200_chars(obj.get("content", "")))
+        topic_vecs.append(topic_emb)
+        content_vecs.append(content_emb)
 
-    # Convert vecs to Numpy matrix in order to do the dot product
-    V = np.array(vecs, dtype=np.float32)
-    return ids, parent, previews, V
+    if len(topic_vecs) == 0 or len(content_vecs) == 0:
+        return ids, parent, previews, None, None
 
-def load_query_embeddings(q_path: str):
+    topic_V = np.array(topic_vecs, dtype=np.float32)
+    content_V = np.array(content_vecs, dtype=np.float32)
 
-    query = []
-    q_emb = []
+    return ids, parent, previews, topic_V, content_V
 
-    # NOTE: from front end, we should get two inputs, and save it in dict, 
-    # so we can get it here
-    for obj in read_jsonl(q_path):
-        # topic = obj.get("topic")
-        # paragraph = obj.get("paragraph")
-
-        # topic_emb = 
-        # Accept either key name based on producer format.
-        content = obj.get("essay") or obj.get("query")
-        emb = obj.get("query_embedding")
-
-        if not isinstance(content, str):
-            print("Invalid content")
-            continue
-        if not isinstance(emb, list) or len(emb) == 0:
-            print("Invalid embedding for content: ", content[:20])
-            continue
-        query.append(content)
-        q_emb.append(emb)
-
-    q_V = np.array(q_emb, dtype=np.float32)
-
-    # return: shape=(number of queries, dimension of embedding)
-    return query, q_V # text and vector (embedding numbers)
-
-def check_shape(V, q_V):
-    if V.size == 0:
+def check_shape(topic_V, content_V, topic_q_V, content_q_V):
+    if topic_V is None or content_V is None:
         print("[ERROR] DB embedding matrix is empty. Check DB_JSONL / embedding key.")
         return False
-    if q_V.size == 0:
+
+    if topic_q_V is None or content_q_V is None:
         print("[ERROR] Query embedding matrix is empty. Check QUERY_JSONL / embedding key.")
         return False
-    if V.ndim != 2 or q_V.ndim != 2:
+
+    if topic_V.size == 0 or content_V.size == 0:
+        print("[ERROR] DB embedding matrix is empty.")
+        return False
+
+    if topic_q_V.size == 0 or content_q_V.size == 0:
+        print("[ERROR] Query embedding matrix is empty.")
+        return False
+
+    if topic_V.ndim != 2 or content_V.ndim != 2 or topic_q_V.ndim != 2 or content_q_V.ndim != 2:
         print("[ERROR] Embedding arrays must be 2D matrices.")
         return False
-     
-    return V.shape[1] == q_V.shape[1]
 
-def cosine_search(ids, parent, previews, V, topic_vec, content_vec, TOP_K):
+    if not (
+        topic_V.shape[1] == content_V.shape[1] ==
+        topic_q_V.shape[1] == content_q_V.shape[1]
+    ):
+        print("[ERROR] Embedding dimensions do not match.")
+        print("topic_V shape:", topic_V.shape)
+        print("content_V shape:", content_V.shape)
+        print("topic_q_V shape:", topic_q_V.shape)
+        print("content_q_V shape:", content_q_V.shape)
+        return False
+
+    return True
+
+def cosine_search(ids, parent, previews, topic_V, content_V, topic_vec, content_vec, mode, TOP_K, topic_weight=0.3, content_weight=0.7):
     """
-    Compute Cosine similarity for one query against entire DB.
+    Compute cosine similarity for one query against entire DB.
+
+    Cases:
+    1. only topic   -> compare topic only
+    2. only content -> compare content only
+    3. both         -> weighted topic + content
     """
-    topic_scores = V @ topic_vec
-    content_scores = V @ content_vec
 
-    scores = 0.3 * topic_scores + 0.7 * content_scores
+    topic_scores = topic_V @ topic_vec
+    content_scores = content_V @ content_vec
 
-    # full sort, all candidates, handle too many duplicates
+    if mode == "topic_only":
+        scores = topic_scores
+
+    elif mode == "content_only":
+        scores = content_scores
+
+    elif mode == "hybrid":
+        scores = topic_weight * topic_scores + content_weight * content_scores
+
+    else:
+        print("[ERROR] Invalid query mode")
+        return "invalid", []
+
     sorted_idx = np.argsort(-scores)
 
     results = []
-    seen_parents = set()  # stores unique values, average runtime O(1)
-    
-    for i in sorted_idx: 
+    seen_parents = set()
+
+    for i in sorted_idx:
         pid = parent[i]
 
         if pid in seen_parents:
             continue
-        
+
         results.append({
-            "rank": len(results)+1,
+            "rank": len(results) + 1,
             "parent_id": pid,
             "id": ids[i],
             "score": float(scores[i]),
+            "topic_score": float(topic_scores[i]),
+            "content_score": float(content_scores[i]),
             "content_preview": previews[i]
         })
 
@@ -160,7 +301,7 @@ def cosine_search(ids, parent, previews, V, topic_vec, content_vec, TOP_K):
         if len(results) == TOP_K:
             break
 
-    return results
+    return mode, results
 
 def write_jsonl(path: str, records: list[dict]):
     Path(path).parent.mkdir(parents=True, exist_ok=True)
@@ -170,20 +311,32 @@ def write_jsonl(path: str, records: list[dict]):
             f.write(json.dumps(r, ensure_ascii=False) + "\n")
 
 def main():
-    ids, parent, previews, V = (load_db_embeddings(DB_JSONL))
-    queries, q_V = (load_query_embeddings(QUERY_JSONL))
+    ids, parent, previews, topic_V, content_V = (load_db_embeddings(DB_JSONL))
+    queries, topic_q_V, content_q_V = (load_query_embeddings(QUERY_JSONL))
 
-    if not check_shape(V, q_V):
+    if not check_shape(topic_V, content_V, topic_q_V, content_q_V):
         return
     
     outputs = []
-    for q_text, q_vec, in zip(queries, q_V):
-        hits = cosine_search(ids, parent, previews, V, q_vec, TOP_K)
+
+    for q_obj, topic_vec, content_vec in zip(queries, topic_q_V, content_q_V):
+        mode, hits = cosine_search(
+            ids=ids,
+            parent=parent,
+            previews=previews,
+            topic_V=topic_V,
+            content_V=content_V,
+            topic_vec=topic_vec,
+            content_vec=content_vec,
+            mode=q_obj["mode"],  
+            TOP_K=TOP_K,
+            topic_weight=TOPIC_WEIGHT,
+            content_weight=CONTENT_WEIGHT
+        )
         outputs.append({
-            # TODO
-            # "topic": 
-            # "paragraph"
-            "query": q_text, # split this
+            "q_topic": q_obj["q_topic"],
+            "q_content": q_obj["q_content"],
+            "mode": mode,
             "top_k": TOP_K,
             "results": hits
         })

@@ -3,6 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from embedding.search_similar import load_db_embeddings, cosine_search
 from embedding.make_embedding import embedding, normalize
 from pydantic import BaseModel
+from dotenv import load_dotenv
 from typing import Optional, List
 from openai import OpenAI
 import numpy as np
@@ -12,6 +13,9 @@ from pathlib import Path
 import time
 
 BASE = Path(__file__).parent
+
+load_dotenv(dotenv_path=Path(__file__).parent / ".env")
+print("OPENAI KEY: ", bool(os.environ.get("OPENAI_API_KEY")))
 
 DB_JSONL   = BASE / "drive_data/finalized_data_jsonl/database.jsonl"
 EMBED_JSONL = BASE / "drive_data/embed_output/embed.jsonl"

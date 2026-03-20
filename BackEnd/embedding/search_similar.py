@@ -151,6 +151,7 @@ def load_db_embeddings(db_path: str):
       - ids: list[str]
       - parent: list[str | None]
       - previews: list[str]
+        - topic_texts: list[str]
       - topic_V: np.ndarray shape (N, d)
       - content_V: np.ndarray shape (N, d)
     """
@@ -158,6 +159,7 @@ def load_db_embeddings(db_path: str):
     ids = []
     parent = []
     previews = []
+    topic_texts = []
     topic_vecs = []
     content_vecs = []
 
@@ -204,16 +206,17 @@ def load_db_embeddings(db_path: str):
         ids.append(rid)
         parent.append(pid)
         previews.append(first_150_chars(obj.get("content", "")))
+        topic_texts.append((obj.get("topic") or "").strip())
         topic_vecs.append(topic_emb)
         content_vecs.append(content_emb)
 
     if len(topic_vecs) == 0 or len(content_vecs) == 0:
-        return ids, parent, previews, None, None
+        return ids, parent, previews, topic_texts, None, None
 
     topic_V = np.array(topic_vecs, dtype=np.float32)
     content_V = np.array(content_vecs, dtype=np.float32)
 
-    return ids, parent, previews, topic_V, content_V
+    return ids, parent, previews, topic_texts, topic_V, content_V
 
 def check_shape(topic_V, content_V, topic_q_V, content_q_V):
     if topic_V is None or content_V is None:
@@ -249,7 +252,20 @@ def check_shape(topic_V, content_V, topic_q_V, content_q_V):
 
     return True
 
-def cosine_search(ids, parent, previews, topic_V, content_V, topic_vec, content_vec, mode, TOP_K, topic_weight=0.3, content_weight=0.7):
+def cosine_search(
+    ids,
+    parent,
+    previews,
+    topic_V,
+    content_V,
+    topic_vec,
+    content_vec,
+    mode,
+    TOP_K,
+    topic_weight=0.3,
+    content_weight=0.7,
+    topic_texts=None,
+):
     """
     Compute cosine similarity for one query against entire DB.
 
@@ -290,6 +306,7 @@ def cosine_search(ids, parent, previews, topic_V, content_V, topic_vec, content_
             "rank": len(results) + 1,
             "parent_id": pid,
             "id": ids[i],
+            "topic": topic_texts[i] if topic_texts is not None and i < len(topic_texts) else None,
             "score": float(scores[i]),
             "topic_score": float(topic_scores[i]),
             "content_score": float(content_scores[i]),
@@ -311,7 +328,7 @@ def write_jsonl(path: str, records: list[dict]):
             f.write(json.dumps(r, ensure_ascii=False) + "\n")
 
 def main():
-    ids, parent, previews, topic_V, content_V = (load_db_embeddings(DB_JSONL))
+    ids, parent, previews, topic_texts, topic_V, content_V = (load_db_embeddings(DB_JSONL))
     queries, topic_q_V, content_q_V = (load_query_embeddings(QUERY_JSONL))
 
     if not check_shape(topic_V, content_V, topic_q_V, content_q_V):
@@ -331,7 +348,8 @@ def main():
             mode=q_obj["mode"],  
             TOP_K=TOP_K,
             topic_weight=TOPIC_WEIGHT,
-            content_weight=CONTENT_WEIGHT
+            content_weight=CONTENT_WEIGHT,
+            topic_texts=topic_texts,
         )
         outputs.append({
             "q_topic": q_obj["q_topic"],

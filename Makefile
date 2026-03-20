@@ -8,6 +8,8 @@ FOLDER_ID=1AhKLsQJaAQF-tJ5q6y5ajGsEb9mA0jgw
 # Commands
 # =========================
 
+venv:
+	source .venv/bin/activate
 pull:
 	git pull
 
@@ -18,6 +20,6 @@ embed:
 	cd BackEnd && python embedding/make_embedding.py
 
 api:
-	cd BackEnd && uvicorn main:app --host 0.0.0.0 --port 8000
+	cd BackEnd && . .venv/bin/activate && python -m uvicorn main:app --host 0.0.0.0 --port 8000 --reload
 
 deploy: pull sync embed

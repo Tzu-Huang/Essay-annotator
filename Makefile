@@ -20,6 +20,6 @@ embed:
 	cd BackEnd && python embedding/make_embedding.py
 
 api:
-	cd BackEnd && . .venv/bin/activate && python -m uvicorn main:app --host 0.0.0.0 --port 8000 --reload
+	cd BackEnd && python -m uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload`
 
 deploy: pull sync embed

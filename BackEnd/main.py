@@ -1,6 +1,6 @@
 from fastapi import FastAPI, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
-from embedding.search_similar import load_db_embeddings, cosine_search
+from embedding.search_similar import load_db_embeddings, cosine_search, classify_query_input
 from embedding.make_embedding import embedding, normalize
 from pydantic import BaseModel
 from dotenv import load_dotenv
@@ -41,14 +41,17 @@ async def lifespan(app: FastAPI):
                 essays[essay["id"]] = essay
 
         # load embeddings to do cosine similarity
-        ids, parent, previews, V = load_db_embeddings(EMBED_JSONL)
+        # TODO add topic
+        ids, parent, previews, topic_texts, topics, V = load_db_embeddings(EMBED_JSONL)
         types = [essays[pid]["type"] if pid in essays else "unknown" for pid in parent]
         
         app.state.essays = essays
         app.state.ids = ids
         app.state.parent = parent
         app.state.V = V
+        app.state.topics = topics
         app.state.previews = previews
+        app.state.topic_texts = topic_texts
         app.state.types = types
 
         app.state.essay_count = len(essays)
@@ -63,6 +66,7 @@ async def lifespan(app: FastAPI):
         app.state.ids = []          
         app.state.parent = []       
         app.state.previews = []     
+        app.state.topic_texts = []
         app.state.V = None          
         app.state.types = []        
         app.state.ready = False
@@ -103,6 +107,19 @@ def get_essay_info(essay):
         "title": essay["title"], 
         "preview": preview(essay["content"])
     }
+
+def normalize_essay_type(value: Optional[str]) -> str:
+    if not isinstance(value, str):
+        return ""
+
+    normalized = value.strip().lower()
+    aliases = {
+        "uc": "uc piq",
+        "piq": "uc piq",
+        "ucpiq": "uc piq",
+        "supplemental": "supplementals",
+    }
+    return aliases.get(normalized, normalized)
 
 
 # -----------------------------
@@ -199,37 +216,71 @@ def embed_input(query: str):
 @app.post("/search")
 def search(topK: int, essay_type, topic, content):
 
+    print(f"INPUT: topK={topK}, essay_type={essay_type}, topic={topic}, content={content}")
+
     if not getattr(app.state, "ready", False):
-        raise HTTPException(status_code=503, detail="Server not ready")
+        raise HTTPException(
+            status_code=503,
+            detail={
+                "error": "Server not ready",
+                "startup_error": getattr(app.state, "startup_error", None),
+            },
+        )
+
+    mode = classify_query_input(topic, content)
+    if mode == "invalid":
+        raise HTTPException(
+            status_code=400,
+            detail="Provide at least one non-empty input: topic or content",
+        )
     
-    topic_vec = np.array(embed_input(topic))
-    content_vec = np.array(embed_input(content))
+    topic_vec = np.array(embed_input(topic)) if (isinstance(topic, str) and topic.strip()) else np.zeros(app.state.topics.shape[1], dtype=np.float32)
+    content_vec = np.array(embed_input(content)) if (isinstance(content, str) and content.strip()) else np.zeros(app.state.V.shape[1], dtype=np.float32)
+
+    print(f"DEBUG topic_vec[:5]: {topic_vec[:5]}")    # first 5 values
+    print(f"DEBUG content_vec[:5]: {content_vec[:5]}")
+
     types = app.state.types
-    essay_type = essay_type.lower()
+    essay_type = normalize_essay_type(essay_type)
 
     # filter out essay types with their corresponding ids
     if essay_type == "all":
         # arange generates a numpy array up to the length of the object  
         allowed_idx = np.arange(len(types))
     else:
-        allowed_idx = [i for i, t in enumerate(types) if t == essay_type]
+        allowed_idx = [i for i, t in enumerate(types) if normalize_essay_type(t) == essay_type]
+
+    if len(allowed_idx) == 0:
+        available_types = sorted(list({normalize_essay_type(t) for t in types if isinstance(t, str) and t.strip()}))
+        raise HTTPException(
+            status_code=400,
+            detail={
+                "error": "No essays found for essay_type",
+                "essay_type": essay_type,
+                "available_types": available_types,
+            },
+        )
     
     V_filtered = app.state.V[allowed_idx]
+    topic_V_filtered = app.state.topics[allowed_idx]
 
     ids_filtered = [app.state.ids[i] for i in allowed_idx]
     parent_filtered = [app.state.parent[i] for i in allowed_idx]
     previews_filtered = [app.state.previews[i] for i in allowed_idx]
-    
+    topic_texts_filtered = [app.state.topic_texts[i] for i in allowed_idx]
     # cosine search: 
     # handles dot product, sorting, get top K, remove duplicate parent id
-    results = cosine_search(
+    _, results = cosine_search(
         ids_filtered, 
         parent_filtered, 
-        previews_filtered,  # can be removed in the future
+        previews_filtered,
+        topic_V_filtered,
         V_filtered,
         topic_vec,
         content_vec, 
-        topK
+        mode,
+        topK,
+        topic_texts=topic_texts_filtered,
     )
     
     return results

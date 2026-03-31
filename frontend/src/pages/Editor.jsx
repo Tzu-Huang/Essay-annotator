@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 function Editor() {
 
@@ -9,6 +10,12 @@ function Editor() {
   const [topic, setTopic] = useState("");
   const [draft, setDraft] = useState("");
   const [essayType, setEssayType] = useState("all");
+
+  // ✅ 原本的（保留）
+  const [selectedEssay, setSelectedEssay] = useState(null);
+
+  // ⭐ 原本的（保留，不動）
+  const navigate = useNavigate();
 
   const testEndpoints = async () => {
     try {
@@ -24,15 +31,31 @@ function Editor() {
 
       console.log("BACKEND RESPONSE:", data);
 
-      setResults(
-        data.map(item => item.content_preview)
-      );
+      setResults(data);
 
     } catch (error) {
 
       console.error("ERROR:", error);
       setResults(["Error calling API"]);
 
+    }
+  };
+
+  // ✅ 原本的 fetch（完全保留）
+  const fetchFullEssay = async (id) => {
+    try {
+      const response = await fetch(
+        `http://44.201.62.0:8000/essay/${id}`
+      );
+
+      const data = await response.json();
+
+      console.log("FULL ESSAY:", data);
+
+      setSelectedEssay(data);
+
+    } catch (error) {
+      console.error("ERROR:", error);
     }
   };
 
@@ -98,9 +121,7 @@ function Editor() {
           >
             <h3 style={{ margin: 0 }}>Top Results</h3>
 
-            {/* Slider */}
             <div style={{ width: "200px" }}>
-
               <div style={{ marginBottom: "6px" }}>
                 Top Query: {topK}
               </div>
@@ -124,18 +145,38 @@ function Editor() {
                 <option value="4" label="4"></option>
                 <option value="5" label="5"></option>
               </datalist>
-
             </div>
           </div>
 
           <div className="output-scroll">
 
             {Array.from({ length: topK }).map((_, i) => (
-              <div className="result-box" key={i}>
-                <h4>Top {i + 1} Similar Essay</h4>
-                <pre>
-                  {results[i] || "Result will appear here"}
-                </pre>
+              <div
+                className="result-box"
+                key={i}
+
+                onClick={() => results[i] && window.open(`http://localhost:5173/essay/${results[i].id}`, "_blank")}
+
+                style={{ cursor: "pointer" }}
+              >
+                <h4>
+                  {results[i]?.topic || "Topic"}
+                </h4>
+
+                {results[i] ? (
+                  <>
+                    <h5>
+                      Topic: {results[i].topic || "N/A"}
+                    </h5>
+
+                    <pre>
+                      {results[i].content_preview}
+                    </pre>
+                  </>
+                ) : (
+                  "Result will appear here"
+                )}
+
               </div>
             ))}
 
@@ -143,6 +184,15 @@ function Editor() {
               <h4>AI Analysis</h4>
               <p>Analysis will appear here</p>
             </div>
+
+            {/* ✅ 原本功能完全保留 */}
+            {selectedEssay && (
+              <div className="result-box">
+                <h4>Full Essay</h4>
+                <h5>{selectedEssay.topic}</h5>
+                <pre>{selectedEssay.content}</pre>
+              </div>
+            )}
 
           </div>
 

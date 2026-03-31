@@ -11,7 +11,7 @@ from pydantic import BaseModel
 # new import
 from app.helpers import preview, normalized_essay_type, get_essay_info
 from app.search_service import run_search
-from compare_results import compare
+from compare_results.analysis import compare
 
 load_dotenv(dotenv_path=Path(__file__).parent / ".env")
 # print("OPENAI KEY: ", bool(os.environ.get("OPENAI_API_KEY")))

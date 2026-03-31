@@ -11,6 +11,7 @@ from pydantic import BaseModel
 # new import
 from app.helpers import preview, normalized_essay_type, get_essay_info
 from app.search_service import run_search
+from compare_results import compare
 
 load_dotenv(dotenv_path=Path(__file__).parent / ".env")
 # print("OPENAI KEY: ", bool(os.environ.get("OPENAI_API_KEY")))
@@ -202,9 +203,9 @@ def compare_api(req: CompareRequest):
     if not req.user_input.strip():
         raise HTTPException(status_code=400, detail="user_input cannot be empty")
 
-    # try:
+    try:
         # Call the actual function that do the actual comparison
-        # result = compare(user_input=req.user_input, essay=essay)
-        # return result
-    # except Exception as e:
-    #     raise HTTPException(status_code=500, detail=f"Compare failed: {str(e)}")
+        result = compare(user_input=req.user_input, essay=essay)
+        return result
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Compare failed: {str(e)}")

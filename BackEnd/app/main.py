@@ -7,7 +7,7 @@ import json
 import os
 from pathlib import Path
 import time
-
+from pydantic import BaseModel
 # new import
 from app.helpers import preview, normalized_essay_type, get_essay_info
 from app.search_service import run_search
@@ -166,7 +166,6 @@ def get_essay(
     result["id"] = essay.get("id", essay_id)
     return result
 
-
 # ===========================
 # Search endpoint
 # ===========================
@@ -179,3 +178,33 @@ def search(topK: int, essay_type: str, topic: str = "", content: str = ""):
 
     print(f"INPUT: topK={topK}, essay_type={essay_type}, topic={topic}, content={content}")
     return run_search(app.state, topK, essay_type, topic, content)
+
+@app.post("/compare")
+
+# ===========================
+# Compare endpoint
+# ===========================
+class CompareRequest(BaseModel):
+    user_input: str
+    essay_id: str
+
+
+# req: automatically change to the right format for backend
+def compare_api(req: CompareRequest):
+    # Load essays from app.state
+    essays = app.state.essays
+    essay = essays.get(req.essay_id)
+    
+    # Error handling
+    if not essay:
+        raise HTTPException(status_code=404, detail="Essay not found")
+    
+    if not req.user_input.strip():
+        raise HTTPException(status_code=400, detail="user_input cannot be empty")
+
+    # try:
+        # Call the actual function that do the actual comparison
+        # result = compare(user_input=req.user_input, essay=essay)
+        # return result
+    # except Exception as e:
+    #     raise HTTPException(status_code=500, detail=f"Compare failed: {str(e)}")

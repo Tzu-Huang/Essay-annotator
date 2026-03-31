@@ -1,9 +1,8 @@
 from fastapi import FastAPI, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
 from embedding.search_similar import load_db_embeddings
-from pydantic import BaseModel
 from dotenv import load_dotenv
-from typing import Optional, List
+from typing import Optional
 import json
 import os
 from pathlib import Path
@@ -13,10 +12,8 @@ import time
 from app.helpers import preview, normalized_essay_type, get_essay_info
 from app.search_service import run_search
 
-BASE = Path(__file__).parent
-
 load_dotenv(dotenv_path=Path(__file__).parent / ".env")
-print("OPENAI KEY: ", bool(os.environ.get("OPENAI_API_KEY")))
+# print("OPENAI KEY: ", bool(os.environ.get("OPENAI_API_KEY")))
 
 BASE = Path(__file__).resolve().parent.parent
 DB_JSONL = BASE / "drive_data/finalized_data_jsonl/database.jsonl"
@@ -94,10 +91,13 @@ app.add_middleware(CORSMiddleware,
     allow_headers=["*"]
 )
 
-
 # -----------------------------
 # Routes
 # ----------------------------
+@app.get("/")
+def read_root():
+    return {"message": "EssayLens API is running"}
+
 @app.get("/health")
 def health():
     """
@@ -129,11 +129,6 @@ def ready():
         )
 
     return {"status": "ready", "essay_count": getattr(app.state, "essay_count", 0)}
-
-@app.get("/")
-def read_root():
-    return {"message": "EssayLens API is running"}
-
 
 DEFAULT_FIELDS = ["id", "topic", "type", "school", "public"]
 ALLOWED_FIELDS = set(DEFAULT_FIELDS + ["content", "source_file", "metadata"])

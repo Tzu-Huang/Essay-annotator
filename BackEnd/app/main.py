@@ -1,23 +1,25 @@
 from fastapi import FastAPI, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
-from embedding.search_similar import load_db_embeddings, cosine_search, classify_query_input
-from embedding.make_embedding import embedding, normalize
+from embedding.search_similar import load_db_embeddings
 from pydantic import BaseModel
 from dotenv import load_dotenv
 from typing import Optional, List
-from openai import OpenAI
-import numpy as np
 import json
 import os
 from pathlib import Path
 import time
+
+# new import
+from app.helpers import preview, normalized_essay_type, get_essay_info
+from app.search_service import run_search
 
 BASE = Path(__file__).parent
 
 load_dotenv(dotenv_path=Path(__file__).parent / ".env")
 print("OPENAI KEY: ", bool(os.environ.get("OPENAI_API_KEY")))
 
-DB_JSONL   = BASE / "drive_data/finalized_data_jsonl/database.jsonl"
+BASE = Path(__file__).resolve().parent.parent
+DB_JSONL = BASE / "drive_data/finalized_data_jsonl/database.jsonl"
 EMBED_JSONL = BASE / "drive_data/embed_output/embed.jsonl"
 
 # -----------------------------
@@ -91,35 +93,6 @@ app.add_middleware(CORSMiddleware,
     allow_methods=["*"],
     allow_headers=["*"]
 )
-
-# -----------------------------
-# Helper functions
-# -----------------------------
-
-def preview(text: str, max_chars: int = 200):
-    if not text:
-        return ""
-    return text[:max_chars] + ("..." if len(text) > max_chars else "")
-
-def get_essay_info(essay):
-    return {
-        "id": essay["id"], 
-        "title": essay["title"], 
-        "preview": preview(essay["content"])
-    }
-
-def normalize_essay_type(value: Optional[str]) -> str:
-    if not isinstance(value, str):
-        return ""
-
-    normalized = value.strip().lower()
-    aliases = {
-        "uc": "uc piq",
-        "piq": "uc piq",
-        "ucpiq": "uc piq",
-        "supplemental": "supplementals",
-    }
-    return aliases.get(normalized, normalized)
 
 
 # -----------------------------
@@ -199,88 +172,15 @@ def get_essay(
     return result
 
 
-def embed_input(query: str):
-    """
-    Create a normalized embedding for a single query.
-    """
-    client = OpenAI(api_key = os.environ["OPENAI_API_KEY"])
-    
-    vecs = embedding(client, query)
-    vec = vecs[0]
-    V = normalize(vec)
-    return V
-
 # ===========================
 # Search endpoint
 # ===========================
 @app.post("/search")
-def search(topK: int, essay_type, topic, content):
+def search(topK: int, essay_type: str, topic: str = "", content: str = ""):
+    """
+    Search for similar essays based on topic/content input.
+    Delegates the full search logic to search_service.run_search().
+    """
 
     print(f"INPUT: topK={topK}, essay_type={essay_type}, topic={topic}, content={content}")
-
-    if not getattr(app.state, "ready", False):
-        raise HTTPException(
-            status_code=503,
-            detail={
-                "error": "Server not ready",
-                "startup_error": getattr(app.state, "startup_error", None),
-            },
-        )
-
-    mode = classify_query_input(topic, content)
-    if mode == "invalid":
-        raise HTTPException(
-            status_code=400,
-            detail="Provide at least one non-empty input: topic or content",
-        )
-    
-    topic_vec = np.array(embed_input(topic)) if (isinstance(topic, str) and topic.strip()) else np.zeros(app.state.topics.shape[1], dtype=np.float32)
-    content_vec = np.array(embed_input(content)) if (isinstance(content, str) and content.strip()) else np.zeros(app.state.V.shape[1], dtype=np.float32)
-
-    print(f"DEBUG topic_vec[:5]: {topic_vec[:5]}")    # first 5 values
-    print(f"DEBUG content_vec[:5]: {content_vec[:5]}")
-
-    types = app.state.types
-    essay_type = normalize_essay_type(essay_type)
-
-    # filter out essay types with their corresponding ids
-    if essay_type == "all":
-        # arange generates a numpy array up to the length of the object  
-        allowed_idx = np.arange(len(types))
-    else:
-        allowed_idx = [i for i, t in enumerate(types) if normalize_essay_type(t) == essay_type]
-
-    if len(allowed_idx) == 0:
-        available_types = sorted(list({normalize_essay_type(t) for t in types if isinstance(t, str) and t.strip()}))
-        raise HTTPException(
-            status_code=400,
-            detail={
-                "error": "No essays found for essay_type",
-                "essay_type": essay_type,
-                "available_types": available_types,
-            },
-        )
-    
-    V_filtered = app.state.V[allowed_idx]
-    topic_V_filtered = app.state.topics[allowed_idx]
-
-    ids_filtered = [app.state.ids[i] for i in allowed_idx]
-    parent_filtered = [app.state.parent[i] for i in allowed_idx]
-    previews_filtered = [app.state.previews[i] for i in allowed_idx]
-    topic_texts_filtered = [app.state.topic_texts[i] for i in allowed_idx]
-    # cosine search: 
-    # handles dot product, sorting, get top K, remove duplicate parent id
-    _, results = cosine_search(
-        ids_filtered, 
-        parent_filtered, 
-        previews_filtered,
-        topic_V_filtered,
-        V_filtered,
-        topic_vec,
-        content_vec, 
-        mode,
-        topK,
-        topic_texts=topic_texts_filtered,
-    )
-    
-    return results
+    return run_search(app.state, topK, essay_type, topic, content)

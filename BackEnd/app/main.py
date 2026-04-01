@@ -180,8 +180,6 @@ def search(topK: int, essay_type: str, topic: str = "", content: str = ""):
     print(f"INPUT: topK={topK}, essay_type={essay_type}, topic={topic}, content={content}")
     return run_search(app.state, topK, essay_type, topic, content)
 
-@app.post("/compare")
-
 # ===========================
 # Compare endpoint
 # ===========================
@@ -189,8 +187,8 @@ class CompareRequest(BaseModel):
     user_input: str
     essay_id: str
 
-
 # req: automatically change to the right format for backend
+@app.post("/compare")
 def compare_api(req: CompareRequest):
     # Load essays from app.state
     essays = app.state.essays
@@ -203,9 +201,11 @@ def compare_api(req: CompareRequest):
     if not req.user_input.strip():
         raise HTTPException(status_code=400, detail="user_input cannot be empty")
 
+    essay_text = essay.get("content", "")
     try:
         # Call the actual function that do the actual comparison
-        result = compare(user_input=req.user_input, essay=essay)
+        result = compare(user_essay=req.user_input, sample_essay=essay_text)
         return result
     except Exception as e:
+        print(e)
         raise HTTPException(status_code=500, detail=f"Compare failed: {str(e)}")

@@ -10,9 +10,11 @@ client = OpenAI(api_key=os.environ["OPENAI_API_KEY"])
 
 MODEL = "gpt-5.4-mini"
 
-# Return the prompt text 
 def load_prompt(path="compare_prompt.txt"):
-    with open(path, "r", encoding="utf-8") as f:
+    base_dir = Path(__file__).resolve().parent
+    full_path = base_dir / path
+
+    with open(full_path, "r", encoding="utf-8") as f:
         return f.read()
     
 # Upon the prompt template, replace the user_essay and database_essay in the prompt

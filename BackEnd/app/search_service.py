@@ -103,7 +103,7 @@ def run_search(app_state, topK: int, essay_type: list, topic: str, content: str)
         else:
             normalized_inputs = [normalized_essay_type(e) for e in essay_type]
             for idx, t in enumerate(types):
-                if normalized_essay_type(t) == normalized_inputs:
+                if normalized_essay_type(t) in normalized_inputs:
                     allowed_idx.append(idx)
 
     print("yaya")

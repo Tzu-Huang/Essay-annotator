@@ -179,7 +179,6 @@ class Search(BaseModel):
     topic: str
     content: str
     
-
 @app.post("/search")
 async def search(request: Request):
     """
@@ -195,6 +194,8 @@ async def search(request: Request):
         topic = body.get("topic","")
         content = body.get("content", "")
         
+        print("yes")
+
         if topK is None or essay_type is None:
             raise HTTPException(
                 status_code=400,
@@ -209,6 +210,7 @@ async def search(request: Request):
                 content
             )
 
+        print("result pass")
         return {"results": results}
 
     except Exception as e:

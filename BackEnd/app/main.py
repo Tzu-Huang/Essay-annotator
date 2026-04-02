@@ -212,7 +212,7 @@ async def search(request: Request):
             )
 
         print(results)
-        return {"results": results}
+        return results
 
     except Exception as e:
         raise HTTPException(

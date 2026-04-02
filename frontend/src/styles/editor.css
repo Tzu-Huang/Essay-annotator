@@ -1,0 +1,338 @@
+/* =========================================
+   Global
+   ========================================= */
+
+body {
+  background: #f8f9fc;
+  font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+/* =========================================
+   Editor Layout
+   ========================================= */
+
+.editor-container {
+  padding: 24px 40px 40px 40px;
+}
+
+.editor-main {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 32px;
+  align-items: start;
+}
+
+.input-panel,
+.output-panel {
+  background: white;
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.06);
+}
+
+/* =========================================
+   Essay Type 圖示卡片選擇器
+   ========================================= */
+
+.essay-type-section {
+  margin-bottom: 24px;
+}
+
+.section-label {
+  display: flex;
+  align-items: center;
+  font-size: 18px;
+  font-weight: 600;
+  color: #555;
+  margin-bottom: 14px;
+}
+
+.label-icon {
+  margin-right: 8px;
+  font-size: 22px;
+}
+
+.essay-type-grid {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.essay-type-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+
+  background: white;
+  border: 2px solid transparent;
+  border-radius: 16px;
+  padding: 10px 14px;
+
+  cursor: pointer;
+  transition: all 0.25s ease;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+}
+
+.essay-type-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+}
+
+.essay-type-card.selected {
+  border-color: #5c5cff;
+  background: #f5f5ff;
+  box-shadow: 0 6px 20px rgba(92, 92, 255, 0.2);
+  transform: translateY(-2px);
+}
+
+.essay-type-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s ease;
+}
+
+.essay-type-card:hover .essay-type-icon {
+  transform: scale(1.08);
+}
+
+.essay-type-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: #555;
+  letter-spacing: 0.3px;
+}
+
+.essay-type-card.selected .essay-type-label {
+  color: #5c5cff;
+}
+
+/* =========================================
+   Input 區
+   ========================================= */
+
+.input-panel {
+  display: flex;
+  flex-direction: column;
+}
+
+.text-input {
+  width: 95%;
+  padding: 12px;
+  margin-bottom: 12px;
+  border-radius: 10px;
+  border: 1px solid #e5e7eb;
+  font-size: 14px;
+  transition: border 0.2s ease, box-shadow 0.2s ease;
+}
+
+.text-input:focus {
+  outline: none;
+  border: 1px solid #5c5cff;
+  box-shadow: 0 0 0 3px rgba(92, 92, 255, 0.15);
+}
+
+.text-area {
+  resize: none;
+  width: 95%;
+  height: 280px;
+  padding: 12px;
+  border-radius: 10px;
+  border: 1px solid #e5e7eb;
+  font-size: 14px;
+  line-height: 1.6;
+  transition: border 0.2s ease, box-shadow 0.2s ease;
+}
+
+.text-area:focus {
+  outline: none;
+  border: 1px solid #5c5cff;
+  box-shadow: 0 0 0 3px rgba(92, 92, 255, 0.15);
+}
+
+/* Generate 按鈕 */
+.primary-btn {
+  margin-top: 14px;
+  padding: 13px;
+  border-radius: 12px;
+  border: none;
+  background: #5c5cff;
+  color: white;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.primary-btn:hover:not(:disabled) {
+  background: #4444dd;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(92, 92, 255, 0.35);
+}
+
+.primary-btn.loading {
+  background: #9090e0;
+  cursor: not-allowed;
+}
+
+.btn-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
+.spinner {
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(255, 255, 255, 0.4);
+  border-top-color: white;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* =========================================
+   Output 區
+   ========================================= */
+
+.output-panel {
+  display: flex;
+  flex-direction: column;
+}
+
+.output-scroll {
+  overflow-y: auto;
+  max-height: 70vh;
+  padding-right: 6px;
+  padding-top: 4px;
+}
+
+/* =========================================
+   Top Bar（Top Results + Slider）
+   ========================================= */
+
+.top-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.top-title {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.slider-box {
+  width: 180px;
+}
+
+.slider-label {
+  font-size: 12px;
+  color: #888;
+  margin-bottom: 6px;
+}
+
+.slider {
+  width: 100%;
+  accent-color: #5c5cff;
+}
+
+.slider-ticks {
+  position: relative;
+  height: 18px;
+  margin-top: 4px;
+}
+
+.slider-ticks span {
+  position: absolute;
+  transform: translateX(-50%);
+  font-size: 11px;
+  color: #999;
+}
+
+/* =========================================
+   Result Cards
+   ========================================= */
+
+.result-box {
+  padding: 16px;
+  margin-bottom: 14px;
+  border-radius: 14px;
+  background: #f5f7f8;
+  border-left: 5px solid #5c5cff;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.05);
+  transition: all 0.2s ease;
+}
+
+.result-clickable {
+  cursor: pointer;
+}
+
+.result-clickable:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.1);
+  background: #ecedf8;
+  border-left-color: #4338ca;
+}
+
+.result-box:nth-child(1) { border-left-color: #3730a3; }
+.result-box:nth-child(2) { border-left-color: #4f46e5; }
+.result-box:nth-child(3) { border-left-color: #6366f1; }
+.result-box:nth-child(4) { border-left-color: #a5b4fc; }
+.result-box:nth-child(5) { border-left-color: #e0e7ff; }
+
+.result-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+
+/* ⭐ 修正開始（只動這裡） */
+.rank-badge {
+  font-size: 18px;
+  line-height: 1;
+  width: 34px;
+  display: inline-block;
+}
+/* ⭐ 修正結束 */
+
+.result-topic {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 600;
+  color: #333;
+}
+
+/* ⭐ 修正開始（只動這裡） */
+.result-preview {
+  padding-left: 44px;
+}
+/* ⭐ 修正結束 */
+
+.result-preview pre {
+  margin: 0;
+  font-size: 13px;
+  color: #555;
+  white-space: pre-wrap;
+  line-height: 1.6;
+  font-family: inherit;
+}
+
+.placeholder-text {
+  font-size: 13px;
+  color: #aaa;
+  font-style: italic;
+}

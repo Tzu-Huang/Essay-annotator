@@ -1,54 +1,111 @@
 import { useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
+import "../styles/EssayPage.css";
 
 function EssayPage() {
   const { id } = useParams();
   const [essay, setEssay] = useState(null);
+  const [comparing, setComparing] = useState(false);
+  const [compareResult, setCompareResult] = useState(null);
 
-//   useEffect(() => {
-//     console.log("Essay ID:", id);
+  useEffect(() => {
+    const fetchEssay = async () => {
+      try {
+        const response = await fetch(
+          `http://44.201.62.0:8000/essays/${id}?include_content=true`
+        );
+        const data = await response.json();
+        setEssay(data);
+      } catch (error) {
+        console.error("ERROR:", error);
+      }
+    };
+    fetchEssay();
+  }, [id]);
+  
 
-//     // 暫時用假資料
-//     const fakeData = {
-//       topic: "My Leadership Journey",
-//       content: `When I first joined the debate club...
+  // ✅ 只新增這段（離開頁面清掉 draft）
+  useEffect(() => {
+    return () => {
+      localStorage.removeItem("userDraft");
+      localStorage.removeItem("userTopic");
+    };
+  }, []);
 
-// Over time, I learned how to lead discussions...
+  const handleCompare = async () => {
+    const userDraft = localStorage.getItem("userDraft");
+    const userTopic = localStorage.getItem("userTopic");
 
-// This experience shaped me...`
-//     };
-
-//     setEssay(fakeData);
-
-//   }, [id]);
-useEffect(() => {
-  const fetchEssay = async () => {
+    setComparing(true);
     try {
-      const response = await fetch(
-        `http://44.201.62.0:8000/essay/${id}`
-      );
-
+      const response = await fetch("http://44.201.62.0:8000/compare", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          reference_id: id,
+          user_content: userDraft,
+          user_topic: userTopic,
+        }),
+      });
       const data = await response.json();
-
-      setEssay(data);
-
+      setCompareResult(data.analysis);
     } catch (error) {
       console.error("ERROR:", error);
+    } finally {
+      setComparing(false);
     }
   };
 
-  fetchEssay();
-}, [id]);
-
   return (
-    <div style={{ padding: "40px" }}>
+    <div className="essay-page">
       {essay ? (
         <>
-          <h1>{essay.topic}</h1>
-          <pre>{essay.content}</pre>
+          <div className="essay-header">
+            <button className="back-btn" onClick={() => window.close()}>
+              ← Back to Results
+            </button>
+            <h1 className="title">{essay.topic}</h1>
+            <div className="essay-meta">
+              <span className="essay-type-badge">{essay.essay_type}</span>
+              <span className="essay-words">{essay.word_count} words</span>
+            </div>
+          </div>
+
+          <div className="essay-body">
+            {essay.content.split("\n\n").map((para, i) => (
+              <p key={i} className="paragraph">{para}</p>
+            ))}
+          </div>
+
+          <div className="essay-footer">
+            <button
+              className={`compare-btn ${comparing ? "loading" : ""}`}
+              onClick={handleCompare}
+              disabled={comparing}
+            >
+              {comparing ? (
+                <>
+                  <span className="spinner" />
+                  Comparing...
+                </>
+              ) : (
+                "⚡ Compare with My Essay"
+              )}
+            </button>
+          </div>
+
+          {compareResult && (
+            <div className="compare-result">
+              <div className="compare-result-header">
+                <span>🤖</span>
+                <h4>AI Analysis</h4>
+              </div>
+              <p>{compareResult}</p>
+            </div>
+          )}
         </>
       ) : (
-        <p>Loading...</p>
+        <p className="loading">Loading...</p>
       )}
     </div>
   );

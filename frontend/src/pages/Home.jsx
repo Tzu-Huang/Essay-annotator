@@ -1,8 +1,10 @@
 import { Link } from "react-router-dom";
+import "../styles/home.css";
+
 
 function Home() {
   return (
-    <div className="home">
+    <div className="home background-image bg-world">
 
       <div className="hero">
         <h1>

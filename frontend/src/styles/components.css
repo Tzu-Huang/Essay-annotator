@@ -1,0 +1,37 @@
+/* =========================================
+   🎨 共用 UI（按鈕 / 輸入）
+   ========================================= */
+
+textarea {
+  border-radius: 8px;
+  border: 1px solid #ddd;
+  padding: 10px;
+}
+
+textarea:focus {
+  outline: none;
+  border: 1px solid #6366f1;
+}
+
+.primary-btn {
+  margin-top: 30px;
+  padding: 12px 26px;
+
+  background: linear-gradient(
+    135deg,
+    #4f46e5,
+    #6366f1
+  );
+
+  color: white;
+  border: none;
+  border-radius: 8px;
+
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.primary-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+}

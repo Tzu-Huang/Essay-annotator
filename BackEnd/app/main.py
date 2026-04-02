@@ -6,7 +6,6 @@ from embedding.search_similar import load_db_embeddings
 from dotenv import load_dotenv
 from typing import Optional
 import json
-import os
 from pathlib import Path
 import time
 from pydantic import BaseModel
@@ -175,7 +174,7 @@ def get_essay(
 
 class Search(BaseModel):
     topK: int
-    essay_type: str
+    essay_type: list
     topic: str
     content: str
     
@@ -191,6 +190,7 @@ async def search(request: Request):
 
         topK = body.get("topK")
         essay_type = body.get("essay_type")
+        print(essay_type)
         topic = body.get("topic","")
         content = body.get("content", "")
         

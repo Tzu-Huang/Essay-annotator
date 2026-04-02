@@ -113,6 +113,8 @@ def run_search(app_state, topK: int, essay_type: str, topic: str, content: str):
             })
         )
         print("ya you")
+        print(essay_type)
+        print(available_types)
         raise HTTPException(
             status_code=400,
             detail={
@@ -132,6 +134,7 @@ def run_search(app_state, topK: int, essay_type: str, topic: str, content: str):
     topic_texts_filtered = [app_state.topic_texts[i] for i in allowed_idx]
 
     # Run similarity search on filtered data
+
     _, results = cosine_search(
         ids_filtered,
         parent_filtered,
@@ -144,6 +147,5 @@ def run_search(app_state, topK: int, essay_type: str, topic: str, content: str):
         topK,
         topic_texts=topic_texts_filtered,
     )
-
     print("all godod")
     return results

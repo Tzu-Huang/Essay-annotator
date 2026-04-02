@@ -1,19 +1,17 @@
-from urllib import request
-
+import time
+import json
+from BackEnd.app.helpers import normalized_essay_type
+from app.search_service import run_search
+from app.state import AppData
+from compare_results.analysis import compare
+from dotenv import load_dotenv
+from embedding.search_similar import load_db_embeddings
 from fastapi import FastAPI, HTTPException, Query, Request
 from fastapi.middleware.cors import CORSMiddleware
-from embedding.search_similar import load_db_embeddings
-from dotenv import load_dotenv
-from typing import Optional
-import json
 from pathlib import Path
-import time
 from pydantic import BaseModel
-# new import
-from app.helpers import preview, normalized_essay_type, get_essay_info
-from app.search_service import run_search
-from compare_results.analysis import compare
-from app.state import AppData
+from typing import Optional
+
 
 load_dotenv(dotenv_path=Path(__file__).parent / ".env")
 # print("OPENAI KEY: ", bool(os.environ.get("OPENAI_API_KEY")))
@@ -39,6 +37,12 @@ async def lifespan(app: FastAPI):
         with open(DB_JSONL, "r", encoding="utf-8") as f:
             for line in f:
                 essay = json.loads(line)
+
+                raw_type = essay.get("type", "unknown")
+
+                # We normalized the type first when loading every essay
+                essay["type"] = normalized_essay_type(raw_type)
+
                 essays[essay["id"]] = essay
 
         ids, parent, previews, topic_texts, topics, V = load_db_embeddings(EMBED_JSONL)
@@ -223,7 +227,7 @@ class CompareRequest(BaseModel):
 def compare_api(req: CompareRequest):
     # Load essays from app.state
     data = app.state.data
-    essay = data.get(req.essay_id)
+    essay = data.essays.get(req.essay_id)
     
     # Error handling
     if not essay:

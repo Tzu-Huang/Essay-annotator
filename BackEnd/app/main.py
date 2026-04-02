@@ -170,15 +170,21 @@ def get_essay(
 # ===========================
 # Search endpoint
 # ===========================
+
+class Search(BaseModel):
+    topK: int
+    essay_type: str
+    topic: str
+    content: str
+
 @app.post("/search")
-def search(topK: int, essay_type: str, topic: str = "", content: str = ""):
+def search(req: Search):
     """
     Search for similar essays based on topic/content input.
     Delegates the full search logic to search_service.run_search().
     """
+    return run_search(app.state, req.topK, req.essay_type, req.topic, req.content)
 
-    print(f"INPUT: topK={topK}, essay_type={essay_type}, topic={topic}, content={content}")
-    return run_search(app.state, topK, essay_type, topic, content)
 
 # ===========================
 # Compare endpoint

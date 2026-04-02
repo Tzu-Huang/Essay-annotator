@@ -78,14 +78,19 @@ def run_search(app_state, topK: int, essay_type: str, topic: str, content: str):
         else np.zeros(app_state.V.shape[1], dtype=np.float32)
     )
 
+    print("Content_vec")
     if topic_vec.ndim != 1:
+        print("topic_vec.ndim")
         raise HTTPException(status_code=500, detail=f"topic_vec must be 1D, got shape {topic_vec.shape}")
 
     if content_vec.ndim != 1:
+        print("content_vec.ndim")
         raise HTTPException(status_code=500, detail=f"content_vec must be 1D, got shape {content_vec.shape}")
     
     types = app_state.types
     essay_type = normalized_essay_type(essay_type)
+
+    print("All good")
 
     # Filter searchable rows by essay type
     if essay_type == "all":
@@ -96,6 +101,8 @@ def run_search(app_state, topK: int, essay_type: str, topic: str, content: str):
             if normalized_essay_type(t) == essay_type
         ]
 
+    print("yaya")
+
     # If no matching essay type exists, return helpful error info
     if len(allowed_idx) == 0:
         available_types = sorted(
@@ -105,6 +112,7 @@ def run_search(app_state, topK: int, essay_type: str, topic: str, content: str):
                 if isinstance(t, str) and t.strip()
             })
         )
+        print("ya you")
         raise HTTPException(
             status_code=400,
             detail={
@@ -137,4 +145,5 @@ def run_search(app_state, topK: int, essay_type: str, topic: str, content: str):
         topic_texts=topic_texts_filtered,
     )
 
+    print("all godod")
     return results

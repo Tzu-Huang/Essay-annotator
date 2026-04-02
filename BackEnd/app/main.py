@@ -13,6 +13,7 @@ from pydantic import BaseModel
 from app.helpers import preview, normalized_essay_type, get_essay_info
 from app.search_service import run_search
 from compare_results.analysis import compare
+from app.state import AppData
 
 load_dotenv(dotenv_path=Path(__file__).parent / ".env")
 # print("OPENAI KEY: ", bool(os.environ.get("OPENAI_API_KEY")))
@@ -27,6 +28,9 @@ EMBED_JSONL = BASE / "drive_data/embed_output/embed.jsonl"
 async def lifespan(app: FastAPI):
     print("startup")
 
+    # data = AppData(
+    #     started_at=time.time(),
+    # )
     app.state.started_at = time.time()
     app.state.ready = False
     app.state.startup_error = None
@@ -190,7 +194,7 @@ async def search(request: Request):
 
         topK = body.get("topK")
         essay_type = body.get("essay_type")
-        print(essay_type)
+        # print(essay_type)
         topic = body.get("topic","")
         content = body.get("content", "")
         

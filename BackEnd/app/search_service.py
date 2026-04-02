@@ -90,22 +90,35 @@ def run_search(app_state, topK: int, essay_type: list, topic: str, content: str)
         raise HTTPException(status_code=500, detail=f"content_vec must be 1D, got shape {content_vec.shape}")
     
     types = app_state.types
-    essay_type = normalized_essay_type(essay_type)
+    normalized_inputs = [normalized_essay_type(e) for e in essay_type]
 
     print("All good")
 
     allowed_idx = []
-    for e in essay_type:
-        # Filter searchable rows by essay type
-        if e == "all":
-            allowed_idx = np.arange(len(types))
-            print(allowed_idx)
-            break
-        else:
-            for idx, t in enumerate(types):
-                if normalized_essay_type(t) == e:
-                    allowed_idx.append(idx)
+
+    # handle "all"
+    if "all" in normalized_inputs:
+        allowed_idx = list(range(len(types)))
+    else:
+        for idx, t in enumerate(types):
+            if normalized_essay_type(t) in normalized_inputs:
+                allowed_idx.append(idx)
                     
+    """
+    TODO
+    curl -X POST "http://44.201.62.0:8000/search" \
+    -H "Content-Type: application/json" \
+    -d '{
+        "topK": 5,
+        "essay_type": ["all"],
+        "topic": "leadership",
+        "content": "I led a robotics team and built a drone"
+    }'
+    {"detail":"400: {'error': 'No essays found for essay_type', 'essay_type': '', 'available_types': ['personal statement', 'supplementals', 'uc piq']}"}
+
+    current issue: it's not accepting any essay type, not sure if it's only all 
+    but need to test on 
+    """
 
     print("yaya")
 

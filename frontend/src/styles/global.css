@@ -1,0 +1,15 @@
+/* =========================================
+   Global 全域設定（字體 / 背景）
+   ========================================= */
+
+body {
+  margin: 0;
+
+  background: linear-gradient(
+    135deg,
+    #f5f7fa,
+    #e4ecf7
+  );
+
+  font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+}

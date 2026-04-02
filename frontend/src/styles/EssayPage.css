@@ -1,0 +1,167 @@
+body {
+  background: #f8f9fc;
+  font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+.essay-page {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 48px 40px 80px;
+}
+
+/* 返回按鈕 */
+.back-btn {
+  background: none;
+  border: none;
+  font-size: 14px;
+  color: #5c5cff;
+  cursor: pointer;
+  padding: 0;
+  margin-bottom: 20px;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  transition: opacity 0.2s;
+}
+
+.back-btn:hover {
+  opacity: 0.7;
+}
+
+/* 標題區 */
+.essay-header {
+  margin-bottom: 40px;
+  padding-bottom: 24px;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.title {
+  font-size: 30px;
+  font-weight: 700;
+  color: #1a1a2e;
+  line-height: 1.3;
+  margin: 0 0 12px;
+}
+
+.essay-meta {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.essay-type-badge {
+  background: #ede9fe;
+  color: #5c5cff;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: 20px;
+}
+
+.essay-words {
+  font-size: 13px;
+  color: #aaa;
+}
+
+/* 內文 */
+.essay-body {
+  margin-bottom: 40px;
+}
+
+.paragraph {
+  margin-bottom: 22px;
+  line-height: 1.9;
+  font-size: 16px;
+  color: #374151;
+}
+
+/* 底部 */
+.essay-footer {
+  padding-top: 24px;
+  border-top: 1px solid #e5e7eb;
+  display: flex;
+  justify-content: flex-end;
+}
+
+/* Compare 按鈕 */
+.compare-btn {
+  background: linear-gradient(135deg, #5c5cff, #4338ca);
+  color: white;
+  border: none;
+  border-radius: 10px;
+  padding: 11px 24px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  box-shadow: 0 4px 14px rgba(92, 92, 255, 0.35);
+  transition: all 0.2s ease;
+}
+
+.compare-btn:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(92, 92, 255, 0.4);
+}
+
+.compare-btn.loading {
+  background: #9090e0;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+/* AI 比較結果卡片 */
+.compare-result {
+  margin-top: 24px;
+  background: white;
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.07);
+  border-left: 5px solid #5c5cff;
+}
+
+.compare-result-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.compare-result-header h4 {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 700;
+  color: #1a1a2e;
+}
+
+.compare-result p {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.8;
+  color: #444;
+}
+
+/* Spinner */
+.spinner {
+  width: 14px;
+  height: 14px;
+  border: 2px solid rgba(255, 255, 255, 0.4);
+  border-top-color: white;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+  display: inline-block;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Loading */
+.loading {
+  text-align: center;
+  font-size: 16px;
+  color: #aaa;
+  margin-top: 80px;
+}

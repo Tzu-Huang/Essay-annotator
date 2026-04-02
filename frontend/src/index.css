@@ -1,3 +1,6 @@
+/*
+Removes the default spacing around the page
+*/
 body {
   margin: 0;
 }

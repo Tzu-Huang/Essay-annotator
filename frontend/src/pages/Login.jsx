@@ -1,4 +1,5 @@
 import { useNavigate } from "react-router-dom";
+import "../styles/login.css";
 
 function Login() {
 
@@ -15,6 +16,9 @@ function Login() {
 
         <button
           className="primary-btn"
+          /*onClick = 按鈕被點擊時要做的事情
+            navigate：把網址改成 /editor
+          */
           onClick={() => navigate("/editor")}
         >
           sign in

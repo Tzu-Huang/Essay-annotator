@@ -1,191 +1,155 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import "../styles/editor.css";
+
+const ESSAY_TYPES = [
+  { value: "all",          label: "All",          icon: "🌍", bg: "linear-gradient(135deg, #81d4fa, #4dd0c4)" },
+  { value: "CommonApp",    label: "Common App",   icon: "🧠", bg: "linear-gradient(135deg, #d7b4f3, #f4a8c7)" },
+  { value: "UC",           label: "UC",           icon: "🌴", bg: "linear-gradient(135deg, #b3d9f5, #a8d8ea)" },
+  { value: "Supplemental", label: "Supplemental", icon: "🧩", bg: "linear-gradient(135deg, #c8e6c9, #a5d6a7)" },
+];
+
+const RANK_LABELS = ["1st", "2nd", "3rd", "4th", "5th"];
 
 function Editor() {
-
-  const [topK, setTopK] = useState(3);
+  const [topK, setTopK] = useState(0);
   const [results, setResults] = useState([]);
-
-  // 存使用者輸入
   const [topic, setTopic] = useState("");
   const [draft, setDraft] = useState("");
   const [essayType, setEssayType] = useState("all");
-
-  // ✅ 原本的（保留）
   const [selectedEssay, setSelectedEssay] = useState(null);
-
-  // ⭐ 原本的（保留，不動）
-  const navigate = useNavigate();
+  const [isLoading, setIsLoading] = useState(false);
 
   const testEndpoints = async () => {
+    setIsLoading(true);
     try {
-
       const response = await fetch(
-        `http://44.201.62.0:8000/search?topK=${topK}&essay_type=${essayType}&topic=${encodeURIComponent(topic)}&content=${encodeURIComponent(draft)}`,
-        {
-          method: "POST"
-        }
+        `http://44.201.62.0:8000/search?topK=${topK}&essay_type=${essayType}&topic=${encodeURIComponent(
+          topic
+        )}&content=${encodeURIComponent(draft)}`,
+        { method: "POST" }
       );
-
       const data = await response.json();
-
       console.log("BACKEND RESPONSE:", data);
-
       setResults(data);
-
     } catch (error) {
-
       console.error("ERROR:", error);
       setResults(["Error calling API"]);
-
-    }
-  };
-
-  // ✅ 原本的 fetch（完全保留）
-  const fetchFullEssay = async (id) => {
-    try {
-      const response = await fetch(
-        `http://44.201.62.0:8000/essay/${id}`
-      );
-
-      const data = await response.json();
-
-      console.log("FULL ESSAY:", data);
-
-      setSelectedEssay(data);
-
-    } catch (error) {
-      console.error("ERROR:", error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
   return (
-    <div style={{ padding: "40px" }}>
-
-      {/* Essay Type */}
-      <div style={{ marginBottom: "20px" }}>
-        <label>Essay type </label>
-
-        <select
-          value={essayType}
-          onChange={(e) => setEssayType(e.target.value)}
-        >
-          <option>all</option>
-          <option>CommonApp</option>
-          <option>UC</option>
-          <option>Supplemental</option>
-        </select>
+    <div className="editor-container">
+      {/* Essay Type 圖示卡片選擇器 */}
+      <div className="essay-type-section">
+        <div className="section-label">
+          <span className="label-icon">📝</span>
+          Essay Type
+        </div>
+        <div className="essay-type-grid">
+          {ESSAY_TYPES.map((type) => (
+            <button
+              key={type.value}
+              className={`essay-type-card ${essayType === type.value ? "selected" : ""}`}
+              onClick={() => setEssayType(type.value)}
+            >
+              <div className="essay-type-icon" style={{ background: type.bg }}>
+                {type.icon}
+              </div>
+              <span className="essay-type-label">{type.label}</span>
+            </button>
+          ))}
+        </div>
       </div>
 
-      <div style={{ display: "flex", gap: "40px" }}>
-
+      <div className="editor-main">
         {/* Input */}
-        <div style={{ flex: 1 }}>
+        <div className="input-panel">
           <h3>Input</h3>
-
           <input
+            className="text-input"
             type="text"
             placeholder="Topic"
             value={topic}
             onChange={(e) => setTopic(e.target.value)}
-            style={{
-              width: "100%",
-              padding: "10px",
-              marginBottom: "15px"
-            }}
           />
-
           <textarea
+            className="text-area"
             placeholder="Write your essay..."
             value={draft}
             onChange={(e) => setDraft(e.target.value)}
-            style={{ width: "100%", height: "300px" }}
           />
-
-          <button className="primary-btn" onClick={testEndpoints}>
-            Generate
+          <button
+            className={`primary-btn ${isLoading ? "loading" : ""}`}
+            onClick={testEndpoints}
+            disabled={isLoading}
+          >
+            {isLoading ? (
+              <span className="btn-loading">
+                <span className="spinner" />
+                Searching...
+              </span>
+            ) : (
+              "Generate"
+            )}
           </button>
         </div>
 
         {/* Output */}
         <div className="output-panel">
-
-          {/* Top Results + Slider */}
-          <div
-            style={{
-              display: "flex",
-              alignItems: "flex-start",
-              gap: "20px",
-              marginBottom: "20px"
-            }}
-          >
-            <h3 style={{ margin: 0 }}>Top Results</h3>
-
-            <div style={{ width: "200px" }}>
-              <div style={{ marginBottom: "6px" }}>
-                Top Query: {topK}
-              </div>
-
+          <div className="top-bar">
+            <h3 className="top-title">Top Results</h3>
+            <div className="slider-box">
+              <div className="slider-label">Top Query: {topK}</div>
               <input
+                className="slider"
                 type="range"
                 min="0"
                 max="5"
                 step="1"
-                list="topk-ticks"
                 value={topK}
                 onChange={(e) => setTopK(Number(e.target.value))}
-                style={{ width: "100%" }}
               />
-
-              <datalist id="topk-ticks">
-                <option value="0" label="0"></option>
-                <option value="1" label="1"></option>
-                <option value="2" label="2"></option>
-                <option value="3" label="3"></option>
-                <option value="4" label="4"></option>
-                <option value="5" label="5"></option>
-              </datalist>
+              <div className="slider-ticks">
+                {[0, 1, 2, 3, 4, 5].map((n) => (
+                  <span key={n} style={{ left: `${6+(n / 5) * 90}%` }}>{n}</span>
+                ))}
+              </div>
             </div>
           </div>
 
           <div className="output-scroll">
-
             {Array.from({ length: topK }).map((_, i) => (
               <div
-                className="result-box"
+                className="result-box result-clickable"
                 key={i}
+                onClick={() => {
+                  if (results[i]) {
+                    // 先把使用者草稿存進 localStorage
+                    localStorage.setItem("userDraft", draft);
+                    localStorage.setItem("userTopic", topic);
 
-                onClick={() => results[i] && window.open(`http://localhost:5173/essay/${results[i].id}`, "_blank")}
-
-                style={{ cursor: "pointer" }}
+                    const realId = results[i].id.split("_").slice(0, 2).join("_");
+                    window.open(`/essay/${realId}`, "_blank");
+                  }
+                }}
               >
-                <h4>
-                  {results[i]?.topic || "Topic"}
-                </h4>
-
-                {results[i] ? (
-                  <>
-                    <h5>
-                      Topic: {results[i].topic || "N/A"}
-                    </h5>
-
-                    <pre>
-                      {results[i].content_preview}
-                    </pre>
-                  </>
-                ) : (
-                  "Result will appear here"
-                )}
-
+                <div className="result-header">
+                  <span className="rank-badge">{RANK_LABELS[i]}</span>
+                  <h4 className="result-topic">{results[i]?.topic || "Topic"}</h4>
+                </div>
+                <div className="result-preview">
+                  {results[i] ? (
+                    <pre>{results[i].content_preview}</pre>
+                  ) : (
+                    <span className="placeholder-text">Result will appear here</span>
+                  )}
+                </div>
               </div>
             ))}
 
-            <div className="analysis-box">
-              <h4>AI Analysis</h4>
-              <p>Analysis will appear here</p>
-            </div>
-
-            {/* ✅ 原本功能完全保留 */}
             {selectedEssay && (
               <div className="result-box">
                 <h4>Full Essay</h4>
@@ -193,13 +157,9 @@ function Editor() {
                 <pre>{selectedEssay.content}</pre>
               </div>
             )}
-
           </div>
-
         </div>
-
       </div>
-
     </div>
   );
 }

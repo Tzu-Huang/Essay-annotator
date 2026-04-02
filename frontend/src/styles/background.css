@@ -1,0 +1,40 @@
+/* =========================================
+   🌍 背景系統
+   ========================================= */
+
+.bg-world {
+  background-image:
+    linear-gradient(
+      rgba(255,255,255,0.85),
+      rgba(255,255,255,0.85)
+    ),
+    url("/bg-world.png");
+
+  background-size: cover;
+  background-position: center;
+}
+
+.bg-us {
+  background-image:
+    linear-gradient(
+      rgba(255,255,255,0.75),
+      rgba(255,255,255,0.75)
+    ),
+    url("/bg-us.png");
+
+  background-size: cover;
+  background-position: center;
+}
+
+.background-image {
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
+
+  min-height: 100vh;
+}
+
+.result-box pre {
+  white-space: pre-wrap;
+  word-break: break-word;
+}

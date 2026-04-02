@@ -1,10 +1,26 @@
+/**
+ * Main Application Component
+ *
+ * This component sets up the overall structure of the app,
+ * including routing and layout.
+ *
+ * It uses React Router to define different pages based on the URL,
+ * and renders the corresponding components (Home, Login, Editor, EssayPage).
+ *
+ * controls navigation and determines what page is displayed.
+ * 網址 = 指令   App.jsx = 導航員
+ */
+
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Navbar from "./components/Navbar";
 import Home from "./pages/Home";
 import Login from "./pages/Login";
 import Editor from "./pages/Editor";
 import EssayPage from "./pages/EssayPage";
-import "./App.css";   
+import "./styles/global.css";
+import "./styles/components.css";
+import "./styles/navbar.css";
+import "./styles/background.css";
 
 function App() {
 

@@ -12,7 +12,7 @@ def get_essay_info(essay):
 
     return {
         "id": essay["id"],
-        "title": essay["title"],
+        "topic": essay["topic"],
         "preview": preview(essay["content"])
     }
 

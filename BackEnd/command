@@ -1,0 +1,15 @@
+Start service:
+sudo systemctl start essay-api
+
+Stop service:
+sudo systemctl stop essay-api
+
+Restart after code changes:
+sudo systemctl restart essay-api
+
+Check status:
+sudo systemctl status essay-api
+
+Read logs:
+journalctl -u essay-api -f
+    

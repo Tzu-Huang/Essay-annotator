@@ -202,6 +202,7 @@ async def search(request: Request):
                 detail="Missing required fields: topK, essay_type"
             )
         
+        print("topk is not None")
         results = run_search(
                 app.state,
                 int(topK),

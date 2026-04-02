@@ -1,6 +1,6 @@
 import time
 import json
-from BackEnd.app.helpers import normalized_essay_type
+from app.helpers import normalized_essay_type
 from app.search_service import run_search
 from app.state import AppData
 from compare_results.analysis import compare

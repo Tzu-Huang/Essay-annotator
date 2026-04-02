@@ -1,3 +1,5 @@
+from urllib import request
+
 from fastapi import FastAPI, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
 from embedding.search_similar import load_db_embeddings
@@ -178,12 +180,15 @@ class Search(BaseModel):
     content: str
 
 @app.post("/search")
-def search(req: Search):
+async def search(req: Search):
     """
     Search for similar essays based on topic/content input.
     Delegates the full search logic to search_service.run_search().
     """
-    return run_search(app.state, req.topK, req.essay_type, req.topic, req.content)
+    body = await request.json()
+    print("RAW BODY:", body)
+    return {"received": body}
+    # return run_search(app.state, req.topK, req.essay_type, req.topic, req.content)
 
 
 # ===========================

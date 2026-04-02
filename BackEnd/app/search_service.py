@@ -7,6 +7,8 @@ from embedding.search_similar import cosine_search, classify_query_input
 from embedding.make_embedding import embedding, normalize
 from app.helpers import normalized_essay_type
 
+client = OpenAI(api_key=os.environ["OPENAI_API_KEY"])
+
 def embed_input(query: str):
 
     """
@@ -21,13 +23,13 @@ def embed_input(query: str):
     Returns:
         normalized embedding vector
     """
-    client = OpenAI(api_key=os.environ["OPENAI_API_KEY"])
+    
     vecs = embedding(client, query)
     vec = vecs[0]
     normalized = normalize(vec)
     return np.asarray(normalized, dtype=np.float32).reshape(-1)
 
-def run_search(app_state, topK: int, essay_type: str, topic: str, content: str):
+def run_search(app_state, topK: int, essay_type: list, topic: str, content: str):
     """
     Run the full search pipeline.
 
@@ -92,14 +94,15 @@ def run_search(app_state, topK: int, essay_type: str, topic: str, content: str):
 
     print("All good")
 
-    # Filter searchable rows by essay type
-    if essay_type == "all":
-        allowed_idx = np.arange(len(types))
-    else:
-        allowed_idx = [
-            i for i, t in enumerate(types)
-            if normalized_essay_type(t) == essay_type
-        ]
+    allowed_idx = []
+    for i in len(essay_type):
+        # Filter searchable rows by essay type
+        if essay_type[i] == "all":
+            allowed_idx = np.arange(len(types))
+            break
+        else:
+            allowed_idx.append(
+                essay_type[i] for i, t in enumerate(types) if normalized_essay_type(t) == essay_type)
 
     print("yaya")
 

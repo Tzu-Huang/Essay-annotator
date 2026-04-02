@@ -45,6 +45,7 @@ def run_search(app_state, topK: int, essay_type: str, topic: str, content: str):
 
     # Ensure startup loading finished successfully
     if not getattr(app_state, "ready", False):
+        print("503")
         raise HTTPException(
             status_code=503,
             detail={
@@ -56,6 +57,7 @@ def run_search(app_state, topK: int, essay_type: str, topic: str, content: str):
     # Decide whether the user provided topic, content, or both
     mode = classify_query_input(topic, content)
     if mode == "invalid":
+        print("400")
         raise HTTPException(
             status_code=400,
             detail="Provide at least one non-empty input: topic or content",
@@ -68,6 +70,7 @@ def run_search(app_state, topK: int, essay_type: str, topic: str, content: str):
         else np.zeros(app_state.topics.shape[1], dtype=np.float32)
     )
 
+    print("topic_vec")
     # Build content embedding if content exists; otherwise use zero vector
     content_vec = (
         embed_input(content)

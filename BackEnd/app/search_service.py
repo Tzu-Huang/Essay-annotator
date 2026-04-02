@@ -95,16 +95,15 @@ def run_search(app_state, topK: int, essay_type: list, topic: str, content: str)
     print("All good")
 
     allowed_idx = []
-    for i in len(essay_type):
+    for e in essay_type:
         # Filter searchable rows by essay type
-        if essay_type[i] == "all":
+        if e == "all":
             allowed_idx = np.arange(len(types))
             print(allowed_idx)
             break
         else:
-            normalized_inputs = [normalized_essay_type(e) for e in essay_type]
             for idx, t in enumerate(types):
-                if normalized_essay_type(t) in normalized_inputs:
+                if normalized_essay_type(t) == e:
                     allowed_idx.append(idx)
                     
 

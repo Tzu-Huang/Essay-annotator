@@ -101,8 +101,9 @@ def run_search(app_state, topK: int, essay_type: list, topic: str, content: str)
             allowed_idx = np.arange(len(types))
             break
         else:
-            allowed_idx.append(
-                essay_type[i] for i, t in enumerate(types) if normalized_essay_type(t) == essay_type)
+            for i, t in enumerate(types):
+                if normalized_essay_type(t) == essay_type[i]:
+                    allowed_idx.append(i)
 
     print("yaya")
 

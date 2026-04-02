@@ -28,55 +28,41 @@ EMBED_JSONL = BASE / "drive_data/embed_output/embed.jsonl"
 async def lifespan(app: FastAPI):
     print("startup")
 
-    # data = AppData(
-    #     started_at=time.time(),
-    # )
-    app.state.started_at = time.time()
-    app.state.ready = False
-    app.state.startup_error = None
-
-    essays = {}
-    types = []
+    data = AppData(
+        started_at=time.time(),
+    )
     
     try:
+        essays = {}
+        
         # Loads our essays into a dict, shorter runtime, just load once
         with open(DB_JSONL, "r", encoding="utf-8") as f:
             for line in f:
                 essay = json.loads(line)
                 essays[essay["id"]] = essay
 
-        # load embeddings to do cosine similarity
-        # TODO add topic
         ids, parent, previews, topic_texts, topics, V = load_db_embeddings(EMBED_JSONL)
         types = [essays[pid]["type"] if pid in essays else "unknown" for pid in parent]
         
-        app.state.essays = essays
-        app.state.ids = ids
-        app.state.parent = parent
-        app.state.V = V
-        app.state.topics = topics
-        app.state.previews = previews
-        app.state.topic_texts = topic_texts
-        app.state.types = types
-
-        app.state.essay_count = len(essays)
-        app.state.data_path = "drive_data/finalized_data_jsonl/database.jsonl"
-        app.state.ready = True
+        data.essays = essays
+        data.ids = ids
+        data.parent = parent
+        data.previews = previews
+        data.topic_texts = topic_texts
+        data.topics = topics
+        data.types = types
+        data.V = V
+        data.essay_count = len(essays)
+        data.ready = True
 
         print(f"loaded {app.state.essay_count} essays")
 
     except Exception as e:
-        app.state.essays = {}
-        app.state.essay_count = 0
-        app.state.ids = []          
-        app.state.parent = []       
-        app.state.previews = []     
-        app.state.topic_texts = []
-        app.state.V = None          
-        app.state.types = []        
-        app.state.ready = False
-        app.state.startup_error = str(e)
+        data.startup_error = str(e)
+        data.ready = False
         print(f"startup failed: {e}")
+
+    app.state.data = data
 
     yield  # Separates startup and shutdown
 
@@ -110,14 +96,15 @@ def health():
     Liveness: service process is running.
     (Should return 200 even if not ready)
     """
-    uptime = int(time.time() - app.state.started_at)
+    data = app.state.data
+    uptime = int(time.time() - data.started_at)
     return {
         "status": "ok",
         "uptime_sec": uptime,
-        "ready": bool(getattr(app.state, "ready", False)),
-        "essay_count": int(getattr(app.state, "essay_count", 0)),
-        "data_path": str(getattr(app.state, "data_path", "")),
-        "startup_error": getattr(app.state, "startup_error", None),
+        "ready": data.ready,
+        "essay_count": data.essay_count,
+        "data_path": data.data_path,
+        "startup_error": data.startup_error,
     }
 
 @app.get("/ready")
@@ -125,7 +112,8 @@ def ready():
     """
     Readiness: Ready: 200, or else: 503
     """
-    if not getattr(app.state, "ready", False):
+    data = app.state.data
+    if not data.ready:
         raise HTTPException(
             status_code=503,
             detail={
@@ -134,7 +122,7 @@ def ready():
             },
         )
 
-    return {"status": "ready", "essay_count": getattr(app.state, "essay_count", 0)}
+    return {"status": "ready", "essay_count": data.essay_count}
 
 DEFAULT_FIELDS = ["id", "topic", "type", "school", "public"]
 ALLOWED_FIELDS = set(DEFAULT_FIELDS + ["content", "source_file", "metadata"])
@@ -145,13 +133,11 @@ def get_essay(
     fields: Optional[str] = Query(default=None, description="Comma-separated fields, e.g. topic,school,content"),
     include_content: bool = Query(default=False),
 ):
-    essay = app.state.essays.get(essay_id)
+    data = app.state.data
+    essay = data.essays.get(essay_id)
 
     if not essay:
         raise HTTPException(status_code=404, detail="Essay not found")
-    
-    # if not essay.get("public", False):
-    #    return {"error": "This essay is not public"}
 
     if fields is None:
         selected = set(DEFAULT_FIELDS)
@@ -207,8 +193,9 @@ async def search(request: Request):
             )
         
         print("topk is not None")
+        data = app.state.data
         results = run_search(
-                app.state,
+                data,
                 int(topK),
                 essay_type,
                 topic,
@@ -223,9 +210,6 @@ async def search(request: Request):
             status_code=500,
             detail=str(e)
         )
-    
-    # return run_search(app.state, req.topK, req.essay_type, req.topic, req.content)
-
 
 # ===========================
 # Compare endpoint
@@ -238,8 +222,8 @@ class CompareRequest(BaseModel):
 @app.post("/compare")
 def compare_api(req: CompareRequest):
     # Load essays from app.state
-    essays = app.state.essays
-    essay = essays.get(req.essay_id)
+    data = app.state.app
+    essay = data.get(req.essay_id)
     
     # Error handling
     if not essay:

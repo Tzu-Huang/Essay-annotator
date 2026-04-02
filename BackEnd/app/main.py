@@ -211,7 +211,7 @@ async def search(request: Request):
                 content
             )
 
-        print("result pass")
+        print(results)
         return {"results": results}
 
     except Exception as e:

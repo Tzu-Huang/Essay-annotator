@@ -55,7 +55,7 @@ async def lifespan(app: FastAPI):
         data.essay_count = len(essays)
         data.ready = True
 
-        print(f"loaded {app.state.essay_count} essays")
+        print(f"loaded {data.essay_count} essays")
 
     except Exception as e:
         data.startup_error = str(e)
@@ -118,7 +118,7 @@ def ready():
             status_code=503,
             detail={
                 "status": "not_ready",
-                "startup_error": getattr(app.state, "startup_error", "unknown"),
+                "startup_error": data.startup_error or "unknown",
             },
         )
 
@@ -222,7 +222,7 @@ class CompareRequest(BaseModel):
 @app.post("/compare")
 def compare_api(req: CompareRequest):
     # Load essays from app.state
-    data = app.state.app
+    data = app.state.data
     essay = data.get(req.essay_id)
     
     # Error handling

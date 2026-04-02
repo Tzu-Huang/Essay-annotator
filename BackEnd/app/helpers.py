@@ -30,7 +30,7 @@ def normalized_essay_type(value: Optional[str]) -> str:
 
     # Map common variations to a single canonical form
     aliases = {
-        "uc": "uc piq",
+        "uc": "uc piq", # personal insight questions
         "piq": "uc piq",
         "ucpiq": "uc piq",
         "supplemental": "supplementals",

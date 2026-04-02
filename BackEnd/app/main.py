@@ -186,9 +186,37 @@ async def search(request: Request):
     Search for similar essays based on topic/content input.
     Delegates the full search logic to search_service.run_search().
     """
-    body = await request.json()
-    print("RAW BODY:", body)
-    return {"received": body}
+    try: 
+        body = await request.json()
+        print("RAW BODY:", body)
+
+        topK = body.get("topK")
+        essay_type = body.get("essay_type")
+        topic = body.get("topic","")
+        content = body.get("content", "")
+        
+        if topK is None or essay_type is None:
+            raise HTTPException(
+                status_code=400,
+                detail="Missing required fields: topK, essay_type"
+            )
+        
+        results = run_search(
+                app.state,
+                int(topK),
+                essay_type,
+                topic,
+                content
+            )
+
+        return {"results": results}
+
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=str(e)
+        )
+    
     # return run_search(app.state, req.topK, req.essay_type, req.topic, req.content)
 
 

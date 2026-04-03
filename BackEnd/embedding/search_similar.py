@@ -311,7 +311,7 @@ def cosine_search(
             "score": float(scores[i]),
             "topic_score": float(topic_scores[i]),
             "content_score": float(content_scores[i]),
-            "content_preview": previews[i]
+            "content_preview": previews[i],
             "school": schools[i] if schools else "none" 
         })
 

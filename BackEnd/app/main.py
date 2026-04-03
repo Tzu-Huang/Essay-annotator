@@ -207,7 +207,7 @@ async def search(request: Request):
                 content
             )
 
-        # print(results)
+        print(results)
         return results
 
     except Exception as e:

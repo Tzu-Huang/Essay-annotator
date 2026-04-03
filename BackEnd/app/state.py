@@ -13,7 +13,6 @@ class AppData:
     schools: list[str] = field(default_factory=list)
     V: Any = None
     essay_count: int = 0
-
     data_path: str = ""
     ready: bool = False
     startup_error: Optional[str] = None

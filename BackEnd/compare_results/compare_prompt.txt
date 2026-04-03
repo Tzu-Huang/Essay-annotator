@@ -22,8 +22,9 @@ Instructions:
    - stronger emotional connection,
    - more specific examples.
 7. Be constructive, specific, and encouraging.
-8. Do not give vague feedback. Every point must be tied to an actual sentence or passage from the database essay.
-9. Return the result in valid JSON only.
+8. The suggestion must be bullet point and not too long
+9. Do not give vague feedback. Every point must be tied to an actual sentence or passage from the database essay.
+10. Return the result in valid JSON only.
 
 Required JSON format:
 {

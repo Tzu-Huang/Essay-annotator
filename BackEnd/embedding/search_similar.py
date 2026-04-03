@@ -265,6 +265,7 @@ def cosine_search(
     topic_weight=0.3,
     content_weight=0.7,
     topic_texts=None,
+    schools=None
 ):
     """
     Compute cosine similarity for one query against entire DB.
@@ -311,6 +312,7 @@ def cosine_search(
             "topic_score": float(topic_scores[i]),
             "content_score": float(content_scores[i]),
             "content_preview": previews[i]
+            "school": schools[i] if schools else "none" 
         })
 
         seen_parents.add(pid)

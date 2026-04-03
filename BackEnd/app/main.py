@@ -47,7 +47,7 @@ async def lifespan(app: FastAPI):
 
         ids, parent, previews, topic_texts, topics, V = load_db_embeddings(EMBED_JSONL)
         types = [essays[pid]["type"] if pid in essays else "unknown" for pid in parent]
-        
+        schools = [essays[pid].get("school", "Unknown") if pid in essays else "none" for pid in parent]
         data.essays = essays
         data.ids = ids
         data.parent = parent
@@ -55,6 +55,7 @@ async def lifespan(app: FastAPI):
         data.topic_texts = topic_texts
         data.topics = topics
         data.types = types
+        data.schools = schools
         data.V = V
         data.essay_count = len(essays)
         data.ready = True
@@ -206,7 +207,7 @@ async def search(request: Request):
                 content
             )
 
-        print(results)
+        # print(results)
         return results
 
     except Exception as e:

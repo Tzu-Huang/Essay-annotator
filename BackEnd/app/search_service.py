@@ -151,6 +151,7 @@ def run_search(app_state, topK: int, essay_type: list, topic: str, content: str)
     parent_filtered = [app_state.parent[i] for i in allowed_idx]
     previews_filtered = [app_state.previews[i] for i in allowed_idx]
     topic_texts_filtered = [app_state.topic_texts[i] for i in allowed_idx]
+    schools_filtered = [app_state.schools[i] for i in allowed_idx]
 
     # Run similarity search on filtered data
 
@@ -165,6 +166,7 @@ def run_search(app_state, topK: int, essay_type: list, topic: str, content: str)
         mode,
         topK,
         topic_texts=topic_texts_filtered,
+        schools=schools_filtered
     )
     print("all godod")
     return results

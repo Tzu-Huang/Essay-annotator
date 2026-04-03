@@ -10,8 +10,10 @@ class AppData:
     topic_texts: list[str] = field(default_factory=list)
     topics: list[str] = field(default_factory=list)
     types: list[str] = field(default_factory=list)
+    schools: list[str] = field(default_factory=list)
     V: Any = None
     essay_count: int = 0
+
     data_path: str = ""
     ready: bool = False
     startup_error: Optional[str] = None

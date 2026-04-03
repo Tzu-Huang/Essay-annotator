@@ -39,6 +39,7 @@ def preview_text(text: str, max_len:int = 200) -> str:
     last_punct = max(cut.rfind("."), cut.rfind(","), cut.rfind(";"), cut.rfind("!"), cut.rfind("?"))
 
     split_pos = max(last_space, last_punct)
+
     # prevent you cut way too early
     if split_pos < max_len * 0.6:
         split_pos = max_len
@@ -268,6 +269,13 @@ def check_shape(topic_V, content_V, topic_q_V, content_q_V):
 
     return True
 
+def similarity_label(score: float) -> str:
+    if score >= 0.8:
+        return "Highly Similar"
+    elif score >= 0.6:
+        return "Strong Match"
+    else:
+        return "Moderate"
 def cosine_search(
     ids,
     parent,
@@ -330,7 +338,8 @@ def cosine_search(
             "content_score": float(content_scores[i]),
             "content_preview": previews[i],
             "school": schools[i] if schools else "none",
-            "type": types[i] if types else "none"
+            "type": types[i] if types else "none",
+            "similarity": similarity_label(float(scores[i])),
         })
 
         seen_parents.add(pid)

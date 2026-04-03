@@ -25,10 +25,26 @@ TOP_K = 5
 TOPIC_WEIGHT = 0.3
 CONTENT_WEIGHT = 0.7
 
+# This is currently the main def that shows the preview text
+def preview_text(text: str, max_len:int = 200) -> str:
+    if not text:
+        return ""
+    
+    text = text.strip()
+    if len(text) <= max_len:
+        return text
+    
+    cut = text[:max_len]
+    last_space = cut.rfind(" ")
+    last_punct = max(cut.rfind("."), cut.rfind(","), cut.rfind(";"), cut.rfind("!"), cut.rfind("?"))
 
-def first_150_chars(text: str) -> str:
-    clean = (text or "").replace("\n", " ").strip()
-    return clean[:150]
+    split_pos = max(last_space, last_punct)
+    # prevent you cut way too early
+    if split_pos < max_len * 0.6:
+        split_pos = max_len
+
+    preview = text[:split_pos].rstrip() + "..."
+    return preview
 
 def read_jsonl(path):
     """
@@ -205,7 +221,7 @@ def load_db_embeddings(db_path: str):
 
         ids.append(rid)
         parent.append(pid)
-        previews.append(first_150_chars(obj.get("content", "")))
+        previews.append(preview_text(obj.get("content", "")))
         topic_texts.append((obj.get("topic") or "").strip())
         topic_vecs.append(topic_emb)
         content_vecs.append(content_emb)

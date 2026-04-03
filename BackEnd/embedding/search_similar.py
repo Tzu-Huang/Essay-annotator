@@ -262,6 +262,7 @@ def cosine_search(
     content_vec,
     mode,
     TOP_K,
+    types,
     topic_weight=0.3,
     content_weight=0.7,
     topic_texts=None,
@@ -312,7 +313,8 @@ def cosine_search(
             "topic_score": float(topic_scores[i]),
             "content_score": float(content_scores[i]),
             "content_preview": previews[i],
-            "school": schools[i] if schools else "none" 
+            "school": schools[i] if schools else "none",
+            "type": types[i] if types else "none"
         })
 
         seen_parents.add(pid)

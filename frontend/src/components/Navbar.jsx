@@ -1,7 +1,13 @@
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import logo from "../assets/logo.png";
+import avatar from "../assets/dog.png";
 
-function Navbar({ showSearch = true }) {
+function Navbar() {
+  const location = useLocation();
+
+  // 判斷是不是 editor 頁面
+  const isEditorPage = location.pathname === "/editor";
+
   return (
     <div className="navbar">
 
@@ -13,15 +19,21 @@ function Navbar({ showSearch = true }) {
       </div>
 
       {/* Center */}
-      {showSearch && (
-        <div className="search-section">
-          <input placeholder="Search ..." />
-        </div>
-      )}
+      <div className="search-box">
+        <span className="search-icon">🔍</span>
+        <input placeholder="Search prompts, topics, or examples..." />
+      </div>
 
-      {/* Right */}
+      {/* Right（重點🔥） */}
       <div className="auth">
-        <Link to="/login">Sign In</Link>
+        {isEditorPage ? (
+        <div className="user-info">
+          <span className="username">Olivia Chu</span>
+          <img src={avatar} alt="avatar" className="avatar" />
+        </div>
+        ) : (
+          <Link to="/login">Sign In</Link>
+        )}
       </div>
 
     </div>

@@ -34,6 +34,12 @@ function App() {
         <Routes>
           <Route path="/" element={<><Navbar /><Home /></>} />
           <Route path="/login" element={<><Navbar /><Login /></>} />
+          {/* 
+          當網址符合 /editor
+            → Router render <Editor />
+            → React 呼叫 Editor()
+            → return JSX
+            → 畫面出現*/}
           <Route path="/editor" element={<><Navbar /><Editor /></>} />
           <Route path="/essay/:id" element={<EssayPage />} />
 

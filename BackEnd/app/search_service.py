@@ -165,6 +165,7 @@ def run_search(app_state, topK: int, essay_type: list, topic: str, content: str)
         content_vec,
         mode,
         topK,
+        types,
         topic_texts=topic_texts_filtered,
         schools=schools_filtered
     )

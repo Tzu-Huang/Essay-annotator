@@ -154,6 +154,7 @@ def run_search(app_state, topK: int, essay_type: list, topic: str, content: str)
     previews_filtered = [app_state.previews[i] for i in allowed_idx]
     topic_texts_filtered = [app_state.topic_texts[i] for i in allowed_idx]
     schools_filtered = [app_state.schools[i] for i in allowed_idx]
+    types_filtered = [app_state.types[i] for i in allowed_idx]
 
     # Run similarity search on filtered data
 
@@ -167,7 +168,7 @@ def run_search(app_state, topK: int, essay_type: list, topic: str, content: str)
         content_vec,
         mode,
         topK,
-        types,
+        types_filtered,
         topic_texts=topic_texts_filtered,
         schools=schools_filtered
     )

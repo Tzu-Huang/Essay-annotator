@@ -99,6 +99,7 @@ def run_search(app_state, topK: int, essay_type: list, topic: str, content: str)
     # handle "all"
     if "all" in normalized_inputs:
         allowed_idx = list(range(len(types)))
+        print("test", allowed_idx)
     else:
         for idx, t in enumerate(types):
             if normalized_essay_type(t) in normalized_inputs:

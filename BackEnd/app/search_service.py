@@ -99,7 +99,7 @@ def run_search(app_state, topK: int, essay_type: list, topic: str, content: str)
     # handle "all"
     if "all" in normalized_inputs:
         allowed_idx = list(range(len(types)))
-        print("test", allowed_idx)
+        # print("test", allowed_idx)
     else:
         for idx, t in enumerate(types):
             if normalized_essay_type(t) in normalized_inputs:
@@ -149,6 +149,7 @@ def run_search(app_state, topK: int, essay_type: list, topic: str, content: str)
     topic_V_filtered = app_state.topics[allowed_idx]
 
     ids_filtered = [app_state.ids[i] for i in allowed_idx]
+    print(ids_filtered)
     parent_filtered = [app_state.parent[i] for i in allowed_idx]
     previews_filtered = [app_state.previews[i] for i in allowed_idx]
     topic_texts_filtered = [app_state.topic_texts[i] for i in allowed_idx]

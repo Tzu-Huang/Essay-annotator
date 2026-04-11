@@ -1,0 +1,40 @@
+.page {
+  max-width: 1600px;
+  margin: 0 auto;
+  padding: 24px;
+}
+
+.header {
+  margin-bottom: 20px;
+}
+
+.header h1 {
+  margin: 0;
+  font-size: 30px;
+}
+
+.header p {
+  margin-top: 8px;
+  color: #6b7280;
+  line-height: 1.7;
+}
+
+.layout {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 22px;
+}
+
+.doc-shell {
+  background: #dde4ee;
+  border: 1px solid #d4dce7;
+  border-radius: 22px;
+  padding: 24px;
+}
+
+.doc-paper {
+  background: white;
+  border-radius: 10px;
+  min-height: 600px;
+  padding: 40px;
+}

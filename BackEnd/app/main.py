@@ -179,7 +179,7 @@ async def search(req: Search):
     Search for similar essays based on topic/content input.
     Delegates the full search logic to search_service.run_search().
     """
-
+    
     try: 
         data = app.state.data
         results = run_search(

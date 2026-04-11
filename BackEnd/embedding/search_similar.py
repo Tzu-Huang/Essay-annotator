@@ -270,12 +270,15 @@ def check_shape(topic_V, content_V, topic_q_V, content_q_V):
     return True
 
 def similarity_label(score: float) -> str:
-    if score >= 0.8:
+    percentage = ((score + 1) / 2) * 100
+
+    if percentage >= 80:
         return "Highly Similar"
-    elif score >= 0.6:
+    elif percentage >= 60:
         return "Strong Match"
     else:
         return "Moderate"
+    
 def cosine_search(
     ids,
     parent,

@@ -17,10 +17,12 @@ import Home from "./pages/Home";
 import Login from "./pages/Login";
 import Editor from "./pages/Editor";
 import EssayPage from "./pages/EssayPage";
+import ComparePage from "./pages/ComparePage";
 import "./styles/global.css";
 import "./styles/components.css";
 import "./styles/navbar.css";
 import "./styles/background.css";
+
 
 function App() {
 
@@ -42,7 +44,7 @@ function App() {
             → 畫面出現*/}
           <Route path="/editor" element={<><Navbar /><Editor /></>} />
           <Route path="/essay/:id" element={<EssayPage />} />
-
+          <Route path="/compare/:id" element={<ComparePage />} />
         </Routes>
 
       </div>

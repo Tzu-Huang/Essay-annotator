@@ -90,19 +90,18 @@ def run_search(app_state, topK: int, essay_type: list, topic: str, content: str)
         raise HTTPException(status_code=500, detail=f"content_vec must be 1D, got shape {content_vec.shape}")
     
     types = app_state.types
-    normalized_inputs = [normalized_essay_type(e) for e in essay_type]
 
     print("All good")
 
     allowed_idx = []
 
     # handle "all"
-    if "all" in normalized_inputs:
+    if "all" in essay_type:
         allowed_idx = list(range(len(types)))
         # print("test", allowed_idx)
     else:
-        for idx, t in enumerate(types):
-            if normalized_essay_type(t) in normalized_inputs:
+        for idx in enumerate(types):
+            if type in essay_type:
                 allowed_idx.append(idx)
                     
     """

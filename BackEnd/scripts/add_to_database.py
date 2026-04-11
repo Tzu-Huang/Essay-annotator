@@ -152,25 +152,18 @@ def get_essay_type(path):
     folder_name_lower = folder_name.lower()
     file_name_lower = file_name.lower()
 
-    if folder_name_lower == "commonapp" or "common" in file_name_lower:
+    if folder_name_lower == "commonapp" or ("common" in file_name_lower):
         return "Personal Statement", "none"
-    elif folder_name_lower == "uc" or "uc" in file_name_lower:
-        return "none", "University of California"
+    elif folder_name_lower == "uc" or ("uc" in file_name_lower):
+        return "University of California", "none"
     
     if " - " in file_name:
-        return "supplementals", file_name.split(" - ")[0].strip()
+        return "Supplementals", file_name.split(" - ")[0].strip()
     else: 
-        return "supplementals", file_name.strip()
+        return "Supplementals", file_name.strip()
 
 
 def normalize_uc_rows_in_database() -> int:
-    """
-    Fix previously misclassified UC rows in database.jsonl.
-
-    Rows with source_file like "UC - xx.txt" that were saved as
-    type="supplementals" and school="UC" are rewritten as:
-    type="none", school="University of California".
-    """
     if not DATABASE_PATH.exists() or DATABASE_PATH.stat().st_size == 0:
         return 0
 
@@ -179,13 +172,12 @@ def normalize_uc_rows_in_database() -> int:
 
     updated = 0
     for row in rows:
-        source_file = (row.get("source_file") or "").strip().lower()
         row_type = (row.get("type") or "").strip().lower()
-        school = (row.get("school") or "").strip().lower()
 
-        if source_file.startswith("uc -") and (row_type == "uc piq" or row_type == "UC PIQ"):
-            row["type"] = "none"
-            row["school"] = "University of California"
+        # Normalize ANY UC PIQ variant
+        if row_type == "uc piq" or row_type == "UC PIQ":
+            row["type"] = "University of California"
+            row["school"] = "none"
             updated += 1
 
     if updated > 0:

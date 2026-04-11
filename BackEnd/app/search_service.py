@@ -5,7 +5,7 @@ import os
 
 from embedding.search_similar import cosine_search, classify_query_input
 from embedding.make_embedding import embedding, normalize
-from app.helpers import normalized_essay_type
+# from app.helpers import normalized_essay_type
 
 client = OpenAI(api_key=os.environ["OPENAI_API_KEY"])
 

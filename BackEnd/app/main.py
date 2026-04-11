@@ -41,7 +41,7 @@ async def lifespan(app: FastAPI):
                 raw_type = essay.get("type", "unknown")
 
                 # We normalized the type first when loading every essay
-                essay["type"] = normalized_essay_type(raw_type)
+                essay["type"] = raw_type
 
                 essays[essay["id"]] = essay
 

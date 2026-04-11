@@ -193,68 +193,95 @@ function Editor() {
 
             <div className="output-scroll">
               {Array.from({ length: topK }).map((_, i) => (
-                <div
-                  className="result-box result-clickable"
-                  key={i}
+              <div
+                className="result-box result-clickable"
+                key={i}
+              >
+                <div className="result-header">
+                  <div className="result-header-left">
+                    <span className={`rank-circle rank-${i + 1}`}>
+                      {i + 1}
+                    </span>
 
-                  // ✅ 只加這裡（其他完全沒動）
-                  onClick={() => {
-                    if (!results[i]) return;
+                    <div className="result-title-block">
+                      {/* ✅ Topic（可點 + 可複製） */}
+                      <h4
+                        className="result-topic clickable-text"
+                        onClick={() => {
+                          const selection = window.getSelection().toString();
+                          if (selection) return;
 
-                    localStorage.setItem("userDraft", draft);
-                    localStorage.setItem("userTopic", topic);
+                          if (!results[i]) return;
 
-                    window.open(
-                      `${window.location.origin}/essay/${results[i].parent_id}`,
-                      "_blank"
-                    );
-                  }}
-                >
-                  <div className="result-header">
-                    <div className="result-header-left">
-                      <span className={`rank-circle rank-${i + 1}`}>
-                        {i + 1}
-                      </span>
+                          localStorage.setItem("userDraft", draft);
+                          localStorage.setItem("userTopic", topic);
 
-                      <div className="result-title-block">
-                        <h4 className="result-topic">
-                          {results[i]?.topic || "Topic"}
-                        </h4>
+                          window.open(
+                            `${window.location.origin}/essay/${results[i].parent_id}`,
+                            "_blank"
+                          );
+                        }}
+                      >
+                        {results[i]?.topic || "Topic"}
+                      </h4>
 
-                        {/* ✅ 新增：school + type 兩個 badge */}
-                        <div className="meta-badges">
-                          {results[i]?.school && results[i].school !== "none" && (
-                            <span className="meta-badge">
-                              {results[i].school}
-                            </span>
-                          )}
+                      {/* school + type */}
+                      <div className="meta-badges">
+                        {results[i]?.school && results[i].school !== "none" && (
+                          <span className="meta-badge">
+                            {results[i].school}
+                          </span>
+                        )}
 
-                          {results[i]?.type && (
-                            <span className="meta-badge">
-                              {results[i].type}
-                            </span>
-                          )}
-                        </div>
+                        {results[i]?.type && (
+                          <span className="meta-badge">
+                            {results[i].type}
+                          </span>
+                        )}
                       </div>
                     </div>
-
-                    {/* ✅ 原本 school → 改成 score */}
-                    <div className="school-badge">
-                      {results[i]?.score ?? ""}
-                    </div>
                   </div>
 
-                  <div className="result-preview">
-                    {results[i] ? (
-                      <pre>{results[i].content_preview}</pre>
-                    ) : (
-                      <span className="placeholder-text">
-                        Result will appear here
-                      </span>
-                    )}
+                  {/* score */}
+                  <div className="school-badge">
+                    {results[i]?.similarity ?? ""}
                   </div>
                 </div>
-              ))}
+
+                <div className="result-preview">
+                  {results[i] ? (
+                    <>
+                      <pre>{results[i].content_preview}</pre>
+
+                      {/* ✅ Read more */}
+                      <span
+                        className="read-more clickable-text"
+                        onClick={() => {
+                          const selection = window.getSelection().toString();
+                          if (selection) return;
+
+                          if (!results[i]) return;
+
+                          localStorage.setItem("userDraft", draft);
+                          localStorage.setItem("userTopic", topic);
+
+                          window.open(
+                            `${window.location.origin}/essay/${results[i].parent_id}`,
+                            "_blank"
+                          );
+                        }}
+                      >
+                        Read more →
+                      </span>
+                    </>
+                  ) : (
+                    <span className="placeholder-text">
+                      Result will appear here
+                    </span>
+                  )}
+                </div>
+              </div>
+            ))}
             </div>
           </div>
 

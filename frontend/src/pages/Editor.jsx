@@ -28,59 +28,96 @@ const ESSAY_TYPES = [
     value: "Supplemental",
     label: "Supplemental",
     icon: supplementalIcon,
-    bg: "linear-gradient(45deg, #f3f3ef, #f3f040)",
+    bg: "linear-gradient(45deg, #eeeec4, #f3f040)",
   },
 ];
 
 const TYPE_STYLES = {
   "personal statement": {
-    borderColor: "#facbf7",
-    rankBg: "#f4a8c7",
+    accentGradient: "linear-gradient(180deg, #efd6e9 0%, #f4a8c7 100%)",
     badgeBg: "#f8e4f3",
     badgeText: "#a8558f",
-    readMore: "#c06bb2",
   },
   UC: {
-    borderColor: "#b3d9f5",
-    rankBg: "#a8d8ea",
+    accentGradient: "linear-gradient(180deg, #d1e5f3 0%, #8dcee5 100%)",
     badgeBg: "#e8f4fb",
     badgeText: "#4b8fb0",
-    readMore: "#5aa6c8",
   },
   Supplemental: {
-    borderColor: "rgb(251, 245, 170)",
-    rankBg: "#ebeb30",
+    accentGradient: "linear-gradient(180deg, #ffffd6 0%, #f3f040 100%)",
     badgeBg: "#f9f8cf",
     badgeText: "#8a8613",
-    readMore: "#a6a11d",
   },
 };
 
 const DEFAULT_RESULT_STYLE = {
-  borderColor: "#6366f1",
-  rankBg: "#f2cb76",
+  accentGradient: "linear-gradient(180deg, #6366f1 0%, #38bdf8 100%)",
   badgeBg: "#eef2ff",
   badgeText: "#4f46e5",
-  readMore: "#4f46e5",
+};
+
+const RANK_STYLES = {
+  1: { bg: "#fff27d", text: "#7a6800" }, // gold
+  2: { bg: "#d8dee9", text: "#475569" }, // silver
+  3: { bg: "#efc3a4", text: "#8a4b25" }, // bronze
+  4: { bg: "#d0d9fb", text: "#4338ca" }, // 4th
+  5: { bg: "#b6a9f0", text: "#6d28d9" }, // 5th
 };
 
 const NON_ALL_TYPES = ["personal statement", "UC", "Supplemental"];
 
-function normalizeResultType(result) {
-  const rawType = result?.type?.toLowerCase?.().trim?.() || "";
-  const rawSchool = result?.school?.toLowerCase?.().trim?.() || "";
 
-  if (rawType === "personal statement") return "personal statement";
-  if (rawType === "uc piq") return "UC";
-
-  if (
-    rawType === "supplementals" ||
-    (rawSchool && rawSchool !== "none" && rawType !== "uc" && rawType !== "personal statement")
-  ) {
-    return "Supplemental";
+function getSimilarityInfo(similarity) {
+  if (similarity === null || similarity === undefined || similarity === "") {
+    return {
+      label: "",
+      bg: "#eef2ff",
+      text: "#4f46e5",
+    };
   }
 
-  return null;
+  const rawLabel = String(similarity).trim();
+const numeric = Number(rawLabel);
+
+if (Number.isNaN(numeric)) {
+  return {
+    label: rawLabel,
+    bg: "#eef2ff",
+    text: "#4f46e5",
+  };
+}
+
+const label = `${rawLabel}% similar`;
+
+if (numeric >= 85) {
+  return {
+    label,
+    bg: "#dcfce7",
+    text: "#15803d",
+  };
+}
+
+if (numeric >= 70) {
+  return {
+    label,
+    bg: "#dbeafe",
+    text: "#1d4ed8",
+  };
+}
+
+if (numeric >= 50) {
+  return {
+    label,
+    bg: "#fef3c7",
+    text: "#b45309",
+  };
+}
+
+return {
+  label,
+  bg: "#fee2e2",
+  text: "#b91c1c",
+};
 }
 
 function Editor() {
@@ -107,8 +144,9 @@ function Editor() {
         const allNonAllSelected = NON_ALL_TYPES.every((t) => next.includes(t));
 
         if (allNonAllSelected && !next.includes("all")) return ["all", ...next];
-        if (!allNonAllSelected && next.includes("all"))
+        if (!allNonAllSelected && next.includes("all")) {
           return next.filter((t) => t !== "all");
+        }
 
         return next;
       }
@@ -116,16 +154,14 @@ function Editor() {
   };
 
   const testEndpoints = async () => {
-    const trimmedTopic = topic.trim();//trim() 是把字串前後的空白拿掉。
+    const trimmedTopic = topic.trim();
     const trimmedDraft = draft.trim();
 
-    // 1. Essay Type 必選
     if (essayTypes.length === 0) {
       setModalMessage("Please select at least one essay type before generating.");
       return;
     }
 
-    // 2. Topic / Draft 至少填一個
     if (!trimmedTopic && !trimmedDraft) {
       setModalMessage("Please enter either a topic or a draft before generating.");
       return;
@@ -147,7 +183,6 @@ function Editor() {
 
       const data = await response.json();
       setResults(data);
-
     } catch (error) {
       console.error("ERROR:", error);
       setResults([{ topic: "Error", content_preview: "Failed to fetch" }]);
@@ -179,7 +214,6 @@ function Editor() {
 
       <div className="editor-container">
         <div className="editor-main">
-
           {/* Input */}
           <div className="input-panel">
             <h3>Draft Workspace</h3>
@@ -288,20 +322,41 @@ function Editor() {
 
             <div className="output-scroll">
               {Array.from({ length: topK }).map((_, i) => {
-                const normalizedType = normalizeResultType(results[i]);
-                const typeStyle = TYPE_STYLES[normalizedType] || DEFAULT_RESULT_STYLE;
+                const resultType = results[i]?.type;
+                const typeStyle = TYPE_STYLES[resultType] || DEFAULT_RESULT_STYLE;
+                const rankStyle = RANK_STYLES[i + 1] || RANK_STYLES[5];
+                const similarityInfo = getSimilarityInfo(results[i]?.similarity);
 
                 return (
                   <div
                     className="result-box result-clickable"
                     key={i}
-                    style={{ borderLeftColor: typeStyle.borderColor }}
+                    style={{
+                      position: "relative",
+                      overflow: "hidden",
+                      borderLeft: "none",
+                    }}
                   >
+                    <div
+                      style={{
+                        position: "absolute",
+                        left: "0",
+                        top: "0",
+                        bottom: "0",
+                        width: "6px",
+                        borderRadius: "14px 0 0 14px",
+                        background: typeStyle.accentGradient,
+                      }}
+                    />
+
                     <div className="result-header">
                       <div className="result-header-left">
                         <span
                           className="rank-circle"
-                          style={{ background: typeStyle.rankBg }}
+                          style={{
+                            background: rankStyle.bg,
+                            color: rankStyle.text,
+                          }}
                         >
                           {i + 1}
                         </span>
@@ -330,29 +385,31 @@ function Editor() {
 
                           {/* school + type */}
                           <div className="meta-badges">
-                            {results[i]?.school && results[i].school !== "none" && (
-                              <span
-                                className="meta-badge"
-                                style={{
-                                  background: typeStyle.badgeBg,
-                                  color: typeStyle.badgeText,
-                                }}
-                              >
-                                {results[i].school}
-                              </span>
-                            )}
+                            {results[i]?.school &&
+                              results[i].school.toLowerCase() !== "none" && (
+                                <span
+                                  className="meta-badge"
+                                  style={{
+                                    background: typeStyle.badgeBg,
+                                    color: typeStyle.badgeText,
+                                  }}
+                                >
+                                  {results[i].school}
+                                </span>
+                              )}
 
-                            {results[i]?.type && (
-                              <span
-                                className="meta-badge"
-                                style={{
-                                  background: typeStyle.badgeBg,
-                                  color: typeStyle.badgeText,
-                                }}
-                              >
-                                {results[i].type}
-                              </span>
-                            )}
+                            {results[i]?.type &&
+                              results[i].type.toLowerCase() !== "none" && (
+                                <span
+                                  className="meta-badge"
+                                  style={{
+                                    background: typeStyle.badgeBg,
+                                    color: typeStyle.badgeText,
+                                  }}
+                                >
+                                  {results[i].type}
+                                </span>
+                              )}
                           </div>
                         </div>
                       </div>
@@ -361,11 +418,11 @@ function Editor() {
                       <div
                         className="school-badge"
                         style={{
-                          background: typeStyle.badgeBg,
-                          color: typeStyle.badgeText,
+                          background: similarityInfo.bg,
+                          color: similarityInfo.text,
                         }}
                       >
-                        {results[i]?.similarity ?? ""}
+                        {similarityInfo.label}
                       </div>
                     </div>
 
@@ -377,7 +434,7 @@ function Editor() {
                           {/* ✅ Read more */}
                           <span
                             className="read-more clickable-text"
-                            style={{ color: typeStyle.readMore }}
+                            style={{ color: "#6b7280" }}
                             onClick={() => {
                               const selection = window.getSelection().toString();
                               if (selection) return;
@@ -407,7 +464,6 @@ function Editor() {
               })}
             </div>
           </div>
-
         </div>
       </div>
     </>

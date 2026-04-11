@@ -163,7 +163,7 @@ def get_essay_type(path):
         return "Supplementals", file_name.strip()
 
 
-def normalize_uc_rows_in_database() -> int:
+def normalize_rows_in_database() -> int:
     if not DATABASE_PATH.exists() or DATABASE_PATH.stat().st_size == 0:
         return 0
 
@@ -178,6 +178,10 @@ def normalize_uc_rows_in_database() -> int:
         if row_type == "uc piq" or row_type == "UC PIQ":
             row["type"] = "University of California"
             row["school"] = "none"
+            updated += 1
+
+        if row_type == "supplementals":
+            row["type"] = "Supplemental"
             updated += 1
 
     if updated > 0:
@@ -211,9 +215,9 @@ def get_next_id():
 # =========================
 def main(mode: str = "both"):
     if mode in {"both", "normalize"}:
-        updated_rows = normalize_uc_rows_in_database()
+        updated_rows = normalize_rows_in_database()
         if updated_rows > 0:
-            print(f"Normalized {updated_rows} existing UC rows in database.jsonl")
+            print(f"Normalized {updated_rows} existing rows in database.jsonl")
         else:
             print("No existing UC rows needed normalization.")
 

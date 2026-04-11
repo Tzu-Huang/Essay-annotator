@@ -16,24 +16,24 @@ def get_essay_info(essay):
         "preview": preview(essay["content"])
     }
 
-def normalized_essay_type(value: Optional[str]) -> str:
-    """
-    Steps:
-    1. Ensure input is a string
-    2. Strip whitespace and lowercase
-    3. Map common aliases → standardized type
-    """
-    if not isinstance(value, str):
-        return ""
+# def normalized_essay_type(value: Optional[str]) -> str:
+#     """
+#     Steps:
+#     1. Ensure input is a string
+#     2. Strip whitespace and lowercase
+#     3. Map common aliases → standardized type
+#     """
+#     if not isinstance(value, str):
+#         return ""
 
-    normalized = value.strip().lower()
+#     normalized = value.strip().lower()
 
-    # Map common variations to a single canonical form
-    aliases = {
-        "uc": "uc piq", # personal insight questions
-        "piq": "uc piq",
-        "ucpiq": "uc piq",
-        "supplemental": "supplementals",
-    }
+#     # Map common variations to a single canonical form
+#     aliases = {
+#         "uc": "uc piq", # personal insight questions
+#         "piq": "uc piq",
+#         "ucpiq": "uc piq",
+#         "supplemental": "supplementals",
+#     }
 
-    return aliases.get(normalized, normalized)
+#     return aliases.get(normalized, normalized)

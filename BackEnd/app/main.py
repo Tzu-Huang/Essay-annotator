@@ -169,42 +169,25 @@ def get_essay(
 
 class Search(BaseModel):
     topK: int
-    essay_type: list
+    essay_type: list[str]
     topic: str
     content: str
     
 @app.post("/search")
-async def search(request: Request):
+async def search(req: Search):
     """
     Search for similar essays based on topic/content input.
     Delegates the full search logic to search_service.run_search().
     """
+
     try: 
-        body = await request.json()
-        print("RAW BODY:", body)
-
-        topK = body.get("topK")
-        essay_type = body.get("essay_type")
-        # print(essay_type)
-        topic = body.get("topic","")
-        content = body.get("content", "")
-        
-        print("yes")
-
-        if topK is None or essay_type is None:
-            raise HTTPException(
-                status_code=400,
-                detail="Missing required fields: topK, essay_type"
-            )
-        
-        print("topk is not None")
         data = app.state.data
         results = run_search(
                 data,
-                int(topK),
-                essay_type,
-                topic,
-                content
+                req.topK,
+                req.essay_type,
+                req.topic,
+                req.content
             )
 
         print(results)

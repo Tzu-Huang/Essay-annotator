@@ -183,7 +183,7 @@ def normalize_uc_rows_in_database() -> int:
         row_type = (row.get("type") or "").strip().lower()
         school = (row.get("school") or "").strip().lower()
 
-        if source_file.startswith("uc -") and row_type == "supplementals" and school == "uc":
+        if source_file.startswith("uc -") and (row_type == "uc piq" or row_type == "UC PIQ"):
             row["type"] = "none"
             row["school"] = "University of California"
             updated += 1

@@ -273,6 +273,7 @@ def similarity_label(score: float) -> str:
     percentage = ((score + 1) / 2) * 100
 
     return round(percentage)
+
     
 def cosine_search(
     ids,
@@ -341,7 +342,7 @@ def cosine_search(
             "topic_score": float(topic_scores[i]),
             "content_score": float(content_scores[i]),
             "content_preview": previews[i],
-            "school": schools[i] if schools else "none",
+            "school": schools[i] if schools else "none", # University of California / UC
             "type": types[i] if types else "none",
             "similarity": similarity_label(float(scores[i])),
         })

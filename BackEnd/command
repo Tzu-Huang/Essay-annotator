@@ -11,5 +11,5 @@ Check status:
 sudo systemctl status essay-api
 
 Read logs:
-journalctl -u essay-api -f
+    journalctl -u essay-api -f
     

@@ -5,7 +5,6 @@ import os
 
 from embedding.search_similar import cosine_search, classify_query_input
 from embedding.make_embedding import embedding, normalize
-# from app.helpers import normalized_essay_type
 
 client = OpenAI(api_key=os.environ["OPENAI_API_KEY"])
 
@@ -91,17 +90,29 @@ def run_search(app_state, topK: int, essay_type: list, topic: str, content: str)
     
     types = app_state.types
 
+    # TODO why isinstance
+    if isinstance(essay_type, (list, tuple, set)):
+        requested_types = {
+            e.strip()
+            for e in essay_type
+            if isinstance(e, str) and e.strip()
+        }
+    elif isinstance(essay_type, str) and essay_type.strip():
+        requested_types = {essay_type.strip()}
+    else:
+        requested_types = set()
+
     print("All good")
 
     allowed_idx = []
 
     # handle "all"
-    if "all" in essay_type:
+    if "all" in requested_types:
         allowed_idx = list(range(len(types)))
         # print("test", allowed_idx)
     else:
-        for idx in enumerate(types):
-            if type in essay_type:
+        for idx, t in enumerate(types):
+            if isinstance(t, str) and t in requested_types:
                 allowed_idx.append(idx)
                     
     """
@@ -126,7 +137,7 @@ def run_search(app_state, topK: int, essay_type: list, topic: str, content: str)
     if len(allowed_idx) == 0:
         available_types = sorted(
             list({
-                normalized_essay_type(t)
+                t.strip()
                 for t in types
                 if isinstance(t, str) and t.strip()
             })

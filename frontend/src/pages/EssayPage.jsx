@@ -12,7 +12,7 @@ function EssayPage() {
     const fetchEssay = async () => {
       try {
         const response = await fetch(
-          http://44.201.62.0:8000/essays/${id}?include_content=true
+          "http://44.201.62.0:8000/essays/${id}?include_content=true"
         );
         const data = await response.json();
         setEssay(data);

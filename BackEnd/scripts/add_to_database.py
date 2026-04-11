@@ -8,6 +8,7 @@ It saves runtime while handling id order issues and uncategorized new input data
 """
 
 import json
+import argparse
 import re
 from itertools import count
 from pathlib import Path
@@ -147,17 +148,52 @@ def get_essay_type(path):
     output: [type, school]
     """
     folder_name = path.parent.name
-    file_name = path.stem.lower()
+    file_name = path.stem
+    folder_name_lower = folder_name.lower()
+    file_name_lower = file_name.lower()
 
-    if folder_name == "commonapp" or "common" in file_name:
-        return "personal statement", "none"
-    elif folder_name == "uc" or "uc" in file_name:
-        return "uc piq", "university of california"
+    if folder_name_lower == "commonapp" or "common" in file_name_lower:
+        return "Personal Statement", "none"
+    elif folder_name_lower == "uc" or "uc" in file_name_lower:
+        return "none", "University of California"
     
     if " - " in file_name:
         return "supplementals", file_name.split(" - ")[0].strip()
     else: 
         return "supplementals", file_name.strip()
+
+
+def normalize_uc_rows_in_database() -> int:
+    """
+    Fix previously misclassified UC rows in database.jsonl.
+
+    Rows with source_file like "UC - xx.txt" that were saved as
+    type="supplementals" and school="UC" are rewritten as:
+    type="none", school="University of California".
+    """
+    if not DATABASE_PATH.exists() or DATABASE_PATH.stat().st_size == 0:
+        return 0
+
+    with open(DATABASE_PATH, "r", encoding="utf-8") as f:
+        rows = [json.loads(line) for line in f if line.strip()]
+
+    updated = 0
+    for row in rows:
+        source_file = (row.get("source_file") or "").strip().lower()
+        row_type = (row.get("type") or "").strip().lower()
+        school = (row.get("school") or "").strip().lower()
+
+        if source_file.startswith("uc -") and row_type == "supplementals" and school == "uc":
+            row["type"] = "none"
+            row["school"] = "University of California"
+            updated += 1
+
+    if updated > 0:
+        with open(DATABASE_PATH, "w", encoding="utf-8") as f:
+            for row in rows:
+                f.write(json.dumps(row, ensure_ascii=False) + "\n")
+
+    return updated
 
 
 def get_next_id():
@@ -181,7 +217,17 @@ def get_next_id():
 # =========================
 # Main
 # =========================
-def main():
+def main(mode: str = "both"):
+    if mode in {"both", "normalize"}:
+        updated_rows = normalize_uc_rows_in_database()
+        if updated_rows > 0:
+            print(f"Normalized {updated_rows} existing UC rows in database.jsonl")
+        else:
+            print("No existing UC rows needed normalization.")
+
+    if mode == "normalize":
+        return
+
     if_database = (not DATABASE_PATH.exists()) or DATABASE_PATH.stat().st_size == 0
 
     # if database.jsonl does not exist or nothing inside, add everything together
@@ -223,4 +269,14 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    parser = argparse.ArgumentParser(
+        description="Build/append database.jsonl and optionally normalize existing UC rows."
+    )
+    parser.add_argument(
+        "--mode",
+        choices=["both", "normalize"],
+        default="both",
+        help="both: normalize existing UC rows + ingest new input (default); normalize: only normalize existing UC rows",
+    )
+    args = parser.parse_args()
+    main(mode=args.mode)

@@ -32,7 +32,56 @@ const ESSAY_TYPES = [
   },
 ];
 
+const TYPE_STYLES = {
+  "personal statement": {
+    borderColor: "#facbf7",
+    rankBg: "#f4a8c7",
+    badgeBg: "#f8e4f3",
+    badgeText: "#a8558f",
+    readMore: "#c06bb2",
+  },
+  UC: {
+    borderColor: "#b3d9f5",
+    rankBg: "#a8d8ea",
+    badgeBg: "#e8f4fb",
+    badgeText: "#4b8fb0",
+    readMore: "#5aa6c8",
+  },
+  Supplemental: {
+    borderColor: "rgb(251, 245, 170)",
+    rankBg: "#ebeb30",
+    badgeBg: "#f9f8cf",
+    badgeText: "#8a8613",
+    readMore: "#a6a11d",
+  },
+};
+
+const DEFAULT_RESULT_STYLE = {
+  borderColor: "#6366f1",
+  rankBg: "#f2cb76",
+  badgeBg: "#eef2ff",
+  badgeText: "#4f46e5",
+  readMore: "#4f46e5",
+};
+
 const NON_ALL_TYPES = ["personal statement", "UC", "Supplemental"];
+
+function normalizeResultType(result) {
+  const rawType = result?.type?.toLowerCase?.().trim?.() || "";
+  const rawSchool = result?.school?.toLowerCase?.().trim?.() || "";
+
+  if (rawType === "personal statement") return "personal statement";
+  if (rawType === "uc piq") return "UC";
+
+  if (
+    rawType === "supplementals" ||
+    (rawSchool && rawSchool !== "none" && rawType !== "uc" && rawType !== "personal statement")
+  ) {
+    return "Supplemental";
+  }
+
+  return null;
+}
 
 function Editor() {
   const [topK, setTopK] = useState(3);
@@ -47,7 +96,8 @@ function Editor() {
   const toggleEssayType = (value) => {
     setEssayTypes((prev) => {
       if (value === "all") {
-        const allSelected = NON_ALL_TYPES.every((t) => prev.includes(t)) && prev.includes("all");
+        const allSelected =
+          NON_ALL_TYPES.every((t) => prev.includes(t)) && prev.includes("all");
         return allSelected ? [] : ["all", ...NON_ALL_TYPES];
       } else {
         const next = prev.includes(value)
@@ -57,7 +107,8 @@ function Editor() {
         const allNonAllSelected = NON_ALL_TYPES.every((t) => next.includes(t));
 
         if (allNonAllSelected && !next.includes("all")) return ["all", ...next];
-        if (!allNonAllSelected && next.includes("all")) return next.filter((t) => t !== "all");
+        if (!allNonAllSelected && next.includes("all"))
+          return next.filter((t) => t !== "all");
 
         return next;
       }
@@ -65,7 +116,7 @@ function Editor() {
   };
 
   const testEndpoints = async () => {
-    const trimmedTopic = topic.trim();
+    const trimmedTopic = topic.trim();//trim() 是把字串前後的空白拿掉。
     const trimmedDraft = draft.trim();
 
     // 1. Essay Type 必選
@@ -236,96 +287,124 @@ function Editor() {
             </div>
 
             <div className="output-scroll">
-              {Array.from({ length: topK }).map((_, i) => (
-              <div
-                className="result-box result-clickable"
-                key={i}
-              >
-                <div className="result-header">
-                  <div className="result-header-left">
-                    <span className={`rank-circle rank-${i + 1}`}>
-                      {i + 1}
-                    </span>
+              {Array.from({ length: topK }).map((_, i) => {
+                const normalizedType = normalizeResultType(results[i]);
+                const typeStyle = TYPE_STYLES[normalizedType] || DEFAULT_RESULT_STYLE;
 
-                    <div className="result-title-block">
-                      {/* ✅ Topic（可點 + 可複製） */}
-                      <h4
-                        className="result-topic clickable-text"
-                        onClick={() => {
-                          const selection = window.getSelection().toString();
-                          if (selection) return;
+                return (
+                  <div
+                    className="result-box result-clickable"
+                    key={i}
+                    style={{ borderLeftColor: typeStyle.borderColor }}
+                  >
+                    <div className="result-header">
+                      <div className="result-header-left">
+                        <span
+                          className="rank-circle"
+                          style={{ background: typeStyle.rankBg }}
+                        >
+                          {i + 1}
+                        </span>
 
-                          if (!results[i]) return;
+                        <div className="result-title-block">
+                          {/* ✅ Topic（可點 + 可複製） */}
+                          <h4
+                            className="result-topic clickable-text"
+                            onClick={() => {
+                              const selection = window.getSelection().toString();
+                              if (selection) return;
 
-                          localStorage.setItem("userDraft", draft);
-                          localStorage.setItem("userTopic", topic);
+                              if (!results[i]) return;
 
-                          window.open(
-                            `${window.location.origin}/essay/${results[i].parent_id}`,
-                            "_blank"
-                          );
+                              localStorage.setItem("userDraft", draft);
+                              localStorage.setItem("userTopic", topic);
+
+                              window.open(
+                                `${window.location.origin}/essay/${results[i].parent_id}`,
+                                "_blank"
+                              );
+                            }}
+                          >
+                            {results[i]?.topic || "Topic"}
+                          </h4>
+
+                          {/* school + type */}
+                          <div className="meta-badges">
+                            {results[i]?.school && results[i].school !== "none" && (
+                              <span
+                                className="meta-badge"
+                                style={{
+                                  background: typeStyle.badgeBg,
+                                  color: typeStyle.badgeText,
+                                }}
+                              >
+                                {results[i].school}
+                              </span>
+                            )}
+
+                            {results[i]?.type && (
+                              <span
+                                className="meta-badge"
+                                style={{
+                                  background: typeStyle.badgeBg,
+                                  color: typeStyle.badgeText,
+                                }}
+                              >
+                                {results[i].type}
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* score */}
+                      <div
+                        className="school-badge"
+                        style={{
+                          background: typeStyle.badgeBg,
+                          color: typeStyle.badgeText,
                         }}
                       >
-                        {results[i]?.topic || "Topic"}
-                      </h4>
-
-                      {/* school + type */}
-                      <div className="meta-badges">
-                        {results[i]?.school && results[i].school !== "none" && (
-                          <span className="meta-badge">
-                            {results[i].school}
-                          </span>
-                        )}
-
-                        {results[i]?.type && (
-                          <span className="meta-badge">
-                            {results[i].type}
-                          </span>
-                        )}
+                        {results[i]?.similarity ?? ""}
                       </div>
                     </div>
+
+                    <div className="result-preview">
+                      {results[i] ? (
+                        <>
+                          <pre>{results[i].content_preview}</pre>
+
+                          {/* ✅ Read more */}
+                          <span
+                            className="read-more clickable-text"
+                            style={{ color: typeStyle.readMore }}
+                            onClick={() => {
+                              const selection = window.getSelection().toString();
+                              if (selection) return;
+
+                              if (!results[i]) return;
+
+                              localStorage.setItem("userDraft", draft);
+                              localStorage.setItem("userTopic", topic);
+
+                              window.open(
+                                `${window.location.origin}/essay/${results[i].parent_id}`,
+                                "_blank"
+                              );
+                            }}
+                          >
+                            Read more →
+                          </span>
+                        </>
+                      ) : (
+                        <span className="placeholder-text">
+                          Result will appear here
+                        </span>
+                      )}
+                    </div>
                   </div>
-
-                  {/* score */}
-                  <div className="school-badge">
-                    {results[i]?.similarity ?? ""}
-                  </div>
-                </div>
-
-                <div className="result-preview">
-                  {results[i] ? (
-                    <>
-                      <pre>{results[i].content_preview}</pre>
-
-                      {/* ✅ Read more */}
-                      <span
-                        className="read-more clickable-text"
-                        onClick={() => {
-                          const selection = window.getSelection().toString();
-                          if (selection) return;
-
-                          if (!results[i]) return;
-
-                          localStorage.setItem("userDraft", draft);
-                          localStorage.setItem("userTopic", topic);
-
-                          window.open(
-                            `${window.location.origin}/essay/${results[i].parent_id}`,
-                            "_blank"
-                          );
-                        }}
-                      >
-                        Read more →
-                      </span>
-                    </>
-                  ) : (
-                    <span className="placeholder-text">
-                      Result will appear here
-                    </span>
-                  )}
-                </div>
-              </div>
-            ))}
+                );
+              })}
             </div>
           </div>
 

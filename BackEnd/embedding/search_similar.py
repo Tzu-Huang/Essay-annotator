@@ -272,7 +272,7 @@ def check_shape(topic_V, content_V, topic_q_V, content_q_V):
 def similarity_label(score: float) -> str:
     percentage = ((score + 1) / 2) * 100
 
-    return percentage 
+    return round(percentage)
     
 def cosine_search(
     ids,

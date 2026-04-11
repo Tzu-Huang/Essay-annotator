@@ -1,11 +1,35 @@
 import { useState } from "react";
 import "../styles/editor.css";
+//import allIcon from "../assets/essayTypes/all.png";
+import personalIcon from "../assets/essayTypes/personal-statement.png";
+import ucIcon from "../assets/essayTypes/uc.png";
+import supplementalIcon from "../assets/essayTypes/supplemental.png";
 
 const ESSAY_TYPES = [
-  { value: "all", label: "All", icon: "🌍", bg: "linear-gradient(135deg, #81d4fa, #4dd0c4)" },
-  { value: "personal statement", label: "personal statement", icon: "🧠", bg: "linear-gradient(135deg, #d7b4f3, #f4a8c7)" },
-  { value: "UC", label: "UC", icon: "🌴", bg: "linear-gradient(135deg, #b3d9f5, #a8d8ea)" },
-  { value: "Supplemental", label: "Supplemental", icon: "🧩", bg: "linear-gradient(135deg, #c8e6c9, #a5d6a7)" },
+  {
+    value: "all",
+    label: "All",
+    icon: "🌍",
+    bg: "linear-gradient(135deg, #81d4fa, #4dd0c4)",
+  },
+  {
+    value: "personal statement",
+    label: "personal statement",
+    icon: personalIcon,
+    bg: "linear-gradient(135deg, #d7b4f3, #f4a8c7)",
+  },
+  {
+    value: "UC",
+    label: "UC",
+    icon: ucIcon,
+    bg: "linear-gradient(135deg, #b3d9f5, #a8d8ea)",
+  },
+  {
+    value: "Supplemental",
+    label: "Supplemental",
+    icon: supplementalIcon,
+    bg: "linear-gradient(45deg, #f3f3ef, #f3f040)",
+  },
 ];
 
 const NON_ALL_TYPES = ["personal statement", "UC", "Supplemental"];
@@ -41,6 +65,21 @@ function Editor() {
   };
 
   const testEndpoints = async () => {
+    const trimmedTopic = topic.trim();
+    const trimmedDraft = draft.trim();
+
+    // 1. Essay Type 必選
+    if (essayTypes.length === 0) {
+      setModalMessage("Please select at least one essay type before generating.");
+      return;
+    }
+
+    // 2. Topic / Draft 至少填一個
+    if (!trimmedTopic && !trimmedDraft) {
+      setModalMessage("Please enter either a topic or a draft before generating.");
+      return;
+    }
+
     setIsLoading(true);
 
     try {
@@ -50,8 +89,8 @@ function Editor() {
         body: JSON.stringify({
           topK: topK,
           essay_type: essayTypes.includes("all") ? ["all"] : essayTypes,
-          topic: topic,
-          content: draft,
+          topic: trimmedTopic,
+          content: trimmedDraft,
         }),
       });
 
@@ -81,7 +120,7 @@ function Editor() {
           <div className="modal-box" onClick={(e) => e.stopPropagation()}>
             <p className="modal-text">{modalMessage}</p>
             <button className="modal-button" onClick={() => setModalMessage("")}>
-              我知道了
+              Got it
             </button>
           </div>
         </div>
@@ -103,12 +142,17 @@ function Editor() {
 
                   return (
                     <button
+                      type="button"
                       key={type.value}
                       className={`essay-type-chip ${isSelected ? "chip-selected" : ""}`}
                       onClick={() => toggleEssayType(type.value)}
                     >
                       <div className="chip-icon" style={{ background: type.bg }}>
-                        {type.icon}
+                        {typeof type.icon === "string" && !type.icon.includes("/") ? (
+                          <span className="chip-emoji">{type.icon}</span>
+                        ) : (
+                          <img src={type.icon} alt={type.label} className="chip-icon-img" />
+                        )}
                       </div>
 
                       <span className="chip-label">{type.label}</span>

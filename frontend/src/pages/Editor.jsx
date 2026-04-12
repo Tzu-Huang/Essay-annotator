@@ -19,7 +19,7 @@ const ESSAY_TYPES = [
     bg: "linear-gradient(135deg, #d7b4f3, #f4a8c7)",
   },
   {
-    value: "UC",
+    value: "University of California",
     label: "UC",
     icon: ucIcon,
     bg: "linear-gradient(135deg, #b3d9f5, #a8d8ea)",
@@ -38,7 +38,7 @@ const TYPE_STYLES = {
     badgeBg: "#f8e4f3",
     badgeText: "#a8558f",
   },
-  UC: {
+  "University of California": {
     accentGradient: "linear-gradient(180deg, #d1e5f3 0%, #8dcee5 100%)",
     badgeBg: "#e8f4fb",
     badgeText: "#4b8fb0",
@@ -64,7 +64,7 @@ const RANK_STYLES = {
   5: { bg: "#b6a9f0", text: "#6d28d9" }, // 5th
 };
 
-const NON_ALL_TYPES = ["personal statement", "UC", "Supplemental"];
+const NON_ALL_TYPES = ["personal statement", "University of California", "Supplemental"];
 
 
 function getSimilarityInfo(similarity) {

@@ -34,17 +34,20 @@ const ESSAY_TYPES = [
 
 const TYPE_STYLES = {
   "personal statement": {
-    accentGradient: "linear-gradient(180deg, #efd6e9 0%, #f4a8c7 100%)",
+    //accentGradient: "linear-gradient(180deg, #efd6e9 0%, #f4a8c7 100%)",
+    accentGradient: "linear-gradient(180deg, #6366f1 0%, #38bdf8 100%)",
     badgeBg: "#f8e4f3",
     badgeText: "#a8558f",
   },
   "University of California": {
-    accentGradient: "linear-gradient(180deg, #d1e5f3 0%, #8dcee5 100%)",
+    //accentGradient: "linear-gradient(180deg, #d1e5f3 0%, #8dcee5 100%)",
+    accentGradient: "linear-gradient(180deg, #6366f1 0%, #38bdf8 100%)",
     badgeBg: "#e8f4fb",
     badgeText: "#4b8fb0",
   },
   Supplemental: {
-    accentGradient: "linear-gradient(180deg, #ffffd6 0%, #f3f040 100%)",
+    //accentGradient: "linear-gradient(180deg, #ffffd6 0%, #f3f040 100%)",
+    accentGradient: "linear-gradient(180deg, #6366f1 0%, #38bdf8 100%)",
     badgeBg: "#f9f8cf",
     badgeText: "#8a8613",
   },

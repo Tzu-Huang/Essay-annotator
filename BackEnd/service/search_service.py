@@ -17,6 +17,8 @@ def get_optional_query_embedding(text: str | None, client, dim: int) -> np.ndarr
 
 def run_search(req, app_state):
 
+    client = get_client()
+    
     # Parameters
     topK = req.topK
     essay_types = req.essay_types

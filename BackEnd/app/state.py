@@ -11,7 +11,8 @@ class AppData:
     topics: list[str] = field(default_factory=list)
     types: list[str] = field(default_factory=list)
     schools: list[str] = field(default_factory=list)
-    V: Any = None
+    topic_V: Any = None
+    content_V: Any = None
     essay_count: int = 0
     data_path: str = ""
     ready: bool = False

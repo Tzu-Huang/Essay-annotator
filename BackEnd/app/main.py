@@ -181,7 +181,7 @@ def search(req: Search, request: Request):
     """
 
     try: 
-        results = run_search(req, request.app_state)
+        results = run_search(req, request.app.state)
 
         print(results)
         return results

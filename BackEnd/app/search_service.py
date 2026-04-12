@@ -159,7 +159,7 @@ def run_search(app_state, topK: int, essay_type: list, topic: str, content: str)
     topic_V_filtered = app_state.topics[allowed_idx]
 
     ids_filtered = [app_state.ids[i] for i in allowed_idx]
-    print(ids_filtered)
+    # print(ids_filtered)
     parent_filtered = [app_state.parent[i] for i in allowed_idx]
     previews_filtered = [app_state.previews[i] for i in allowed_idx]
     topic_texts_filtered = [app_state.topic_texts[i] for i in allowed_idx]
@@ -182,5 +182,5 @@ def run_search(app_state, topK: int, essay_type: list, topic: str, content: str)
         topic_texts=topic_texts_filtered,
         schools=schools_filtered
     )
-    print("all godod")
+    # print("all godod")
     return results

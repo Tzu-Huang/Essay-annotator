@@ -178,7 +178,7 @@ function Editor() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           topK: topK,
-          essay_type: essayTypes.includes("all") ? ["all"] : essayTypes,
+          essay_types: essayTypes.includes("all") ? ["all"] : essayTypes,
           topic: trimmedTopic,
           content: trimmedDraft,
         }),

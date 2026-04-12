@@ -142,7 +142,7 @@ def run_search(app_state, topK: int, essay_type: list, topic: str, content: str)
                 if isinstance(t, str) and t.strip()
             })
         )
-        # print("ya you")
+        print("ya you")
         # print(essay_type)
         # print(available_types)
         raise HTTPException(

@@ -270,8 +270,7 @@ def check_shape(topic_V, content_V, topic_q_V, content_q_V):
     return True
 
 def similarity_label(score: float) -> str:
-    percentage = ((score + 1) / 2) * 100
-
+    percentage = max(score, 0) ** 2 * 100
     return round(percentage)
 
     

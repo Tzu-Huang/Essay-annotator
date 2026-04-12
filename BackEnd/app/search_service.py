@@ -142,9 +142,9 @@ def run_search(app_state, topK: int, essay_type: list, topic: str, content: str)
                 if isinstance(t, str) and t.strip()
             })
         )
-        print("ya you")
-        print(essay_type)
-        print(available_types)
+        # print("ya you")
+        # print(essay_type)
+        # print(available_types)
         raise HTTPException(
             status_code=400,
             detail={
@@ -167,7 +167,7 @@ def run_search(app_state, topK: int, essay_type: list, topic: str, content: str)
     types_filtered = [app_state.types[i] for i in allowed_idx]
 
     # Run similarity search on filtered data
-
+    print("Before running cosine_search")
     _, results = cosine_search(
         ids_filtered,
         parent_filtered,

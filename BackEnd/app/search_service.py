@@ -43,7 +43,7 @@ def run_search(app_state, topK: int, essay_type: list, topic: str, content: str)
     5. Run cosine similarity search
     6. Return final search results
     """
-
+    print("RUN")
     # Ensure startup loading finished successfully
     if not getattr(app_state, "ready", False):
         # print("503")

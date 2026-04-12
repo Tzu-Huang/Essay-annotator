@@ -45,15 +45,14 @@ async def lifespan(app: FastAPI):
 
                 essays[essay["id"]] = essay
 
-        ids, parent, previews, topic_texts, topics, topic_V, content_V = load_db_embeddings(EMBED_JSONL)
+        ids, parent, previews, topic_texts, topic_V, content_V = load_db_embeddings(EMBED_JSONL)
         types = [essays[pid]["type"] if pid in essays else "unknown" for pid in parent]
         schools = [essays[pid].get("school", "Unknown") if pid in essays else "none" for pid in parent]
         data.essays = essays
         data.ids = ids
         data.parent = parent
         data.previews = previews
-        data.topic_texts = topic_texts
-        data.topics = topics
+        data.topic_texts = topic_texts       
         data.types = types
         data.schools = schools
         data.topic_V = topic_V

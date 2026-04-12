@@ -247,6 +247,25 @@ def build_output_record(rec):
 
     return ordered
 
+def get_query_embedding(query: str, client):
+
+    """
+    Convert input string into a normalized embedding vector.
+
+    Steps:
+    1. Create OpenAI client
+    2. Generate embedding for the query
+    3. Take the first embedding result
+    4. Normalize the vector before returning
+
+    Returns:
+        normalized embedding vector
+    """
+    
+    vecs = embedding(client, query)
+    vec = vecs[0]
+    normalized = normalize(vec)
+    return np.asarray(normalized, dtype=np.float32).reshape(-1)
 # =========================
 # Main logic
 # =========================

@@ -1,7 +1,7 @@
 import time
 import json
 # from app.helpers import normalized_essay_type
-from app.search_service import run_search
+from service.search_service import run_search
 from app.state import AppData
 from compare_results.analysis import compare
 from dotenv import load_dotenv
@@ -169,33 +169,25 @@ def get_essay(
 
 class Search(BaseModel):
     topK: int
-    essay_type: list
+    essay_types: list
     topic: str
     content: str
     
 @app.post("/search")
-async def search(req: Search):
+def search(req: Search, request: Request):
     """
     Search for similar essays based on topic/content input.
     Delegates the full search logic to search_service.run_search().
     """
 
     try: 
-        data = app.state.data
-        # print("Received from Frontend Type: " + req.essay_type)
-        results = run_search(
-                data,
-                req.topK,
-                req.essay_type,
-                req.topic,
-                req.content
-            )
+        results = run_search(req, request.app_state)
 
         print(results)
         return results
 
     except Exception as e:
-        print("/search did not run successfully")
+        print("[Error] /search API did not run successfully")
         raise HTTPException(
             status_code=500,
             detail=str(e)

@@ -3,7 +3,7 @@ from openai import OpenAI
 import numpy as np
 import os
 
-from BackEnd.service import build_results
+from service.build_results import build_results
 from embedding.search_similar import cosine_search, classify_query_input
 from embedding.make_embedding import get_query_embedding
 

@@ -182,7 +182,7 @@ async def search(req: Search):
 
     try: 
         data = app.state.data
-        print("Received from Frontend Type: " + req.essay_type)
+        # print("Received from Frontend Type: " + req.essay_type)
         results = run_search(
                 data,
                 req.topK,

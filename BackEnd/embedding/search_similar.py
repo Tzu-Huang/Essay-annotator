@@ -272,85 +272,6 @@ def check_shape(topic_V, content_V, topic_q_V, content_q_V):
 def similarity_label(score: float) -> str:
     percentage = max(score, 0) ** 0.5 * 100
     return round(percentage)
-    
-def cosine_search(
-    ids,
-    parent,
-    previews,
-    topic_V,
-    content_V,
-    topic_vec,
-    content_vec,
-    mode,
-    TOP_K,
-    types,
-    topic_weight=0.3,
-    content_weight=0.7,
-    topic_texts=None,
-    schools=None
-):
-    """
-    Compute cosine similarity for one query against entire DB.
-
-    Cases:
-    1. only topic   -> compare topic only
-    2. only content -> compare content only
-    3. both         -> weighted topic + content
-    """
-
-    topic_scores = topic_V @ topic_vec
-    content_scores = content_V @ content_vec
-
-    if mode == "topic_only":
-        scores = topic_scores
-
-    elif mode == "content_only":
-        scores = content_scores
-
-    elif mode == "hybrid":
-        scores = topic_weight * topic_scores + content_weight * content_scores
-
-    else:
-        print("[ERROR] Invalid query mode")
-        return "invalid", []
-
-    sorted_idx = np.argsort(-scores)
-
-    results = []
-    seen_parents = set()
-
-    for i in sorted_idx:
-        pid = parent[i]
-
-        if pid in seen_parents:
-            continue
-
-        # print("i =", i)
-        # print("ids[i] =", ids[i])
-        # print("parent[i] =", parent[i])
-        # print("preview =", previews[i][:80])
-        # print("topic =", topic_texts[i])
-        # print("type =", types[i])
-        results.append({
-            "rank": len(results) + 1,
-            "parent_id": pid,
-            "id": ids[i],
-            "topic": topic_texts[i] if topic_texts is not None and i < len(topic_texts) else None,
-            "score": float(scores[i]),
-            "topic_score": float(topic_scores[i]),
-            "content_score": float(content_scores[i]),
-            "content_preview": previews[i],
-            "school": schools[i] if schools else "none", # University of California / UC
-            "type": types[i] if types else "none",
-            "similarity": similarity_label(float(scores[i])),
-        })
-
-        seen_parents.add(pid)
-
-        if len(results) == TOP_K:
-            break
-
-    return mode, results
 
 def write_jsonl(path: str, records: list[dict]):
     Path(path).parent.mkdir(parents=True, exist_ok=True)
@@ -358,6 +279,59 @@ def write_jsonl(path: str, records: list[dict]):
     with open(path, "w", encoding="utf-8") as f:
         for r in records:
             f.write(json.dumps(r, ensure_ascii=False) + "\n")
+
+def cosine_search(
+    topic_V,
+    content_V,
+    topic_vec, # from user
+    content_vec, # from user
+    mode,
+    top_k,
+    parent_ids,
+    topic_weight: float = 0.3,
+    content_weight: float = 0.7,
+) -> tuple[list[int], np.ndarray]:
+    
+    # === Checking calculations ===
+    if mode == "topic_only":
+        scores = topic_V @ topic_vec
+    
+    elif mode == "content_only":
+        scores = content_V @ content_vec
+
+    elif mode == "hybrid":
+        topic_scores = topic_V @ topic_vec
+        content_scores = content_V @ content_vec
+        scores = topic_weight * topic_scores + content_weight * content_scores 
+
+    else:
+        raise ValueError(f"Invalid mode: {mode}")
+    
+    # =============================
+
+    # Sort all the essays' similiarity from largest to smallest and return the sorted index
+    sorted_idx = np.argsort(-scores)
+
+    # If no repeatition:
+    if parent_ids is None:
+        return sorted_idx[:top_k].tolist(), scores
+
+    selected = []
+    seen_parents = set()
+
+    for i in sorted_idx:
+        pid = parent_ids[i]
+        if pid in seen_parents:
+            continue
+
+        selected.append(int(i))
+        seen_parents.add(pid)
+
+        if len(selected) == top_k:
+            break
+
+    return selected, scores
+
 
 def main():
     ids, parent, previews, topic_texts, topic_V, content_V = (load_db_embeddings(DB_JSONL))

@@ -327,12 +327,12 @@ def cosine_search(
         if pid in seen_parents:
             continue
 
-        print("i =", i)
-        print("ids[i] =", ids[i])
-        print("parent[i] =", parent[i])
-        print("preview =", previews[i][:80])
-        print("topic =", topic_texts[i])
-        print("type =", types[i])
+        # print("i =", i)
+        # print("ids[i] =", ids[i])
+        # print("parent[i] =", parent[i])
+        # print("preview =", previews[i][:80])
+        # print("topic =", topic_texts[i])
+        # print("type =", types[i])
         results.append({
             "rank": len(results) + 1,
             "parent_id": pid,

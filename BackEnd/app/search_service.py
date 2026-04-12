@@ -46,7 +46,7 @@ def run_search(app_state, topK: int, essay_type: list, topic: str, content: str)
 
     # Ensure startup loading finished successfully
     if not getattr(app_state, "ready", False):
-        print("503")
+        # print("503")
         raise HTTPException(
             status_code=503,
             detail={
@@ -58,7 +58,7 @@ def run_search(app_state, topK: int, essay_type: list, topic: str, content: str)
     # Decide whether the user provided topic, content, or both
     mode = classify_query_input(topic, content)
     if mode == "invalid":
-        print("400")
+        # print("400")
         raise HTTPException(
             status_code=400,
             detail="Provide at least one non-empty input: topic or content",
@@ -71,7 +71,7 @@ def run_search(app_state, topK: int, essay_type: list, topic: str, content: str)
         else np.zeros(app_state.topics.shape[1], dtype=np.float32)
     )
 
-    print("topic_vec")
+    # print("topic_vec")
     # Build content embedding if content exists; otherwise use zero vector
     content_vec = (
         embed_input(content)
@@ -79,13 +79,13 @@ def run_search(app_state, topK: int, essay_type: list, topic: str, content: str)
         else np.zeros(app_state.V.shape[1], dtype=np.float32)
     )
 
-    print("Content_vec")
+    # print("Content_vec")
     if topic_vec.ndim != 1:
-        print("topic_vec.ndim")
+        # print("topic_vec.ndim")
         raise HTTPException(status_code=500, detail=f"topic_vec must be 1D, got shape {topic_vec.shape}")
 
     if content_vec.ndim != 1:
-        print("content_vec.ndim")
+        # print("content_vec.ndim")
         raise HTTPException(status_code=500, detail=f"content_vec must be 1D, got shape {content_vec.shape}")
     
     types = app_state.types
@@ -102,7 +102,7 @@ def run_search(app_state, topK: int, essay_type: list, topic: str, content: str)
     else:
         requested_types = set()
 
-    print("All good")
+    # print("All good")
 
     allowed_idx = []
 
@@ -131,7 +131,7 @@ def run_search(app_state, topK: int, essay_type: list, topic: str, content: str)
     but need to test on 
     """
 
-    print("yaya")
+    # print("yaya")
 
     # If no matching essay type exists, return helpful error info
     if len(allowed_idx) == 0:

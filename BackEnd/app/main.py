@@ -169,7 +169,7 @@ def get_essay(
 
 class Search(BaseModel):
     topK: int
-    essay_type: list[str]
+    essay_type: list
     topic: str
     content: str
     
@@ -195,7 +195,7 @@ async def search(req: Search):
         return results
 
     except Exception as e:
-        print(e)
+        print("/search did not run successfully")
         raise HTTPException(
             status_code=500,
             detail=str(e)

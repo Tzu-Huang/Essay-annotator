@@ -269,10 +269,6 @@ def check_shape(topic_V, content_V, topic_q_V, content_q_V):
 
     return True
 
-def similarity_label(score: float) -> str:
-    percentage = max(score, 0) ** 0.5 * 100
-    return round(percentage)
-
 def write_jsonl(path: str, records: list[dict]):
     Path(path).parent.mkdir(parents=True, exist_ok=True)
 
@@ -291,7 +287,7 @@ def cosine_search(
     topic_weight: float = 0.3,
     content_weight: float = 0.7,
 ) -> tuple[list[int], np.ndarray]:
-    
+
     # === Checking calculations ===
     if mode == "topic_only":
         scores = topic_V @ topic_vec
@@ -308,7 +304,7 @@ def cosine_search(
         raise ValueError(f"Invalid mode: {mode}")
     
     # =============================
-
+ 
     # Sort all the essays' similiarity from largest to smallest and return the sorted index
     sorted_idx = np.argsort(-scores)
 
@@ -331,7 +327,6 @@ def cosine_search(
             break
 
     return selected, scores
-
 
 def main():
     ids, parent, previews, topic_texts, topic_V, content_V = (load_db_embeddings(DB_JSONL))

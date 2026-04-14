@@ -269,6 +269,10 @@ def check_shape(topic_V, content_V, topic_q_V, content_q_V):
 
     return True
 
+def similarity_label(score: float) -> str:
+    percentage = max(score, 0) ** 0.5 * 100
+    return round(percentage)
+
 def write_jsonl(path: str, records: list[dict]):
     Path(path).parent.mkdir(parents=True, exist_ok=True)
 

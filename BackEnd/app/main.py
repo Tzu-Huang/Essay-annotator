@@ -1,6 +1,6 @@
 import time
 import json
-# from app.helpers import normalized_essay_type
+from app.helpers import load_essays
 from service.search_service import run_search
 from app.state import AppData
 from compare_results.analysis import compare
@@ -32,23 +32,14 @@ async def lifespan(app: FastAPI):
     
     try:
         essays = {}
-        
-        # Loads our essays into a dict, shorter runtime, just load once
-        with open(DB_JSONL, "r", encoding="utf-8") as f:
-            for line in f:
-                essay = json.loads(line)
-
-                raw_type = essay.get("type", "unknown")
-
-                # We normalized the type first when loading every essay
-                essay["type"] = raw_type
-
-                essays[essay["id"]] = essay
+        database_essays = load_essays(DB_JSONL)
 
         ids, parent, previews, topic_texts, topic_V, content_V = load_db_embeddings(EMBED_JSONL)
         types = [essays[pid]["type"] if pid in essays else "unknown" for pid in parent]
         schools = [essays[pid].get("school", "Unknown") if pid in essays else "none" for pid in parent]
+        
         data.essays = essays
+        data.database_essays = database_essays
         data.ids = ids
         data.parent = parent
         data.previews = previews
@@ -57,7 +48,6 @@ async def lifespan(app: FastAPI):
         data.schools = schools
         data.topic_V = topic_V
         data.content_V = content_V
-        data.essay_count = len(essays)
         data.ready = True
 
         print(f"loaded {data.essay_count} essays")
@@ -132,6 +122,7 @@ def ready():
 DEFAULT_FIELDS = ["id", "topic", "type", "school", "public"]
 ALLOWED_FIELDS = set(DEFAULT_FIELDS + ["content", "source_file", "metadata"])
 
+# TODO: frontend is taking parent id
 @app.get("/essays/{essay_id}")
 def get_essay(
     essay_id: str,
@@ -139,7 +130,7 @@ def get_essay(
     include_content: bool = Query(default=False),
 ):
     data = app.state.data
-    essay = data.essays.get(essay_id)
+    essay = data.database_essays.get(essay_id)
 
     if not essay:
         raise HTTPException(status_code=404, detail="Essay not found")

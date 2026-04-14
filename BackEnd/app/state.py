@@ -4,6 +4,7 @@ from typing import Any, Optional
 @dataclass
 class AppData:
     essays: dict[str, dict] = field(default_factory=dict)
+    database_essays: dict[str, dict] = field(default_factory=dict)
     ids: list[str] = field(default_factory=list)
     parent: list[str] = field(default_factory=list)
     previews: list[str] = field(default_factory=list)

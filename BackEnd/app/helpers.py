@@ -1,3 +1,4 @@
+import json
 from typing import Optional
 
 def preview(text: str, max_chars: int = 200):
@@ -16,24 +17,10 @@ def get_essay_info(essay):
         "preview": preview(essay["content"])
     }
 
-# def normalized_essay_type(value: Optional[str]) -> str:
-#     """
-#     Steps:
-#     1. Ensure input is a string
-#     2. Strip whitespace and lowercase
-#     3. Map common aliases → standardized type
-#     """
-#     if not isinstance(value, str):
-#         return ""
-
-#     normalized = value.strip().lower()
-
-#     # Map common variations to a single canonical form
-#     aliases = {
-#         "uc": "uc piq", # personal insight questions
-#         "piq": "uc piq",
-#         "ucpiq": "uc piq",
-#         "supplemental": "supplementals",
-#     }
-
-#     return aliases.get(normalized, normalized)
+def load_essays(db_path: str):
+    database_essays = {}
+    with open(db_path, "r", encoding="utf-8") as f:
+        for line in f:
+            essay = json.loads(line)
+            database_essays[essay["id"]] = essay
+    return database_essays

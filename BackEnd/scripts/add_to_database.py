@@ -8,7 +8,6 @@ It saves runtime while handling id order issues and uncategorized new input data
 """
 
 import json
-import argparse
 import re
 from itertools import count
 from pathlib import Path
@@ -158,39 +157,9 @@ def get_essay_type(path):
         return "University of California", "none"
     
     if " - " in file_name:
-        return "Supplementals", file_name.split(" - ")[0].strip()
+        return "Supplemental", file_name.split(" - ")[0].strip()
     else: 
-        return "Supplementals", file_name.strip()
-
-
-def normalize_rows_in_database() -> int:
-    if not DATABASE_PATH.exists() or DATABASE_PATH.stat().st_size == 0:
-        return 0
-
-    with open(DATABASE_PATH, "r", encoding="utf-8") as f:
-        rows = [json.loads(line) for line in f if line.strip()]
-
-    updated = 0
-    for row in rows:
-        row_type = (row.get("type") or "").strip().lower()
-
-        # Normalize ANY UC PIQ variant
-        if row_type == "uc piq" or row_type == "UC PIQ":
-            row["type"] = "University of California"
-            row["school"] = "none"
-            updated += 1
-
-        if row_type == "supplementals":
-            row["type"] = "Supplemental"
-            updated += 1
-
-    if updated > 0:
-        with open(DATABASE_PATH, "w", encoding="utf-8") as f:
-            for row in rows:
-                f.write(json.dumps(row, ensure_ascii=False) + "\n")
-
-    return updated
-
+        return "Supplemental", file_name.strip()
 
 def get_next_id():
     """
@@ -213,17 +182,7 @@ def get_next_id():
 # =========================
 # Main
 # =========================
-def main(mode: str = "both"):
-    if mode in {"both", "normalize"}:
-        updated_rows = normalize_rows_in_database()
-        if updated_rows > 0:
-            print(f"Normalized {updated_rows} existing rows in database.jsonl")
-        else:
-            print("No existing UC rows needed normalization.")
-
-    if mode == "normalize":
-        return
-
+def main():
     if_database = (not DATABASE_PATH.exists()) or DATABASE_PATH.stat().st_size == 0
 
     # if database.jsonl does not exist or nothing inside, add everything together
@@ -265,14 +224,4 @@ def main(mode: str = "both"):
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(
-        description="Build/append database.jsonl and optionally normalize existing UC rows."
-    )
-    parser.add_argument(
-        "--mode",
-        choices=["both", "normalize"],
-        default="both",
-        help="both: normalize existing UC rows + ingest new input (default); normalize: only normalize existing UC rows",
-    )
-    args = parser.parse_args()
-    main(mode=args.mode)
+    main()

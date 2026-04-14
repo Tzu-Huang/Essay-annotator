@@ -7,6 +7,7 @@ from service.build_results import build_results
 from embedding.search_similar import cosine_search, classify_query_input
 from embedding.make_embedding import get_query_embedding
 
+
 def get_client():
     return OpenAI(api_key=os.environ["OPENAI_API_KEY"])
 
@@ -16,7 +17,6 @@ def get_optional_query_embedding(text: str | None, client, dim: int) -> np.ndarr
     return np.zeros(dim, dtype=np.float32)
 
 def run_search(req, app_state):
-
     client = get_client()
     
     # Parameters

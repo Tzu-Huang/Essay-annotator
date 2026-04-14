@@ -1,10 +1,11 @@
 # Essay-Annotator 
 
 <p align="center">
-  <img src='BackEnd/picture/summary.png'>
+  <img src='BackEnd/picture/website.png' width = "700">
+  
 </p>
 
-EssayLens is a data-driven platform designed to help students learn how to write effective U.S. college application essays by analyzing real examples and providing structural, non-ghostwriting feedback.
+**Essay-Annotator** is a data-driven platform designed to help students learn how to write effective U.S. college application essays by analyzing real examples and providing structural, non-ghostwriting feedback.
 
 
 ---
@@ -12,49 +13,44 @@ EssayLens is a data-driven platform designed to help students learn how to write
 - [Introduction](#introduction)
 - [Motivation](#motivation)
 - [Architecture](#architecture)
+- [Getting Started](#getting-started)
+- [Tech Stack](#tech-stack)
 - [Contributors](#contributors)
 
 ## Introduction
-**Essay-Annotator** implements an end-to-end pipeline covering heterogeneous data ingestion, document normalization, dense vector generation, and optimized similarity search. 
+Essay-Annotator implements an **end-to-end NLP pipeline** for long-form student essays, covering:
+
+- Heterogeneous data ingestion
+- Document normalization
+- Dense vector embedding
+- Semantic similarity retrieval
 
 As a research prototype, this system facilitates the study of **semantic similarity**, **narrative structure alignment**, and **thematic clustering** in long-form reflective student writing.
 
-The system constructs an end-to-end pipeline that:
+This project serves as a **research prototype** for studying:
 
-1. Ingests essays from multiple sources (Google Drive and public web crawlers),
-
-2. Normalizes documents into a unified structured schema,
-
-3. Generates dense vector representations using pretrained embedding models,
-
-4. Performs cosine-based top-K retrieval over the vector database.
-
-This repository serves as a research prototype for studying semantic similarity, narrative structure alignment, and thematic clustering in long-form student writing.
-
+- Semantic similarity in long-form writing  
+- Narrative structure alignment  
+- Thematic clustering in personal essays  
 
 ---
-
 
 ## Motivation
 
-College application essays present unique challenges for retrieval systems:
-- They are long-form, reflective narratives.
-- Themes are often implicit rather than keyword-driven.
-- Emotional progression and growth arcs matter.
-- Prompt alignment is semantically nuanced.
-- Traditional keyword-based retrieval (e.g., BM25) struggles to capture narrative similarity and thematic resonance.
+College application essays present unique challenges for traditional retrieval systems:
 
-This project explores whether dense vector representations can provide a more semantically meaningful retrieval mechanism for long-form essays.
+- Long-form, highly personal narratives  
+- Themes are implicit rather than keyword-based  
+- Emotional arcs and storytelling structure matter  
+- Prompt alignment is semantically subtle 
 
+❌ Traditional methods (e.g., BM25) struggle  
+✅ Dense embeddings enable deeper semantic understanding 
 
-1.  **Data Sources**: Heterogeneous collection from Google Drive and public web crawlers.
-2.  **Ingestion & Normalization**: Standardizing raw text into a unified JSONL schema with deterministic state tracking.
-3.  **Embedding**: Generating 1536-dimensional vectors using `text-embedding-3-small`.
-4.  **Vector Store**: Memory-efficient streaming storage for high-dimensional vectors.
-5.  **Retrieval Engine**: Optimized matrix-based similarity computation.
+**Goal:** 
+Explore whether vector-based retrieval can better capture **meaning, structure, and storytelling quality**.
 
 ---
-
 
 ## Architecture
 <p align="center">
@@ -126,18 +122,51 @@ $$\text{cosine}(q, d) = q \cdot d $$
 ---
 
 
-### Prerequisites
+### Getting Started
+Prerequisites
 - Python 3.10+
+- Node.js (for frontend)
 
+Backend Setup
+```bash
+cd BackEnd
+python -m venv .venv
+source .venv/bin/activate   # Mac/Linux
+# or
+.venv\Scripts\activate      # Windows
+
+pip install -r requirements.txt
+
+uvicorn app.main:app --reload
+```
+
+Fronted Setup
+```bash
+cd frontend
+npm install
+npm run dev
+```
 --- 
 
 
-### Instructions
-```bash
+### Tech Stack
+**Backend**
+- FastAPI
+- NumPy
+- OpenAI API (Embeddings)
+- JSONL-based storage
 
-in progress..
+**Frontend**
+- React
+- TypeScript
 
-```
+**Infrastructure**
+- AWS EC2 (deployment)
+
+**Dataset**
+- 200+ real accepted essays
+- Multiple schools
+- Personal statements, UC essays, and supplments
 
 ## Contributors:
 **Backend**

@@ -13,8 +13,8 @@ const ESSAY_TYPES = [
     bg: "linear-gradient(135deg, #81d4fa, #4dd0c4)",
   },
   {
-    value: "personal statement",
-    label: "personal statement",
+    value: "Personal Statement",
+    label: "Personal Statement",
     icon: personalIcon,
     bg: "linear-gradient(135deg, #d7b4f3, #f4a8c7)",
   },

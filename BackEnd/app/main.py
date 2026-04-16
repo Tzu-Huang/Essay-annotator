@@ -189,14 +189,13 @@ def search(req: Search, request: Request):
 # ===========================
 class CompareRequest(BaseModel):
     user_input: str
-    essay_id: str
 
 # req: automatically change to the right format for backend
-@app.post("/compare")
-def compare_api(req: CompareRequest):
+@app.post("/compare/{essay_id}")
+def compare_api(essay_id: str, req: CompareRequest):
     # Load essays from app.state
     data = app.state.data
-    essay = data.essays.get(req.essay_id)
+    essay = data.essays.get(essay_id)
     
     # Error handling
     if not essay:

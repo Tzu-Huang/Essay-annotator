@@ -38,7 +38,6 @@ async def lifespan(app: FastAPI):
         schools = [essays[pid].get("school", "Unknown") if pid in essays else "none" for pid in parent]
         
         data.essays = essays
-        data.database_essays = database_essays
         data.ids = ids
         data.parent = parent
         data.previews = previews
@@ -129,7 +128,7 @@ def get_essay(
     include_content: bool = Query(default=False),
 ):
     data = app.state.data
-    essay = data.database_essays.get(essay_id)
+    essay = data.essays.get(essay_id)
 
     if not essay:
         raise HTTPException(status_code=404, detail="Essay not found")
@@ -137,7 +136,7 @@ def get_essay(
     if fields is None:
         selected = set(DEFAULT_FIELDS)
         if include_content:
-                selected.add("content")
+            selected.add("content")
     else:
         selected = {f.strip() for f in fields.split(",") if f.strip()}
         unknown = selected - ALLOWED_FIELDS
@@ -150,6 +149,7 @@ def get_essay(
     for k in selected:
         result[k] = essay.get(k)
 
+    # originally this get "id" will get the chunked id ? 
     result["id"] = essay.get("id", essay_id)
     return result
 

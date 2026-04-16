@@ -33,7 +33,7 @@ const ESSAY_TYPES = [
 ];
 
 const TYPE_STYLES = {
-  "personal statement": {
+  "Personal Statement": {
     //accentGradient: "linear-gradient(180deg, #efd6e9 0%, #f4a8c7 100%)",
     accentGradient: "linear-gradient(180deg, #6366f1 0%, #38bdf8 100%)",
     badgeBg: "#f8e4f3",
@@ -67,7 +67,7 @@ const RANK_STYLES = {
   5: { bg: "#b6a9f0", text: "#6d28d9" }, // 5th
 };
 
-const NON_ALL_TYPES = ["personal statement", "University of California", "Supplemental"];
+const NON_ALL_TYPES = ["Personal Statement", "University of California", "Supplemental"];
 
 
 function getSimilarityInfo(similarity) {

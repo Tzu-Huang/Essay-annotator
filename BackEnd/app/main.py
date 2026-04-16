@@ -31,8 +31,7 @@ async def lifespan(app: FastAPI):
     )
     
     try:
-        essays = {}
-        database_essays = load_essays(DB_JSONL)
+        essays = load_essays(DB_JSONL)
 
         ids, parent, previews, topic_texts, topic_V, content_V = load_db_embeddings(EMBED_JSONL)
         types = [essays[pid]["type"] if pid in essays else "unknown" for pid in parent]
@@ -201,6 +200,7 @@ def compare_api(essay_id: str, req: CompareRequest):
         raise HTTPException(status_code=500, detail="Server essays data not initialized")
 
     essay = data.essays.get(essay_id)
+    print(essay)
     if not essay:
         raise HTTPException(status_code=404, detail="Essay not found")
     

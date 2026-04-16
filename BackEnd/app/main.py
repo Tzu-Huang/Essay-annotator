@@ -195,9 +195,12 @@ class CompareRequest(BaseModel):
 def compare_api(essay_id: str, req: CompareRequest):
     # Load essays from app.state
     data = app.state.data
-    essay = data.essays.get(essay_id)
     
     # Error handling
+    if not hasattr(data, "essays"):
+        raise HTTPException(status_code=500, detail="Server essays data not initialized")
+
+    essay = data.essays.get(essay_id)
     if not essay:
         raise HTTPException(status_code=404, detail="Essay not found")
     

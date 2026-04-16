@@ -148,7 +148,6 @@ npm run dev
 ```
 --- 
 
-
 ### Tech Stack
 **Backend**
 - FastAPI

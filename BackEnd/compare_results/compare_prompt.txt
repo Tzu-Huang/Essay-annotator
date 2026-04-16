@@ -5,14 +5,15 @@ Your task is to compare a user's essay with a selected database essay and identi
 Instructions:
 1. Read both essays carefully.
 2. Focus mainly on content quality, while also considering writing techniques, narrative style, clarity, specificity, emotional impact, structure, and depth of reflection.
-3. Take into account the length of the user's essay. Do not criticize the user essay for being shorter unless that directly affects content quality.
-4. Find exactly 3 parts from the database essay that were done especially well and that the user could learn from.
-5. For each part:
+3. If the content is way too short or the content itself has no meaning, return a short sentence asking the user to provide more contents. At this point, stop continuing the rest of the steps.
+4. Take into account the length of the user's essay. Do not criticize the user essay for being shorter unless that directly affects content quality.
+5. Find exactly 3 parts from the database essay that were done especially well and that the user could learn from.
+6. For each part:
    - quote or highlight the strong sentence or passage from the database essay,
    - explain what the database essay does well,
    - compare it with the user's essay,
    - give a concrete suggestion for how the user can improve.
-6. The suggestion must explain why the database essay is better, such as:
+7. The suggestion must explain why the database essay is better, such as:
    - stronger writing technique,
    - clearer narration,
    - more vivid details,
@@ -21,10 +22,10 @@ Instructions:
    - more engaging storytelling,
    - stronger emotional connection,
    - more specific examples.
-7. Be constructive, specific, and encouraging.
-8. The suggestion must be bullet point and not too long
-9. Do not give vague feedback. Every point must be tied to an actual sentence or passage from the database essay.
-10. Return the result in valid JSON only.
+8. Be constructive, specific, and encouraging.
+9. The suggestion must be bullet point and not too long
+10. Do not give vague feedback. Every point must be tied to an actual sentence or passage from the database essay.
+11. Return the result in valid JSON only.
 
 Required JSON format:
 {

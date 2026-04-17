@@ -1,39 +1,244 @@
-/* =========================================
-   🏠 Home
-   ========================================= */
+/* =========================
+   GLOBAL BACKGROUND（重點🔥）
+   ========================= */
+
+body {
+  margin: 0;
+  font-family: sans-serif;
+
+  background-image: url("/world.png"); /* 👉 換你的圖片 */
+  background-size: cover;
+  background-position: center;
+
+  /* 🔥 關鍵：背景固定 */
+  background-attachment: fixed;
+
+  background-repeat: no-repeat;
+}
+
+/* 🔥 白色霧化（讓文字清楚，像設計稿） */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+
+  background: rgba(255, 255, 255, 0.85);
+
+  pointer-events: none;
+  z-index: -1;
+}
+
+/* =========================
+   PAGE STRUCTURE
+   ========================= */
 
 .home {
+  width: 100%;
+  overflow-x: hidden;
+}
+
+/* HERO */
+
+.hero {
   text-align: center;
-  padding-top: 120px;
+  padding: 120px 20px 80px;
 }
 
 .hero h1 {
   font-size: 42px;
-  max-width: 700px;
+  max-width: 800px;
   margin: auto;
   line-height: 1.3;
 }
 
+.hero span {
+  color: #4f46e5;
+}
+
 .hero p {
   margin-top: 20px;
-  font-size: 18px;
   color: #666;
+}
+
+/* BUTTON */
+
+.primary-btn {
+  margin-top: 30px;
+  padding: 12px 24px;
+  font-size: 16px;
+  border: none;
+  border-radius: 8px;
+  background: #4f46e5;
+  color: white;
+  cursor: pointer;
+}
+
+/* BADGES */
+
+.hero-badges {
+  margin-top: 30px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 15px;
+}
+
+.hero-badges div {
+  background: #f3f4f6;
+  padding: 10px 16px;
+  border-radius: 8px;
+  font-size: 14px;
+}
+
+/* =========================
+   EXAMPLE
+   ========================= */
+
+.example-section {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 30px;
+  padding: 60px 20px;
+}
+
+.example-box {
+  width: 320px;
+  background: white;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+}
+
+.placeholder {
+  background: #e5e7eb;
+  border-radius: 8px;
+  margin-top: 10px;
+}
+
+.placeholder.large {
+  height: 200px;
+}
+
+.arrow {
+  font-size: 24px;
+  color: #999;
+}
+
+/* =========================
+   HOW IT WORKS
+   ========================= */
+
+.how-it-works {
+  text-align: center;
+  padding: 80px 20px;
 }
 
 .steps {
   display: flex;
   justify-content: center;
-  gap: 60px;
+  gap: 40px;
   margin-top: 40px;
 }
 
 .step {
-  width: 180px;
+  width: 200px;
   padding: 20px;
-
-  border-radius: 10px;
   background: white;
+  border-radius: 10px;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.05);
+}
 
-  box-shadow:
-    0 6px 20px rgba(0,0,0,0.05);
+/* =========================
+   FEATURED
+   ========================= */
+
+.featured {
+  text-align: center;
+  padding: 80px 20px;
+}
+
+.cards {
+  display: flex;
+  justify-content: center;
+  gap: 30px;
+  margin-top: 40px;
+}
+
+.card {
+  width: 240px;
+  padding: 20px;
+  border-radius: 12px;
+  background: white;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.05);
+  text-align: left;
+}
+
+.card h4 {
+  margin: 0;
+}
+
+.card p {
+  font-weight: bold;
+  margin: 10px 0;
+}
+
+.card span {
+  font-size: 14px;
+  color: #666;
+}
+
+.link-btn {
+  margin-top: 15px;
+  background: none;
+  border: none;
+  color: #4f46e5;
+  cursor: pointer;
+}
+
+/* =========================
+   COMPARISON（最下面那塊🔥）
+   ========================= */
+
+.comparison {
+  text-align: center;
+  padding: 80px 20px 120px;
+}
+
+.compare-box {
+  display: flex;
+  justify-content: center;
+  gap: 30px;
+  margin-top: 40px;
+}
+
+.bad, .good {
+  width: 300px;
+  padding: 25px;
+  border-radius: 12px;
+  text-align: left;
+}
+
+/* 紅色 */
+.bad {
+  background: #fee2e2;
+}
+
+/* 綠色 */
+.good {
+  background: #dcfce7;
+}
+
+.bad h3, .good h3 {
+  margin-top: 0;
+}
+
+.bad ul, .good ul {
+  margin-top: 15px;
+  padding-left: 20px;
+}
+
+.bad li, .good li {
+  margin-bottom: 8px;
+  font-size: 14px;
 }

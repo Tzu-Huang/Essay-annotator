@@ -52,7 +52,7 @@ def run_search(req, app_state):
         top_k=topK,
         parent_ids =app_state.parent
     )
-
+    print("essay_types:", essay_types, type(essay_types))
     results = build_results(indices, scores, app_state)
     
     # essay_types filter 

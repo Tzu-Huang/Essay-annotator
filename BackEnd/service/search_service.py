@@ -32,6 +32,9 @@ def run_search(req, app_state):
         status_code=400,
         detail="Need topic or content",
     )
+
+    if essay_types == "":
+        print("no essay type found")
     
     # dimension
     dim = app_state.topic_V.shape[1] # Both topic and content can use this dim because they are from the same model

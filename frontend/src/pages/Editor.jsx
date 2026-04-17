@@ -173,6 +173,11 @@ function Editor() {
     setIsLoading(true);
 
     try {
+      console.log(
+        "essay_types being sent:",
+        essayTypes.includes("all") ? ["all"] : essayTypes
+      );
+
       const response = await fetch("http://44.201.62.0:8000/search", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -185,6 +190,8 @@ function Editor() {
       });
 
       const data = await response.json();
+      console.log("search response:", data);
+      console.log("types received:", data.map((item) => item.type));
       setResults(data);
     } catch (error) {
       console.error("ERROR:", error);

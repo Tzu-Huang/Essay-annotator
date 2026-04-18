@@ -1,29 +1,22 @@
 /* =========================
-   GLOBAL BACKGROUND（重點🔥）
+   GLOBAL BACKGROUND
    ========================= */
 
 body {
   margin: 0;
   font-family: sans-serif;
-
-  background-image: url("/world.png"); /* 👉 換你的圖片 */
+  background-image: url("/world.png");
   background-size: cover;
   background-position: center;
-
-  /* 🔥 關鍵：背景固定 */
   background-attachment: fixed;
-
   background-repeat: no-repeat;
 }
 
-/* 🔥 白色霧化（讓文字清楚，像設計稿） */
 body::before {
   content: "";
   position: fixed;
   inset: 0;
-
   background: rgba(255, 255, 255, 0.85);
-
   pointer-events: none;
   z-index: -1;
 }
@@ -37,11 +30,13 @@ body::before {
   overflow-x: hidden;
 }
 
-/* HERO */
+/* =========================
+   HERO
+   ========================= */
 
 .hero {
   text-align: center;
-  padding: 120px 20px 80px;
+  padding: 110px 20px 56px;
 }
 
 .hero h1 {
@@ -60,7 +55,9 @@ body::before {
   color: #666;
 }
 
-/* BUTTON */
+/* =========================
+   BUTTON
+   ========================= */
 
 .primary-btn {
   margin-top: 30px;
@@ -73,7 +70,9 @@ body::before {
   cursor: pointer;
 }
 
-/* BADGES */
+/* =========================
+   BADGES
+   ========================= */
 
 .hero-badges {
   margin-top: 30px;
@@ -99,7 +98,7 @@ body::before {
   justify-content: center;
   align-items: center;
   gap: 30px;
-  padding: 60px 20px;
+  padding: 42px 20px 28px;
 }
 
 .example-box {
@@ -107,7 +106,7 @@ body::before {
   background: white;
   padding: 20px;
   border-radius: 12px;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
 }
 
 .placeholder {
@@ -131,14 +130,14 @@ body::before {
 
 .how-it-works {
   text-align: center;
-  padding: 80px 20px;
+  padding: 34px 20px 56px;
 }
 
 .steps {
   display: flex;
   justify-content: center;
   gap: 40px;
-  margin-top: 40px;
+  margin-top: 32px;
 }
 
 .step {
@@ -146,99 +145,356 @@ body::before {
   padding: 20px;
   background: white;
   border-radius: 10px;
-  box-shadow: 0 6px 20px rgba(0,0,0,0.05);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.05);
 }
 
 /* =========================
-   FEATURED
+   FEATURED SCROLLING BANNER
    ========================= */
 
-.featured {
+.featured-scroll {
   text-align: center;
-  padding: 80px 20px;
+  padding: 56px 0;
+  overflow: hidden;
 }
 
-.cards {
-  display: flex;
-  justify-content: center;
-  gap: 30px;
-  margin-top: 40px;
+.featured-scroll h2 {
+  margin-bottom: 0;
 }
 
-.card {
-  width: 240px;
-  padding: 20px;
-  border-radius: 12px;
-  background: white;
-  box-shadow: 0 6px 20px rgba(0,0,0,0.05);
-  text-align: left;
-}
-
-.card h4 {
-  margin: 0;
-}
-
-.card p {
-  font-weight: bold;
-  margin: 10px 0;
-}
-
-.card span {
-  font-size: 14px;
+.featured-subtitle {
   color: #666;
+  margin-top: 12px;
+  margin-bottom: 24px;
 }
 
-.link-btn {
-  margin-top: 15px;
-  background: none;
-  border: none;
+.scroll-wrapper {
+  width: 100%;
+  overflow: hidden;
+  position: relative;
+  padding: 6px 0;
+}
+
+.scroll-track {
+  display: flex;
+  width: max-content;
+  animation: scroll-left 60s linear infinite;
+  padding: 10px 0;
+}
+
+.scroll-track:hover {
+  animation-play-state: paused;
+}
+
+.scroll-card {
+  position: relative;
+  flex: 0 0 auto;
+  width: 260px;
+  min-height: 220px;
+  padding: 22px 20px 20px;
+  border-radius: 18px;
+  background: white;
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.07);
+  text-align: left;
+  text-decoration: none;
+  color: inherit;
+  transition: transform 0.22s ease, box-shadow 0.22s ease;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  margin-right: 24px;
+}
+
+.scroll-card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 6px;
+  width: 100%;
+  background: #4f46e5;
+}
+
+.scroll-card::after {
+  content: "";
+  position: absolute;
+  right: -30px;
+  top: -30px;
+  width: 110px;
+  height: 110px;
+  border-radius: 50%;
+  background: rgba(79, 70, 229, 0.08);
+  pointer-events: none;
+}
+
+.scroll-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 16px 34px rgba(0, 0, 0, 0.12);
+}
+
+.card-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 6px;
+  position: relative;
+  z-index: 1;
+}
+
+.school-logo {
+  width: 34px;
+  height: 34px;
+  object-fit: contain;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.92);
+  padding: 4px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  flex-shrink: 0;
+}
+
+.scroll-card h4 {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.2px;
+  color: #5b6475;
+  text-transform: uppercase;
+  position: relative;
+  z-index: 1;
+}
+
+.scroll-card p {
+  margin: 12px 0 10px;
+  font-weight: 700;
+  font-size: 18px;
+  line-height: 1.35;
+  color: #111827;
+  position: relative;
+  z-index: 1;
+}
+
+.scroll-card span {
+  display: block;
+  font-size: 14px;
+  color: #5f6675;
+  line-height: 1.6;
+  min-height: 72px;
+  position: relative;
+  z-index: 1;
+}
+
+.scroll-link {
+  margin-top: 18px;
   color: #4f46e5;
-  cursor: pointer;
+  font-size: 14px;
+  font-weight: 700;
+  position: relative;
+  z-index: 1;
+}
+
+/* Harvard */
+.scroll-card:nth-child(10n + 1) {
+  background: linear-gradient(to bottom, #fff7f7, #ffffff);
+}
+.scroll-card:nth-child(10n + 1)::before {
+  background: #a51c30;
+}
+.scroll-card:nth-child(10n + 1)::after {
+  background: rgba(165, 28, 48, 0.08);
+}
+.scroll-card:nth-child(10n + 1) .scroll-link {
+  color: #a51c30;
+}
+
+/* Stanford */
+.scroll-card:nth-child(10n + 2) {
+  background: linear-gradient(to bottom, #fff8f8, #ffffff);
+}
+.scroll-card:nth-child(10n + 2)::before {
+  background: #8c1515;
+}
+.scroll-card:nth-child(10n + 2)::after {
+  background: rgba(140, 21, 21, 0.08);
+}
+.scroll-card:nth-child(10n + 2) .scroll-link {
+  color: #8c1515;
+}
+
+/* Columbia */
+.scroll-card:nth-child(10n + 3) {
+  background: linear-gradient(to bottom, #f5fbff, #ffffff);
+}
+.scroll-card:nth-child(10n + 3)::before {
+  background: #6cadde;
+}
+.scroll-card:nth-child(10n + 3)::after {
+  background: rgba(108, 173, 222, 0.11);
+}
+.scroll-card:nth-child(10n + 3) .scroll-link {
+  color: #2d6ea3;
+}
+
+/* UPenn */
+.scroll-card:nth-child(10n + 4) {
+  background: linear-gradient(to bottom, #f5f8ff, #ffffff);
+}
+.scroll-card:nth-child(10n + 4)::before {
+  background: #011f5b;
+}
+.scroll-card:nth-child(10n + 4)::after {
+  background: rgba(1, 31, 91, 0.08);
+}
+.scroll-card:nth-child(10n + 4) .scroll-link {
+  color: #011f5b;
+}
+
+/* Johns Hopkins */
+.scroll-card:nth-child(10n + 5),
+.scroll-card:nth-child(10n + 6),
+.scroll-card:nth-child(10n + 7) {
+  background: linear-gradient(to bottom, #f4f8ff, #ffffff);
+}
+.scroll-card:nth-child(10n + 5)::before,
+.scroll-card:nth-child(10n + 6)::before,
+.scroll-card:nth-child(10n + 7)::before {
+  background: #002d72;
+}
+.scroll-card:nth-child(10n + 5)::after,
+.scroll-card:nth-child(10n + 6)::after,
+.scroll-card:nth-child(10n + 7)::after {
+  background: rgba(0, 45, 114, 0.08);
+}
+.scroll-card:nth-child(10n + 5) .scroll-link,
+.scroll-card:nth-child(10n + 6) .scroll-link,
+.scroll-card:nth-child(10n + 7) .scroll-link {
+  color: #002d72;
+}
+
+/* Ivy League */
+.scroll-card:nth-child(10n + 8),
+.scroll-card:nth-child(10n + 9),
+.scroll-card:nth-child(10n + 10) {
+  background: linear-gradient(to bottom, #f5fbf7, #ffffff);
+}
+.scroll-card:nth-child(10n + 8)::before,
+.scroll-card:nth-child(10n + 9)::before,
+.scroll-card:nth-child(10n + 10)::before {
+  background: #1f4d3a;
+}
+.scroll-card:nth-child(10n + 8)::after,
+.scroll-card:nth-child(10n + 9)::after,
+.scroll-card:nth-child(10n + 10)::after {
+  background: rgba(31, 77, 58, 0.08);
+}
+.scroll-card:nth-child(10n + 8) .scroll-link,
+.scroll-card:nth-child(10n + 9) .scroll-link,
+.scroll-card:nth-child(10n + 10) .scroll-link {
+  color: #1f4d3a;
+}
+
+@keyframes scroll-left {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
 }
 
 /* =========================
-   COMPARISON（最下面那塊🔥）
+   COMPARISON
    ========================= */
 
 .comparison {
   text-align: center;
-  padding: 80px 20px 120px;
+  padding: 56px 20px 88px;
 }
 
 .compare-box {
   display: flex;
   justify-content: center;
   gap: 30px;
-  margin-top: 40px;
+  margin-top: 28px;
 }
 
-.bad, .good {
+.bad,
+.good {
   width: 300px;
   padding: 25px;
   border-radius: 12px;
   text-align: left;
 }
 
-/* 紅色 */
 .bad {
   background: #fee2e2;
 }
 
-/* 綠色 */
 .good {
   background: #dcfce7;
 }
 
-.bad h3, .good h3 {
+.bad h3,
+.good h3 {
   margin-top: 0;
 }
 
-.bad ul, .good ul {
+.bad ul,
+.good ul {
   margin-top: 15px;
   padding-left: 20px;
 }
 
-.bad li, .good li {
+.bad li,
+.good li {
   margin-bottom: 8px;
   font-size: 14px;
+}
+
+/* =========================
+   RESPONSIVE
+   ========================= */
+
+@media (max-width: 900px) {
+  .example-section {
+    flex-direction: column;
+  }
+
+  .steps {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .compare-box {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .hero h1 {
+    font-size: 34px;
+  }
+}
+
+@media (max-width: 600px) {
+  .hero {
+    padding: 92px 16px 54px;
+  }
+
+  .hero h1 {
+    font-size: 28px;
+  }
+
+  .example-box {
+    width: 100%;
+    max-width: 320px;
+  }
+
+  .scroll-card {
+    width: 220px;
+    min-height: 230px;
+  }
+
+  .bad,
+  .good {
+    width: 100%;
+    max-width: 320px;
+  }
 }

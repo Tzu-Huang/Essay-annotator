@@ -131,6 +131,7 @@ function Editor() {
   const [essayTypes, setEssayTypes] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [modalMessage, setModalMessage] = useState("");
+  const [emptyStateMessage, setEmptyStateMessage] = useState("");
   const total = 5;
 
   const toggleEssayType = (value) => {
@@ -171,6 +172,7 @@ function Editor() {
     }
 
     setIsLoading(true);
+    setEmptyStateMessage("");
 
     try {
       console.log(
@@ -190,12 +192,35 @@ function Editor() {
       });
 
       const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data?.detail || "Search failed");
+      }
+
       console.log("search response:", data);
-      console.log("types received:", data.map((item) => item.type));
+      console.log("types received:", Array.isArray(data) ? data.map((item) => item.type) : []);
+
+      if (!Array.isArray(data) || data.length === 0) {
+        setResults([]);
+        setEmptyStateMessage(
+          "No matching essays found. Please try a different topic, add more draft details, or choose broader essay types."
+        );
+        setModalMessage(
+          "We couldn’t find a match for that input. Please try another topic or add a bit more detail to your draft."
+        );
+        return;
+      }
+
       setResults(data);
     } catch (error) {
       console.error("ERROR:", error);
-      setResults([{ topic: "Error", content_preview: "Failed to fetch" }]);
+      setResults([]);
+      setEmptyStateMessage(
+        "Search couldn’t be completed. Please revise your input and try again."
+      );
+      setModalMessage(
+        error.message || "Search failed. Please try another topic or draft."
+      );
     } finally {
       setIsLoading(false);
     }
@@ -207,6 +232,7 @@ function Editor() {
     setEssayTypes([]);
     setTopK(3);
     setResults([]);
+    setEmptyStateMessage("");
   };
 
   return (
@@ -333,6 +359,13 @@ function Editor() {
             </div>
 
             <div className="output-scroll">
+              {emptyStateMessage && (
+                <div className="empty-state-box">
+                  <p className="empty-state-title">No results yet</p>
+                  <p className="empty-state-text">{emptyStateMessage}</p>
+                </div>
+              )}
+
               {Array.from({ length: topK }).map((_, i) => {
                 const resultType = results[i]?.type;
                 const typeStyle = TYPE_STYLES[resultType] || DEFAULT_RESULT_STYLE;

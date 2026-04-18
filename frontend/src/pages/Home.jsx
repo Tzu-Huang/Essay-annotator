@@ -2,9 +2,29 @@ import { Link } from "react-router-dom";
 import "../styles/home.css";
 
 function Home() {
+  const featuredEssays = [
+    {
+      id: 101,
+      school: "Harvard",
+      title: "Personal Growth",
+      description: "Strong narrative arc and emotional depth",
+    },
+    {
+      id: 102,
+      school: "MIT",
+      title: "Passion for Research",
+      description: "Clear intellectual curiosity and impact",
+    },
+    {
+      id: 103,
+      school: "Stanford",
+      title: "Unique Perspective",
+      description: "Distinct voice and personal storytelling",
+    },
+  ];
+
   return (
     <div className="home">
-
       {/* HERO */}
       <section className="hero">
         <h1>
@@ -71,26 +91,17 @@ function Home() {
         <h2>Featured Accepted Essays</h2>
 
         <div className="cards">
-          <div className="card">
-            <h4>Harvard</h4>
-            <p>Personal Growth</p>
-            <span>Strong narrative arc and emotional depth</span>
-            <button className="link-btn">View Analysis →</button>
-          </div>
+          {featuredEssays.map((essay) => (
+            <div className="card" key={essay.id}>
+              <h4>{essay.school}</h4>
+              <p>{essay.title}</p>
+              <span>{essay.description}</span>
 
-          <div className="card">
-            <h4>MIT</h4>
-            <p>Passion for Research</p>
-            <span>Clear intellectual curiosity and impact</span>
-            <button className="link-btn">View Analysis →</button>
-          </div>
-
-          <div className="card">
-            <h4>Stanford</h4>
-            <p>Unique Perspective</p>
-            <span>Distinct voice and personal storytelling</span>
-            <button className="link-btn">View Analysis →</button>
-          </div>
+              <Link to={`/example/${essay.id}`}>
+                <button className="link-btn">View Analysis →</button>
+              </Link>
+            </div>
+          ))}
         </div>
       </section>
 
@@ -121,7 +132,6 @@ function Home() {
           </div>
         </div>
       </section>
-
     </div>
   );
 }

@@ -229,7 +229,9 @@ function Editor() {
             <h3>Draft Workspace</h3>
 
             <div className="essay-type-inline">
-              <div className="essay-type-inline-label">Essay Type</div>
+              <div className="essay-type-inline-label">
+                Essay Type <span className="required">*</span>
+              </div>
 
               <div className="essay-type-inline-grid">
                 {ESSAY_TYPES.map((type) => {

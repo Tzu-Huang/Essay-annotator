@@ -85,6 +85,13 @@ body {
   margin-top: 0;
 }
 
+.required {
+  color: #ef4444;
+  margin-left: 1px;
+  font-weight: 700;
+  font-size: 1.2em;
+}
+
 /* Generate 按鈕 - 已更新顏色與選擇器權重 */
 .input-panel .btn-row .primary-btn {
   margin-top: 0; 

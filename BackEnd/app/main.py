@@ -211,6 +211,9 @@ def compare_api(essay_id: str, req: CompareRequest):
     try:
         # Call the actual function that do the actual comparison
         result = compare(user_essay=req.user_input, sample_essay=essay_text)
+        # result.append({
+        #     "similarity":
+        # })
         return result
     except Exception as e:
         print(e)

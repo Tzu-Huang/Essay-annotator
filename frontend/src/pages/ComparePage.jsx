@@ -4,37 +4,67 @@ import "../styles/compare.css";
 
 function ComparePage() {
   const { id } = useParams();
+
+  // =========================
+  // Core state
+  // =========================
   const [userDraft, setUserDraft] = useState("");
   const [essay, setEssay] = useState(null);
+
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+
+  // =========================
+  // Compare state
+  // =========================
   const [compareResult, setCompareResult] = useState(null);
   const [compareLoading, setCompareLoading] = useState(false);
   const [compareError, setCompareError] = useState("");
+
+  // =========================
+  // Interaction state (UI highlight logic)
+  // =========================
   const [hoveredPoint, setHoveredPoint] = useState(null);
   const [selectedPoint, setSelectedPoint] = useState(null);
 
+  // =========================
+  // Load user draft from localStorage
+  // =========================
   useEffect(() => {
     setUserDraft(localStorage.getItem("userDraft") || "");
   }, []);
 
+  // =========================
+  // Check if value is valid (should display)
+  // =========================
+  const isValid = (value) => {
+    if (!value) return false;
+
+    const v = value.toString().toLowerCase().trim();
+
+    return v !== "none" && v !== "unknown" && v !== "";
+  };
+  // =========================
+  // Fetch selected essay from backend
+  // =========================
   useEffect(() => {
     const fetchEssay = async () => {
       try {
-        setLoading(true)
-        setError("")
+        setLoading(true);
+        setError("");
 
         const response = await fetch(
           `http://44.201.62.0:8000/essays/${id}?include_content=true`
         );
+
         if (!response.ok) {
-          throw new Error(`Failed to fetch essay: ${response.status}`)
+          throw new Error(`Failed to fetch essay: ${response.status}`);
         }
 
         const data = await response.json();
-        // Store to state
-        setEssay(data);
 
+        // Store essay into state
+        setEssay(data);
       } catch (error) {
         console.error("ERROR:", error);
         setError(error.message || "Failed to load essay.");
@@ -44,21 +74,26 @@ function ComparePage() {
     };
 
     fetchEssay();
-  }, [id]); // When the id changes, reload the essay
+  }, [id]); // re-fetch when id changes
 
+  // =========================
+  // Call compare API
+  // =========================
   const runCompare = async () => {
-    if (!userDraft.trim()){
-        setCompareError("Your draft is empty.");
-        return;
+    // Prevent empty draft submission
+    if (!userDraft.trim()) {
+      setCompareError("Your draft is empty.");
+      return;
     }
 
-    try{
+    try {
       setCompareLoading(true);
       setCompareError("");
-      setCompareResult(null);
+
+      // Reset previous compare interaction state
       setHoveredPoint(null);
       setSelectedPoint(null);
-    
+
       const response = await fetch(`http://44.201.62.0:8000/compare/${id}`, {
         method: "POST",
         headers: {
@@ -78,36 +113,42 @@ function ComparePage() {
             : data?.detail?.error || "Compare failed"
         );
       }
-      
-      // Organize the data since backend might not return completely yet
+
+      // Normalize backend response (important: backend not stable yet)
       const normalized = {
         essay_id: data.essay_id,
+
+        // similarity may be 0.87 or 87
+        similarity: data.similarity ?? data.similarity_percentage ?? null,
+
         comparisons: (data.comparisons || []).map((item, index) => ({
           id: index + 1,
           highlighted_sentence: item.highlighted_sentence,
-
           comparison: item.comparison,
-
           suggestion: item.suggestion,
-          
-          // If matched_sentence haven't received yet
-          matched_sentence: item.matched_sentence || item.highlighted_sentence,
 
+          // fallback if backend missing field
+          matched_sentence: item.matched_sentence || item.highlighted_sentence,
           matched_paragraph: item.matched_paragraph || "",
 
           category: item.category || "Feedback",
 
+          // cycle through colors
           color: ["yellow", "green", "pink"][index % 3],
-          
-          // Highlighted part in user draft
+
+          // paragraph mapping
           userParagraphIndex: item.user_paragraph_index ?? index,
-          
-          // Highlighted part in selected essay
           exampleParagraphIndex: item.example_paragraph_index ?? index,
         })),
       };
 
       setCompareResult(normalized);
+
+      // Scroll back to top after running compare
+      window.scrollTo({
+        top: 0,
+        behavior: "smooth",
+      });
     } catch (error) {
       console.error("COMPARE ERROR:", error);
       setCompareError(error.message || "Compare failed.");
@@ -116,14 +157,17 @@ function ComparePage() {
     }
   };
 
-  // activePoint = which part in the screen should be highlighted
-  // Rules:
-  // 1. if been clicked, selectedPoint first
-  // 2. hover second
+  // =========================
+  // Active highlight logic
+  // Priority:
+  // 1. selected
+  // 2. hover
+  // =========================
   const activePoint = selectedPoint || hoveredPoint;
 
-  // Purpose: paragraph -> array
-  // Triggered only when userDraft is different
+  // =========================
+  // Convert text → paragraph array
+  // =========================
   const userParagraphs = useMemo(() => {
     return userDraft
       .split("\n")
@@ -138,31 +182,89 @@ function ComparePage() {
       .filter(Boolean);
   }, [essay]);
 
-  // helper function for user paragraph
-  // Find comparesult and feedback point
+  // =========================
+  // Find feedback for each paragraph
+  // =========================
   const getPointForParagraph = (index) => {
     return compareResult?.comparisons?.find(
       (item) => item.userParagraphIndex === index
     );
   };
-  
-  // Deactivate hover / selected
+
+  // =========================
+  // Reset view
+  // What it should do:
+  // 1. clear hover
+  // 2. clear selected popup
+  // 3. clear compare error
+  // 4. scroll back to top
+  // =========================
   const resetView = () => {
     setHoveredPoint(null);
     setSelectedPoint(null);
+    setCompareError("");
+    setCompareResult(null);
+
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth",
+    });
   };
+
+  // =========================
+  // Dynamic color for similarity
+  // =========================
+  const getSimilarityClass = (value) => {
+    if (value === null || value === undefined) return "chip-gray";
+
+    const percent =
+      Number(value) <= 1 ? Number(value) * 100 : Number(value);
+
+    if (percent >= 80) return "chip-green";
+    if (percent >= 50) return "chip-yellow";
+    return "chip-red";
+  };
+
+  // =========================
+  // Dynamic color for essay type
+  // =========================
+  const getTypeClass = (type) => {
+    if (!type) return "chip-gray";
+
+    const t = type.toLowerCase();
+
+    if (t.includes("personal")) return "chip-pink";
+    if (t.includes("supplement")) return "chip-yellow";
+
+    return "chip-uc";
+  };
+  // =========================
+  // Metadata (right panel cards / chips)
+  // =========================
+  const essaySchool = essay?.school || "Unknown School";
+  const essayType = essay?.type || "Unknown Type";
+
+  const similarityValue =
+    compareResult?.similarity ?? essay?.score ?? essay?.similarity ?? null;
+
+  const similarityText = similarityValue || "none";
 
   return (
     <div className="compare-page">
-      {/* Top area */}
+      {/* =========================
+         Header section
+         Note:
+         EA / navbar / search bar already comes from App.jsx,
+         so ComparePage only keeps its own local title + buttons
+         ========================= */}
       <div className="compare-header">
-        <div>
+        <div className="compare-header-left">
           <p className="compare-label">Essay Comparison</p>
           <h1>Compare With This Essay</h1>
           <p className="compare-subtitle">Current essay ID: {id}</p>
         </div>
 
-        {/* Right Corner */}
+        {/* Action buttons */}
         <div className="header-actions">
           <button className="secondary-btn" onClick={resetView}>
             Reset View
@@ -178,14 +280,20 @@ function ComparePage() {
         </div>
       </div>
 
-      {/* Error detector */}
+      {/* =========================
+         Error message
+         ========================= */}
       {(error || compareError) && (
         <div className="message error-message">{error || compareError}</div>
       )}
 
-      {/* Left and Right side */}
+      {/* =========================
+         Main layout (Left + Right)
+         ========================= */}
       <div className="compare-layout">
-        {/* Left：User Draft */}
+        {/* =========================
+           LEFT: User Draft
+           ========================= */}
         <section className="doc-shell">
           <div className="doc-paper">
             <div className="panel-meta">
@@ -198,12 +306,10 @@ function ComparePage() {
 
             <div className="doc-body">
               {userParagraphs.length ? (
-                // 把 user draft 每一段渲染出來
                 userParagraphs.map((paragraph, index) => {
-                  // Find whether there is feedback in this paragraph
                   const point = getPointForParagraph(index);
 
-                  // do regular expression if there is no point
+                  // No feedback → normal text
                   if (!point) {
                     return (
                       <p key={index} className="para">
@@ -212,7 +318,7 @@ function ComparePage() {
                     );
                   }
 
-                  // if feedback exists -> hover / click highlight
+                  // Feedback exists → interactive highlight
                   return (
                     <p key={index} className="para">
                       <span
@@ -221,12 +327,16 @@ function ComparePage() {
                         }`}
                         onMouseEnter={() => setHoveredPoint(point)}
                         onMouseLeave={() => setHoveredPoint(null)}
-                        onClick={() => setSelectedPoint(point)}
+                        onClick={() =>
+                          setSelectedPoint((prev) =>
+                            prev?.id === point.id ? null : point
+                          )
+                        }
                       >
                         {paragraph}
                       </span>
 
-                      {/* 右側小圓點，顯示這是第幾個 feedback */}
+                      {/* feedback number badge */}
                       <span className={`comment-tag ${point.color}`}>
                         {point.id}
                       </span>
@@ -238,25 +348,49 @@ function ComparePage() {
               )}
             </div>
 
-            {/* Hint */}
+            {/* Hint bar */}
             <div className="hintbar">
               {activePoint
-                ? `Point ${activePoint.id} selected. Hover preview and detail popup are active.`
-                : "Hover on a highlighted sentence to preview the matched paragraph on the right."}
+                ? `Point ${activePoint.id} selected.`
+                : "Hover to preview matching paragraph."}
             </div>
           </div>
         </section>
 
-        {/* Right：Selected Essay Example */}
+        {/* =========================
+           RIGHT: Database Essay
+           ========================= */}
         <section className="doc-shell">
           <div className="doc-paper">
-            <div className="panel-meta">
+            <div className="panel-meta panel-meta-right">
               <div>
                 <h2>Selected Essay Example</h2>
                 <p>This is the database essay used for comparison.</p>
+
+                {/* Small metadata chips */}
+                <div className="essay-meta-chips">
+                  {/* School */}
+                  {isValid(essaySchool) && (
+                    <div className="meta-chip chip-school">
+                      {essaySchool}
+                    </div>
+                  )}
+                  {/* Similarity（只要有數值就顯示） */}
+                  {similarityValue !== null && similarityValue !== undefined && (
+                    <div className={`meta-chip ${getSimilarityClass(similarityValue)}`}>
+                      {similarityText}
+                    </div>
+                  )}
+
+                  {/* Essay Type */}
+                  {isValid(essayType) && (
+                    <div className={`meta-chip ${getTypeClass(essayType)}`}>
+                      {essayType}
+                    </div>
+                  )}
+                </div>
               </div>
 
-              {/* Right corner: compare essay_id */}
               <div className="panel-state">
                 {compareResult?.essay_id
                   ? `essay_id: ${compareResult.essay_id}`
@@ -268,15 +402,14 @@ function ComparePage() {
               {loading ? (
                 <p>Loading...</p>
               ) : exampleParagraphs.length ? (
-                // 把右邊 essay 每一段渲染出來
                 exampleParagraphs.map((paragraph, index) => (
                   <p
                     key={index}
                     className={`para example-paragraph ${
-                      // 如果這一段剛好是 activePoint 對應的 example 段落，就加 active class
-                      activePoint?.exampleParagraphIndex === index ? "active" : ""
+                      activePoint?.exampleParagraphIndex === index
+                        ? "active"
+                        : ""
                     } ${
-                      // 同時也加上顏色 class
                       activePoint?.exampleParagraphIndex === index
                         ? activePoint.color
                         : ""
@@ -290,27 +423,23 @@ function ComparePage() {
               )}
             </div>
 
-            {/* Right buttom hint */}
             <div className="hintbar">
               {activePoint
-                ? `This paragraph is linked to feedback point ${activePoint.id}.`
-                : "No linked paragraph selected yet."}
+                ? `Linked to feedback ${activePoint.id}`
+                : "No paragraph selected"}
             </div>
           </div>
         </section>
       </div>
 
-      {/* popup: only when selectedPoint exists */}
+      {/* =========================
+         Popup detail view
+         ========================= */}
       {selectedPoint && (
-        // if click the background，close popup
         <div className="popup-backdrop" onClick={() => setSelectedPoint(null)}>
-          {/* stopPropagation()：avoid clicking popup triggers onClick */}
           <div className="popup-card" onClick={(e) => e.stopPropagation()}>
             <div className="popup-head">
-              <div>
-                <h3>{selectedPoint.category}</h3>
-                <p>Sentence-level comparison against the selected essay.</p>
-              </div>
+              <h3>{selectedPoint.category}</h3>
 
               <button
                 className="secondary-btn"
@@ -329,9 +458,9 @@ function ComparePage() {
               </div>
 
               <div className="detail-block">
-                <div className="detail-label">Matched database sentence</div>
+                <div className="detail-label">Matched sentence</div>
                 <div className="detail-quote">
-                  {selectedPoint.matched_sentence || "No matched sentence yet."}
+                  {selectedPoint.matched_sentence}
                 </div>
               </div>
 
@@ -353,7 +482,9 @@ function ComparePage() {
         </div>
       )}
 
-      {/* 下方 feedback cards 區：compare 成功後才顯示 */}
+      {/* =========================
+         Bottom feedback cards
+         ========================= */}
       {compareResult?.comparisons?.length > 0 && (
         <section className="result-section">
           <h2>Feedback Cards</h2>
@@ -367,7 +498,11 @@ function ComparePage() {
                 }`}
                 onMouseEnter={() => setHoveredPoint(item)}
                 onMouseLeave={() => setHoveredPoint(null)}
-                onClick={() => setSelectedPoint(item)}
+                onClick={() =>
+                  setSelectedPoint((prev) =>
+                    prev?.id === item.id ? null : item
+                  )
+                }
               >
                 <div className={`result-badge ${item.color}`}>
                   Point {item.id}

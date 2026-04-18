@@ -44,7 +44,7 @@ function App() {
             → 畫面出現*/}
           <Route path="/editor" element={<><Navbar /><Editor /></>} />
           <Route path="/essay/:id" element={<EssayPage />} />
-          <Route path="/compare/:id" element={<ComparePage />} />
+          <Route path="/compare/:id" element={<><Navbar /><ComparePage /></>} />
           <Route path="/example/:id" element={<ExampleEssayPage />} />
         </Routes>
 

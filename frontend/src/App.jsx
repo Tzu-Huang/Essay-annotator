@@ -22,7 +22,7 @@ import "./styles/global.css";
 import "./styles/components.css";
 import "./styles/navbar.css";
 import "./styles/background.css";
-
+import ExampleEssayPage from "./pages/ExampleEssayPage";
 
 function App() {
 
@@ -45,6 +45,7 @@ function App() {
           <Route path="/editor" element={<><Navbar /><Editor /></>} />
           <Route path="/essay/:id" element={<EssayPage />} />
           <Route path="/compare/:id" element={<ComparePage />} />
+          <Route path="/example/:id" element={<ExampleEssayPage />} />
         </Routes>
 
       </div>

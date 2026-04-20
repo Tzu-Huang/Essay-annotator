@@ -11,13 +11,16 @@ from google_auth_oauthlib.flow import InstalledAppFlow
 from google.oauth2.credentials import Credentials
 from google.auth.transport.requests import Request
 
-SCOPES = ["https://www.googleapis.com/auth/drive.readonly"]
-CLIENT_SECRET_FILE = "client_secret.json"
-TOKEN_FILE = "token.json"
+SCRIPT_DIR = Path(__file__).resolve().parent
+BACKEND_DIR = SCRIPT_DIR.parent
+
+SCOPES = ["https://www.googleapis.com/auth/drive"]
+CLIENT_SECRET_FILE = BACKEND_DIR / "client_secret.json"
+TOKEN_FILE = BACKEND_DIR / "token.json"
 
 def get_creds():
     creds = None
-    if os.path.exists(TOKEN_FILE):
+    if TOKEN_FILE.exists():
         creds = Credentials.from_authorized_user_file(TOKEN_FILE, SCOPES)
 
     if not creds or not creds.valid:
@@ -62,20 +65,23 @@ def sync_folder(service, folder_id, out_dir: Path):
             download_file(service, file_id, out_path)
             print(f"Downloaded: {out_path}")
 
+
+def run_sync(folder_id: str, out_dir: str | Path) -> None:
+    creds = get_creds()
+    service = build("drive", "v3", credentials=creds)
+
+    out_dir = Path(out_dir)
+    out_dir.mkdir(parents=True, exist_ok=True)
+
+    sync_folder(service, folder_id, out_dir)
+    print("✅ Sync complete.")
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--folder_id", required=True, help="Google Drive folder ID to sync")
     parser.add_argument("--out", default="backend/data", help="Local output directory")
     args = parser.parse_args()
-
-    creds = get_creds()
-    service = build("drive", "v3", credentials=creds)
-
-    out_dir = Path(args.out)
-    out_dir.mkdir(parents=True, exist_ok=True)
-
-    sync_folder(service, args.folder_id, out_dir)
-    print("✅ Sync complete.")
+    run_sync(args.folder_id, args.out)
 
 if __name__ == "__main__":
     main()

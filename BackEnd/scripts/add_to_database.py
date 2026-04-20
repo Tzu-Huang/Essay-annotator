@@ -9,6 +9,7 @@ It saves runtime while handling id order issues and uncategorized new input data
 
 import json
 import re
+import shutil
 from itertools import count
 from pathlib import Path
 
@@ -19,6 +20,7 @@ script_dir = Path(__file__).parent
 ONLINE_INPUT_DIR = script_dir / "../drive_data/essays_jsonl/online_essays"
 COLLECTED_JSONL = script_dir / "../drive_data/essays_jsonl/collected_essays.jsonl"
 NEW_INPUT_DIR = script_dir / "../drive_data/organized_data/new_input"
+PROCESSED_INPUT_DIR = NEW_INPUT_DIR / "processed"
 DATABASE_PATH = script_dir / "../drive_data/finalized_data_jsonl/database.jsonl"
 
 
@@ -78,17 +80,70 @@ def load_collected_essays(id_counter: count) -> list[dict]:
     print(f"  Loaded {len(essays)} essays from collected_essays.jsonl\n")
     return essays
 
+# =========================
+# Make essay signature
+# =========================
+'''
+We're doing this so that it can ensure that there are no duplicate essays 
+in the database. 
+'''
 
-def load_new_input_essays(id_counter: count) -> list[dict]:
+def normalize_text(text: str) -> str:
+    return re.sub(r"\s+", " ", (text or "").strip())
+
+def make_essay_signature(topic: str, content: str, source_file: str | None = None):
+    return (
+        normalize_text(topic).lower(),
+        normalize_text(content).lower(),
+        (source_file or "").strip().lower(),
+    )
+
+# load the essay signatures in the database.jsonl (topic + content + source)
+def load_existing_signatures():
+    signatures = set()
+
+    if not DATABASE_PATH.exists():
+        print(f"  database.jsonl has not been created")
+        return signatures
+
+    with open(DATABASE_PATH, "r", encoding="utf-8") as f:
+        for line in f:
+            line = line.strip()
+            if not line:
+                continue
+
+            try:
+                obj = json.loads(line)
+            except json.JSONDecodeError:  # invalid line, skip
+                continue
+
+            topic = obj.get("topic") or ""
+            content = obj.get("content") or ""
+            source_file = obj.get("source_file")
+
+            if topic and content:
+                signatures.add(make_essay_signature(topic, content, source_file))
+
+    return signatures
+
+# =========================
+# Handle new input + move files
+# =========================
+
+
+def load_new_input_essays(id_counter: count, existing_signatures=None) -> list[dict]:
     """
     Read all .txt files from NEW_INPUT_DIR and the type of the essay is detected by filename.
     """
     essays = []
+    existing_signatures = existing_signatures or set()
+
     if not NEW_INPUT_DIR.exists():
         print(f"  [skip] new_input/ not found: {NEW_INPUT_DIR}")
         return essays
 
-    for file_path in sorted(NEW_INPUT_DIR.rglob("*.txt")):
+    for file_path in sorted(NEW_INPUT_DIR.glob("*.txt")):
+
         with file_path.open(encoding="utf-8-sig") as f:
             text = f.read()
 
@@ -97,9 +152,20 @@ def load_new_input_essays(id_counter: count) -> list[dict]:
 
         sections = split_topic_content(text)
         essay_type, school = get_essay_type(file_path)
+        file_had_new_essay = False
 
         for section in sections:
-            essays.append({
+            signature_with_file = make_essay_signature(
+                section["topic"],
+                section["content"],
+                file_path.name,
+            )
+
+            if (signature_with_file in existing_signatures):
+                print(f"  [skip] Already in database: {file_path.name}")
+                continue
+
+            essay = {
                 "id":          f"essay_{next(id_counter):04d}",
                 "topic":       section["topic"],
                 "content":     section["content"],
@@ -107,10 +173,30 @@ def load_new_input_essays(id_counter: count) -> list[dict]:
                 "school":      school,
                 "public":      False,
                 "source_file": file_path.name
-            })
+            }
+            essays.append(essay)
+            existing_signatures.add(signature_with_file)
+            file_had_new_essay = True
+
+        # Once a file has been fully accounted for, move it out of new_input.
+        # all(), check if all essay signatures are in existing signatures
+        if sections and (file_had_new_essay or all(
+            make_essay_signature(section["topic"], section["content"], file_path.name) in existing_signatures
+            for section in sections
+        )):
+            move_processed_file(file_path)
 
     print(f"  Loaded {len(essays)} new essays from new_input/\n")
     return essays
+
+
+# Move the new input files into a folder under new_input, to eliminate repetition
+def move_processed_file(file_path: Path):
+    relative_path = file_path.relative_to(NEW_INPUT_DIR)
+    destination = PROCESSED_INPUT_DIR / relative_path
+    destination.parent.mkdir(parents=True, exist_ok=True)
+    shutil.move(str(file_path), str(destination))
+    print(f"  Moved processed file -> {destination}")
 
 
 def split_topic_content(text):
@@ -138,10 +224,10 @@ def split_topic_content(text):
             })
     return sections
 
-
 def get_essay_type(path):
     """
-    Retrieve the folder name and the file name. If the folder name or the file name matches, then return the type of essay and the school
+    Retrieve the folder name and the file name. Normalize to one format. 
+    If the folder name or the file name matches, then return the type of essay and the school
 
     input: path of the file
     output: [type, school]
@@ -182,8 +268,9 @@ def get_next_id():
 # =========================
 # Main
 # =========================
-def main():
+def update_database():
     if_database = (not DATABASE_PATH.exists()) or DATABASE_PATH.stat().st_size == 0
+    existing_signatures = load_existing_signatures()
 
     # if database.jsonl does not exist or nothing inside, add everything together
     if (if_database):
@@ -192,7 +279,7 @@ def main():
 
         online_essays = load_online_essays(counter)
         collected_essays = load_collected_essays(counter)
-        new_essays = load_new_input_essays(counter)
+        new_essays = load_new_input_essays(counter, existing_signatures)
         all_essays = online_essays + collected_essays + new_essays
 
         if not all_essays:
@@ -210,7 +297,7 @@ def main():
     else:
         # get next id and append
         counter = count(get_next_id())
-        new_essays = load_new_input_essays(counter)
+        new_essays = load_new_input_essays(counter, existing_signatures)
 
         if not new_essays:
             print("No new essays found in new_input/. Nothing appended.")
@@ -224,4 +311,4 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    update_database()

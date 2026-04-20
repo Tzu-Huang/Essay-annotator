@@ -25,7 +25,7 @@ DOC_MIME = "application/vnd.google-apps.document"
 DOCX_MIME = "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
 ALLOWED_MIME_TYPE = {DOCX_MIME, DOC_MIME}
 
-OUT_DIR = Path("data/new_input")
+OUT_DIR = Path("data/new_input/test")
 STATE_DIR = Path("data/processed")
 STATE_PREFIX = "exported_ids_part_"
 STATE_GLOB = f"{STATE_PREFIX}*.json"
@@ -104,7 +104,7 @@ def export_docx_to_text(service, file_id: str) -> str:
 # Main logic
 # =========================
 
-def main():
+def export_new_docs():
     creds = service_account.Credentials.from_service_account_file(KEY_PATH, scopes=SCOPES)
     service = build("drive", "v3", credentials=creds)
 
@@ -113,6 +113,8 @@ def main():
 
     processed_ids = load_all_processed_ids()
     batch_idx = next_batch_index()
+
+    new_essays = []
 
     print("\nScanning...")
 
@@ -178,11 +180,15 @@ def main():
             out_path = OUT_DIR / f"{safe_name}.txt"
             out_path.write_text(content, encoding="utf-8")
 
+            new_essays.append({
+                "file_id": file_id,
+                "name": name, 
+                "content": content, 
+                "source": "drive",
+            })
+
             current_batch_state[file_id] = {
                 "name": name,
-                "source_folder": "raw_curated",
-                "mimeType": mime,
-                "exported_at": datetime.utcnow().isoformat(),
                 "output": str(out_path)
             }
 
@@ -212,6 +218,7 @@ def main():
     print(f"TXT output dir: {OUT_DIR}")
     print(f"State dir: {STATE_DIR}")
 
+    return new_essays
 
 if __name__ == "__main__":
-    main()
+    export_new_docs()

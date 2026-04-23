@@ -11,6 +11,7 @@ from google_auth_oauthlib.flow import InstalledAppFlow
 from google.oauth2.credentials import Credentials
 from google.auth.transport.requests import Request
 from google.auth.exceptions import RefreshError
+from googleapiclient.errors import HttpError
 
 SCRIPT_DIR = Path(__file__).resolve().parent
 BACKEND_DIR = SCRIPT_DIR.parent
@@ -42,6 +43,32 @@ def get_creds():
         with open(TOKEN_FILE, "w", encoding="utf-8") as f:
             f.write(creds.to_json())
     return creds
+
+
+def get_drive_service():
+    creds = get_creds()
+    return build("drive", "v3", credentials=creds)
+
+
+def ensure_folder_access(service, folder_id: str, label: str = "Google Drive folder"):
+    try:
+        folder = service.files().get(
+            fileId=folder_id,
+            fields="id,name,mimeType",
+            supportsAllDrives=True,
+        ).execute()
+    except HttpError as exc:
+        raise RuntimeError(
+            f"{label} is not accessible: {folder_id}. "
+            "Check that the folder ID is correct and that the authenticated Google account has access."
+        ) from exc
+
+    if folder.get("mimeType") != "application/vnd.google-apps.folder":
+        raise RuntimeError(
+            f"{label} is not a folder: {folder_id} ({folder.get('name', 'unknown')})."
+        )
+
+    return folder
 
 def list_children(service, folder_id):
     results = service.files().list(
@@ -76,14 +103,14 @@ def sync_folder(service, folder_id, out_dir: Path):
 
 
 def run_sync(folder_id: str, out_dir: str | Path) -> None:
-    creds = get_creds()
-    service = build("drive", "v3", credentials=creds)
+    service = get_drive_service()
+    folder = ensure_folder_access(service, folder_id, "Sync target folder")
 
     out_dir = Path(out_dir)
     out_dir.mkdir(parents=True, exist_ok=True)
 
     sync_folder(service, folder_id, out_dir)
-    print("✅ Sync complete.")
+    print(f"✅ Sync complete from folder: {folder['name']}")
 
 def main():
     parser = argparse.ArgumentParser()

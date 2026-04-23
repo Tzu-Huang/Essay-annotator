@@ -266,11 +266,12 @@ def get_query_embedding(query: str, client):
     vec = vecs[0]
     normalized = normalize(vec)
     return np.asarray(normalized, dtype=np.float32).reshape(-1)
+
 # =========================
 # Main logic
 # =========================
 
-def main():
+def update_embeddings():
 
     # LOADING
     try:
@@ -397,4 +398,4 @@ def main():
     print(f"Output: {Output_file}")
 
 if __name__ == "__main__":
-    main()
+    update_embeddings()

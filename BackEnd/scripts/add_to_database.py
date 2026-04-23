@@ -129,8 +129,6 @@ def load_existing_signatures():
 # =========================
 # Handle new input + move files
 # =========================
-
-
 def load_new_input_essays(id_counter: count, existing_signatures=None) -> list[dict]:
     """
     Read all .txt files from NEW_INPUT_DIR and the type of the essay is detected by filename.
@@ -196,8 +194,12 @@ def load_new_input_essays(id_counter: count, existing_signatures=None) -> list[d
 
 # Move the new input files into a folder under new_input, to eliminate repetition
 def move_processed_file(file_path: Path):
-    relative_path = file_path.relative_to(NEW_INPUT_DIR)
-    destination = PROCESSED_INPUT_DIR / relative_path
+    '''
+    input: file_path: path of the current processed file
+    destination: the folder that this file will relocate
+    '''
+    relative_path = file_path.relative_to(file_path.parent)
+    destination = file_path.parent / "processed" / relative_path
     destination.parent.mkdir(parents=True, exist_ok=True)
     shutil.move(str(file_path), str(destination))
     print(f"  Moved processed file -> {destination}")

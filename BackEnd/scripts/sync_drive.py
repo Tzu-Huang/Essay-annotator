@@ -10,6 +10,7 @@ from googleapiclient.http import MediaIoBaseDownload
 from google_auth_oauthlib.flow import InstalledAppFlow
 from google.oauth2.credentials import Credentials
 from google.auth.transport.requests import Request
+from google.auth.exceptions import RefreshError
 
 SCRIPT_DIR = Path(__file__).resolve().parent
 BACKEND_DIR = SCRIPT_DIR.parent
@@ -25,11 +26,19 @@ def get_creds():
 
     if not creds or not creds.valid:
         if creds and creds.expired and creds.refresh_token:
-            creds.refresh(Request())
-        else:
+            try:
+                creds.refresh(Request())
+            except RefreshError:
+                print("Stored Google token is no longer valid. Re-authenticating...")
+                creds = None
+                if TOKEN_FILE.exists():
+                    TOKEN_FILE.unlink()
+
+        if not creds or not creds.valid:
             flow = InstalledAppFlow.from_client_secrets_file(CLIENT_SECRET_FILE, SCOPES)
             creds = flow.run_local_server(port=0)
             # creds = flow.run_console() # This one is for aws
+
         with open(TOKEN_FILE, "w", encoding="utf-8") as f:
             f.write(creds.to_json())
     return creds

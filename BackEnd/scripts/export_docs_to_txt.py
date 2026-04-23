@@ -1,4 +1,4 @@
-# Input: Google Drive folder (RAW_FOLDER_ID) that contains Google Docs / .docx files
+# Input: Google Drive folder (DRIVE_FOLDER_ID) that contains Google Docs / .docx files
 # Output: Exported .txt files stored under the app's new_input folder
 
 import json
@@ -22,7 +22,7 @@ BACKEND_DIR = SCRIPT_DIR.parent
 
 load_dotenv()
 
-RAW_FOLDER_ID = os.getenv("DRIVE_FOLDER_ID", "")
+DRIVE_FOLDER_ID = os.getenv("DRIVE_FOLDER_ID", "")
 
 # File Type. Current: Google Docs + DOCX
 DOC_MIME = "application/vnd.google-apps.document"
@@ -102,8 +102,8 @@ def export_docx_to_text(service, file_id: str) -> str:
 # Main logic
 # =========================
 def export_new_docs():
-    if not RAW_FOLDER_ID:
-        raise ValueError("RAW_FOLDER_ID is empty.")
+    if not DRIVE_FOLDER_ID:
+        raise ValueError("DRIVE_FOLDER_ID is empty.")
 
     creds = get_creds()
     service = build("drive", "v3", credentials=creds)
@@ -127,7 +127,7 @@ def export_new_docs():
 
     while True:
         results = service.files().list(
-            q=f"'{RAW_FOLDER_ID}' in parents and trashed=false",
+            q=f"'{DRIVE_FOLDER_ID}' in parents and trashed=false",
             fields="nextPageToken, files(id, name, mimeType)",
             pageSize=PAGE_SIZE,
             pageToken=page_token,

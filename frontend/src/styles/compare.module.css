@@ -4,6 +4,7 @@
   --bg: #f6f5f3;
   --surface: #ffffff;
   --border: #e6e2dc;
+  --border-strong: #d9d2ca;
   --text: #1f1f1f;
   --muted: #7a766e;
   --muted2: #9a958d;
@@ -30,17 +31,15 @@
 .comparePage {
   min-height: 100vh;
   background: var(--bg);
-  padding-bottom: 320px;
   color: var(--text);
   font-family: "Inter", sans-serif;
+  padding-bottom: 320px;
 }
 
-.brandLogo {
-  height: 40px;
-  width: auto;
-  display: block;
-  object-fit: contain;
-}
+/* =========================
+   Topbar
+   ========================= */
+
 .compareTopbar {
   position: sticky;
   top: 0;
@@ -66,10 +65,11 @@
   gap: 6px;
 }
 
-.brandMain {
-  font-weight: 800;
-  font-size: 20px;
-  letter-spacing: -0.03em;
+.brandLogo {
+  height: 40px;
+  width: auto;
+  display: block;
+  object-fit: contain;
 }
 
 .brandSub {
@@ -125,39 +125,9 @@
   gap: 10px;
 }
 
-.metaChipRow {
-  display: flex;
-  gap: 10px;
-  margin-top: 10px;
-}
-
-/* 基礎 chip */
-.metaChip {
-  padding: 6px 14px;
-  border-radius: 999px; /* ← 關鍵：圓角 */
-  font-size: 13px;
-  font-weight: 600;
-  line-height: 1;
-  display: inline-flex;
-  align-items: center;
-}
-
-/* 不同類型顏色 */
-
-.chipSchool {
-  background: #f3f0c9;
-  color: #7a7a2f;
-}
-
-.chipType {
-  background: #f3f0c9;
-  color: #7a7a2f;
-}
-
-.chipRef {
-  background: #e8f3ea;
-  color: #2f7a4f;
-}
+/* =========================
+   Buttons
+   ========================= */
 
 .ghostButton,
 .primaryButton,
@@ -179,21 +149,6 @@
   gap: 8px;
 }
 
-.statusDot {
-  width: 10px;
-  height: 10px;
-  border-radius: 999px;
-  flex-shrink: 0;
-}
-
-.statusOn {
-  background: #4caf50;
-}
-
-.statusOff {
-  background: #d64545;
-}
-
 .ghostButton:hover {
   background: #faf9f7;
 }
@@ -209,6 +164,10 @@
   gap: 10px;
 }
 
+.primaryButton:hover {
+  transform: translateY(-1px);
+}
+
 .primaryButton:disabled {
   cursor: not-allowed;
   opacity: 0.85;
@@ -216,6 +175,21 @@
 
 .primaryButtonLoading {
   background: #34784b;
+}
+
+.statusDot {
+  width: 10px;
+  height: 10px;
+  border-radius: 999px;
+  flex-shrink: 0;
+}
+
+.statusOn {
+  background: #4caf50;
+}
+
+.statusOff {
+  background: #d64545;
 }
 
 .buttonSpinner {
@@ -227,6 +201,10 @@
   animation: compareSpin 0.75s linear infinite;
   flex-shrink: 0;
 }
+
+/* =========================
+   Loading + error
+   ========================= */
 
 .loadingOverlay {
   position: fixed;
@@ -272,8 +250,12 @@
   color: var(--muted);
 }
 
-.primaryButton:hover {
-  transform: translateY(-1px);
+.compareLoading {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  font-size: 18px;
+  color: var(--muted);
 }
 
 .globalMessage {
@@ -282,97 +264,6 @@
   padding: 0 20px;
 }
 
-@keyframes compareSpin {
-  to {
-    transform: rotate(360deg);
-  }
-}
-
-.compareHoverLayout {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) 220px;
-  gap: 18px;
-  align-items: start;
-}
-
-.hoverNoteRail {
-  position: sticky;
-  top: 96px;
-  opacity: 0;
-  transform: translateY(4px);
-  transition: opacity 0.14s ease, transform 0.14s ease;
-  pointer-events: none;
-}
-
-.hoverNoteRailVisible {
-  opacity: 1;
-  transform: translateY(0);
-  pointer-events: auto;
-}
-
-.hoverNoteCard {
-  background: #ffffff;
-  border: 1px solid #d9d2ca;
-  border-radius: 12px;
-  box-shadow: 0 10px 22px rgba(28, 24, 20, 0.06);
-  overflow: hidden;
-}
-
-.hoverNoteAccent {
-  height: 3px;
-}
-
-.hoverNoteBody {
-  padding: 12px 12px 10px;
-}
-
-.hoverNoteCategory {
-  font-size: 10px;
-  font-weight: 800;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  margin-bottom: 5px;
-}
-
-.hoverNoteTitle {
-  font-size: 13px;
-  font-weight: 700;
-  line-height: 1.3;
-  color: #1f1f1f;
-  margin-bottom: 6px;
-}
-
-.hoverNoteButton {
-  width: 100%;
-  border: none;
-  border-radius: 8px;
-  background: #f7efea;
-  color: #de5e24;
-  font-size: 11px;
-  font-weight: 700;
-  padding: 8px 10px;
-  cursor: pointer;
-}
-
-.hoverNoteButton:hover {
-  filter: brightness(0.98);
-}
-
-.essayHighlight {
-  display: inline;
-  padding: 2px 4px;
-  border-radius: 7px;
-  cursor: pointer;
-  transition: background 0.15s ease, filter 0.15s ease, box-shadow 0.15s ease;
-}
-
-.isHovered {
-  filter: brightness(0.96);
-}
-
-.hoverNoteButton:hover {
-  filter: brightness(0.98);
-}
 .compareErrorInline,
 .compareErrorBox {
   color: #b42318;
@@ -384,26 +275,92 @@
   margin: 40px auto;
 }
 
+@keyframes compareSpin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* =========================
+   Main layout
+   ========================= */
+
 .compareMain {
   max-width: 1600px;
   margin: 18px auto 0;
   padding: 0 20px;
 }
 
-.essayGrid {
+.compareSplitLayout {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 0;
+  align-items: stretch;
   border: 1px solid var(--border);
   border-radius: 20px;
   overflow: hidden;
   background: var(--surface);
   box-shadow: var(--shadow);
+  position: relative;
 }
 
-.essayColumn + .essayColumn {
-  border-left: 1px solid var(--border);
+.userPanel,
+.databasePanel {
+  min-width: 0;
+  background: var(--surface);
 }
+
+/* =========================
+   Left panel
+   ========================= */
+
+.userPanel {
+  display: flex;
+  flex-direction: column;
+}
+
+.userPanelHeader {
+  padding: 26px 28px 18px;
+  position: relative;
+}
+
+.userPanelHeader::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 1px;
+  background: var(--border);
+}
+
+.userPanelGrid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 220px;
+  gap: 18px;
+  align-items: start;
+  padding: 26px 28px 0;
+}
+
+.userEssayMain {
+  min-width: 0;
+}
+
+.userEssayBody {
+  font-family: "Source Serif 4", Georgia, serif;
+  font-size: 18px;
+  line-height: 1.95;
+  font-weight: 400;
+  letter-spacing: -0.01em;
+  color: #2f2b28;
+}
+
+.userHoverRail {
+  position: relative;
+  min-height: 100%;
+}
+
+/* =========================
+   Shared cards
+   ========================= */
 
 .essayCard {
   min-height: 720px;
@@ -414,7 +371,17 @@
 
 .essayCardHeader {
   padding: 26px 28px 18px;
-  border-bottom: 1px solid var(--border);
+  position: relative;
+}
+
+.essayCardHeader::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 1px;
+  background: var(--border);
 }
 
 .essayCardLabel {
@@ -433,23 +400,15 @@
   letter-spacing: -0.02em;
 }
 
-.essayCardMeta {
-  font-size: 14px;
-  color: var(--muted);
-}
-
-.metaSep {
-  margin: 0 8px;
-  color: #b6b0a8;
-}
-
 .essayCardBody {
   flex: 1;
-  padding: 22px 28px 26px;
-  font-family: "Source Serif 4", serif;
-  font-size: 20px;
-  line-height: 1.9;
-  color: #2a2928;
+  padding: 26px 30px 30px;
+  font-family: "Source Serif 4", Georgia, serif;
+  font-size: 18px;
+  line-height: 1.95;
+  font-weight: 400;
+  letter-spacing: -0.01em;
+  color: #2f2b28;
 }
 
 .essayCardFooter {
@@ -459,8 +418,123 @@
   color: var(--muted);
 }
 
+.metaSep {
+  margin: 0 8px;
+  color: #b6b0a8;
+}
+
+/* =========================
+   Chips
+   ========================= */
+
+.metaChipRow {
+  display: flex;
+  gap: 10px;
+  margin-top: 10px;
+  flex-wrap: wrap;
+}
+
+.metaChip {
+  padding: 6px 14px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+}
+
+.chipSchool {
+  background: #f3f0c9;
+  color: #7a7a2f;
+}
+
+.chipType {
+  background: #f3f0c9;
+  color: #7a7a2f;
+}
+
+.chipRef {
+  background: #e8f3ea;
+  color: #2f7a4f;
+}
+
+.chipNeutral {
+  background: #f5f3ef;
+  color: #6f6a63;
+}
+
+/* =========================
+   Divider
+   ========================= */
+
+.resizeDivider {
+  position: relative;
+  cursor: col-resize;
+  background: transparent;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  user-select: none;
+}
+
+.resizeDividerLine {
+  width: 1px;
+  height: 100%;
+  background: var(--border);
+}
+
+.resizeDividerHandle {
+  position: absolute;
+  width: 42px;
+  height: 42px;
+  border-radius: 999px;
+  background: #ffffff;
+  border: 1px solid var(--border);
+  box-shadow: 0 8px 18px rgba(30, 24, 20, 0.08);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  color: #5f5a53;
+  font-size: 14px;
+  user-select: none;
+  transition: all 0.15s ease;
+}
+
+.resizeDivider:hover .resizeDividerHandle {
+  border-color: #cfc7bd;
+  background: #fcfbf9;
+  transform: scale(1.05);
+}
+
+.resizeDividerActive .resizeDividerHandle {
+  border-color: #bfb6aa;
+  box-shadow: 0 10px 22px rgba(30, 24, 20, 0.12);
+  transform: scale(1.08);
+}
+
+.resizeDividerActive .resizeDividerLine {
+  background: #cfc7bd;
+}
+
+.resizeArrow {
+  font-size: 16px;
+  line-height: 1;
+}
+
+.resizeDots {
+  font-size: 14px;
+  line-height: 1;
+  color: #8a847b;
+}
+
+/* =========================
+   Paragraph interaction
+   ========================= */
+
 .essayParagraph {
-  margin: 0 0 22px 0;
+  margin: 0 0 26px 0;
 }
 
 .essayLineWrap {
@@ -486,7 +560,11 @@
   padding: 2px 4px;
   border-radius: 7px;
   cursor: pointer;
-  transition: 0.15s ease;
+  transition: background 0.15s ease, filter 0.15s ease, box-shadow 0.15s ease;
+}
+
+.isHovered {
+  filter: brightness(0.96);
 }
 
 .isFocused {
@@ -523,6 +601,129 @@
   color: #6c4bb0;
 }
 
+/* =========================
+   Hover note card
+   ========================= */
+
+.hoverNoteRail {
+  position: absolute;
+  left: 0;
+  width: 210px;
+  opacity: 0;
+  transform: translateY(-4px);
+  transition: opacity 0.14s ease, transform 0.14s ease, top 0.14s ease;
+  pointer-events: none;
+}
+
+.hoverNoteRailVisible {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
+.hoverNoteCard {
+  width: 100%;
+  max-width: 210px;
+  background: #ffffff;
+  border: 1px solid #e6e2dc;
+  border-radius: 14px;
+  box-shadow: 0 10px 22px rgba(28, 24, 20, 0.06);
+  overflow: hidden;
+}
+
+.hoverNoteAccent {
+  height: 4px;
+  background: #e86b2c;
+}
+
+.hoverNoteBody {
+  padding: 14px 14px 12px;
+}
+
+.hoverNoteCategory {
+  font-size: 10px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #e86b2c;
+  margin-bottom: 6px;
+}
+
+.hoverNoteTitle {
+  font-size: 15px;
+  font-weight: 700;
+  line-height: 1.3;
+  color: #1f1f1f;
+  margin-bottom: 8px;
+}
+
+.hoverNotePreview {
+  font-size: 13px;
+  line-height: 1.6;
+  color: #7a8594;
+  margin-bottom: 14px;
+}
+
+.hoverNoteButton {
+  width: 100%;
+  border: none;
+  border-radius: 10px;
+  background: #f4eeea;
+  color: #e86b2c;
+  font-size: 13px;
+  font-weight: 600;
+  padding: 10px 12px;
+  cursor: pointer;
+  transition: 0.15s ease;
+}
+
+.hoverNoteButton:hover {
+  background: #efe7e2;
+  filter: brightness(0.98);
+}
+
+.essaySentenceBlock {
+  display: inline;
+}
+
+.inlineSentenceHighlight {
+  border-radius: 6px;
+  padding: 2px 4px;
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.04);
+}
+.annotationGroup {
+  display: inline-flex;
+  flex-direction: column;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.inlineSentenceHighlight {
+  border-radius: 6px;
+  padding: 2px 4px;
+  cursor: pointer;
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.04);
+}
+.hoverNoteAccent.variantExpression {
+  background: #ef8f2f;
+}
+
+.hoverNoteAccent.variantReflection {
+  background: #4a7ddc;
+}
+
+.hoverNoteAccent.variantEnding {
+  background: #4e9a6e;
+}
+
+.hoverNoteAccent.variantStructure {
+  background: #8a63d2;
+}
+
+/* =========================
+   Bottom detail panel
+   ========================= */
+
 .bottomPanel {
   position: fixed;
   left: 18px;
@@ -546,13 +747,6 @@
   border-radius: 999px;
   background: #d9d4cd;
   margin: 10px auto 0;
-}
-
-.bottomPanelEmpty {
-  padding: 26px 28px 30px;
-  text-align: center;
-  color: var(--muted);
-  font-size: 15px;
 }
 
 .bottomPanelInner {
@@ -686,12 +880,18 @@
   line-height: 1.75;
 }
 
-.compareLoading {
-  min-height: 100vh;
-  display: grid;
-  place-items: center;
-  font-size: 18px;
-  color: var(--muted);
+/* =========================
+   Responsive
+   ========================= */
+
+@media (max-width: 1280px) {
+  .userPanelGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .userHoverRail {
+    display: none;
+  }
 }
 
 @media (max-width: 1200px) {
@@ -708,15 +908,6 @@
     justify-content: center;
   }
 
-  .essayGrid {
-    grid-template-columns: 1fr;
-  }
-
-  .essayColumn + .essayColumn {
-    border-left: none;
-    border-top: 1px solid var(--border);
-  }
-
   .bottomPanelGrid {
     grid-template-columns: 1fr;
     gap: 18px;
@@ -726,15 +917,6 @@
     border-left: none;
     border-top: 1px solid var(--border);
     padding-top: 18px;
-  }
-}
-@media (max-width: 1280px) {
-  .compareHoverLayout {
-    grid-template-columns: 1fr;
-  }
-
-  .hoverNoteRail {
-    display: none;
   }
 }
 
@@ -748,13 +930,16 @@
     flex-wrap: wrap;
   }
 
-  .essayCardBody {
+  .essayCardBody,
+  .userEssayBody {
     font-size: 18px;
     padding: 18px 20px 20px;
   }
 
   .essayCardHeader,
-  .essayCardFooter {
+  .essayCardFooter,
+  .userPanelHeader,
+  .userPanelGrid {
     padding-left: 20px;
     padding-right: 20px;
   }

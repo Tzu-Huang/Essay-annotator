@@ -6,6 +6,7 @@ import {
   Search,
   TrendingUp,
 } from "lucide-react";
+
 import styles from "../styles/home.module.css";
 
 function Home() {

@@ -9,9 +9,8 @@ from pathlib import Path
 
 import docx
 from dotenv import load_dotenv
-from googleapiclient.discovery import build
-
-from sync_drive import get_creds
+from add_to_database import move_processed_file
+from sync_drive import ensure_folder_access, get_drive_service
 
 # =========================
 # Config
@@ -28,7 +27,7 @@ DRIVE_FOLDER_ID = os.getenv("DRIVE_FOLDER_ID", "")
 DOC_MIME = "application/vnd.google-apps.document"
 DOCX_MIME = "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
 ALLOWED_MIME_TYPE = {DOCX_MIME, DOC_MIME}
-
+NEW_DOCS_DIR = BACKEND_DIR / "drive_data/new_input"
 OUT_DIR = BACKEND_DIR / "drive_data/organized_data/new_input"
 STATE_DIR = BACKEND_DIR / "drive_data/organized_data/export_state"
 STATE_PREFIX = "exported_ids_part_"
@@ -101,12 +100,12 @@ def export_docx_to_text(service, file_id: str) -> str:
 # =========================
 # Main logic
 # =========================
-def export_new_docs():
-    if not DRIVE_FOLDER_ID:
+def export_new_docs(FOLDER_ID):
+    if not FOLDER_ID:
         raise ValueError("DRIVE_FOLDER_ID is empty.")
 
-    creds = get_creds()
-    service = build("drive", "v3", credentials=creds)
+    service = get_drive_service()
+    folder = ensure_folder_access(service, DRIVE_FOLDER_ID, "Export source folder")
 
     OUT_DIR.mkdir(parents=True, exist_ok=True)
     STATE_DIR.mkdir(parents=True, exist_ok=True)
@@ -116,7 +115,7 @@ def export_new_docs():
 
     new_essays = []
 
-    print("\nScanning...")
+    print(f"\nScanning folder: {folder['name']}")
 
     page_token = None
     total_seen = 0
@@ -192,6 +191,8 @@ def export_new_docs():
             processed_ids.add(file_id)
             total_exported += 1
 
+            move_processed_file(NEW_DOCS_DIR)
+
         state_path = state_file_for_batch(batch_idx)
         state_path.write_text(
             json.dumps(current_batch_state, indent=2, ensure_ascii=False),
@@ -217,4 +218,4 @@ def export_new_docs():
 
 
 if __name__ == "__main__":
-    export_new_docs()
+    export_new_docs(DRIVE_FOLDER_ID)

@@ -2,50 +2,51 @@
    Main page container
    Full page background
    ========================= */
-.compare-page {
+.comparePage {
   min-height: 100vh;
   background: #f4f7fb;
   color: #1f2937;
   padding-bottom: 40px;
 }
 
-
 /* =========================
    Content wrapper
    Controls max width + centering
    ========================= */
-.compare-header,
-.compare-layout,
-.result-section,
-.message.error-message {
+.compareHeader,
+.compareLayout,
+.resultSection,
+.message.errorMessage {
   max-width: 1600px;
   margin-left: auto;
   margin-right: auto;
 }
-
 
 /* =========================
    Header section (top area)
    Left: title
    Right: buttons
    ========================= */
-.compare-header {
+.compareHeader {
   display: flex;
   justify-content: space-between;
-  align-items: center; /* fixed alignment */
+  align-items: flex-end;
   gap: 20px;
-  margin-top: 5px;
+  margin-top: 0px;
   margin-bottom: 24px;
   padding: 0 24px;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
 }
 
-.compare-header-left {
+.compareHeaderLeft {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
   min-width: 0;
 }
 
 /* Small label above title */
-.compare-label {
+.compareLabel {
   font-size: 0.85rem;
   font-weight: 700;
   color: #5b5ce2;
@@ -55,31 +56,59 @@
 }
 
 /* Main page title */
-.compare-header h1 {
+.compareHeader h1 {
   margin: 0;
   font-size: 2rem;
 }
 
-/* Subtitle (essay id) */
-.compare-subtitle {
+.compareTitle {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  margin: 0;
+  line-height: 1.1;
+  font-size: clamp(1.9rem, 3vw, 2.6rem);
+  font-weight: 800;
+  letter-spacing: -0.04em;
+  color: #18212f;
+}
+
+.compareTitlePrefix {
+  color: #1f2937;
+}
+
+/* Subtitle / auxiliary text */
+.compareSubtitle {
   margin-top: 8px;
   color: #6b7280;
 }
 
+.topicText {
+  margin: 0 0 18px;
+  color: #4b5563;
+  font-size: 0.98rem;
+  font-weight: 600;
+}
 
 /* =========================
    Header buttons container
    ========================= */
-.header-actions {
+.headerActions {
   display: flex;
   gap: 12px;
-  flex-wrap: wrap;
-  align-items: center;
+  align-items: stretch;
+}
+
+.headerActions .primaryBtn,
+.headerActions .secondaryBtn {
+  min-width: 148px;
+  height: 44px;
 }
 
 /* Shared button styles */
-.primary-btn,
-.secondary-btn {
+.primaryBtn,
+.secondaryBtn {
   cursor: pointer;
   font: inherit;
   display: inline-flex;
@@ -92,11 +121,23 @@
   white-space: nowrap;
   vertical-align: middle;
   transition: 0.18s ease;
+  flex: 0 0 auto;
+
+  appearance: none;
+  -webkit-appearance: none;
+  line-height: 1;
+  margin: 0;
+}
+
+.buttonGroup {
+  display: flex;
+  align-items: center;
+  gap: 12px;
 }
 
 /* Primary button (Run Compare) */
-.primary-btn {
-  background: linear-gradient(90deg, #6b5bff 0%, #5b5ce2 100%);
+.primaryBtn {
+  background: linear-gradient(90deg, #6b5bff 0%, #5cc8f5 100%);
   color: white;
   border-radius: 12px;
   font-weight: 800;
@@ -105,7 +146,7 @@
 }
 
 /* Secondary button (Reset View) */
-.secondary-btn {
+.secondaryBtn {
   background: white;
   border: 1px solid #d8dde8;
   color: #374151;
@@ -113,17 +154,16 @@
   font-weight: 700;
 }
 
-.primary-btn:hover,
-.secondary-btn:hover {
+.primaryBtn:hover,
+.secondaryBtn:hover {
   transform: translateY(-1px);
 }
 
-.primary-btn:disabled {
+.primaryBtn:disabled {
   opacity: 0.72;
   cursor: not-allowed;
   transform: none;
 }
-
 
 /* =========================
    Error message box
@@ -134,7 +174,7 @@
   border-radius: 12px;
 }
 
-.error-message {
+.errorMessage {
   background: #fef2f2;
   color: #b91c1c;
   border: 1px solid #fecaca;
@@ -142,13 +182,12 @@
   padding-right: 24px;
 }
 
-
 /* =========================
    Main layout: two columns
    Left: user draft
    Right: example essay
    ========================= */
-.compare-layout {
+.compareLayout {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 22px;
@@ -158,7 +197,7 @@
 }
 
 /* Outer container (gray background block) */
-.doc-shell {
+.docShell {
   background: #dde4ee;
   border-radius: 22px;
   padding: 24px;
@@ -166,7 +205,7 @@
 }
 
 /* Inner "paper" area */
-.doc-paper {
+.docPaper {
   background: white;
   border-radius: 12px;
   padding: 32px 28px;
@@ -174,12 +213,11 @@
   box-shadow: 0 12px 30px rgba(0, 0, 0, 0.08);
 }
 
-
 /* =========================
    Top section inside each panel
    (title + description + status box)
    ========================= */
-.panel-meta {
+.panelMeta {
   display: flex;
   justify-content: space-between;
   gap: 12px;
@@ -189,18 +227,21 @@
   border-bottom: 1px solid #eef2f7;
 }
 
-.panel-meta h2 {
+.panelMeta h2 {
   margin: 0;
 }
 
-.panel-meta p {
+.panelMeta p {
   margin-top: 8px;
   color: #6b7280;
   font-size: 0.92rem;
 }
 
+.panelMetaRight {
+}
+
 /* Small status box (top-right inside panel) */
-.panel-state {
+.panelState {
   background: #f8fafc;
   border: 1px solid #e2e8f0;
   border-radius: 12px;
@@ -211,47 +252,18 @@
   white-space: nowrap;
 }
 
-
 /* =========================
    Database essay metadata
    Small tag style like sample
    ========================= */
-.essay-meta-chips {
+.essayMetaChips {
   display: flex;
   flex-wrap: wrap;
-  gap: 1px;
+  gap: 6px;
   margin-bottom: 0px;
 }
 
-.meta-chip {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-height: 34px;
-  padding: 0 16px;
-  background: #e9eafb;
-  border-radius: 999px;
-  color: #4f56d9;
-  font-size: 0.82rem;
-  font-weight: 700;
-  line-height: 1;
-  white-space: nowrap;
-}
-
-.meta-chip-value {
-  display: inline-flex;
-  align-items: center;
-  line-height: 1;
-}
-
-.id-chip {
-  background: #ececff;
-  color: #4f56d9;
-}
-/* =========================
-   Base chip
-   ========================= */
-.meta-chip {
+.metaChip {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -261,20 +273,34 @@
   font-size: 0.82rem;
   font-weight: 700;
   white-space: nowrap;
+  background: #e9eafb;
+  color: #4f56d9;
+  line-height: 1;
+}
+
+.metaChipValue {
+  display: inline-flex;
+  align-items: center;
+  line-height: 1;
+}
+
+.idChip {
+  background: #ececff;
+  color: #4f56d9;
 }
 
 /* =========================
    Default / neutral
    ========================= */
-.chip-gray {
+.chipGray {
   background: #eef1f6;
   color: #5b6472;
 }
 
 /* =========================
-   School (固定淡藍)
+   School
    ========================= */
-.chip-school {
+.chipSchool {
   background: #f9f8cf;
   color: #8a8613;
 }
@@ -282,17 +308,17 @@
 /* =========================
    Similarity colors
    ========================= */
-.chip-green {
+.chipGreen {
   background: #e8f8f0;
   color: #1f9d62;
 }
 
-.chip-yellow {
+.chipYellow {
   background: #f9f8cf;
   color: #8a8613;
 }
 
-.chip-red {
+.chipRed {
   background: #ffe4e6;
   color: #b91c1c;
 }
@@ -300,17 +326,17 @@
 /* =========================
    Essay type colors
    ========================= */
-.chip-pink { 
+.chipPink {
   background: #f8e4f3;
   color: #a8558f;
 }
 
-.chip-blue {
+.chipBlue {
   background: #e8f4fb;
   color: #4b8fb0;
 }
 
-.chip-uc {
+.chipUc {
   background: #e8f4fb;
   color: #4b8fb0;
 }
@@ -319,7 +345,7 @@
    Essay text area
    Uses serif font to look like real essays
    ========================= */
-.doc-body {
+.docBody {
   font-family: Georgia, "Times New Roman", serif;
   font-size: 1.06rem;
   line-height: 1.95;
@@ -332,10 +358,9 @@
 }
 
 /* Optional empty state */
-.empty-text {
+.emptyText {
   color: #6b7280;
 }
-
 
 /* =========================
    Highlighted user text (left side)
@@ -348,31 +373,30 @@
   transition: 0.15s ease;
 }
 
-/* When the highlight is active (hover or selected) */
-.highlight.active {
+/* Reusable active state */
+.active {
   outline: 2px solid rgba(91, 92, 226, 0.16);
   box-shadow: 0 0 0 4px rgba(91, 92, 226, 0.08);
 }
 
 /* Different feedback colors */
-.highlight.yellow {
+.yellow {
   background: #fff4cc;
 }
 
-.highlight.green {
+.green {
   background: #eafbf1;
 }
 
-.highlight.pink {
+.pink {
   background: #fff0f6;
 }
-
 
 /* =========================
    Small circular number tag (1, 2, 3...)
    Appears next to highlighted text
    ========================= */
-.comment-tag {
+.commentTag {
   display: inline-flex;
   width: 22px;
   height: 22px;
@@ -385,24 +409,26 @@
   margin-left: 6px;
 }
 
-.comment-tag.yellow {
+.commentTag.yellow {
   background: #efc14d;
+  color: white;
 }
 
-.comment-tag.green {
+.commentTag.green {
   background: #34c27a;
+  color: white;
 }
 
-.comment-tag.pink {
+.commentTag.pink {
   background: #e879b0;
+  color: white;
 }
-
 
 /* =========================
    Example essay paragraphs (right side)
    Highlighted when linked to active point
    ========================= */
-.example-paragraph {
+.exampleParagraph {
   padding: 8px 10px;
   border-radius: 10px;
   transition: 0.18s ease;
@@ -410,25 +436,23 @@
 }
 
 /* Active linked paragraph */
-.example-paragraph.active {
+.exampleParagraph.active {
   background: #f7f8ff;
   border-color: #dbe2ff;
   box-shadow: inset 4px 0 0 #6b5bff;
 }
 
-/* Color variations when active */
-.example-paragraph.active.yellow {
+.exampleParagraph.active.yellow {
   background: rgba(255, 244, 204, 0.45);
 }
 
-.example-paragraph.active.green {
+.exampleParagraph.active.green {
   background: rgba(234, 251, 241, 0.45);
 }
 
-.example-paragraph.active.pink {
+.exampleParagraph.active.pink {
   background: rgba(255, 240, 246, 0.48);
 }
-
 
 /* =========================
    Hint bar at the bottom of panels
@@ -444,26 +468,25 @@
   color: #566275;
 }
 
-
 /* =========================
    Feedback cards section (bottom)
    ========================= */
-.result-section {
+.resultSection {
   padding: 0 24px 40px;
 }
 
-.result-section h2 {
+.resultSection h2 {
   margin-bottom: 16px;
 }
 
-.result-grid {
+.resultGrid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 16px;
 }
 
 /* Individual feedback card */
-.result-card {
+.resultCard {
   background: white;
   border: 1px solid #e7ebf2;
   border-radius: 18px;
@@ -473,14 +496,15 @@
 }
 
 /* Hover or selected state */
-.result-card:hover,
-.result-card.selected {
+.resultCard:hover,
+.resultCard.selected,
+.selected {
   box-shadow: 0 12px 26px rgba(15, 23, 42, 0.08);
   transform: translateY(-2px);
 }
 
 /* Badge showing "Point 1", "Point 2" */
-.result-badge {
+.resultBadge {
   display: inline-block;
   padding: 6px 10px;
   border-radius: 999px;
@@ -489,27 +513,26 @@
   margin-bottom: 10px;
 }
 
-.result-badge.yellow {
+.resultBadge.yellow {
   background: #fff4cc;
   color: #946200;
 }
 
-.result-badge.green {
+.resultBadge.green {
   background: #eafbf1;
   color: #0b7a43;
 }
 
-.result-badge.pink {
+.resultBadge.pink {
   background: #fff0f6;
   color: #b33173;
 }
-
 
 /* =========================
    Popup overlay (dark background)
    Covers entire screen
    ========================= */
-.popup-backdrop {
+.popupBackdrop {
   position: fixed;
   inset: 0;
   background: rgba(15, 23, 42, 0.38);
@@ -521,7 +544,7 @@
 }
 
 /* Popup main card */
-.popup-card {
+.popupCard {
   width: min(760px, 100%);
   max-height: 88vh;
   overflow: auto;
@@ -531,7 +554,7 @@
 }
 
 /* Popup header */
-.popup-head {
+.popupHead {
   display: flex;
   justify-content: space-between;
   gap: 12px;
@@ -540,17 +563,17 @@
 }
 
 /* Popup body content */
-.popup-body {
+.popupBody {
   padding: 20px 22px 24px;
 }
 
 /* Each section inside popup */
-.detail-block {
+.detailBlock {
   margin-bottom: 16px;
 }
 
-/* Label text (e.g. "User sentence") */
-.detail-label {
+/* Label text */
+.detailLabel {
   font-size: 0.78rem;
   color: #6b7280;
   font-weight: 800;
@@ -559,7 +582,7 @@
 }
 
 /* Normal text content */
-.detail-content {
+.detailContent {
   font-size: 0.96rem;
   line-height: 1.75;
   color: #374151;
@@ -567,7 +590,7 @@
 }
 
 /* Highlighted quote box */
-.detail-quote {
+.detailQuote {
   background: #fff9ed;
   border: 1px solid #fde7bb;
   border-radius: 14px;
@@ -576,70 +599,74 @@
   line-height: 1.75;
 }
 
-
 /* =========================
    Responsive design (tablet / mobile)
    Switch from 2 columns → 1 column
    ========================= */
 @media (max-width: 1100px) {
-  .compare-layout {
+  .compareLayout {
     grid-template-columns: 1fr;
   }
 
-  .result-grid {
+  .resultGrid {
     grid-template-columns: 1fr;
   }
 
-  .doc-paper {
+  .docPaper {
     min-height: auto;
   }
 
-  .compare-header {
+  .compareHeader {
     flex-direction: column;
     align-items: flex-start;
   }
-
-  .header-actions {
-    width: 100%;
-  }
 }
-
 
 /* =========================
    Responsive design (smaller mobile)
    ========================= */
 @media (max-width: 700px) {
-  .compare-header,
-  .compare-layout,
-  .result-section,
-  .message.error-message {
+  .compareHeader,
+  .compareLayout,
+  .resultSection,
+  .message.errorMessage {
     padding-left: 16px;
     padding-right: 16px;
   }
 
-  .doc-shell {
+  .docShell {
     padding: 16px;
   }
 
-  .doc-paper {
+  .docPaper {
     padding: 24px 20px;
   }
 
-  .compare-header h1 {
+  .compareHeader h1 {
     font-size: 1.7rem;
   }
 
-  .doc-body {
+  .compareTitle {
+    gap: 8px;
+    font-size: clamp(1.6rem, 8vw, 2rem);
+  }
+
+  .compareTitleEmphasis {
+    min-height: 38px;
+    padding: 0 14px;
+  }
+
+  .docBody {
     font-size: 1rem;
   }
 
-  .header-actions {
+  .headerActions {
     flex-direction: column;
     align-items: stretch;
   }
 
-  .primary-btn,
-  .secondary-btn {
+  .primaryBtn,
+  .secondaryBtn {
     width: 100%;
   }
 }

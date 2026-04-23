@@ -1,6 +1,6 @@
 import { useEffect, useState, useMemo } from "react";
 import { useParams } from "react-router-dom";
-import "../styles/compare.css";
+import styles from "../styles/compare.module.css";
 
 function ComparePage() {
   const { id } = useParams();
@@ -22,7 +22,7 @@ function ComparePage() {
   const [compareError, setCompareError] = useState("");
 
   // =========================
-  // Interaction state (UI highlight logic)
+  // Interaction state
   // =========================
   const [hoveredPoint, setHoveredPoint] = useState(null);
   const [selectedPoint, setSelectedPoint] = useState(null);
@@ -35,15 +35,14 @@ function ComparePage() {
   }, []);
 
   // =========================
-  // Check if value is valid (should display)
+  // Check if value is valid
   // =========================
   const isValid = (value) => {
     if (!value) return false;
-
     const v = value.toString().toLowerCase().trim();
-
     return v !== "none" && v !== "unknown" && v !== "";
   };
+
   // =========================
   // Fetch selected essay from backend
   // =========================
@@ -62,8 +61,6 @@ function ComparePage() {
         }
 
         const data = await response.json();
-
-        // Store essay into state
         setEssay(data);
       } catch (error) {
         console.error("ERROR:", error);
@@ -74,13 +71,12 @@ function ComparePage() {
     };
 
     fetchEssay();
-  }, [id]); // re-fetch when id changes
+  }, [id]);
 
   // =========================
   // Call compare API
   // =========================
   const runCompare = async () => {
-    // Prevent empty draft submission
     if (!userDraft.trim()) {
       setCompareError("Your draft is empty.");
       return;
@@ -89,8 +85,6 @@ function ComparePage() {
     try {
       setCompareLoading(true);
       setCompareError("");
-
-      // Reset previous compare interaction state
       setHoveredPoint(null);
       setSelectedPoint(null);
 
@@ -114,29 +108,18 @@ function ComparePage() {
         );
       }
 
-      // Normalize backend response (important: backend not stable yet)
       const normalized = {
         essay_id: data.essay_id,
-
-        // similarity may be 0.87 or 87
         similarity: data.similarity ?? data.similarity_percentage ?? null,
-
         comparisons: (data.comparisons || []).map((item, index) => ({
           id: index + 1,
           highlighted_sentence: item.highlighted_sentence,
           comparison: item.comparison,
           suggestion: item.suggestion,
-
-          // fallback if backend missing field
           matched_sentence: item.matched_sentence || item.highlighted_sentence,
           matched_paragraph: item.matched_paragraph || "",
-
           category: item.category || "Feedback",
-
-          // cycle through colors
           color: ["yellow", "green", "pink"][index % 3],
-
-          // paragraph mapping
           userParagraphIndex: item.user_paragraph_index ?? index,
           exampleParagraphIndex: item.example_paragraph_index ?? index,
         })),
@@ -144,7 +127,6 @@ function ComparePage() {
 
       setCompareResult(normalized);
 
-      // Scroll back to top after running compare
       window.scrollTo({
         top: 0,
         behavior: "smooth",
@@ -159,9 +141,6 @@ function ComparePage() {
 
   // =========================
   // Active highlight logic
-  // Priority:
-  // 1. selected
-  // 2. hover
   // =========================
   const activePoint = selectedPoint || hoveredPoint;
 
@@ -193,11 +172,6 @@ function ComparePage() {
 
   // =========================
   // Reset view
-  // What it should do:
-  // 1. clear hover
-  // 2. clear selected popup
-  // 3. clear compare error
-  // 4. scroll back to top
   // =========================
   const resetView = () => {
     setHoveredPoint(null);
@@ -215,63 +189,65 @@ function ComparePage() {
   // Dynamic color for similarity
   // =========================
   const getSimilarityClass = (value) => {
-    if (value === null || value === undefined) return "chip-gray";
+    if (value === null || value === undefined) return "chipGray";
 
     const percent =
       Number(value) <= 1 ? Number(value) * 100 : Number(value);
 
-    if (percent >= 80) return "chip-green";
-    if (percent >= 50) return "chip-yellow";
-    return "chip-red";
+    if (percent >= 80) return "chipGreen";
+    if (percent >= 50) return "chipYellow";
+    return "chipRed";
   };
 
   // =========================
   // Dynamic color for essay type
   // =========================
   const getTypeClass = (type) => {
-    if (!type) return "chip-gray";
+    if (!type) return "chipGray";
 
     const t = type.toLowerCase();
 
-    if (t.includes("personal")) return "chip-pink";
-    if (t.includes("supplement")) return "chip-yellow";
+    if (t.includes("personal")) return "chipPink";
+    if (t.includes("supplement")) return "chipYellow";
 
-    return "chip-uc";
+    return "chipUc";
   };
+
   // =========================
-  // Metadata (right panel cards / chips)
+  // Metadata
   // =========================
   const essaySchool = essay?.school || "Unknown School";
   const essayType = essay?.type || "Unknown Type";
+  const selectedEssayTopic = essay?.topic || "Unknown Topic";
+  const userDraftTopic = localStorage.getItem("userTopic") || "No Topic";
 
   const similarityValue =
     compareResult?.similarity ?? essay?.score ?? essay?.similarity ?? null;
 
-  const similarityText = similarityValue || "none";
+  const similarityText =
+    similarityValue !== null && similarityValue !== undefined
+      ? Number(similarityValue) <= 1
+        ? `${Math.round(Number(similarityValue) * 100)}% Similar`
+        : `${Math.round(Number(similarityValue))}% Similar`
+      : "";
 
   return (
-    <div className="compare-page">
-      {/* =========================
-         Header section
-         Note:
-         EA / navbar / search bar already comes from App.jsx,
-         so ComparePage only keeps its own local title + buttons
-         ========================= */}
-      <div className="compare-header">
-        <div className="compare-header-left">
-          <p className="compare-label">Essay Comparison</p>
-          <h1>Compare With This Essay</h1>
-          <p className="compare-subtitle">Current essay ID: {id}</p>
+    <div className={styles.comparePage}>
+      <div className={styles.compareHeader}>
+        <div className={styles.compareHeaderLeft}>
+          <p className={styles.compareLabel}>Essay Comparison</p>
+          <h1 className={styles.compareTitle}>
+            <span className={styles.compareTitlePrefix}>Compare With This Essay</span>
+          </h1>
         </div>
 
-        {/* Action buttons */}
-        <div className="header-actions">
-          <button className="secondary-btn" onClick={resetView}>
+        <div className={styles.headerActions}>
+          <button className={styles.secondaryBtn} onClick={resetView}>
             Reset View
           </button>
 
           <button
-            className="primary-btn"
+            className={styles.primaryBtn}
             onClick={runCompare}
             disabled={compareLoading}
           >
@@ -280,50 +256,47 @@ function ComparePage() {
         </div>
       </div>
 
-      {/* =========================
-         Error message
-         ========================= */}
       {(error || compareError) && (
-        <div className="message error-message">{error || compareError}</div>
+        <div className={`${styles.message} ${styles.errorMessage}`}>
+          {error || compareError}
+        </div>
       )}
 
-      {/* =========================
-         Main layout (Left + Right)
-         ========================= */}
-      <div className="compare-layout">
-        {/* =========================
-           LEFT: User Draft
-           ========================= */}
-        <section className="doc-shell">
-          <div className="doc-paper">
-            <div className="panel-meta">
+      <div className={styles.compareLayout}>
+        {/* LEFT: User Draft */}
+        <section className={styles.docShell}>
+          <div className={styles.docPaper}>
+            <div className={styles.panelMeta}>
               <div>
                 <h2>User Draft</h2>
-                <p>Main editing target. Feedback points appear here.</p>
+
+                <p className={styles.compareSubtitle}>
+                  Topic: {userDraftTopic}
+                </p>
               </div>
-              <div className="panel-state">Hover + click interaction</div>
+
+              <div className={styles.panelState}>Hover + click interaction</div>
             </div>
 
-            <div className="doc-body">
+            <div className={styles.docBody}>
+
               {userParagraphs.length ? (
                 userParagraphs.map((paragraph, index) => {
                   const point = getPointForParagraph(index);
 
-                  // No feedback → normal text
                   if (!point) {
                     return (
-                      <p key={index} className="para">
+                      <p key={index} className={styles.para}>
                         {paragraph}
                       </p>
                     );
                   }
 
-                  // Feedback exists → interactive highlight
                   return (
-                    <p key={index} className="para">
+                    <p key={index} className={styles.para}>
                       <span
-                        className={`highlight ${point.color} ${
-                          activePoint?.id === point.id ? "active" : ""
+                        className={`${styles.highlight} ${styles[point.color]} ${
+                          activePoint?.id === point.id ? styles.active : ""
                         }`}
                         onMouseEnter={() => setHoveredPoint(point)}
                         onMouseLeave={() => setHoveredPoint(null)}
@@ -336,20 +309,20 @@ function ComparePage() {
                         {paragraph}
                       </span>
 
-                      {/* feedback number badge */}
-                      <span className={`comment-tag ${point.color}`}>
+                      <span
+                        className={`${styles.commentTag} ${styles[point.color]}`}
+                      >
                         {point.id}
                       </span>
                     </p>
                   );
                 })
               ) : (
-                <p>No user draft found.</p>
+                <p className={styles.emptyText}>No user draft found.</p>
               )}
             </div>
 
-            {/* Hint bar */}
-            <div className="hintbar">
+            <div className={styles.hintbar}>
               {activePoint
                 ? `Point ${activePoint.id} selected.`
                 : "Hover to preview matching paragraph."}
@@ -357,61 +330,66 @@ function ComparePage() {
           </div>
         </section>
 
-        {/* =========================
-           RIGHT: Database Essay
-           ========================= */}
-        <section className="doc-shell">
-          <div className="doc-paper">
-            <div className="panel-meta panel-meta-right">
+        {/* RIGHT: Database Essay */}
+        <section className={styles.docShell}>
+          <div className={styles.docPaper}>
+            <div className={styles.panelMeta}>
               <div>
                 <h2>Selected Essay Example</h2>
-                <p>This is the database essay used for comparison.</p>
+                <p className={styles.compareSubtitle}>
+                  Topic: {selectedEssayTopic}
+                </p>
 
-                {/* Small metadata chips */}
-                <div className="essay-meta-chips">
-                  {/* School */}
+                <div className={styles.essayMetaChips}>
                   {isValid(essaySchool) && (
-                    <div className="meta-chip chip-school">
+                    <div className={`${styles.metaChip} ${styles.chipSchool}`}>
                       {essaySchool}
                     </div>
                   )}
-                  {/* Similarity（只要有數值就顯示） */}
+
                   {similarityValue !== null && similarityValue !== undefined && (
-                    <div className={`meta-chip ${getSimilarityClass(similarityValue)}`}>
+                    <div
+                      className={`${styles.metaChip} ${
+                        styles[getSimilarityClass(similarityValue)]
+                      }`}
+                    >
                       {similarityText}
                     </div>
                   )}
 
-                  {/* Essay Type */}
                   {isValid(essayType) && (
-                    <div className={`meta-chip ${getTypeClass(essayType)}`}>
+                    <div
+                      className={`${styles.metaChip} ${
+                        styles[getTypeClass(essayType)]
+                      }`}
+                    >
                       {essayType}
                     </div>
                   )}
                 </div>
               </div>
 
-              <div className="panel-state">
+              <div className={styles.panelState}>
                 {compareResult?.essay_id
                   ? `essay_id: ${compareResult.essay_id}`
                   : "Reference essay"}
               </div>
             </div>
 
-            <div className="doc-body">
+            <div className={styles.docBody}>
               {loading ? (
-                <p>Loading...</p>
+                <p className={styles.emptyText}>Loading...</p>
               ) : exampleParagraphs.length ? (
                 exampleParagraphs.map((paragraph, index) => (
                   <p
                     key={index}
-                    className={`para example-paragraph ${
+                    className={`${styles.para} ${styles.exampleParagraph} ${
                       activePoint?.exampleParagraphIndex === index
-                        ? "active"
+                        ? styles.active
                         : ""
                     } ${
                       activePoint?.exampleParagraphIndex === index
-                        ? activePoint.color
+                        ? styles[activePoint.color]
                         : ""
                     }`}
                   >
@@ -419,11 +397,11 @@ function ComparePage() {
                   </p>
                 ))
               ) : (
-                <p>No essay found.</p>
+                <p className={styles.emptyText}>No essay found.</p>
               )}
             </div>
 
-            <div className="hintbar">
+            <div className={styles.hintbar}>
               {activePoint
                 ? `Linked to feedback ${activePoint.id}`
                 : "No paragraph selected"}
@@ -432,48 +410,52 @@ function ComparePage() {
         </section>
       </div>
 
-      {/* =========================
-         Popup detail view
-         ========================= */}
+      {/* Popup */}
       {selectedPoint && (
-        <div className="popup-backdrop" onClick={() => setSelectedPoint(null)}>
-          <div className="popup-card" onClick={(e) => e.stopPropagation()}>
-            <div className="popup-head">
+        <div
+          className={styles.popupBackdrop}
+          onClick={() => setSelectedPoint(null)}
+        >
+          <div
+            className={styles.popupCard}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className={styles.popupHead}>
               <h3>{selectedPoint.category}</h3>
 
               <button
-                className="secondary-btn"
+                className={styles.secondaryBtn}
                 onClick={() => setSelectedPoint(null)}
               >
                 Close
               </button>
             </div>
 
-            <div className="popup-body">
-              <div className="detail-block">
-                <div className="detail-label">User sentence</div>
-                <div className="detail-content">
+            <div className={styles.popupBody}>
+              <div className={styles.detailBlock}>
+                <div className={styles.detailLabel}>User sentence</div>
+                <div className={styles.detailContent}>
                   {selectedPoint.highlighted_sentence}
                 </div>
               </div>
 
-              <div className="detail-block">
-                <div className="detail-label">Matched sentence</div>
-                <div className="detail-quote">
+              <div className={styles.detailBlock}>
+                <div className={styles.detailLabel}>Matched sentence</div>
+                <div className={styles.detailQuote}>
                   {selectedPoint.matched_sentence}
                 </div>
               </div>
 
-              <div className="detail-block">
-                <div className="detail-label">Comparison</div>
-                <div className="detail-content">
+              <div className={styles.detailBlock}>
+                <div className={styles.detailLabel}>Comparison</div>
+                <div className={styles.detailContent}>
                   {selectedPoint.comparison}
                 </div>
               </div>
 
-              <div className="detail-block">
-                <div className="detail-label">Suggestion</div>
-                <div className="detail-content">
+              <div className={styles.detailBlock}>
+                <div className={styles.detailLabel}>Suggestion</div>
+                <div className={styles.detailContent}>
                   {selectedPoint.suggestion?.replace(/^- /, "")}
                 </div>
               </div>
@@ -482,19 +464,17 @@ function ComparePage() {
         </div>
       )}
 
-      {/* =========================
-         Bottom feedback cards
-         ========================= */}
+      {/* Bottom feedback cards */}
       {compareResult?.comparisons?.length > 0 && (
-        <section className="result-section">
+        <section className={styles.resultSection}>
           <h2>Feedback Cards</h2>
 
-          <div className="result-grid">
+          <div className={styles.resultGrid}>
             {compareResult.comparisons.map((item) => (
               <div
                 key={item.id}
-                className={`result-card ${
-                  selectedPoint?.id === item.id ? "selected" : ""
+                className={`${styles.resultCard} ${
+                  selectedPoint?.id === item.id ? styles.selected : ""
                 }`}
                 onMouseEnter={() => setHoveredPoint(item)}
                 onMouseLeave={() => setHoveredPoint(null)}
@@ -504,7 +484,9 @@ function ComparePage() {
                   )
                 }
               >
-                <div className={`result-badge ${item.color}`}>
+                <div
+                  className={`${styles.resultBadge} ${styles[item.color]}`}
+                >
                   Point {item.id}
                 </div>
 

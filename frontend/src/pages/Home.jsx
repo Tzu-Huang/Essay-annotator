@@ -1,5 +1,12 @@
 import { Link } from "react-router-dom";
-import "../styles/home.css";
+import {
+  FileText,
+  FileCheck,
+  Upload,
+  Search,
+  TrendingUp,
+} from "lucide-react";
+import styles from "../styles/home.module.css";
 
 function Home() {
   const curatedEssays = [
@@ -104,12 +111,12 @@ function Home() {
       logo: "/logos/ivy.png",
     },
   ];
+
   const scrollingEssays = [...curatedEssays, ...curatedEssays];
 
   return (
-    <div className="home">
-      {/* HERO */}
-      <section className="hero">
+    <div className={styles.home}>
+      <section className={styles.hero}>
         <h1>
           Get Into Top Colleges <br />
           By Learning From <span>200+ Real Accepted Essays</span>
@@ -121,10 +128,10 @@ function Home() {
         </p>
 
         <Link to="/login">
-          <button className="primary-btn">Start Writing</button>
+          <button className={styles.primaryBtn}>Start Writing</button>
         </Link>
 
-        <div className="hero-badges">
+        <div className={styles.heroBadges}>
           <div>✓ 200+ accepted essays</div>
           <div>✓ Harvard, MIT, Stanford</div>
           <div>✓ Real student submissions</div>
@@ -132,83 +139,96 @@ function Home() {
         </div>
       </section>
 
-      {/* EXAMPLE */}
-      <section className="example-section">
-        <div className="example-box">
+      <section className={styles.exampleSection}>
+        <div className={styles.exampleBox}>
           <h3>Your Essay</h3>
-          <div className="placeholder large">Essay Preview</div>
+          <p className={styles.boxSubtitle}>Essay Preview</p>
+
+          <div className={`${styles.placeholder} ${styles.large}`}>
+            <FileText className={styles.placeholderSvg} />
+          </div>
         </div>
 
-        <div className="arrow">→</div>
+        <div className={styles.arrow}>→</div>
 
-        <div className="example-box">
+        <div className={styles.exampleBox}>
           <h3>Similar Accepted Essays</h3>
-          <div className="placeholder large">Matched Essays</div>
+          <p className={styles.boxSubtitle}>Matched Essays</p>
+
+          <div className={`${styles.placeholder} ${styles.large}`}>
+            <FileCheck className={styles.placeholderSvg} />
+          </div>
         </div>
       </section>
 
-      {/* HOW IT WORKS */}
-      <section className="how-it-works">
+      <section className={styles.howItWorks}>
         <h2>See How It Works</h2>
 
-        <div className="steps">
-          <div className="step">
+        <div className={styles.steps}>
+          <div className={styles.step}>
+            <div className={styles.stepIcon}>
+              <Upload className={styles.stepSvg} />
+            </div>
             <h3>1. Upload Essay</h3>
             <p>Paste your draft or upload a file</p>
           </div>
 
-          <div className="step">
+          <div className={styles.step}>
+            <div className={styles.stepIcon}>
+              <Search className={styles.stepSvg} />
+            </div>
             <h3>2. Find Matches</h3>
             <p>We find essays accepted by top schools</p>
           </div>
 
-          <div className="step">
+          <div className={styles.step}>
+            <div className={styles.stepIcon}>
+              <TrendingUp className={styles.stepSvg} />
+            </div>
             <h3>3. Improve</h3>
             <p>Compare structure, tone, storytelling</p>
           </div>
         </div>
       </section>
 
-      {/* FEATURED SCROLL */}
-      <section className="featured-scroll">
+      <section className={styles.featuredScroll}>
         <h2>Featured Accepted Essays</h2>
-        <p className="featured-subtitle">
+        <p className={styles.featuredSubtitle}>
           Explore real essays from top schools and click any card to read more.
         </p>
 
-        <div className="scroll-wrapper">
-          <div className="scroll-track">
+        <div className={styles.scrollWrapper}>
+          <div className={styles.scrollTrack}>
             {scrollingEssays.map((essay, index) => (
               <Link
                 to={`/example/${essay.id}`}
-                className="scroll-card"
+                className={styles.scrollCard}
                 key={`${essay.id}-${index}`}
               >
-                <div className="card-header">
+                <div className={styles.cardHeader}>
                   <img
                     src={essay.logo}
                     alt={`${essay.school} logo`}
-                    className="school-logo"
+                    className={styles.schoolLogo}
                   />
                   <h4>{essay.school}</h4>
                 </div>
 
                 <p>{essay.title}</p>
                 <span>{essay.description}</span>
-                <div className="scroll-link">Read more →</div>
+                <div className={styles.scrollLink}>Read more →</div>
               </Link>
             ))}
           </div>
         </div>
       </section>
 
-      {/* COMPARISON / CTA */}
-      <section className="comparison">
+      <section className={styles.comparison}>
         <h2>Boost Your Admissions Chances Today</h2>
         <p>Learn from real essays that actually got into top schools.</p>
 
-        <div className="compare-box">
-          <div className="bad">
+        <div className={styles.compareBox}>
+          <div className={styles.bad}>
             <h3>✗ Generic Advice</h3>
             <p>AI gives broad, non-specific feedback</p>
             <ul>
@@ -218,7 +238,7 @@ function Home() {
             </ul>
           </div>
 
-          <div className="good">
+          <div className={styles.good}>
             <h3>✓ Real Examples</h3>
             <p>See essays that actually got accepted</p>
             <ul>

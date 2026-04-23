@@ -142,6 +142,7 @@ def load_new_input_essays(id_counter: count, existing_signatures=None) -> list[d
         print(f"  [skip] new_input/ not found: {NEW_INPUT_DIR}")
         return essays
 
+    moved_count = 0
     for file_path in sorted(NEW_INPUT_DIR.glob("*.txt")):
 
         with file_path.open(encoding="utf-8-sig") as f:
@@ -185,8 +186,11 @@ def load_new_input_essays(id_counter: count, existing_signatures=None) -> list[d
             for section in sections
         )):
             move_processed_file(file_path)
+            moved_count += 1
+
 
     print(f"  Loaded {len(essays)} new essays from new_input/\n")
+    print(f"  Successfully moved {moved_count} files. ")
     return essays
 
 
@@ -300,7 +304,7 @@ def update_database():
         new_essays = load_new_input_essays(counter, existing_signatures)
 
         if not new_essays:
-            print("No new essays found in new_input/. Nothing appended.")
+            print("  No new essays found in new_input/. Nothing appended.")
             return
 
         with open(DATABASE_PATH, "a", encoding="utf-8") as f:

@@ -548,7 +548,9 @@ function ComparePage() {
           <section className={styles.userPanel}>
             <div className={styles.userPanelHeader}>
               <div className={styles.essayCardLabel}>Your Essay</div>
-              <div className={styles.essayCardTitle}>{userTopic}</div>
+              <div className={styles.essayCardTitle}>
+                  {userTopic || "User Draft"}
+              </div>
 
               <div className={styles.metaChipRow}>
                 <span className={`${styles.metaChip} ${styles.chipNeutral}`}>

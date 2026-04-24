@@ -202,7 +202,7 @@ function Home() {
           <div className={styles.scrollTrack}>
             {scrollingEssays.map((essay, index) => (
               <Link
-                to={`/example/${essay.id}`}
+                to={`/essay/${essay.id}`}
                 className={styles.scrollCard}
                 key={`${essay.id}-${index}`}
               >

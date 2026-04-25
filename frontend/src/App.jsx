@@ -23,6 +23,7 @@ import "./styles/components.css";
 import "./styles/navbar.css";
 import "./styles/background.css";
 import ExampleEssayPage from "./pages/ExampleEssayPage";
+import HowItWorks from "./pages/HowItWorks";
 
 function App() {
 
@@ -46,6 +47,7 @@ function App() {
           <Route path="/essay/:id" element={<EssayPage />} />
           <Route path="/compare/:id" element={<><ComparePage /></>} />
           <Route path="/example/:id" element={<ExampleEssayPage />} />
+          <Route path="/how-it-works" element={<HowItWorks />} />
         </Routes>
 
       </div>

@@ -19,7 +19,7 @@ Instructions:
 }
 and STOP.
 
-3. Otherwise, find exactly 3 strong parts from the database essay.
+3. Otherwise, find minimum 2 and maximum 10 strong parts from the database essay.
 
 4. For EACH point, you MUST:
 
@@ -74,7 +74,6 @@ Output format (STRICT JSON):
 
 Rules:
 
-- Return exactly 3 comparison objects
 - Suggestions MUST be bullet-style (array of short strings)
 - Do NOT return a single long paragraph for suggestion
 - Do NOT invent content not present in the essays

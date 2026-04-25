@@ -1,0 +1,392 @@
+.how-page {
+  min-height: calc(100vh - 78px);
+  background: #f7f7fb;
+  padding: 34px 28px 60px;
+}
+
+.how-wrapper {
+  max-width: 1220px;
+  margin: 0 auto;
+  background: #f7f7fb;
+  border: 1px solid #e9e9ef;
+  border-radius: 18px;
+  box-shadow: 0 6px 22px rgba(31, 41, 55, 0.04);
+  padding: 36px 28px 28px;
+}
+
+.how-heading {
+  margin: 0;
+  text-align: center;
+  font-size: 26px;
+  font-weight: 800;
+  color: #111827;
+  letter-spacing: -0.02em;
+}
+
+.how-subheading {
+  margin: 14px auto 28px;
+  max-width: 900px;
+  text-align: center;
+  font-size: 15px;
+  line-height: 1.75;
+  color: #4b5563;
+}
+
+.how-steps-panel {
+  background: #fbfbfd;
+  border: 1px solid #eeeeF5;
+  border-radius: 18px;
+  padding: 28px 18px;
+}
+
+.how-steps-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+}
+
+.how-step-group {
+  display: flex;
+  align-items: center;
+  flex: 1;
+  gap: 10px;
+}
+
+.how-step-card {
+  position: relative;
+  flex: 1;
+  min-height: 255px;
+  text-align: center;
+  background: transparent;
+  border-radius: 16px;
+  padding: 18px 12px 8px;
+}
+
+.how-step-number {
+  position: absolute;
+  top: -4px;
+  left: 6px;
+  width: 34px;
+  height: 34px;
+  border-radius: 999px;
+  background: #4f46e5;
+  color: white;
+  font-size: 18px;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 6px 14px rgba(79, 70, 229, 0.18);
+  z-index: 2;
+}
+
+.how-step-visual {
+  height: 120px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 10px 0 18px;
+}
+
+.how-step-card h3 {
+  margin: 0 0 10px;
+  font-size: 18px;
+  line-height: 1.3;
+  color: #111827;
+  font-weight: 800;
+}
+
+.how-step-card p {
+  margin: 0 auto;
+  max-width: 250px;
+  font-size: 14px;
+  line-height: 1.75;
+  color: #4b5563;
+}
+
+.how-arrow {
+  flex-shrink: 0;
+  font-size: 44px;
+  color: #9b8cf7;
+  font-weight: 300;
+  margin: 0 4px;
+}
+
+/* upload visual */
+.upload-visual {
+  position: relative;
+  width: 160px;
+  height: 100px;
+}
+
+.upload-cloud {
+  position: absolute;
+  left: 10px;
+  top: 18px;
+  width: 82px;
+  height: 58px;
+  border: 2px solid #6f63ff;
+  border-radius: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #6f63ff;
+  background: #f8f7ff;
+  box-shadow: 0 4px 12px rgba(111, 99, 255, 0.08);
+}
+
+.upload-file {
+  position: absolute;
+  right: 8px;
+  top: 6px;
+  width: 72px;
+  height: 92px;
+  background: #fcfcff;
+  border: 2px solid #e4e2fb;
+  border-radius: 12px;
+  box-sizing: border-box;
+  padding: 18px 12px 12px;
+}
+
+.file-corner {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 18px;
+  height: 18px;
+  background: #ffffff;
+  border-left: 2px solid #e4e2fb;
+  border-bottom: 2px solid #e4e2fb;
+  border-top-right-radius: 10px;
+}
+
+.file-line {
+  height: 6px;
+  border-radius: 999px;
+  background: #dddafc;
+  margin-bottom: 10px;
+}
+
+.file-line.short {
+  width: 70%;
+}
+
+/* analyze visual */
+.analyze-visual {
+  position: relative;
+  width: 180px;
+  height: 110px;
+}
+
+.analyze-paper {
+  position: absolute;
+  left: 14px;
+  top: 10px;
+  width: 104px;
+  height: 82px;
+  background: #fcfcff;
+  border: 2px solid #dfe5ff;
+  border-radius: 12px;
+  padding: 18px 10px 10px 12px;
+  box-sizing: border-box;
+  box-shadow: 0 6px 14px rgba(120, 139, 255, 0.08);
+}
+
+.analyze-badge {
+  position: absolute;
+  width: 12px;
+  height: 12px;
+  border-radius: 4px;
+  left: 10px;
+}
+
+.badge-1 {
+  top: 12px;
+  background: #73b4ff;
+}
+
+.badge-2 {
+  top: 34px;
+  background: #9ed3ff;
+}
+
+.analyze-line {
+  height: 6px;
+  background: #d8e7ff;
+  border-radius: 999px;
+  margin-left: 18px;
+  margin-bottom: 10px;
+}
+
+.analyze-line.short {
+  width: 65%;
+}
+
+.magnifier {
+  position: absolute;
+  right: 14px;
+  top: 2px;
+  width: 88px;
+  height: 88px;
+}
+
+.magnifier-circle {
+  width: 66px;
+  height: 66px;
+  border: 3px solid #6ba8ff;
+  border-radius: 50%;
+  background: #eff6ff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #5b8dff;
+  position: absolute;
+  top: 6px;
+  left: 0;
+}
+
+.magnifier-handle {
+  position: absolute;
+  width: 36px;
+  height: 8px;
+  background: #6f63ff;
+  border-radius: 999px;
+  transform: rotate(42deg);
+  right: 0;
+  bottom: 12px;
+}
+
+/* matched visual */
+.matched-visual {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+}
+
+.essay-card {
+  position: relative;
+  width: 68px;
+  height: 92px;
+  background: #ffffff;
+  border: 2px solid #e7e7f2;
+  border-radius: 12px;
+  padding: 18px 10px 12px;
+  box-sizing: border-box;
+}
+
+.essay-card::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 18px;
+  height: 18px;
+  background: #fff;
+  border-left: 2px solid #e7e7f2;
+  border-bottom: 2px solid #e7e7f2;
+  border-top-right-radius: 10px;
+}
+
+.essay-badge {
+  position: absolute;
+  top: 10px;
+  left: 8px;
+  width: 16px;
+  height: 16px;
+  border-radius: 5px;
+  color: white;
+  font-size: 10px;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.essay-card.purple .essay-badge {
+  background: #8b5cf6;
+}
+
+.essay-card.teal .essay-badge {
+  background: #14b8a6;
+}
+
+.essay-line {
+  height: 6px;
+  background: #e8eaf9;
+  border-radius: 999px;
+  margin-top: 10px;
+}
+
+.essay-line.short {
+  width: 65%;
+}
+
+/* bottom note */
+.how-note {
+  margin: 18px auto 0;
+  max-width: 740px;
+  background: #efebff;
+  color: #4138c2;
+  border: 1px solid #e1dbff;
+  border-radius: 16px;
+  padding: 16px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  font-size: 15px;
+  font-weight: 600;
+  text-align: center;
+}
+
+.how-note svg {
+  flex-shrink: 0;
+}
+
+/* responsive */
+@media (max-width: 980px) {
+  .how-page {
+    padding: 20px 16px 40px;
+  }
+
+  .how-wrapper {
+    padding: 24px 16px 20px;
+  }
+
+  .how-heading {
+    font-size: 22px;
+  }
+
+  .how-subheading {
+    font-size: 14px;
+    margin-bottom: 20px;
+  }
+
+  .how-steps-row {
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .how-step-group {
+    width: 100%;
+    flex-direction: column;
+  }
+
+  .how-arrow {
+    transform: rotate(90deg);
+    font-size: 34px;
+    margin: 4px 0;
+  }
+
+  .how-step-card {
+    min-height: auto;
+    width: 100%;
+  }
+
+  .how-note {
+    font-size: 14px;
+    padding: 14px 16px;
+  }
+}

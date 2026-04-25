@@ -5,6 +5,13 @@ import {
   Upload,
   Search,
   TrendingUp,
+  Shield,
+  Building2,
+  FileBadge2,
+  GraduationCap,
+  CalendarDays,
+  ArrowRight,
+  BadgeCheck,
 } from "lucide-react";
 
 import styles from "../styles/home.module.css";
@@ -73,7 +80,8 @@ function Home() {
     },
     {
       id: "essay_0029",
-      school: "Johns Hopkins",
+      school:
+        "Johns Hopkins",
       topic:
         "Discuss an accomplishment, event, or realization that sparked a period of personal growth and a new understanding of yourself or others.",
       title: "Building Community Through Music",
@@ -118,9 +126,19 @@ function Home() {
   return (
     <div className={styles.home}>
       <section className={styles.hero}>
+        <div className={styles.heroDecor} />
+
+        <div className={styles.trustBadge}>
+          <Shield size={16} />
+          <span>Trusted by Students Worldwide</span>
+        </div>
+
         <h1>
-          Get Into Top Colleges <br />
-          By Learning From <span>200+ Real Accepted Essays</span>
+          Get Into Top Colleges
+          <br />
+          By Learning From <span>200+</span>
+          <br />
+          <span>Real Accepted Essays</span>
         </h1>
 
         <p>
@@ -128,36 +146,142 @@ function Home() {
           MIT, Stanford, and other top universities.
         </p>
 
-        <Link to="/login">
-          <button className={styles.primaryBtn}>Start Writing</button>
+        <div className={styles.filterPanel}>
+          <div className={styles.filterItem}>
+            <label>University</label>
+            <button type="button" className={styles.filterButton}>
+              <span className={styles.filterLeft}>
+                <Building2 size={18} />
+                <span>All Universities</span>
+              </span>
+              <span className={styles.filterArrow}>⌄</span>
+            </button>
+          </div>
+
+          <div className={styles.filterItem}>
+            <label>Essay Type</label>
+            <button type="button" className={styles.filterButton}>
+              <span className={styles.filterLeft}>
+                <FileBadge2 size={18} />
+                <span>All Essay Types</span>
+              </span>
+              <span className={styles.filterArrow}>⌄</span>
+            </button>
+          </div>
+
+          <div className={styles.filterItem}>
+            <label>Major</label>
+            <button type="button" className={styles.filterButton}>
+              <span className={styles.filterLeft}>
+                <GraduationCap size={18} />
+                <span>All Majors</span>
+              </span>
+              <span className={styles.filterArrow}>⌄</span>
+            </button>
+          </div>
+
+          <div className={styles.filterItem}>
+            <label>Year</label>
+            <button type="button" className={styles.filterButton}>
+              <span className={styles.filterLeft}>
+                <CalendarDays size={18} />
+                <span>All Years</span>
+              </span>
+              <span className={styles.filterArrow}>⌄</span>
+            </button>
+          </div>
+        </div>
+
+        <Link to="/login" className={styles.startWritingLink}>
+          <button className={styles.primaryBtn}>
+            <span>Start Writing</span>
+            <ArrowRight size={18} />
+          </button>
         </Link>
 
         <div className={styles.heroBadges}>
-          <div>✓ 200+ accepted essays</div>
-          <div>✓ Harvard, MIT, Stanford</div>
-          <div>✓ Real student submissions</div>
-          <div>✓ Compare & improve</div>
+          <div>
+            <BadgeCheck size={18} />
+            <span>200+ Accepted Essays</span>
+          </div>
+          <div>
+            <Shield size={18} />
+            <span>Harvard, MIT, Stanford</span>
+          </div>
+          <div>
+            <FileCheck size={18} />
+            <span>Real Student Submissions</span>
+          </div>
+          <div>
+            <TrendingUp size={18} />
+            <span>Compare & Improve</span>
+          </div>
         </div>
       </section>
 
       <section className={styles.exampleSection}>
-        <div className={styles.exampleBox}>
-          <h3>Your Essay</h3>
-          <p className={styles.boxSubtitle}>Essay Preview</p>
+        <div className={`${styles.exampleBox} ${styles.exampleBoxPurple}`}>
+          <div className={styles.boxTop}>
+            <div className={`${styles.boxIconWrap} ${styles.boxIconPurple}`}>
+              <FileText className={styles.boxTopIcon} />
+            </div>
+            <div>
+              <h3>Your Essay</h3>
+              <p className={styles.boxSubtitle}>Preview and enhance your essay</p>
+            </div>
+          </div>
 
           <div className={`${styles.placeholder} ${styles.large}`}>
-            <FileText className={styles.placeholderSvg} />
+            <div className={styles.mockEssay}>
+              <div className={styles.mockEssayLineWide} />
+              <div className={styles.mockEssayBody}>
+                <div className={styles.mockEssayThumbPurple} />
+                <div className={styles.mockEssayText}>
+                  <div className={styles.mockEssayLine} />
+                  <div className={styles.mockEssayLine} />
+                  <div className={styles.mockEssayLine} />
+                  <div className={styles.mockEssayLineShort} />
+                </div>
+              </div>
+            </div>
           </div>
         </div>
 
-        <div className={styles.arrow}>→</div>
-
-        <div className={styles.exampleBox}>
-          <h3>Similar Accepted Essays</h3>
-          <p className={styles.boxSubtitle}>Matched Essays</p>
+        <div className={`${styles.exampleBox} ${styles.exampleBoxBlue}`}>
+          <div className={styles.boxTop}>
+            <div className={`${styles.boxIconWrap} ${styles.boxIconBlue}`}>
+              <FileCheck className={styles.boxTopIcon} />
+            </div>
+            <div>
+              <h3>Similar Accepted Essays</h3>
+              <p className={styles.boxSubtitle}>
+                Find and compare similar successful essays
+              </p>
+            </div>
+          </div>
 
           <div className={`${styles.placeholder} ${styles.large}`}>
-            <FileCheck className={styles.placeholderSvg} />
+            <div className={styles.mockEssay}>
+              <div className={styles.mockEssayBody}>
+                <div className={styles.mockEssayThumbBlue} />
+                <div className={styles.mockEssayText}>
+                  <div className={styles.mockEssayLine} />
+                  <div className={styles.mockEssayLine} />
+                  <div className={styles.mockEssayLineShort} />
+                </div>
+              </div>
+
+              <div className={styles.mockCardDivider} />
+
+              <div className={styles.mockEssayBody}>
+                <div className={styles.mockEssayThumbBlue} />
+                <div className={styles.mockEssayText}>
+                  <div className={styles.mockEssayLine} />
+                  <div className={styles.mockEssayLine} />
+                  <div className={styles.mockEssayLineShort} />
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </section>

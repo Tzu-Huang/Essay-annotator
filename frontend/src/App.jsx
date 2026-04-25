@@ -18,9 +18,10 @@ import Login from "./pages/Login";
 import Editor from "./pages/Editor";
 import EssayPage from "./pages/EssayPage";
 import ComparePage from "./pages/ComparePage";
+import FAQsPage from "./pages/FAQsPage";
 import "./styles/global.css";
 import "./styles/components.css";
-import "./styles/navbar.css";
+import "./styles/navbar.module.css";
 import "./styles/background.css";
 import ExampleEssayPage from "./pages/ExampleEssayPage";
 import HowItWorks from "./pages/HowItWorks";
@@ -37,6 +38,7 @@ function App() {
         <Routes>
           <Route path="/" element={<><Navbar /><Home /></>} />
           <Route path="/login" element={<><Navbar /><Login /></>} />
+          <Route path="/faqs" element={<><Navbar /><FAQsPage /></>} />
           {/* 
           當網址符合 /editor
             → Router render <Editor />

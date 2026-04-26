@@ -1,5 +1,12 @@
 import { Link, useLocation } from "react-router-dom";
-import { Search, HelpCircle, UserCircle2 } from "lucide-react";
+import {
+  Search,
+  HelpCircle,
+  UserCircle2,
+  BookOpen,
+  Info,
+  Sparkles,
+} from "lucide-react";
 import logo from "../assets/logo.png";
 import avatar from "../assets/dog.png";
 import styles from "../styles/navbar.module.css";
@@ -21,6 +28,22 @@ function Navbar() {
               />
             </Link>
           </div>
+
+          <nav className={styles.leftNavLinks}>
+            <Link to="/examples" className={styles.leftNavLink}>
+              <span className={styles.leftNavIcon}>
+                <BookOpen size={16} strokeWidth={2} />
+              </span>
+              <span>Example Essays</span>
+            </Link>
+
+            <Link to="/how-it-works" className={styles.leftNavLink}>
+              <span className={styles.leftNavIcon}>
+                <Sparkles size={16} strokeWidth={2} />
+              </span>
+              <span>How It Works</span>
+            </Link>
+          </nav>
         </div>
 
         <div className={styles.navbarCenter}>
@@ -36,7 +59,7 @@ function Navbar() {
           <nav className={styles.navbarLinks}>
             <Link to="/about" className={styles.navLink}>
               <span className={styles.navLinkIcon}>
-                <UserCircle2 size={16} strokeWidth={2} />
+                <Info size={16} strokeWidth={2} />
               </span>
               <span>About Us</span>
             </Link>

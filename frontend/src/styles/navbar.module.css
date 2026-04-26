@@ -185,22 +185,23 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-width: 108px;
-  height: 40px;
-  padding: 0 18px;
+  min-width: 88px;
+  height: 34px;
+  padding: 0 14px;
   border-radius: 999px;
-  background: linear-gradient(90deg, #4f46e5 0%, #5a54e8 100%);
+  background: linear-gradient(90deg, #3730a3 0%, #4338ca 100%);
   color: #ffffff;
   text-decoration: none;
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 700;
-  box-shadow: 0 8px 18px rgba(79, 70, 229, 0.16);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  box-shadow: 0 6px 14px rgba(55, 48, 163, 0.18);
+  transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
 }
 
 .signInBtn:hover {
   transform: translateY(-1px);
-  box-shadow: 0 10px 20px rgba(79, 70, 229, 0.2);
+  background: linear-gradient(90deg, #312e81 0%, #3730a3 100%);
+  box-shadow: 0 8px 16px rgba(55, 48, 163, 0.24);
 }
 
 /* user info */
@@ -335,9 +336,10 @@
   }
 
   .signInBtn {
-    height: 38px;
-    min-width: 96px;
+    height: 32px;
+    min-width: 82px;
     font-size: 12px;
+    padding: 0 12px;
   }
 
   .navLink {

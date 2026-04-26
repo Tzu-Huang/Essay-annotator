@@ -20,7 +20,8 @@
 .navbarLeft {
   display: flex;
   align-items: center;
-  min-width: 180px;
+  gap: 24px;
+  min-width: 430px;
   z-index: 2;
 }
 
@@ -46,6 +47,7 @@
 .logo {
   display: flex;
   align-items: center;
+  flex-shrink: 0;
 }
 
 .logo a {
@@ -59,12 +61,44 @@
   display: block;
 }
 
+/* left nav links */
+.leftNavLinks {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.leftNavLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  text-decoration: none;
+  color: #1f2937;
+  font-size: 13px;
+  font-weight: 600;
+  white-space: nowrap;
+  padding: 6px 4px;
+  transition: color 0.18s ease, transform 0.18s ease;
+}
+
+.leftNavLink:hover {
+  color: #4f46e5;
+  transform: translateY(-1px);
+}
+
+.leftNavIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #5a61c8;
+}
+
 /* search */
 .searchBox {
   display: flex;
   align-items: center;
   gap: 10px;
-  width: 470px;
+  width: 430px;
   height: 44px;
   padding: 0 16px;
   background: #f5f6f8;
@@ -119,11 +153,12 @@
   font-size: 13px;
   font-weight: 500;
   padding: 6px 4px;
-  transition: color 0.18s ease;
+  transition: color 0.18s ease, transform 0.18s ease;
 }
 
 .navLink:hover {
   color: #4f46e5;
+  transform: translateY(-1px);
 }
 
 .navLinkIcon {
@@ -200,6 +235,29 @@
 }
 
 /* responsive */
+@media (max-width: 1200px) {
+  .navbarLeft {
+    min-width: 360px;
+    gap: 16px;
+  }
+
+  .navbarRight {
+    min-width: 360px;
+  }
+
+  .searchBox {
+    width: 360px;
+  }
+
+  .leftNavLinks {
+    gap: 12px;
+  }
+
+  .leftNavLink {
+    font-size: 12px;
+  }
+}
+
 @media (max-width: 1100px) {
   .navbarShell {
     padding: 0 18px;
@@ -225,7 +283,8 @@
   }
 
   .navbarLeft {
-    justify-content: flex-start;
+    justify-content: center;
+    flex-wrap: wrap;
   }
 
   .navbarCenter {
@@ -255,6 +314,20 @@
     height: 38px;
   }
 
+  .navbarLeft {
+    gap: 12px;
+  }
+
+  .leftNavLinks {
+    gap: 10px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .leftNavLink {
+    font-size: 12px;
+  }
+
   .searchBox {
     width: 100%;
     max-width: 100%;
@@ -279,6 +352,10 @@
 @media (max-width: 560px) {
   .navbarLinks {
     gap: 10px;
+  }
+
+  .leftNavLink span:last-child {
+    display: none;
   }
 
   .navLink span:last-child {

@@ -2,16 +2,8 @@ import { Link } from "react-router-dom";
 import {
   FileText,
   FileCheck,
-  Upload,
   Search,
   TrendingUp,
-  Shield,
-  Building2,
-  FileBadge2,
-  GraduationCap,
-  CalendarDays,
-  ArrowRight,
-  BadgeCheck,
 } from "lucide-react";
 
 import styles from "../styles/home.module.css";
@@ -80,8 +72,7 @@ function Home() {
     },
     {
       id: "essay_0029",
-      school:
-        "Johns Hopkins",
+      school: "Johns Hopkins",
       topic:
         "Discuss an accomplishment, event, or realization that sparked a period of personal growth and a new understanding of yourself or others.",
       title: "Building Community Through Music",
@@ -128,85 +119,27 @@ function Home() {
       <section className={styles.hero}>
         <div className={styles.heroDecor} />
 
-        <div className={styles.trustBadge}>
-          <Shield size={16} />
-          <span>Trusted by Students Worldwide</span>
-        </div>
-
-        <h1>
-          Get Into Top Colleges
-          <br />
-          By Learning From <span>200+</span>
-          <br />
-          <span>Real Accepted Essays</span>
-        </h1>
+          <h1>
+            Get Into Top Colleges By Learning From 
+            <br />
+            <span>200+ Real Accepted Essays</span>
+          </h1>
 
         <p>
           Access a curated database of 200+ real essays accepted into Harvard,
           MIT, Stanford, and other top universities.
         </p>
 
-        <div className={styles.filterPanel}>
-          <div className={styles.filterItem}>
-            <label>University</label>
-            <button type="button" className={styles.filterButton}>
-              <span className={styles.filterLeft}>
-                <Building2 size={18} />
-                <span>All Universities</span>
-              </span>
-              <span className={styles.filterArrow}>⌄</span>
-            </button>
-          </div>
-
-          <div className={styles.filterItem}>
-            <label>Essay Type</label>
-            <button type="button" className={styles.filterButton}>
-              <span className={styles.filterLeft}>
-                <FileBadge2 size={18} />
-                <span>All Essay Types</span>
-              </span>
-              <span className={styles.filterArrow}>⌄</span>
-            </button>
-          </div>
-
-          <div className={styles.filterItem}>
-            <label>Major</label>
-            <button type="button" className={styles.filterButton}>
-              <span className={styles.filterLeft}>
-                <GraduationCap size={18} />
-                <span>All Majors</span>
-              </span>
-              <span className={styles.filterArrow}>⌄</span>
-            </button>
-          </div>
-
-          <div className={styles.filterItem}>
-            <label>Year</label>
-            <button type="button" className={styles.filterButton}>
-              <span className={styles.filterLeft}>
-                <CalendarDays size={18} />
-                <span>All Years</span>
-              </span>
-              <span className={styles.filterArrow}>⌄</span>
-            </button>
-          </div>
-        </div>
-
         <Link to="/login" className={styles.startWritingLink}>
           <button className={styles.primaryBtn}>
             <span>Start Writing</span>
-            <ArrowRight size={18} />
           </button>
         </Link>
 
         <div className={styles.heroBadges}>
           <div>
-            <BadgeCheck size={18} />
-            <span>200+ Accepted Essays</span>
-          </div>
-          <div>
-            <Shield size={18} />
-            <span>Harvard, MIT, Stanford</span>
+            <Search size={18} />
+            <span>Find Matches</span>
           </div>
           <div>
             <FileCheck size={18} />
@@ -215,6 +148,38 @@ function Home() {
           <div>
             <TrendingUp size={18} />
             <span>Compare & Improve</span>
+          </div>
+        </div>
+      </section>
+
+      <section className={styles.featuredScroll}>
+        <h2>Featured Accepted Essays</h2>
+        <p className={styles.featuredSubtitle}>
+          Explore real essays from top schools and click any card to read more.
+        </p>
+
+        <div className={styles.scrollWrapper}>
+          <div className={styles.scrollTrack}>
+            {scrollingEssays.map((essay, index) => (
+              <Link
+                to={`/essay/${essay.id}`}
+                className={styles.scrollCard}
+                key={`${essay.id}-${index}`}
+              >
+                <div className={styles.cardHeader}>
+                  <img
+                    src={essay.logo}
+                    alt={`${essay.school} logo`}
+                    className={styles.schoolLogo}
+                  />
+                  <h4>{essay.school}</h4>
+                </div>
+
+                <p>{essay.title}</p>
+                <span>{essay.description}</span>
+                <div className={styles.scrollLink}>Read more →</div>
+              </Link>
+            ))}
           </div>
         </div>
       </section>
@@ -282,68 +247,6 @@ function Home() {
                 </div>
               </div>
             </div>
-          </div>
-        </div>
-      </section>
-
-      <section className={styles.howItWorks}>
-        <h2>See How It Works</h2>
-
-        <div className={styles.steps}>
-          <div className={styles.step}>
-            <div className={styles.stepIcon}>
-              <Upload className={styles.stepSvg} />
-            </div>
-            <h3>1. Upload Essay</h3>
-            <p>Paste your draft or upload a file</p>
-          </div>
-
-          <div className={styles.step}>
-            <div className={styles.stepIcon}>
-              <Search className={styles.stepSvg} />
-            </div>
-            <h3>2. Find Matches</h3>
-            <p>We find essays accepted by top schools</p>
-          </div>
-
-          <div className={styles.step}>
-            <div className={styles.stepIcon}>
-              <TrendingUp className={styles.stepSvg} />
-            </div>
-            <h3>3. Improve</h3>
-            <p>Compare structure, tone, storytelling</p>
-          </div>
-        </div>
-      </section>
-
-      <section className={styles.featuredScroll}>
-        <h2>Featured Accepted Essays</h2>
-        <p className={styles.featuredSubtitle}>
-          Explore real essays from top schools and click any card to read more.
-        </p>
-
-        <div className={styles.scrollWrapper}>
-          <div className={styles.scrollTrack}>
-            {scrollingEssays.map((essay, index) => (
-              <Link
-                to={`/essay/${essay.id}`}
-                className={styles.scrollCard}
-                key={`${essay.id}-${index}`}
-              >
-                <div className={styles.cardHeader}>
-                  <img
-                    src={essay.logo}
-                    alt={`${essay.school} logo`}
-                    className={styles.schoolLogo}
-                  />
-                  <h4>{essay.school}</h4>
-                </div>
-
-                <p>{essay.title}</p>
-                <span>{essay.description}</span>
-                <div className={styles.scrollLink}>Read more →</div>
-              </Link>
-            ))}
           </div>
         </div>
       </section>

@@ -10,10 +10,13 @@ import {
 import logo from "../assets/logo.png";
 import avatar from "../assets/dog.png";
 import styles from "../styles/navbar.module.css";
+import { useAuth } from "../hooks/useAuth";
 
 function Navbar() {
   const location = useLocation();
   const isEditorPage = location.pathname === "/editor";
+  const isHomePage = location.pathname === "/";
+  const { user, logoutUser } = useAuth();
 
   return (
     <header className={styles.navbarShell}>
@@ -73,10 +76,20 @@ function Navbar() {
 
             <div className={styles.navDivider} />
 
-            {isEditorPage ? (
-              <div className={styles.userInfo}>
-                <span className={styles.username}>Olivia Chu</span>
-                <img src={avatar} alt="avatar" className={styles.avatar} />
+            {(isEditorPage || isHomePage) && user ? (
+              <div className={styles.userActions}>
+                <div className={styles.userInfo}>
+                  <span className={styles.username}>{user.name}</span>
+                  <img
+                    src={user.picture || avatar}
+                    alt={user.name}
+                    className={styles.avatar}
+                  />
+                </div>
+
+                <button className={styles.signInBtn} onClick={logoutUser}>
+                  Log Out
+                </button>
               </div>
             ) : (
               <>
@@ -88,9 +101,15 @@ function Navbar() {
                 </Link>
 
                 <div className={styles.auth}>
-                  <Link to="/login" className={styles.signInBtn}>
-                    Sign In
-                  </Link>
+                  {user ? (
+                    <Link to="/editor" className={styles.signInBtn}>
+                      Editor
+                    </Link>
+                  ) : (
+                    <Link to="/login" className={styles.signInBtn}>
+                      Sign In
+                    </Link>
+                  )}
                 </div>
               </>
             )}

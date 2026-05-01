@@ -1,6 +1,5 @@
 import { useState } from "react";
 import styles from "../styles/faqs.module.css";
-import logo from "../assets/logo.png";
 
 const categories = [
   "All Questions",

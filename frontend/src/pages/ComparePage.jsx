@@ -50,35 +50,6 @@ function normalizeForSearch(text) {
     .trim();
 }
 
-function splitParagraphBySentence(paragraph, sentence) {
-  const safeParagraph = paragraph || "";
-  const safeSentence = sentence || "";
-
-  if (!safeParagraph || !safeSentence) {
-    return null;
-  }
-
-  const directIndex = safeParagraph.indexOf(safeSentence);
-  if (directIndex !== -1) {
-    return {
-      before: safeParagraph.slice(0, directIndex),
-      match: safeParagraph.slice(directIndex, directIndex + safeSentence.length),
-      after: safeParagraph.slice(directIndex + safeSentence.length),
-    };
-  }
-
-  const normalizedParagraph = normalizeForSearch(safeParagraph);
-  const normalizedSentence = normalizeForSearch(safeSentence);
-  const normalizedIndex = normalizedParagraph.indexOf(normalizedSentence);
-
-  if (normalizedIndex === -1) {
-    return null;
-  }
-
-  // Fallback: if normalization matches but raw index fails, return null and avoid broken slicing.
-  // Better to render plain text than highlight the wrong span.
-  return null;
-}
 
 function normalizeCompareResponse(data, essayId) {
   const rawResults = data?.comparisons || [];

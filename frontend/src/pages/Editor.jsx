@@ -54,17 +54,17 @@ const TYPE_STYLES = {
 };
 
 const DEFAULT_RESULT_STYLE = {
-  accentGradient: "linear-gradient(180deg, #6366f1 0%, #38bdf8 100%)",
+  accentGradient: "linear-gradient(180deg, #6366f1 0%, #a1d9f1 100%)",
   badgeBg: "#eef2ff",
   badgeText: "#4f46e5",
 };
 
 const RANK_STYLES = {
-  1: { bg: "#fff27d", text: "#7a6800" }, // gold
-  2: { bg: "#d8dee9", text: "#475569" }, // silver
-  3: { bg: "#efc3a4", text: "#8a4b25" }, // bronze
-  4: { bg: "#d0d9fb", text: "#4338ca" }, // 4th
-  5: { bg: "#b6a9f0", text: "#6d28d9" }, // 5th
+  1: { bg: "#fde68a", text: "#713f12" }, // deeper gold
+  2: { bg: "#fed7aa", text: "#7c2d12" }, // deeper bronze
+  3: { bg: "#fad1e8", text: "#701a75" }, // deeper pink
+  4: { bg: "#d0d9fc", text: "#3730a3" }, // deeper violet
+  5: { bg: "#e2dcfa", text: "#5b21b6" }, // deeper purple
 };
 
 const NON_ALL_TYPES = ["Personal Statement", "University of California", "Supplemental"];

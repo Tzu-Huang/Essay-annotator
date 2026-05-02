@@ -44,7 +44,6 @@
   display: flex;
   align-items: center;
   flex-shrink: 0;
-  transform: translateY(-1px);
 }
 
 .logo a {
@@ -86,8 +85,8 @@
   color: #ea580c;
   background: #fff1e7;
   transform: translateY(-1px);
-}
 
+}
 .leftNavIcon {
   display: flex;
   align-items: center;
@@ -106,13 +105,6 @@
   padding: 0 16px;
   background: #ffffff;
   border-radius: 999px;
-  border: 1px solid #eadfce;
-  box-shadow: 0 10px 24px rgba(31, 41, 55, 0.05);
-  transition:
-    background 0.2s ease,
-    border-color 0.2s ease,
-    box-shadow 0.2s ease,
-    transform 0.2s ease;
 }
 
 .searchBox:hover {
@@ -197,15 +189,15 @@
   text-decoration: none;
   font-size: 12px;
   font-weight: 700;
-  box-shadow: 0 6px 14px rgba(55, 48, 163, 0.18);
+  box-shadow: 0 4px 12px rgba(55, 48, 163, 0.12);
   cursor: pointer;
-  transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+  transition: background 0.16s ease, box-shadow 0.16s ease, transform 0.16s ease;
 }
 
 .signInBtn:hover {
   transform: translateY(-1px);
   background: linear-gradient(90deg, #312e81 0%, #3730a3 100%);
-  box-shadow: 0 8px 16px rgba(55, 48, 163, 0.24);
+  box-shadow: 0 6px 14px rgba(55, 48, 163, 0.16);
 }
 
 /* user info */
@@ -221,7 +213,7 @@
   gap: 8px;
   padding: 7px 10px;
   border-radius: 999px;
-  transition: background 0.18s ease;
+  transition: background 0.16s ease;
 }
 
 .username {

@@ -26,12 +26,11 @@ textarea:focus {
   color: white;
   border: none;
   border-radius: 8px;
-
   cursor: pointer;
-  transition: 0.2s;
+  transition: background 0.16s ease, box-shadow 0.16s ease, transform 0.16s ease;
 }
 
 .primary-btn:hover {
   transform: translateY(-1px);
-  box-shadow: 0 10px 20px rgba(0,0,0,0.15);
+  box-shadow: 0 4px 12px rgba(79, 70, 229, 0.12);
 }

@@ -43,7 +43,6 @@
   display: flex;
   align-items: center;
   flex-shrink: 0;
-  transform: translateY(-1px);
 }
 
 .logo a {
@@ -74,12 +73,11 @@
   font-weight: 600;
   white-space: nowrap;
   padding: 6px 4px;
-  transition: color 0.18s ease, transform 0.18s ease;
+  transition: color 0.16s ease;
 }
 
 .leftNavLink:hover {
   color: #4f46e5;
-  transform: translateY(-1px);
 }
 
 .leftNavIcon {
@@ -100,7 +98,7 @@
   background: #f5f6f8;
   border-radius: 999px;
   border: 1px solid #e3e6ee;
-  transition: all 0.2s ease;
+  transition: background 0.16s ease, border-color 0.16s ease, box-shadow 0.16s ease;
 }
 
 .searchBox:hover {
@@ -149,12 +147,11 @@
   font-size: 13px;
   font-weight: 500;
   padding: 6px 4px;
-  transition: color 0.18s ease, transform 0.18s ease;
+  transition: color 0.16s ease;
 }
 
 .navLink:hover {
   color: #4f46e5;
-  transform: translateY(-1px);
 }
 
 .navLinkIcon {
@@ -190,15 +187,15 @@
   text-decoration: none;
   font-size: 12px;
   font-weight: 700;
-  box-shadow: 0 6px 14px rgba(55, 48, 163, 0.18);
+  box-shadow: 0 4px 12px rgba(55, 48, 163, 0.12);
   cursor: pointer;
-  transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+  transition: background 0.16s ease, box-shadow 0.16s ease, transform 0.16s ease;
 }
 
 .signInBtn:hover {
   transform: translateY(-1px);
   background: linear-gradient(90deg, #312e81 0%, #3730a3 100%);
-  box-shadow: 0 8px 16px rgba(55, 48, 163, 0.24);
+  box-shadow: 0 6px 14px rgba(55, 48, 163, 0.16);
 }
 
 /* user info */
@@ -214,7 +211,7 @@
   gap: 8px;
   padding: 7px 10px;
   border-radius: 999px;
-  transition: background 0.18s ease;
+  transition: background 0.16s ease;
 }
 
 .username {

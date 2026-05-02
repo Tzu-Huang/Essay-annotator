@@ -1,173 +1,190 @@
 import { useState } from "react";
 import styles from "../styles/faqs.module.css";
 
-const categories = [
-  "All Questions",
-  "Getting Started",
-  "Essays & Tools",
-  "Account & Billing",
-  "Privacy & Security",
+const faqSections = [
+  {
+    title: "Getting Started",
+    questions: [
+      {
+        question: "What is Essay Annotator?",
+        answer:
+          "Essay Annotator helps students learn from real college essay examples by comparing drafts, surfacing similar essays, and giving structured feedback.",
+      },
+      {
+        question: "Is Essay Annotator free to use?",
+        answer:
+          "For now, the platform is designed for limited student testing. Some features may be adjusted as the project develops.",
+      },
+      {
+        question: "How does Essay Annotator help me improve my writing?",
+        answer:
+          "It does not rewrite your essay for you. Instead, it shows what strong essays do well so you can improve your own structure, specificity, reflection, and storytelling.",
+      },
+    ],
+  },
+  {
+    title: "Using the Platform",
+    questions: [
+      {
+        question: "How do I search for essay examples?",
+        answer:
+          "You can search by topic, prompt, theme, or draft content. The system uses semantic search, so it looks for meaning rather than only matching keywords.",
+      },
+      {
+        question: "Can I compare my draft with a selected essay?",
+        answer:
+          "Yes. After selecting an example essay, you can compare your draft against it and receive focused suggestions based on content and writing quality.",
+      },
+      {
+        question: "What kinds of essays are included?",
+        answer:
+          "The database is focused on college application essays, including personal statements and school-specific supplemental essays.",
+      },
+    ],
+  },
+  {
+    title: "Feedback & Privacy",
+    questions: [
+      {
+        question: "Does Essay Annotator write my essay for me?",
+        answer:
+          "No. The goal is not ghostwriting. The platform is built to help students learn from examples and improve their own thinking and writing.",
+      },
+      {
+        question: "Do you store my drafts?",
+        answer:
+          "During testing, drafts may be processed to generate results. You should avoid submitting private information that you do not want processed.",
+      },
+      {
+        question: "Why are the results sometimes imperfect?",
+        answer:
+          "The system depends on the essay database, embeddings, and AI-generated comparison logic. It is meant to guide revision, not replace human judgment.",
+      },
+    ],
+  },
 ];
 
-const faqs = [
-  {
-    question: "What is Essay Annotator?",
-    answer:
-      "Essay-Annotator is a data-driven platform designed to help students learn how to write effective U.S. college application essays by analyzing real examples and providing structural, non-ghostwriting feedback.",
-    category: "Getting Started",
-  },
-  {
-    question: "How does Essay Annotator help me improve my writing?",
-    answer:
-      "It compares your draft with similar accepted essays and highlights specific areas where the reference essay is stronger, such as reflection, structure, specificity, and storytelling.",
-    category: "Essays & Tools",
-  },
-  {
-    question: "Is Essay Annotator free to use?",
-    answer:
-      "We are currently only open to a few organizations that collaborates with us",
-    category: "Account & Billing",
-  },
-  {
-    question: "Where do the essays in the database come from?",
-    answer:
-      "The database is built from real accepted essays that are organized by school, essay type, topic, and writing pattern.",
-    category: "Essays & Tools",
-  },
-  {
-    question: "Can I use Essay Annotator for school applications?",
-    answer:
-      "Yes. Essay AI is designed to help you understand strong writing patterns and improve your own draft while keeping your voice and ideas original.",
-    category: "Getting Started",
-  },
-  {
-    question: "Is my data safe and private?",
-    answer:
-      "Your draft should be treated as private user content. Avoid sharing sensitive personal information unless necessary.",
-    category: "Privacy & Security",
-  },
-  {
-    question: "Can I cancel my subscription anytime?",
-    answer:
-      "Yes. If subscriptions are enabled, users should be able to manage or cancel their plan from account settings.",
-    category: "Account & Billing",
-  },
-  {
-    question: "What types of essays can I write with Essay Annotator?",
-    answer:
-      "Essay AI can support personal statements, supplemental essays, community essays, leadership essays, diversity essays, and more.",
-    category: "Essays & Tools",
-  },
-];
+export default function FAQPage() {
+  const [openSection, setOpenSection] = useState(0);
+  const [openQuestion, setOpenQuestion] = useState(0);
 
-function FAQsPage() {
-  const [activeCategory, setActiveCategory] = useState("All Questions");
-  const [openIndex, setOpenIndex] = useState(0);
-  const [search, setSearch] = useState("");
-
-  const filteredFaqs = faqs.filter((faq) => {
-    const matchesCategory =
-      activeCategory === "All Questions" || faq.category === activeCategory;
-
-    const matchesSearch =
-      faq.question.toLowerCase().includes(search.toLowerCase()) ||
-      faq.answer.toLowerCase().includes(search.toLowerCase());
-
-    return matchesCategory && matchesSearch;
-  });
+  const handleSectionClick = (index) => {
+    setOpenSection(openSection === index ? null : index);
+    setOpenQuestion(0);
+  };
 
   return (
-    <div className={styles.faqPage}>
-
+    <div className={styles.page}>
       <section className={styles.hero}>
-        <div className={styles.heroContent}>
-          <span className={styles.heroPill}>FAQs</span>
-          <h1>
-            Answers to Your
-            <br />
-            Most Common Questions
-          </h1>
-          <p>
-            Everything you need to know about Essay Annotator.
-            <br />
-            Can’t find the answer you’re looking for? Contact us anytime.
-          </p>
+        <div>
+          <h1>Essay Annotator Help Center</h1>
+          <p>Ask us anything. We’re here to help.</p>
 
-          <div className={styles.searchBox}>
-            <span>⌕</span>
-            <input
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              placeholder="Search for a question..."
-            />
+          <div className={styles.search}>
+            <input placeholder="Search for help..." />
+            <button>Search</button>
           </div>
         </div>
 
-        <div className={styles.heroVisual}>
-          <div className={styles.questionBubble}>?</div>
-          <div className={styles.chatBubble}>•••</div>
-          <div className={styles.bookStack} />
-          <div className={styles.plant} />
+        <div className={styles.illustration}>
+          <div className={styles.imageCard}>
+            <div className={styles.paper}>
+              <span></span>
+              <span></span>
+              <span></span>
+            </div>
+            <div className={styles.highlight}></div>
+            <div className={styles.avatar}></div>
+            <div className={styles.chatBubble}>?</div>
+          </div>
         </div>
       </section>
 
-      <main className={styles.faqMain}>
-        <aside className={styles.sidebar}>
-          <div className={styles.categoryCard}>
-            {categories.map((category) => (
-              <button
-                key={category}
-                className={`${styles.categoryButton} ${
-                  activeCategory === category ? styles.categoryActive : ""
-                }`}
-                onClick={() => {
-                  setActiveCategory(category);
-                  setOpenIndex(0);
-                }}
-              >
-                <span className={styles.categoryIcon}>▣</span>
-                {category}
-              </button>
-            ))}
-          </div>
+      <div className={styles.main}>
+        <div>
+          <h2>FAQs</h2>
+          <p className={styles.subtitle}>
+            Quick answers about how Essay Annotator works.
+          </p>
 
-          <div className={styles.helpCard}>
-            <h3>Still need help?</h3>
-            <p>Our support team is here for you.</p>
-            <button className={styles.primarySupport}>Contact Support</button>
-            <button className={styles.secondarySupport}>Live Chat</button>
-          </div>
-        </aside>
-
-        <section className={styles.faqList}>
-          {filteredFaqs.map((faq, index) => {
-            const isOpen = openIndex === index;
-
-            return (
-              <div
-                key={faq.question}
-                className={`${styles.faqItem} ${isOpen ? styles.faqOpen : ""}`}
-              >
+          <div className={styles.card}>
+            {faqSections.map((section, sectionIndex) => (
+              <div key={section.title} className={styles.section}>
                 <button
-                  className={styles.faqQuestion}
-                  onClick={() => setOpenIndex(isOpen ? null : index)}
+                  className={styles.sectionHeader}
+                  onClick={() => handleSectionClick(sectionIndex)}
                 >
-                  <span>{faq.question}</span>
-                  <span className={styles.chevron}>{isOpen ? "⌃" : "⌄"}</span>
+                  <span className={styles.sectionTitle}>
+                    {section.title}
+                  </span>
+
+                  <span className={styles.toggleIcon}>
+                    {openSection === sectionIndex ? "−" : "+"}
+                  </span>
                 </button>
 
-                {isOpen && (
-                  <div className={styles.faqAnswer}>
-                    <p>{faq.answer}</p>
-                  </div>
-                )}
+                <div
+                  className={`${styles.questionsPanel} ${
+                    openSection === sectionIndex ? styles.open : ""
+                  }`}
+                >
+                  {section.questions.map((item, questionIndex) => (
+                    <div key={item.question} className={styles.questionBlock}>
+                      <button
+                        className={`${styles.question} ${
+                          openQuestion === questionIndex &&
+                          openSection === sectionIndex
+                            ? styles.featured
+                            : ""
+                        }`}
+                        onClick={() =>
+                          setOpenQuestion(
+                            openQuestion === questionIndex ? null : questionIndex
+                          )
+                        }
+                      >
+                        <span>{item.question}</span>
+                        <span>{openQuestion === questionIndex ? "−" : "+"}</span>
+                      </button>
+
+                      <div
+                        className={`${styles.answer} ${
+                          openQuestion === questionIndex &&
+                          openSection === sectionIndex
+                            ? styles.answerOpen
+                            : ""
+                        }`}
+                      >
+                        <p>{item.answer}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
               </div>
-            );
-          })}
-        </section>
-      </main>
+            ))}
+          </div>
+        </div>
+
+        <div className={styles.sidebar}>
+          <h3>Categories</h3>
+
+          {faqSections.map((section, index) => (
+            <button
+              key={section.title}
+              className={openSection === index ? styles.activeCategory : ""}
+              onClick={() => handleSectionClick(index)}
+            >
+              {section.title}
+            </button>
+          ))}
+
+          <div className={styles.contactBox}>
+            <h4>Still need questions?</h4>
+            <p>We respond within 24 hours</p>
+            <button>Contact Us</button>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }
-
-export default FAQsPage;

@@ -1,9 +1,10 @@
 .navbarShell {
   width: 100%;
   box-sizing: border-box;
-  background: #dee3f4;
-  border-bottom: 1px solid #e4e6eb;
+  background: linear-gradient(180deg, #f6f6f6 0%, #ffffff 100%);
+  border-bottom: 1px solid #ffffff;
   padding: 0 28px;
+  box-shadow: 0 4px 18px rgba(31, 41, 55, 0.04);
 }
 
 .navbar {
@@ -73,12 +74,17 @@
   font-size: 13px;
   font-weight: 600;
   white-space: nowrap;
-  padding: 6px 4px;
-  transition: color 0.18s ease, transform 0.18s ease;
+  padding: 8px 10px;
+  border-radius: 999px;
+  transition:
+    color 0.2s ease,
+    background 0.2s ease,
+    transform 0.2s ease;
 }
 
 .leftNavLink:hover {
-  color: #4f46e5;
+  color: #ea580c;
+  background: #fff1e7;
   transform: translateY(-1px);
 }
 
@@ -86,8 +92,9 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #5a61c8;
+  color: #ea580c;
 }
+
 
 /* search */
 .searchBox {
@@ -97,32 +104,27 @@
   width: min(430px, 100%);
   height: 44px;
   padding: 0 16px;
-  background: #f5f6f8;
+  background: #ffffff;
   border-radius: 999px;
-  border: 1px solid #e3e6ee;
-  transition: all 0.2s ease;
+  border: 1px solid #eadfce;
+  box-shadow: 0 10px 24px rgba(31, 41, 55, 0.05);
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    transform 0.2s ease;
 }
 
 .searchBox:hover {
-  background: #f2f4f8;
+  background: #fffaf4;
+  border-color: #fed7aa;
 }
 
 .searchBox:focus-within {
   background: #ffffff;
-  border-color: #c7d2fe;
-}
-
-.searchBox input {
-  border: none;
-  outline: none;
-  background: transparent;
-  width: 100%;
-  font-size: 13px;
-  color: #111827;
-}
-
-.searchBox input::placeholder {
-  color: #9aa3af;
+  border-color: #fb923c;
+  box-shadow: 0 12px 28px rgba(249, 115, 22, 0.12);
+  transform: translateY(-1px);
 }
 
 .searchIcon {
@@ -148,12 +150,17 @@
   color: #1f2937;
   font-size: 13px;
   font-weight: 500;
-  padding: 6px 4px;
-  transition: color 0.18s ease, transform 0.18s ease;
+  padding: 8px 10px;
+  border-radius: 999px;
+  transition:
+    color 0.2s ease,
+    background 0.2s ease,
+    transform 0.2s ease;
 }
 
 .navLink:hover {
-  color: #4f46e5;
+  color: #ea580c;
+  background: #fff1e7;
   transform: translateY(-1px);
 }
 
@@ -161,13 +168,13 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #5a61c8;
+  color: #ea580c;
 }
 
 .navDivider {
   width: 1px;
   height: 22px;
-  background: #d3d8e4;
+  background: #eadfce;
   margin: 0 2px;
 }
 

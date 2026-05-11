@@ -1,6 +1,6 @@
 import { Navigate, useNavigate } from "react-router-dom";
 import { useGoogleLogin } from "@react-oauth/google";
-import "../styles/login.css";
+import styles from "../styles/login.module.css";
 import { useAuth } from "../hooks/useAuth";
 
 const GOOGLE_USERINFO_URL = "https://www.googleapis.com/oauth2/v3/userinfo";
@@ -8,7 +8,6 @@ const GOOGLE_USERINFO_URL = "https://www.googleapis.com/oauth2/v3/userinfo";
 function Login() {
   const navigate = useNavigate();
   const { user, loginUser } = useAuth();
-
 
   const googleLogin = useGoogleLogin({
     onSuccess: async (tokenResponse) => {
@@ -45,25 +44,25 @@ function Login() {
   };
 
   return (
-    <div className="login-container">
-      <div className="login-card">
+    <div className={styles.loginContainer}>
+      <div className={styles.loginCard}>
         <h2>Sign In</h2>
 
         <input type="text" placeholder="account" />
         <input type="password" placeholder="password" />
 
         <button
-          className="primary-btn"
+          className={styles.primaryBtn}
           onClick={() => navigate("/editor")}
         >
           Sign In
         </button>
 
-        <button className="google-btn" onClick={handleGoogleLogin}>
+        <button className={styles.googleBtn} onClick={handleGoogleLogin}>
           Continue with Google
         </button>
 
-        <p className="signup-link">Sign Up</p>
+        <p className={styles.signupLink}>Sign Up</p>
       </div>
     </div>
   );

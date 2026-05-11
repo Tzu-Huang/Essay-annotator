@@ -1,0 +1,161 @@
+/* =========================================
+   Login
+   ========================================= */
+
+.loginContainer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  height: calc(100vh - 60px);
+  padding: 32px 20px;
+
+  background: linear-gradient(120deg, #eef2ff, #f8fafc);
+}
+
+.loginCard {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+
+  width: min(420px, 100%);
+  padding: 45px 42px;
+
+  background: rgba(255, 255, 255, 0.96);
+  border-radius: 20px;
+  box-shadow: 0 16px 36px rgba(15, 23, 42, 0.08);
+
+  animation: loginCardEnter 0.5s ease-out;
+}
+
+.loginCard h2 {
+  margin: 0 0 10px;
+
+  font-size: 32px;
+  line-height: 1;
+}
+
+.loginCard input {
+  height: 50px;
+  margin: 2px;
+  padding: 0 18px;
+
+  background: rgba(255, 255, 255, 0.94);
+  border: 1px solid #c7cfde;
+  border-radius: 12px;
+
+  color: #111827;
+  font-size: 17px;
+
+  transition:
+    border-color 0.16s ease,
+    background-color 0.16s ease;
+}
+
+.loginCard input:focus {
+  outline: none;
+
+  background: #ffffff;
+  border-color: #b9c3e0;
+}
+
+.loginCard input::placeholder {
+  color: #7a7a7a;
+}
+
+.primaryBtn {
+  height: 52px;
+  padding: 0 18px;
+
+  background: linear-gradient(90deg, #3730a3 0%, #4338ca 100%);
+  border: none;
+  border-radius: 12px;
+
+  color: #ffffff;
+  font-size: 16px;
+  font-weight: 700;
+
+  cursor: pointer;
+
+  transition:
+    background 0.16s ease,
+    box-shadow 0.16s ease,
+    transform 0.16s ease;
+}
+
+.primaryBtn:hover {
+  background: linear-gradient(90deg, #312e81 0%, #3730a3 100%);
+  box-shadow: 0 6px 14px rgba(55, 48, 163, 0.16);
+  transform: translateY(-1px);
+}
+
+.googleBtn {
+  height: 52px;
+  padding: 0 18px;
+
+  background: #f8f9fc;
+  border: 1px solid #d6dbe7;
+  border-radius: 12px;
+
+  color: #1f2937;
+  font-size: 16px;
+  font-weight: 600;
+
+  cursor: pointer;
+
+  transition:
+    background 0.16s ease,
+    border-color 0.16s ease,
+    box-shadow 0.16s ease;
+}
+
+.googleBtn:hover {
+  background: #ffffff;
+  border-color: #cfd6e6;
+  box-shadow: 0 4px 12px rgba(148, 163, 184, 0.12);
+}
+
+.googleLoginWrapper {
+  display: flex;
+  justify-content: center;
+}
+
+.signupLink {
+  margin: 0;
+
+  color: #4338ca;
+  font-size: 14px;
+  font-weight: 600;
+  text-align: center;
+
+  cursor: pointer;
+}
+
+.loginHelp,
+.loginError {
+  margin: 0;
+
+  font-size: 14px;
+  line-height: 1.4;
+  text-align: center;
+}
+
+.loginHelp {
+  color: #475569;
+}
+
+.loginError {
+  color: #b91c1c;
+}
+
+@keyframes loginCardEnter {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

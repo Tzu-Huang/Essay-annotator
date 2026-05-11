@@ -1,7 +1,7 @@
 import { useParams, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
-import "../styles/EssayPage.css";
 import { Copy, Download, Share2 } from "lucide-react";
+import styles from "../styles/EssayPage.module.css";
 
 function EssayPage() {
   const { id } = useParams();
@@ -24,7 +24,6 @@ function EssayPage() {
 
         const data = await response.json();
         setEssay(data);
-
       } catch (err) {
         console.error("ERROR:", err);
         setError("Failed to load essay.");
@@ -39,17 +38,20 @@ function EssayPage() {
   };
 
   if (error) {
-    return <p className="loading">{error}</p>;
+    return <p className={styles.loading}>{error}</p>;
   }
 
   return (
-    <div className="essay-page">
+    <div className={styles.essayPage}>
       {essay ? (
         <>
           {/* NAV */}
-          <div className="essay-nav">
-            <div className="logo">Essay <span>AI</span></div>
-            <div className="nav-links">
+          <div className={styles.essayNav}>
+            <div className={styles.logo}>
+              Essay <span>AI</span>
+            </div>
+
+            <div className={styles.navLinks}>
               <span>Home</span>
               <span>My Essays</span>
               <span>Examples</span>
@@ -58,50 +60,53 @@ function EssayPage() {
           </div>
 
           {/* HERO */}
-          <div className="essay-hero">
-            <button className="back-btn" onClick={() => navigate(-1)}>
+          <div className={styles.essayHero}>
+            <button className={styles.backBtn} onClick={() => navigate(-1)}>
               ← Back to Results
             </button>
 
-            <h1 title={essay.topic}>
-              {essay.topic}
-            </h1>
+            <h1 title={essay.topic}>{essay.topic}</h1>
 
-            <div className="meta-row">
+            <div className={styles.metaRow}>
               {essay.essay_type && (
-                <span className="badge type">{essay.essay_type}</span>
+                <span className={`${styles.badge} ${styles.type}`}>
+                  {essay.essay_type}
+                </span>
               )}
+
               {essay.word_count && (
-                <span className="badge words">{essay.word_count} words</span>
+                <span className={`${styles.badge} ${styles.words}`}>
+                  {essay.word_count} words
+                </span>
               )}
             </div>
           </div>
 
           {/* MAIN */}
-          <div className="essay-layout">
+          <div className={styles.essayLayout}>
             {/* LEFT SIDEBAR */}
-            <div className="sidebar">
-              <div className="card info-card">
+            <div className={styles.sidebar}>
+              <div className={`${styles.card} ${styles.infoCard}`}>
                 <h3>Essay Info</h3>
 
-                <div className="info-row">
-                  <div className="info-icon">▣</div>
+                <div className={styles.infoRow}>
+                  <div className={styles.infoIcon}>▣</div>
                   <div>
                     <span>Word Count</span>
                     <b>{essay.word_count || essay.words || "-"}</b>
                   </div>
                 </div>
 
-                <div className="info-row">
-                  <div className="info-icon">Aa</div>
+                <div className={styles.infoRow}>
+                  <div className={styles.infoIcon}>Aa</div>
                   <div>
                     <span>Type</span>
                     <b>{essay.essay_type || essay.type || "-"}</b>
                   </div>
                 </div>
 
-                <div className="info-row">
-                  <div className="info-icon">⌂</div>
+                <div className={styles.infoRow}>
+                  <div className={styles.infoIcon}>⌂</div>
                   <div>
                     <span>School</span>
                     <b>{essay.school || "-"}</b>
@@ -109,26 +114,29 @@ function EssayPage() {
                 </div>
               </div>
 
-              <div className="card note-card">
+              <div className={`${styles.card} ${styles.noteCard}`}>
                 <h3>Reading Guide</h3>
-                <p>This essay example is provided for learning structure, tone, and storytelling techniques.</p>
+                <p>
+                  This essay example is provided for learning structure, tone,
+                  and storytelling techniques.
+                </p>
               </div>
             </div>
 
             {/* RIGHT CONTENT */}
-            <div className="content-card">
-              <div className="essay-text">
+            <div className={styles.contentCard}>
+              <div className={styles.essayText}>
                 {essay.content.split("\n\n").map((para, i) => (
                   <p key={i}>{para}</p>
                 ))}
               </div>
 
-              <div className="action-bar">
-                <button className="primary-btn" onClick={handleCompare}>
+              <div className={styles.actionBar}>
+                <button className={styles.primaryBtn} onClick={handleCompare}>
                   ⚡ Compare with My Essay
                 </button>
 
-                <div className="secondary-btns">
+                <div className={styles.secondaryBtns}>
                   <button>
                     <Copy size={16} />
                     Copy
@@ -142,8 +150,9 @@ function EssayPage() {
               </div>
             </div>
           </div>
-          <div className="feature-strip">
-            <div className="feature-item">
+
+          <div className={styles.featureStrip}>
+            <div className={styles.featureItem}>
               🛡
               <div>
                 <b>AI-Powered</b>
@@ -151,7 +160,7 @@ function EssayPage() {
               </div>
             </div>
 
-            <div className="feature-item">
+            <div className={styles.featureItem}>
               ✦
               <div>
                 <b>High Quality</b>
@@ -159,7 +168,7 @@ function EssayPage() {
               </div>
             </div>
 
-            <div className="feature-item">
+            <div className={styles.featureItem}>
               📖
               <div>
                 <b>Learning Focused</b>
@@ -167,7 +176,7 @@ function EssayPage() {
               </div>
             </div>
 
-            <div className="feature-item">
+            <div className={styles.featureItem}>
               🔒
               <div>
                 <b>Your Privacy</b>
@@ -177,7 +186,7 @@ function EssayPage() {
           </div>
         </>
       ) : (
-        <p className="loading">Loading...</p>
+        <p className={styles.loading}>Loading...</p>
       )}
     </div>
   );

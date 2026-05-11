@@ -1,108 +1,124 @@
-.essay-page {
-  background: #f8f8fd;
+.essayPage {
   min-height: 100vh;
-  font-family: Inter, sans-serif;
+
+  background: #f8f8fd;
+
   color: #1c2340;
+  font-family: Inter, sans-serif;
 }
 
 /* =========================
-   NAV
+   Nav
 ========================= */
-.essay-nav {
-  height: 70px;
-  background: white;
+
+.essayNav {
   display: flex;
   justify-content: space-between;
   align-items: center;
+
+  height: 70px;
   padding: 0 10%;
-  border-bottom: 1px solid #eee;
+
+  background: #ffffff;
+  border-bottom: 1px solid #eeeeee;
 }
 
 .logo {
-  font-weight: 800;
   font-size: 22px;
+  font-weight: 800;
 }
 
 .logo span {
   color: #6a5af9;
 }
 
-.nav-links {
+.navLinks {
   display: flex;
   gap: 34px;
-  font-size: 15px;
+
   color: #1c2340;
+  font-size: 15px;
 }
 
 /* =========================
-   HERO
+   Hero
 ========================= */
-.essay-hero {
+
+.essayHero {
   padding: 48px 10% 72px;
 }
 
-.essay-hero h1 {
+.essayHero h1 {
+  display: -webkit-box;
   max-width: 850px;
+  margin: 0 0 18px;
+  overflow: hidden;
+
+  font-family: Georgia, serif;
   font-size: 50px;
   line-height: 1.12;
-  font-family: Georgia, serif;
-  margin: 0 0 18px;
 
-  /* ✅ 關鍵：限制最多兩行 */
-  display: -webkit-box;
   -webkit-line-clamp: 4;
   -webkit-box-orient: vertical;
-  overflow: hidden;
 }
 
-.back-btn {
-  border: none;
-  background: none;
-  color: #6a5af9;
-  font-weight: 700;
-  cursor: pointer;
+.backBtn {
   width: fit-content;
   margin-bottom: 22px;
+
+  background: none;
+  border: none;
+
+  color: #6a5af9;
+  font-weight: 700;
+
+  cursor: pointer;
 }
 
-
-.meta-row {
+.metaRow {
   display: flex;
   gap: 10px;
 }
 
 .badge {
   padding: 8px 13px;
+
   border-radius: 12px;
+
   font-size: 13px;
   font-weight: 700;
 }
 
 .type {
   background: #e8e5ff;
+
   color: #5a4df0;
 }
 
 .words {
   background: #eef2ff;
+
   color: #3b5bdb;
 }
 
 /* =========================
-   MAIN LAYOUT
+   Main Layout
 ========================= */
-.essay-layout {
+
+.essayLayout {
   display: grid;
   grid-template-columns: 280px 1fr;
-  gap: 28px;
-  padding: 0 10% 30px;
-  margin-top: -42px;
   align-items: start;
+  gap: 28px;
+
+  margin-top: -42px;
+  padding: 0 10% 30px;
 }
 
 /* =========================
-   SIDEBAR CARDS
+   Sidebar Cards
 ========================= */
+
 .sidebar {
   display: flex;
   flex-direction: column;
@@ -110,240 +126,280 @@
 }
 
 .sidebar .card {
-  background: white;
-  border-radius: 18px;
-  border: 5px solid #ececf5;
   overflow: hidden;
+
+  background: #ffffff;
+  border: 5px solid #ececf5;
+  border-radius: 18px;
   box-shadow:
     0 10px 25px rgba(30, 34, 90, 0.06),
     0 2px 6px rgba(30, 34, 90, 0.04);
+
   transition: all 0.25s ease;
 }
 
 .sidebar .card:hover {
-  transform: translateY(-4px);
   box-shadow:
     0 18px 40px rgba(30, 34, 90, 0.1),
     0 4px 12px rgba(30, 34, 90, 0.06);
+  transform: translateY(-4px);
 }
 
-.info-card h3 {
-  background: linear-gradient(135deg, #f7f5ff, #fbfbff);
-  padding: 18px 22px;
+.infoCard h3 {
   margin: -22px -22px 16px;
+  padding: 18px 22px;
+
+  background: linear-gradient(135deg, #f7f5ff, #fbfbff);
   border-bottom: 1px solid #f0f0f7;
   border-radius: 18px 18px 0 0;
 }
 
 /* Essay Info title area */
+
 .card h3 {
   margin: 0;
   padding: 18px 22px;
-  font-size: 17px;
-  font-weight: 800;
+
   background: linear-gradient(135deg, #f7f5ff, #fbfbff);
   border-bottom: 1px solid #f0f0f7;
+
+  font-size: 17px;
+  font-weight: 800;
 }
 
 /* Card body spacing */
-.info-row,
-.info-item {
+
+.infoRow,
+.infoItem {
   display: flex;
   align-items: center;
   gap: 14px;
+
   padding: 14px 22px;
+
   border-bottom: 1px solid #f0f1f7;
+
   font-size: 14px;
 }
 
-.info-row:last-child,
-.info-item:last-child {
+.infoRow:last-child,
+.infoItem:last-child {
   border-bottom: none;
 }
 
-.info-icon {
-  width: 38px;
-  height: 38px;
-  border-radius: 12px;
-  background: linear-gradient(135deg, #f3f1ff, #ebe8ff);
+.infoIcon {
   display: grid;
   place-items: center;
+  flex-shrink: 0;
+
+  width: 38px;
+  height: 38px;
+
+  background: linear-gradient(135deg, #f3f1ff, #ebe8ff);
+  border-radius: 12px;
+
   color: #6a5af9;
   font-weight: 700;
-  flex-shrink: 0;
 }
 
-.info-row span,
-.info-item span {
+.infoRow span,
+.infoItem span {
   display: block;
+  margin-bottom: 4px;
+
   color: #8a91a8;
   font-size: 13px;
-  margin-bottom: 4px;
 }
 
-.info-row b,
-.info-item b {
+.infoRow b,
+.infoItem b {
   color: #1c2340;
   font-size: 14px;
 }
 
-/* Reading guide card */
-.note-card {
+/* =========================
+   Reading Guide Card
+========================= */
+
+.noteCard {
   background: linear-gradient(135deg, #ffffff, #f4f1ff);
 }
 
-.note-card p {
-  color: #6f7890;
-  line-height: 1.6;
-  font-size: 14px;
+.noteCard p {
   margin: 0;
   padding: 18px 22px 22px;
+
+  color: #6f7890;
+  font-size: 14px;
+  line-height: 1.6;
 }
 
 /* =========================
-   ESSAY CONTENT
+   Essay Content
 ========================= */
-.content-card {
-  background: white;
-  border-radius: 18px;
+
+.contentCard {
   padding: 36px 38px 24px;
+
+  background: #ffffff;
   border: 1px solid #ececf5;
+  border-radius: 18px;
   box-shadow: 0 10px 28px rgba(31, 35, 60, 0.05);
 }
 
-.essay-text {
+.essayText {
   max-width: 980px;
+
+  color: #2a3355;
   font-size: 18px;
   line-height: 1.82;
-  color: #2a3355;
 }
 
-.essay-text p {
+.essayText p {
   margin: 0 0 22px;
 }
 
 /* =========================
-   ACTION BUTTONS
+   Action Buttons
 ========================= */
-.action-bar {
-  margin-top: 28px;
-  padding-top: 24px;
-  border-top: 1px solid #eeeef6;
+
+.actionBar {
   display: flex;
   justify-content: space-between;
   align-items: center;
+
+  margin-top: 28px;
+  padding-top: 24px;
+
+  border-top: 1px solid #eeeef6;
 }
 
-.primary-btn {
-  background: linear-gradient(135deg, #6a5af9, #4d39e8);
-  color: white;
-  border: none;
+.primaryBtn {
   padding: 14px 28px;
+
+  background: linear-gradient(135deg, #6a5af9, #4d39e8);
+  border: none;
   border-radius: 12px;
-  font-weight: 800;
-  cursor: pointer;
   box-shadow: 0 12px 24px rgba(89, 74, 238, 0.25);
+
+  color: #ffffff;
+  font-weight: 800;
+
+  cursor: pointer;
 }
 
-.secondary-btns {
+.secondaryBtns {
   display: flex;
   gap: 12px;
 }
 
-.secondary-btns button {
+.secondaryBtns button {
   display: flex;
   align-items: center;
   gap: 8px;
-  border: 1px solid #e0e2ec;
-  background: white;
+
   padding: 10px 16px;
+
+  background: #ffffff;
+  border: 1px solid #e0e2ec;
   border-radius: 10px;
-  cursor: pointer;
-  font-weight: 600;
+
   color: #1c2340;
+  font-weight: 600;
+
+  cursor: pointer;
+
   transition: all 0.2s ease;
 }
 
-.secondary-btns button:hover {
+.secondaryBtns button:hover {
   background: #f5f6ff;
   border-color: #d5d9ff;
 }
 
-.secondary-btns button svg {
+.secondaryBtns button svg {
   color: #6a5af9;
 }
 
 /* =========================
-   FEATURE STRIP
+   Feature Strip
 ========================= */
-.feature-strip {
-  margin: 0 10% 50px;
-  background: #ffffff;
-  border: 1px solid #ececf5;
-  border-radius: 18px;
-  padding: 24px 32px;
+
+.featureStrip {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 24px;
+
+  margin: 0 10% 50px;
+  padding: 24px 32px;
+
+  background: #ffffff;
+  border: 1px solid #ececf5;
+  border-radius: 18px;
   box-shadow: 0 10px 28px rgba(31, 35, 60, 0.04);
 }
 
-.feature-item {
+.featureItem {
   display: flex;
-  gap: 14px;
   align-items: center;
+  gap: 14px;
+
   color: #1c2340;
 }
 
-.feature-item b {
+.featureItem b {
   font-size: 14px;
 }
 
-.feature-item p {
+.featureItem p {
   margin: 5px 0 0;
+
   color: #7d859d;
   font-size: 13px;
 }
 
 /* =========================
-   LOADING
+   Loading
 ========================= */
+
 .loading {
-  text-align: center;
   margin-top: 100px;
+
+  text-align: center;
 }
 
 /* =========================
-   RESPONSIVE
+   Responsive
 ========================= */
+
 @media (max-width: 900px) {
-  .essay-nav,
-  .essay-hero,
-  .essay-layout,
-  .feature-strip {
-    padding-left: 24px;
+  .essayNav,
+  .essayHero,
+  .essayLayout,
+  .featureStrip {
     padding-right: 24px;
+    padding-left: 24px;
   }
 
-  .nav-links {
+  .navLinks {
     display: none;
   }
 
-  .essay-layout {
+  .essayLayout {
     grid-template-columns: 1fr;
   }
 
-  .essay-hero h1 {
+  .essayHero h1 {
     font-size: 38px;
   }
 
-  .action-bar {
+  .actionBar {
     flex-direction: column;
     align-items: stretch;
     gap: 16px;
   }
 
-  .feature-strip {
+  .featureStrip {
     grid-template-columns: 1fr;
   }
 }

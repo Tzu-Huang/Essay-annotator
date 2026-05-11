@@ -1,6 +1,6 @@
 import { useParams, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
-import "../styles/EssayPage.css";
+import styles from "../styles/EssayPage.module.css";
 
 function ExampleEssayPage() {
   const { id } = useParams();

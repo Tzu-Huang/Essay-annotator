@@ -19,6 +19,8 @@ function EssayPage() {
     const fetchEssay = async () => {
       try {
         setError("");
+        setEssay(null);
+        setRelatedEssays([]);
 
         const response = await fetch(
           `http://44.201.62.0:8000/essays/${id}?include_content=true`
@@ -123,7 +125,16 @@ function EssayPage() {
                   <button
                     key={item.id || item.essay_id || index}
                     className={styles.relatedCard}
-                    onClick={() => navigate(`/essay/${item.parent_id}`)}
+                    onClick={() => {
+                      const nextId = item.parent_id;
+
+                      navigate(`/essay/${nextId}`);
+                    
+                      window.scrollTo({
+                        top: 0,
+                        behavior: "smooth",
+                      });
+                    }}
                   >
                   <img
                     className={styles.relatedImage}

@@ -1,13 +1,19 @@
 import { useParams, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
-import "../styles/EssayPage.css";
-import { Copy, Download, Share2 } from "lucide-react";
+import styles from "../styles/EssayPage.module.css";
+
+const PLACEHOLDER_IMAGES = [
+  "https://images.unsplash.com/photo-1455390582262-044cdead277a?q=80&w=1200&auto=format&fit=crop",
+  "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?q=80&w=1200&auto=format&fit=crop",
+  "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?q=80&w=1200&auto=format&fit=crop",
+];
 
 function EssayPage() {
   const { id } = useParams();
   const navigate = useNavigate();
   const [essay, setEssay] = useState(null);
   const [error, setError] = useState("");
+  const [relatedEssays, setRelatedEssays] = useState([]);
 
   useEffect(() => {
     const fetchEssay = async () => {
@@ -25,6 +31,32 @@ function EssayPage() {
         const data = await response.json();
         setEssay(data);
 
+        // Find related essays
+        const searchResponse = await fetch(`http://44.201.62.0:8000/search`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            topK: 4,
+            essay_types: ["all"],
+            topic: data.topic || "",
+            content: data.content || "",
+          }),
+        });
+
+        if (searchResponse.ok) {
+          const searchData = await searchResponse.json();
+          const results = searchData.results || searchData || [];
+
+          const filtered = results
+            .filter((item) => item.id !== id && item.essay_id !== id)
+            .slice(0, 3);
+
+          setRelatedEssays(filtered);
+        }
+        // find related essays === 
+
       } catch (err) {
         console.error("ERROR:", err);
         setError("Failed to load essay.");
@@ -39,147 +71,87 @@ function EssayPage() {
   };
 
   if (error) {
-    return <p className="loading">{error}</p>;
+    return <p className={styles.loading}>{error}</p>;
   }
 
   return (
-    <div className="essay-page">
+    <main className={styles.essayPage}>
       {essay ? (
         <>
-          {/* NAV */}
-          <div className="essay-nav">
-            <div className="logo">Essay <span>AI</span></div>
-            <div className="nav-links">
-              <span>Home</span>
-              <span>My Essays</span>
-              <span>Examples</span>
-              <span>About Us</span>
-            </div>
-          </div>
-
-          {/* HERO */}
-          <div className="essay-hero">
-            <button className="back-btn" onClick={() => navigate(-1)}>
+          <section className={styles.hero}>
+            <button className={styles.backBtn} onClick={() => navigate(-1)}>
               ← Back to Results
             </button>
 
-            <h1 title={essay.topic}>
-              {essay.topic}
+            <h1 className={styles.title}>
+              {essay.generated_title || essay.title || "Untitled Essay"}
             </h1>
 
-            <div className="meta-row">
-              {essay.essay_type && (
-                <span className="badge type">{essay.essay_type}</span>
-              )}
-              {essay.word_count && (
-                <span className="badge words">{essay.word_count} words</span>
-              )}
+            <p className={styles.prompt}>
+              {essay.topic}
+            </p>
+
+            <div className={styles.meta}>
+              <span>•</span>
+              <span>{essay.type || "Example Essay"} </span>
+
+              <span>•</span>
+              <span>{essay.school || "School not listed"}</span>
+
+              <span>{essay.word_count || essay.words || "-"} words</span>
             </div>
+          </section>
+
+          <article className={styles.article}>
+            {essay.content.split("\n\n").map((para, i) => (
+              <p key={i}>{para}</p>
+            ))}
+          </article>
+
+          <div className={styles.actionArea}>
+            <button className={styles.compareBtn} onClick={handleCompare}>
+              ⚡ Compare with My Essay
+            </button>
           </div>
 
-          {/* MAIN */}
-          <div className="essay-layout">
-            {/* LEFT SIDEBAR */}
-            <div className="sidebar">
-              <div className="card info-card">
-                <h3>Essay Info</h3>
+          {relatedEssays.length > 0 && (
+            <section className={styles.relatedSection}>
+              <h2>Posts you may also be interested in</h2>
 
-                <div className="info-row">
-                  <div className="info-icon">▣</div>
-                  <div>
-                    <span>Word Count</span>
-                    <b>{essay.word_count || essay.words || "-"}</b>
-                  </div>
-                </div>
+              <div className={styles.relatedList}>
+                {relatedEssays.map((item, index) => (
+                  <button
+                    key={item.id || item.essay_id || index}
+                    className={styles.relatedCard}
+                    onClick={() => navigate(`/essay/${item.parent_id}`)}
+                  >
+                  <img
+                    className={styles.relatedImage}
+                    src={PLACEHOLDER_IMAGES[index % PLACEHOLDER_IMAGES.length]}
+                    alt=""
+                  />
 
-                <div className="info-row">
-                  <div className="info-icon">Aa</div>
-                  <div>
-                    <span>Type</span>
-                    <b>{essay.essay_type || essay.type || "-"}</b>
-                  </div>
-                </div>
+                    <div className={styles.relatedBody}>
+                      <span>{item.type || item.essay_type || "Example Essay"}</span>
 
-                <div className="info-row">
-                  <div className="info-icon">⌂</div>
-                  <div>
-                    <span>School</span>
-                    <b>{essay.school || "-"}</b>
-                  </div>
-                </div>
-              </div>
+                      <h3>
+                        {item.generated_title || "Untitled Essay"}
+                      </h3>
 
-              <div className="card note-card">
-                <h3>Reading Guide</h3>
-                <p>This essay example is provided for learning structure, tone, and storytelling techniques.</p>
-              </div>
-            </div>
-
-            {/* RIGHT CONTENT */}
-            <div className="content-card">
-              <div className="essay-text">
-                {essay.content.split("\n\n").map((para, i) => (
-                  <p key={i}>{para}</p>
+                      <p>
+                        {item.school || "School not listed"}
+                      </p>
+                    </div>
+                  </button>
                 ))}
               </div>
-
-              <div className="action-bar">
-                <button className="primary-btn" onClick={handleCompare}>
-                  ⚡ Compare with My Essay
-                </button>
-
-                <div className="secondary-btns">
-                  <button>
-                    <Copy size={16} />
-                    Copy
-                  </button>
-
-                  <button>
-                    <Download size={16} />
-                    Download
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div className="feature-strip">
-            <div className="feature-item">
-              🛡
-              <div>
-                <b>AI-Powered</b>
-                <p>Smart comparison support</p>
-              </div>
-            </div>
-
-            <div className="feature-item">
-              ✦
-              <div>
-                <b>High Quality</b>
-                <p>Curated essay examples</p>
-              </div>
-            </div>
-
-            <div className="feature-item">
-              📖
-              <div>
-                <b>Learning Focused</b>
-                <p>Improve through examples</p>
-              </div>
-            </div>
-
-            <div className="feature-item">
-              🔒
-              <div>
-                <b>Your Privacy</b>
-                <p>Your essay stays secure</p>
-              </div>
-            </div>
-          </div>
+            </section>
+          )}
         </>
       ) : (
-        <p className="loading">Loading...</p>
+        <p className={styles.loading}>Loading...</p>
       )}
-    </div>
+    </main>
   );
 }
 

@@ -1,0 +1,149 @@
+.footer {
+  width: 100%;
+
+  overflow: hidden;
+
+  margin-top: 0;
+
+  background: rgba(75, 78, 101, 0.92);
+
+  border-top: 1px solid rgba(255,255,255,0.08);
+
+  backdrop-filter: blur(10px);
+
+  color: white;
+}
+
+/* =========================
+   Main Layout
+========================= */
+
+.footer-container {
+  max-width: 1400px;
+
+  margin: 0 auto;
+
+  padding: 20px 20px;
+
+  display: grid;
+
+  grid-template-columns: 2fr 1fr 1fr;
+
+  gap: 60px;
+}
+
+/* =========================
+   Titles
+========================= */
+
+.footer-section h3 {
+  font-size: 17px;
+
+  margin-bottom: 22px;
+
+  color: rgba(255,255,255,0.95);
+
+  letter-spacing: 0.03em;
+}
+
+/* =========================
+   Brand Section
+========================= */
+
+.footer-brand h2 {
+  font-size: 15px;
+
+  margin-bottom: 20px;
+
+  font-weight: 700;
+}
+
+.footer-brand p {
+  color: rgba(255,255,255,0.68);
+
+  line-height: 1.8;
+
+  max-width: 500px;
+
+  margin-bottom: 28px;
+}
+
+/* =========================
+   Navigation
+========================= */
+
+.footer-section ul {
+  list-style: none;
+
+  padding: 0;
+
+  margin: 0;
+}
+
+.footer-section li {
+  margin-bottom: 14px;
+
+  color: rgba(255,255,255,0.68);
+
+  line-height: 1.7;
+}
+
+.footer-section a {
+  display: inline-block;
+
+  color: rgba(255,255,255,0.68);
+
+  text-decoration: none;
+
+  transition: all 0.25s ease;
+}
+
+.footer-section a:hover {
+  color: white;
+
+  transform: translateX(3px);
+}
+
+/* =========================
+   Bottom
+========================= */
+
+.footer-bottom {
+  border-top: 2px solid rgba(189, 66, 66, 0.06);
+
+  background: rgba(75, 78, 101, 0.92);
+  
+  text-align: center;
+
+  padding: 22px;
+
+  font-size: 14px;
+
+  color: rgba(255,255,255,0.45);
+}
+
+/* =========================
+   Responsive
+========================= */
+
+@media (max-width: 900px) {
+  .footer-container {
+    grid-template-columns: 1fr;
+
+    gap: 50px;
+  }
+
+  .footer {
+    margin-top: 80px;
+  }
+}
+
+@media (max-width: 600px) {
+  .footer-container {
+    padding: 50px 24px;
+  }
+
+  .footer-brand h2 {
+    font-size: 28px;
+  }
+}

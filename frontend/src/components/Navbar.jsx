@@ -48,16 +48,7 @@ function Navbar() {
             </Link>
           </nav>
         </div>
-
-        <div className={styles.navbarCenter}>
-          <div className={styles.searchBox}>
-            <span className={styles.searchIcon}>
-              <Search size={16} strokeWidth={2.1} />
-            </span>
-            <input placeholder="Search prompts, topics, or examples..." />
-          </div>
-        </div>
-
+        
         <div className={styles.navbarRight}>
           <nav className={styles.navbarLinks}>
             <Link to="/about" className={styles.navLink}>

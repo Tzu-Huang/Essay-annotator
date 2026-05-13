@@ -87,7 +87,16 @@ function App() {
           <Route path="/compare/:id" element={<ComparePage />} />
 
           {/* How it works page 不加 Navbar / Footer */}
-          <Route path="/how-it-works" element={<HowItWorks />} />
+          <Route 
+            path="/how-it-works" 
+            element={
+              <>
+                <Navbar />
+                <HowItWorks />
+
+              </>
+            }
+          />
         </Routes>
       </div>
     </BrowserRouter>

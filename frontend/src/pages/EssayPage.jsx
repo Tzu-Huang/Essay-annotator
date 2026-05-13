@@ -1,5 +1,5 @@
 import { useParams, useNavigate } from "react-router-dom";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import styles from "../styles/EssayPage.module.css";
 
 const PLACEHOLDER_IMAGES = [
@@ -14,7 +14,36 @@ function EssayPage() {
   const [essay, setEssay] = useState(null);
   const [error, setError] = useState("");
   const [relatedEssays, setRelatedEssays] = useState([]);
+  const cardRef = useRef(null);
 
+  useEffect(() => {
+    let currentY = 0;
+    let targetY = 0;
+    let animationFrame;
+
+    const handleScroll = () => {
+      targetY = window.scrollY * 0.05;
+    };
+
+    const animate = () => {
+      currentY += (targetY - currentY) * 0.001;
+
+      if (cardRef.current) {
+        cardRef.current.style.transform = `translateY(${currentY}px)`;
+      }
+
+      animationFrame = requestAnimationFrame(animate);
+    };
+
+    window.addEventListener("scroll", handleScroll);
+
+    animate();
+
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+      cancelAnimationFrame(animationFrame);
+    };
+  }, []);
   useEffect(() => {
     const fetchEssay = async () => {
       try {
@@ -71,6 +100,10 @@ function EssayPage() {
   const handleCompare = () => {
     navigate(`/compare/${id}`);
   };
+  const heroImage =
+  essay?.hero_image ||
+  "https://images.unsplash.com/photo-1455390582262-044cdead277a?q=80&w=1600&auto=format&fit=crop";
+
 
   if (error) {
     return <p className={styles.loading}>{error}</p>;
@@ -80,7 +113,18 @@ function EssayPage() {
     <main className={styles.essayPage}>
       {essay ? (
         <>
-          <section className={styles.hero}>
+          <section
+            className={styles.hero}
+            style={{
+              backgroundImage: `linear-gradient(
+                90deg,
+                rgba(248, 248, 253, 0.96) 0%,
+                rgba(248, 248, 253, 0.82) 42%,
+                rgba(248, 248, 253, 0.18) 100%
+              ), url(${heroImage})`,
+            }}
+          >
+            
             <button className={styles.backBtn} onClick={() => navigate(-1)}>
               ← Back to Results
             </button>
@@ -104,21 +148,39 @@ function EssayPage() {
             </div>
           </section>
 
-          <article className={styles.article}>
-            {essay.content.split("\n\n").map((para, i) => (
-              <p key={i}>{para}</p>
-            ))}
-          </article>
+          <div className={styles.contentLayout}>
 
-          <div className={styles.actionArea}>
-            <button className={styles.compareBtn} onClick={handleCompare}>
-              ⚡ Compare with My Essay
-            </button>
+            <article className={styles.article}>
+              {essay.content.split("\n\n").map((para, i) => (
+                <p key={i}>{para}</p>
+              ))}
+            </article>
+
+            <aside className={styles.sideColumn}>
+              <section 
+                  className={styles.ctaCard}
+                  ref={cardRef}
+                >
+                <h2>Ready to write your own essay?</h2>
+
+                <p>
+                  Compare your essay with real successful examples.
+                </p>
+
+                <button
+                  className={styles.ctaBtn}
+                  onClick={handleCompare}
+                >
+                  Compare with My Essay ⚡
+                </button>
+              </section>
+            </aside>
+
           </div>
 
           {relatedEssays.length > 0 && (
             <section className={styles.relatedSection}>
-              <h2>Posts you may also be interested in</h2>
+              <h2>You may also enjoy these essays related to this topic.</h2>
 
               <div className={styles.relatedList}>
                 {relatedEssays.map((item, index) => (

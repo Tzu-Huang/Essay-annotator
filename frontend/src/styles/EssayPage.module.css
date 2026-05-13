@@ -8,9 +8,13 @@
 /* HERO */
 
 .hero {
-  max-width: 980px;
+  max-width: none;
   margin: 0 auto;
-  padding: 72px 28px 42px;
+  padding: 72px 17% 72px;
+
+  background-size: cover;
+  background-position: center right;
+  background-repeat: no-repeat;
 }
 
 .backBtn {
@@ -71,25 +75,43 @@
 /* ARTICLE */
 
 .article {
-  max-width: 820px;
+  max-width: 1000px;
   margin: 0 auto;
-  margin-left: 350px;
-  padding: 42px 28px 20px;
+  padding: 42px 160px 20px;
 
   border-top: 1px solid rgba(28, 35, 64, 0.1);
 }
 
+
 .article p {
-  margin: 0 0 30px;
+  margin: 0 0 35px;
 
   font-family: Inter, system-ui, sans-serif;
   font-size: 19px;
   line-height: 1.9;
-  font-weight: 450;
+  font-weight: 400;
 
   letter-spacing: -0.01em;
 
   color: #26304f;
+}
+
+.article p:first-child::first-letter {
+  float: left;
+
+  font-size: 92px;
+
+  line-height: 0.82;
+
+  padding-right: 10px;
+
+  margin-top: 10px;
+
+  font-weight: 700;
+
+  font-family: "Cormorant Garamond", serif;
+
+  color: #010102;
 }
 
 /* ACTION */
@@ -120,6 +142,107 @@
   box-shadow: 0 14px 28px rgba(89, 74, 238, 0.22);
 }
 
+.ctaCard {
+  position: relative;
+  will-change: transform;
+  backdrop-filter: blur(14px);
+  padding: 34px 38px;
+  border-radius: 18px;
+
+  background: linear-gradient(
+    135deg,
+    rgba(106, 90, 249, 0.14),
+    rgba(255, 255, 255, 0.9)
+  );
+  top: 120px;
+  margin: 30px 0 80px;
+  margin-left: -50px;
+
+  box-shadow: 0 18px 45px rgba(31, 35, 60, 0.08);
+  transition:
+    box-shadow 0.3s ease;
+}
+
+.ctaCard h2 {
+  margin: 0 0 16px;
+  font-size: 23px;
+  line-height: 1.05;
+  font-weight: 850;
+  letter-spacing: -0.04em;
+
+  color: #5a4df0;
+}
+
+.ctaCard p {
+  margin: 0 0 26px;
+
+  font-size: 15px;
+  line-height: 1.55;
+  font-weight: 500;
+
+  color: #5f667c;
+}
+
+.ctaBtn {
+  width: 100%;
+
+  border: none;
+  border-radius: 999px;
+
+  padding: 15px 22px;
+
+  background: linear-gradient(135deg, #6a5af9, #4d39e8);
+  color: white;
+
+  font-size: 13px;
+  font-weight: 850;
+
+  cursor: pointer;
+
+  box-shadow: 0 14px 28px rgba(89, 74, 238, 0.25);
+}
+
+.contentLayout {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 28px;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 280px;
+  gap: 100px;
+  align-items: start;
+}
+
+.sideColumn {
+  height: 100%;
+  padding-top: 60px;
+}
+
+.ctaCard {
+  position: sticky;
+  top: 120px;
+
+  backdrop-filter: blur(14px);
+  padding: 34px 30px;
+  border-radius: 22px;
+
+  background: linear-gradient(
+    135deg,
+    rgba(106, 90, 249, 0.14),
+    rgba(255,255,255,0.96)
+  );
+
+  box-shadow:
+    0 18px 42px rgba(31, 35, 60, 0.08);
+
+  transition:
+    box-shadow 0.3s ease;
+    will-change: transform;
+}
+
+.ctaCard:hover {
+  box-shadow:
+    0 24px 52px rgba(31, 35, 60, 0.12);
+}
 /* =========================
    RELATED ESSAYS
 ========================= */
@@ -186,7 +309,7 @@
 }
 
 .relatedBody {
-  padding: 20px 22px 22px;
+  padding: 20px 12px 22px;
 }
 
 .relatedBody span {
@@ -204,7 +327,6 @@
 
 .relatedBody h3 {
   margin: 0 0 12px;
-
   font-size: 22px;
   line-height: 1.15;
   font-weight: 850;

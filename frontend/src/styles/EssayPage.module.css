@@ -1,6 +1,6 @@
 .essayPage {
   min-height: 100vh;
-  background: #f3f2f0;
+  background: #eeeeed;
   color: #151936;
   font-family: Inter, system-ui, sans-serif;
 }
@@ -77,7 +77,7 @@
 .article {
   max-width: 1000px;
   margin: 0 auto;
-  padding: 42px 160px 20px;
+  padding: clamp(32px, 5vw, 72px) 160px clamp(24px, 4vw, 48px);
 
   border-top: 1px solid rgba(28, 35, 64, 0.1);
 }
@@ -152,7 +152,7 @@
   border-radius: 22px;
 
   Opacity: 0.95;
-  background: #a7a8a964;;
+  background: #b6b8b964;;
 
   border: 1px solid rgba(1, 1, 1, 0);
 
@@ -234,9 +234,9 @@
 .relatedSection {
   max-width: 1200px;
 
-  margin: 30px auto 100px;
-
-  padding: 0 28px;
+  margin: clamp(24px, 5vw, 60px) auto 0;
+  
+  padding: 0 28px 80px;
 }
 
 .relatedSection h2 {
@@ -325,7 +325,7 @@
   font-size: 14px;
   font-weight: 650;
 
-  color: #83889c;
+  color: #577eaa;
 }
 
 /* MOBILE */

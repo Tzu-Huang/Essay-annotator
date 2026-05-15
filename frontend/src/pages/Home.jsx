@@ -1,9 +1,9 @@
 import { Link } from "react-router-dom";
 import {
-  FileText,
   FileCheck,
-  Search,
-  TrendingUp,
+  Upload,
+  ScanSearch,
+  Sparkles,
 } from "lucide-react";
 
 import styles from "../styles/home.module.css";
@@ -115,169 +115,394 @@ function Home() {
   const scrollingEssays = [...curatedEssays, ...curatedEssays];
 
   return (
-    <div className={styles.home}>
+    <main className={styles.home}>
+      {/* HERO SECTION */}
       <section className={styles.hero}>
-        <div className={styles.heroDecor} />
+        <div className={styles.heroContent}>
 
-          <h1>
-            Get Into Top Colleges By Learning From 
-            <br />
-            <span>200+ Real Accepted Essays</span>
+          <h1 className={styles.heroTitle}>
+            <span className={styles.titleLine1}>Real Essays</span>
+            <span className={styles.titleLine2}>Real Improvement</span>
           </h1>
 
-        <p>
-          Access a curated database of 200+ real essays accepted into Harvard,
-          MIT, Stanford, and other top universities.
-        </p>
+          <p className={styles.heroDescription}>
+            Upload your draft, find similar successful essays, and see what
+            makes them work.
+          </p>
 
-        <Link to="/login" className={styles.startWritingLink}>
-          <button className={styles.primaryBtn}>
-            <span>Start Writing</span>
-          </button>
-        </Link>
+          <div className={styles.heroActions}>
+            <Link to="/login" className={styles.primaryBtn}>
+              Start Writing
+            </Link>
 
-        <div className={styles.heroBadges}>
-          <div>
-            <Search size={18} />
-            <span>Find Matches</span>
-          </div>
-          <div>
-            <FileCheck size={18} />
-            <span>Real Student Submissions</span>
-          </div>
-          <div>
-            <TrendingUp size={18} />
-            <span>Compare & Improve</span>
+            <Link to="/how-it-works" className={styles.secondaryLink}>
+              See how it works →
+            </Link>
           </div>
         </div>
-      </section>
 
-      <section className={styles.featuredScroll}>
-        <h2>Featured Accepted Essays</h2>
-        <p className={styles.featuredSubtitle}>
-          Explore real essays from top schools and click any card to read more.
-        </p>
-
-        <div className={styles.scrollWrapper}>
-          <div className={styles.scrollTrack}>
-            {scrollingEssays.map((essay, index) => (
-              <Link
-                to={`/essay/${essay.id}`}
-                className={styles.scrollCard}
-                key={`${essay.id}-${index}`}
-              >
-                <div className={styles.cardHeader}>
-                  <img
-                    src={essay.logo}
-                    alt={`${essay.school} logo`}
-                    className={styles.schoolLogo}
-                  />
-                  <h4>{essay.school}</h4>
-                </div>
-
-                <p>{essay.title}</p>
-                <span>{essay.description}</span>
-                <div className={styles.scrollLink}>Read more →</div>
-              </Link>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      <section className={styles.exampleSection}>
-        <div className={`${styles.exampleBox} ${styles.exampleBoxPurple}`}>
-          <div className={styles.boxTop}>
-            <div className={`${styles.boxIconWrap} ${styles.boxIconPurple}`}>
-              <FileText className={styles.boxTopIcon} />
-            </div>
-            <div>
-              <h3>Your Essay</h3>
-              <p className={styles.boxSubtitle}>Preview and enhance your essay</p>
-            </div>
+        <div className={styles.heroVisual}>
+          <div className={styles.stickyNoteGreen}>
+            Learn from <br /> essays that <br /> actually got in.
           </div>
 
-          <div className={`${styles.placeholder} ${styles.large}`}>
-            <div className={styles.mockEssay}>
-              <div className={styles.mockEssayLineWide} />
-              <div className={styles.mockEssayBody}>
-                <div className={styles.mockEssayThumbPurple} />
-                <div className={styles.mockEssayText}>
-                  <div className={styles.mockEssayLine} />
-                  <div className={styles.mockEssayLine} />
-                  <div className={styles.mockEssayLine} />
-                  <div className={styles.mockEssayLineShort} />
-                </div>
+          <div className={styles.heroPaper}>
+            <div className={styles.paperColumn}>
+              <p className={styles.paperMiniTitle}>Your Essay</p>
+              <h3 className={styles.paperMainTitle}>music</h3>
+
+              <div className={styles.pillRow}>
+                <span>0 words</span>
+                <span>User Draft</span>
               </div>
-            </div>
-          </div>
-        </div>
 
-        <div className={`${styles.exampleBox} ${styles.exampleBoxBlue}`}>
-          <div className={styles.boxTop}>
-            <div className={`${styles.boxIconWrap} ${styles.boxIconBlue}`}>
-              <FileCheck className={styles.boxTopIcon} />
+              <div className={styles.fakeLineShort}></div>
+              <div className={styles.fakeLine}></div>
+              <div className={styles.fakeLine}></div>
+              <div className={styles.fakeLineMedium}></div>
             </div>
-            <div>
-              <h3>Similar Accepted Essays</h3>
-              <p className={styles.boxSubtitle}>
-                Find and compare similar successful essays
+
+            <div className={styles.paperColumn}>
+              <p className={styles.paperMiniTitle}>Similar Accepted Essays</p>
+              <h3 className={styles.paperMainTitle}>essay_0155</h3>
+
+              <div className={styles.pillRow}>
+                <span>University of California</span>
+                <span>Reference essay</span>
+              </div>
+
+              <p className={styles.paperText}>
+                Born in New York, I have lived abroad most of my life:
+                Shanghai for 8 years and Taiwan making up most of the rest.
               </p>
+
+              <div className={styles.fakeLine}></div>
+              <div className={styles.fakeLine}></div>
+              <div className={styles.fakeLineMedium}></div>
             </div>
           </div>
 
-          <div className={`${styles.placeholder} ${styles.large}`}>
-            <div className={styles.mockEssay}>
-              <div className={styles.mockEssayBody}>
-                <div className={styles.mockEssayThumbBlue} />
-                <div className={styles.mockEssayText}>
-                  <div className={styles.mockEssayLine} />
-                  <div className={styles.mockEssayLine} />
-                  <div className={styles.mockEssayLineShort} />
-                </div>
+          <div className={styles.matchCard}>
+            <div className={styles.matchHeader}>
+              <strong>Top Matches</strong>
+              <span className={styles.matchCount}>3</span>
+            </div>
+
+            <div className={styles.matchItem}>
+              <span className={styles.matchIndex}>1</span>
+              <p>What would you say is your greatest talent...</p>
+              <b className={styles.matchPercent}>49% similar</b>
+            </div>
+
+            <div className={styles.matchItem}>
+              <span className={styles.matchIndex}>2</span>
+              <p>In addition to my major, my academic interests include...</p>
+              <b className={styles.matchPercent}>46% similar</b>
+            </div>
+
+            <div className={styles.matchItem}>
+              <span className={styles.matchIndex}>3</span>
+              <p>Some students have a background, identity, interest...</p>
+              <b className={styles.matchPercent}>44% similar</b>
+            </div>
+          </div>
+
+          <div className={styles.stickyNotePurple}>
+            See what makes <br /> successful essays <br /> stand out.
+          </div>
+        </div>
+      </section>
+
+      {/* HOW IT WORKS */}
+      <section className={styles.howItWorks}>
+        <div className={styles.sectionLabel}>HOW IT WORKS</div>
+
+        <div className={styles.stepsGrid}>
+          <div className={styles.step}>
+            <div className={styles.stepHead}>
+              <span className={styles.stepNumber}>1</span>
+              <h3>Upload your draft</h3>
+            </div>
+
+            <p>
+              Paste your essay and let Essay Annotator understand your story.
+            </p>
+
+            <div className={styles.stepCard}>
+              <strong>Your Draft</strong>
+              <span>Personal Statement — Draft 1</span>
+
+              <div className={styles.stepCardLines}>
+                <i></i>
+                <i></i>
+                <i></i>
               </div>
 
-              <div className={styles.mockCardDivider} />
+              <div className={styles.stepIcon}>
+                <Upload size={28} />
+              </div>
+            </div>
+          </div>
 
-              <div className={styles.mockEssayBody}>
-                <div className={styles.mockEssayThumbBlue} />
-                <div className={styles.mockEssayText}>
-                  <div className={styles.mockEssayLine} />
-                  <div className={styles.mockEssayLine} />
-                  <div className={styles.mockEssayLineShort} />
-                </div>
+          <div className={styles.stepArrow}>→</div>
+
+          <div className={styles.step}>
+            <div className={styles.stepHead}>
+              <span className={styles.stepNumber}>2</span>
+              <h3>Find similar accepted essays</h3>
+            </div>
+
+            <p>Essay Annotator finds real essays from students like you.</p>
+
+            <div className={styles.stepCard}>
+              <strong>Top Matches</strong>
+
+              <div className={styles.matchRow}>
+                <span>1</span>
+                <div></div>
+                <b>86% match</b>
+              </div>
+
+              <div className={styles.matchRow}>
+                <span>2</span>
+                <div></div>
+                <b>82% match</b>
+              </div>
+
+              <div className={styles.matchRow}>
+                <span>3</span>
+                <div></div>
+                <b>78% match</b>
+              </div>
+            </div>
+          </div>
+
+          <div className={styles.stepArrow}>→</div>
+
+          <div className={styles.step}>
+            <div className={styles.stepHead}>
+              <span className={styles.stepNumber}>3</span>
+              <h3>Learn what works</h3>
+            </div>
+
+            <p>
+              See how successful essays answer the same questions — and why
+              they stand out.
+            </p>
+
+            <div className={styles.stepCard}>
+              <div className={styles.analysisLines}>
+                <i></i>
+                <i></i>
+                <i></i>
+                <i></i>
+              </div>
+
+              <div className={styles.scanIcon}>
+                <ScanSearch size={42} />
               </div>
             </div>
           </div>
         </div>
       </section>
 
-      <section className={styles.comparison}>
-        <h2>Boost Your Admissions Chances Today</h2>
-        <p>Learn from real essays that actually got into top schools.</p>
+      {/* COMPARE */}
+      <section className={styles.compareSection}>
+        <div className={styles.compareIntro}>
+          <p className={styles.kicker}>SEE ESSAY ANNOTATOR IN ACTION</p>
 
-        <div className={styles.compareBox}>
-          <div className={styles.bad}>
-            <h3>✗ Generic Advice</h3>
-            <p>AI gives broad, non-specific feedback</p>
+          <h2 className={styles.sectionTitle}>
+            Compare. <br />
+            Learn. Elevate.
+          </h2>
+
+          <p>
+            Essay Annotator shows you real accepted essays side by side with
+            your draft, so you can learn what works — and make your story even
+            stronger.
+          </p>
+
+          <div className={styles.curveArrow}>↘</div>
+        </div>
+
+        <div className={styles.comparePapers}>
+          <div className={styles.paperClip}></div>
+
+          <div className={styles.comparePaperWrap}>
+            <div className={styles.tapePink}>Your Essay</div>
+
+            <div className={styles.comparePaper}>
+              <p className={styles.compareMiniTitle}>YOUR ESSAY</p>
+
+              <div className={styles.comparePaperHeader}>
+                <strong>Personal Statement — Draft 1</strong>
+                <span>612 words</span>
+              </div>
+
+              <div className={styles.compareDivider}></div>
+
+              <p className={styles.paperBody}>
+                Ever since my first day volunteering at the community clinic, I
+                knew I wanted to make a difference in people&apos;s lives. The
+                experience{" "}
+                <mark>opened my eyes to how small acts of kindness</mark> can
+                have a big impact.
+              </p>
+
+              <div className={styles.fakeLines}>
+                <span></span>
+                <span></span>
+                <span></span>
+              </div>
+            </div>
+          </div>
+
+          <div className={styles.vsCircle}>VS.</div>
+
+          <div className={styles.comparePaperWrap}>
+            <div className={styles.tapeGreen}>Similar Accepted Essays</div>
+
+            <div className={styles.comparePaper}>
+              <p className={styles.compareMiniTitle}>UNIVERSITY OF MICHIGAN</p>
+
+              <div className={styles.comparePaperHeader}>
+                <strong>Personal Statement</strong>
+                <span>638 words</span>
+              </div>
+
+              <div className={styles.compareDivider}></div>
+
+              <p className={styles.paperBody}>
+                The first time I walked into the community clinic, I expected to
+                help others. I didn&apos;t expect to learn so much about{" "}
+                <mark>patience, humility, and what it means to listen.</mark>
+              </p>
+
+              <div className={styles.fakeLines}>
+                <span></span>
+                <span></span>
+                <span></span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ESSAY LIBRARY - ORIGINAL ANIMATION STYLE */}
+      <section className={styles.featuredScroll}>
+        <div className={styles.libraryNote}>
+          Browse essays <br />
+          from top <br />
+          colleges.
+        </div>
+
+        <div className={styles.libraryContent}>
+          <h2 className={styles.sectionTitleCenter}>
+            EXPLORE REAL ACCEPTED ESSAYS
+          </h2>
+
+          <p className={styles.featuredSubtitle}>
+            Explore real essays from top schools and click any card to read
+            more.
+          </p>
+
+          <div className={styles.scrollWrapper}>
+            <div className={styles.scrollTrack}>
+              {scrollingEssays.map((essay, index) => (
+                <Link
+                  to={`/essay/${essay.id}`}
+                  className={styles.scrollCard}
+                  key={`${essay.id}-${index}`}
+                >
+                  <div className={styles.pin}></div>
+
+                  <div className={styles.cardHeader}>
+                    <img
+                      src={essay.logo}
+                      alt={`${essay.school} logo`}
+                      className={styles.schoolLogo}
+                    />
+
+                    <h4>{essay.school}</h4>
+                  </div>
+
+                  <p>{essay.title}</p>
+
+                  <span>{essay.description}</span>
+
+                  <div className={styles.scrollLink}>Read more →</div>
+                </Link>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        <div className={styles.smallSticky}>
+          ...and many <br />
+          more.
+        </div>
+      </section>
+
+      {/* WHY DIFFERENT */}
+      <section className={styles.differenceSection}>
+        <div className={styles.differenceTitle}>
+          <h2 className={styles.sectionTitleSmall}>
+            Why Essay Annotator <br />
+            Is Different
+          </h2>
+        </div>
+
+        <div className={styles.differenceCompareWrap}>
+          <div className={styles.differenceCardBad}>
+            <div className={styles.iconBadgeMuted}>
+              <Sparkles size={26} />
+            </div>
+
+            <h3>Generic AI Advice</h3>
+
             <ul>
-              <li>✗ Vague suggestions</li>
-              <li>✗ No real examples</li>
-              <li>✗ Hard to apply</li>
+              <li>Vague, one-size-fits-all tips</li>
+              <li>Not based on real admissions outcomes</li>
+              <li>Doesn&apos;t show proven examples</li>
+              <li>Hard to know what actually works</li>
             </ul>
           </div>
 
-          <div className={styles.good}>
-            <h3>✓ Real Examples</h3>
-            <p>See essays that actually got accepted</p>
+          <div className={styles.vsCircleSmall}>VS.</div>
+
+          <div className={styles.differenceCardGood}>
+            <div className={styles.iconBadgeGreen}>
+              <FileCheck size={26} />
+            </div>
+
+            <h3>Learning From Real Accepted Essays</h3>
+
             <ul>
-              <li>✓ 10,000+ essays indexed</li>
-              <li>✓ Real successful structures</li>
-              <li>✓ Clear improvement path</li>
+              <li>Based on essays that got students in</li>
+              <li>See real responses to real prompts</li>
+              <li>Discover what makes essays effective</li>
+              <li>Learn and strengthen your unique voice</li>
             </ul>
           </div>
         </div>
       </section>
-    </div>
+
+      {/* CTA */}
+      <section className={styles.ctaSection}>
+        <div className={styles.bottomPaperDecorLeft}></div>
+
+        <h2 className={styles.ctaTitle}>Ready to improve your essay?</h2>
+
+        <p>
+          Join students using Essay Annotator to write with more clarity and
+          confidence.
+        </p>
+
+        <Link to="/login" className={styles.primaryBtn}>
+          Start Writing Now →
+        </Link>
+      </section>
+    </main>
   );
 }
 

@@ -122,8 +122,7 @@ function Home() {
 
           <h1 className={styles.heroTitle}>
             <span className={styles.titleLine1}>REAL Essays</span>
-            <span className={styles.titleLine2}>REAL</span>
-            <span className={styles.titleLine3}>Improvement.</span>
+            <span className={styles.titleLine2}>REAL Improvement.</span>
           </h1>
 
           <p className={styles.heroDescription}>
@@ -136,9 +135,9 @@ function Home() {
               Start Writing
             </Link>
 
-            <Link to="/how-it-works" className={styles.secondaryLink}>
+            <a href="#how-it-works" className={styles.secondaryLink}>
               See how it works →
-            </Link>
+            </a>
           </div>
         </div>
 
@@ -215,7 +214,7 @@ function Home() {
       </section>
 
       {/* HOW IT WORKS */}
-      <section className={styles.howItWorks}>
+      <section id="how-it-works" className={styles.howItWorks}>
         <div className={styles.sectionLabel}>HOW IT WORKS</div>
 
         <div className={styles.stepsGrid}>
@@ -232,13 +231,11 @@ function Home() {
             <div className={styles.stepCard}>
               <strong>Your Draft</strong>
               <span>Personal Statement — Draft 1</span>
-
               <div className={styles.stepCardLines}>
                 <i></i>
                 <i></i>
                 <i></i>
               </div>
-
               <div className={styles.stepIcon}>
                 <Upload size={28} />
               </div>
@@ -273,7 +270,7 @@ function Home() {
               <div className={styles.matchRow}>
                 <span>3</span>
                 <div></div>
-                <b>78% match</b>
+                <b>79% match</b>
               </div>
             </div>
           </div>
@@ -292,6 +289,9 @@ function Home() {
             </p>
 
             <div className={styles.stepCard}>
+              <strong>Essay Insights</strong>
+              <span>See structure, tone, and details that make accepted essays stronger.</span>
+
               <div className={styles.analysisLines}>
                 <i></i>
                 <i></i>
@@ -300,12 +300,13 @@ function Home() {
               </div>
 
               <div className={styles.scanIcon}>
-                <ScanSearch size={42} />
+                <ScanSearch size={28} />
               </div>
             </div>
           </div>
         </div>
       </section>
+
 
       {/* COMPARE */}
       <section className={styles.compareSection}>
@@ -313,76 +314,111 @@ function Home() {
           <p className={styles.kicker}>SEE ESSAY ANNOTATOR IN ACTION</p>
 
           <h2 className={styles.sectionTitle}>
-            Compare. <br />
-            Learn. Elevate.
+            See the Connections <br />
+            That Help You Grow
           </h2>
 
           <p>
-            Essay Annotator shows you real accepted essays side by side with
-            your draft, so you can learn what works — and make your story even
-            stronger.
+            Side-by-side insights show you what successful essays do—and how you can
+            do it, too.
           </p>
-
-          <div className={styles.curveArrow}>↘</div>
         </div>
 
-        <div className={styles.comparePapers}>
-          <div className={styles.paperClip}></div>
+        <div className={styles.analysisDemo}>
+          <div className={styles.analysisPaper}>
+            <div className={styles.analysisColumn}>
+              <p className={styles.analysisLabel}>YOUR ESSAY</p>
+              <h3>User Draft</h3>
 
-          <div className={styles.comparePaperWrap}>
-            <div className={styles.tapePink}>Your Essay</div>
+              <div className={styles.analysisDivider}></div>
 
-            <div className={styles.comparePaper}>
-              <p className={styles.compareMiniTitle}>YOUR ESSAY</p>
-
-              <div className={styles.comparePaperHeader}>
-                <strong>Personal Statement — Draft 1</strong>
-                <span>612 words</span>
-              </div>
-
-              <div className={styles.compareDivider}></div>
-
-              <p className={styles.paperBody}>
-                Ever since my first day volunteering at the community clinic, I
-                knew I wanted to make a difference in people&apos;s lives. The
-                experience{" "}
-                <mark>opened my eyes to how small acts of kindness</mark> can
-                have a big impact.
+              <p className={styles.analysisText}>
+                Ever since my first day volunteering at the community clinic,
               </p>
 
-              <div className={styles.fakeLines}>
+              <p className={styles.analysisText}>
+                I knew I wanted to make a difference in people&apos;s lives.
+              </p>
+
+              <p className={styles.analysisText}>
+                <span className={styles.hoverHighlight}>
+                  The experience opened my eyes to how small acts of kindness can
+                  have a big impact.
+                </span>
+              </p>
+
+              <p className={styles.analysisTextMuted}>
+                I hope to continue this journey in college and beyond.
+              </p>
+
+              <div className={styles.demoSoftLines}>
                 <span></span>
                 <span></span>
-                <span></span>
+              </div>
+
+              <div className={styles.demoFooter}>
+                <span>37 words</span>
+                <span>·</span>
+                <span>1 paragraph</span>
               </div>
             </div>
-          </div>
 
-          <div className={styles.vsCircle}>VS.</div>
+            <div className={styles.analysisMiddle}>
+              <svg
+                className={styles.demoArrowSvg}
+                viewBox="0 0 220 260"
+                aria-hidden="true"
+              >
+                <path
+                  d="M38 62 C78 12, 142 16, 174 54"
+                  className={styles.demoArrowPath}
+                />
+                <path
+                  d="M44 184 C84 224, 148 220, 178 182"
+                  className={styles.demoArrowPath}
+                />
+              </svg>
 
-          <div className={styles.comparePaperWrap}>
-            <div className={styles.tapeGreen}>Similar Accepted Essays</div>
-
-            <div className={styles.comparePaper}>
-              <p className={styles.compareMiniTitle}>UNIVERSITY OF MICHIGAN</p>
-
-              <div className={styles.comparePaperHeader}>
-                <strong>Personal Statement</strong>
-                <span>638 words</span>
+              <div className={styles.suggestionPopup}>
+                <p>EXPRESSION</p>
+                <strong>Stronger opening image</strong>
+                <span>
+                  The database essay is stronger because it turns a general idea into
+                  a vivid, sensory image that pulls readers in.
+                </span>
+                <button type="button">See full analysis →</button>
               </div>
+            </div>
 
-              <div className={styles.compareDivider}></div>
+            <div className={styles.analysisColumn}>
+              <p className={styles.analysisLabel}>DATABASE ESSAY</p>
+              <h3>essay_0167</h3>
 
-              <p className={styles.paperBody}>
-                The first time I walked into the community clinic, I expected to
-                help others. I didn&apos;t expect to learn so much about{" "}
-                <mark>patience, humility, and what it means to listen.</mark>
+              <div className={styles.analysisDivider}></div>
+
+              <p className={styles.analysisText}>
+                Stepping into the local hospital sophomore year summer, I embraced the
+                role of student volunteer, eager to assist patients.{" "}
+                <span className={styles.blueHighlight}>
+                  The sterile scent of alcohol greeted me and the vast, maze-like
+                  hospital left me disoriented,
+                </span>{" "}
+                so I struggled to find the desired locations in the labyrinthine
+                hallways.
               </p>
 
-              <div className={styles.fakeLines}>
+              <p className={styles.analysisTextMuted}>...</p>
+
+              <div className={styles.demoSoftLines}>
                 <span></span>
                 <span></span>
                 <span></span>
+              </div>
+
+              <div className={styles.demoFooter}>
+                <span>638 words</span>
+                <span>·</span>
+                <span>Personal Statement</span>
               </div>
             </div>
           </div>

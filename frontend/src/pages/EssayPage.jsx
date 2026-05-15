@@ -22,11 +22,11 @@ function EssayPage() {
     let animationFrame;
 
     const handleScroll = () => {
-      targetY = window.scrollY * 0.05;
+      targetY = window.scrollY * 0.1;
     };
 
     const animate = () => {
-      currentY += (targetY - currentY) * 0.001;
+      currentY += (targetY - currentY) * 0.15;
 
       if (cardRef.current) {
         cardRef.current.style.transform = `translateY(${currentY}px)`;
@@ -36,7 +36,6 @@ function EssayPage() {
     };
 
     window.addEventListener("scroll", handleScroll);
-
     animate();
 
     return () => {
@@ -118,9 +117,9 @@ function EssayPage() {
             style={{
               backgroundImage: `linear-gradient(
                 90deg,
-                rgba(248, 248, 253, 0.96) 0%,
+                rgba(248, 248, 253, 0.86) 0%,
                 rgba(248, 248, 253, 0.82) 42%,
-                rgba(248, 248, 253, 0.18) 100%
+                rgba(248, 248, 253, 0.25) 100%
               ), url(${heroImage})`,
             }}
           >
@@ -171,7 +170,7 @@ function EssayPage() {
                   className={styles.ctaBtn}
                   onClick={handleCompare}
                 >
-                  Compare with My Essay ⚡
+                  Compare with My Essay
                 </button>
               </section>
             </aside>
@@ -180,7 +179,7 @@ function EssayPage() {
 
           {relatedEssays.length > 0 && (
             <section className={styles.relatedSection}>
-              <h2>You may also enjoy these essays related to this topic.</h2>
+              <h2>You may also enjoy these essays related to this topic</h2>
 
               <div className={styles.relatedList}>
                 {relatedEssays.map((item, index) => (

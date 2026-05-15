@@ -449,23 +449,6 @@ function ComparePage() {
           </div>
         </div>
 
-        <div className={styles.topbarCenter}>
-          <div className={styles.pillGroup}>
-            <span className={`${styles.topPill} ${styles.pillTotal}`}>
-              {compareData.length} suggestions
-            </span>
-            <span className={`${styles.topPill} ${styles.pillExpression}`}>
-              {getAnnotationCountByType("expression")} Expression
-            </span>
-            <span className={`${styles.topPill} ${styles.pillReflection}`}>
-              {getAnnotationCountByType("reflection")} Reflection
-            </span>
-            <span className={`${styles.topPill} ${styles.pillEnding}`}>
-              {getAnnotationCountByType("ending")} Ending
-            </span>
-          </div>
-        </div>
-
         <div className={styles.topbarRight}>
           <button
             type="button"

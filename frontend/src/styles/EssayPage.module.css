@@ -1,6 +1,6 @@
 .essayPage {
   min-height: 100vh;
-  background: #f8f8fd;
+  background: #f3f2f0;
   color: #151936;
   font-family: Inter, system-ui, sans-serif;
 }
@@ -43,10 +43,10 @@
   font-family: Inter, system-ui, sans-serif;
   font-size: clamp(48px, 6.6vw, 82px);
   line-height: 0.98;
-  letter-spacing: -0.07em;
+  letter-spacing: -0.05em;
   font-weight: 850;
 
-  color: #151936;
+  color: #090a17;
 }
 
 .prompt {
@@ -57,7 +57,7 @@
   line-height: 1.65;
   font-weight: 500;
 
-  color: #6f748a;
+  color: #575b6c;
 }
 
 .meta {
@@ -69,7 +69,7 @@
 
   font-size: 15px;
   font-weight: 700;
-  color: #83889c;
+  color: #577eaa;
 }
 
 /* ARTICLE */
@@ -143,24 +143,26 @@
 }
 
 .ctaCard {
-  position: relative;
+  position: sticky;
   will-change: transform;
-  backdrop-filter: blur(14px);
-  padding: 34px 38px;
-  border-radius: 18px;
-
-  background: linear-gradient(
-    135deg,
-    rgba(106, 90, 249, 0.14),
-    rgba(255, 255, 255, 0.9)
-  );
   top: 120px;
   margin: 30px 0 80px;
-  margin-left: -50px;
+  backdrop-filter: blur(14px);
+  padding: 34px 20px;
+  border-radius: 22px;
 
-  box-shadow: 0 18px 45px rgba(31, 35, 60, 0.08);
+  Opacity: 0.95;
+  background: #a7a8a964;;
+
+  border: 1px solid rgba(1, 1, 1, 0);
+
+  box-shadow:
+      0 10px 30px rgba(0,0,0,0),
+      0 24px 60px rgba(0,0,0,0);
+
   transition:
-    box-shadow 0.3s ease;
+    box-shadow 1s ease;
+    will-change: transform;
 }
 
 .ctaCard h2 {
@@ -170,7 +172,7 @@
   font-weight: 850;
   letter-spacing: -0.04em;
 
-  color: #5a4df0;
+  color: #050505;
 }
 
 .ctaCard p {
@@ -180,7 +182,7 @@
   line-height: 1.55;
   font-weight: 500;
 
-  color: #5f667c;
+  color: #363a46;
 }
 
 .ctaBtn {
@@ -191,7 +193,11 @@
 
   padding: 15px 22px;
 
-  background: linear-gradient(135deg, #6a5af9, #4d39e8);
+  background: linear-gradient(
+    135deg,
+    #ceadb7,
+    #b07981
+  );
   color: white;
 
   font-size: 13px;
@@ -199,7 +205,7 @@
 
   cursor: pointer;
 
-  box-shadow: 0 14px 28px rgba(89, 74, 238, 0.25);
+  box-shadow: 0 5px 10px rgba(21, 21, 21, 0.6);
 }
 
 .contentLayout {
@@ -207,36 +213,14 @@
   margin: 0 auto;
   padding: 0 28px;
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 280px;
-  gap: 100px;
+  grid-template-columns: minmax(0, 1fr) 300px;
+  gap: 8px;
   align-items: start;
 }
 
 .sideColumn {
-  height: 100%;
-  padding-top: 60px;
-}
-
-.ctaCard {
-  position: sticky;
-  top: 120px;
-
-  backdrop-filter: blur(14px);
-  padding: 34px 30px;
-  border-radius: 22px;
-
-  background: linear-gradient(
-    135deg,
-    rgba(106, 90, 249, 0.14),
-    rgba(255,255,255,0.96)
-  );
-
-  box-shadow:
-    0 18px 42px rgba(31, 35, 60, 0.08);
-
-  transition:
-    box-shadow 0.3s ease;
-    will-change: transform;
+  height: 90%;
+  padding-top: 0;
 }
 
 .ctaCard:hover {

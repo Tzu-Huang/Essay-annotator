@@ -121,8 +121,9 @@ function Home() {
         <div className={styles.heroContent}>
 
           <h1 className={styles.heroTitle}>
-            <span className={styles.titleLine1}>Real Essays</span>
-            <span className={styles.titleLine2}>Real Improvement</span>
+            <span className={styles.titleLine1}>REAL Essays</span>
+            <span className={styles.titleLine2}>REAL</span>
+            <span className={styles.titleLine3}>Improvement.</span>
           </h1>
 
           <p className={styles.heroDescription}>

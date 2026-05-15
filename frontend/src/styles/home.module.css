@@ -1,5 +1,4 @@
-@import url("https://fonts.googleapis.com/css2?family=Caveat:wght@500;600;700&family=Cormorant+Garamond:wght@600;700&family=Inter:wght@400;500;600;700;800&family=Playfair+Display:wght@600;700;800&family=Shadows+Into+Light&display=swap");
-
+@import url("https://fonts.googleapis.com/css2?family=Patrick+Hand&family=Inter:wght@400;500;600;700;800&display=swap");
 :root {
   --ink: #111827;
   --ink-soft: #2f3a4d;
@@ -135,7 +134,7 @@
 
 .heroTitle span {
   display: block;
-  font-family: "Shadows Into Light", cursive;
+  font-family: "Patrick Hand", cursive;
   font-weight: 700;
   letter-spacing: 0.03em;
   text-shadow: 0 2px 0 rgba(255, 255, 255, 0.75);
@@ -143,20 +142,22 @@
 }
 
 .titleLine1 {
-  font-size: clamp(56px, 5.5vw, 76px);
+  font-size: clamp(56px, 5.5vw, 75px);
   line-height: 110px;
 }
 
 .titleLine2 {
   font-size: clamp(56px, 5.5vw, 75px);
   line-height: 90px;
+  margin-left: 0.8cm;
 }
 
 .titleLine3 {
-  font-size: clamp(56px, 5.5vw, 65px);
+  font-size: clamp(56px, 5.5vw, 75px);
   line-height: 90px;
   position: relative;
   width: max-content;
+  margin-left: 1.5cm;
 }
 
 .titleLine3::after {
@@ -293,7 +294,7 @@
 
 .paperColumn h3 {
   margin: 0 0 10px;
-  font-family: "Playfair Display", serif;
+  font-family: "Inter", sans-serif;
   font-size: 22px;
 }
 

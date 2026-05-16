@@ -120,7 +120,7 @@
 }
 
 .topbarRight {
-  display: flex;
+  display: flex-end;
   /*justify-content: flex-end;*/
   gap: 10px;
   margin-left: auto;

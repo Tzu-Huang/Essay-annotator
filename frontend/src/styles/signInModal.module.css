@@ -1,0 +1,154 @@
+.signInOverlay {
+  position: fixed;
+  inset: 0;
+  z-index: 90;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  background: rgba(15, 23, 42, 0.28);
+  -webkit-backdrop-filter: blur(5px);
+  backdrop-filter: blur(5px);
+  animation: signInOverlayIn 220ms ease-out;
+}
+
+.signInModal {
+  position: relative;
+  width: min(620px, 92vw);
+  min-height: 370px;
+  padding: 42px 42px 36px;
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.985);
+  box-shadow: 0 18px 44px rgba(15, 23, 42, 0.14);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  animation: signInModalIn 240ms ease-out;
+}
+
+.signInClose {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  width: 34px;
+  height: 34px;
+  border: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  color: #8a8f98;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.signInClose:hover {
+  color: #3f434a;
+}
+
+.signInEyebrow {
+  margin: 0 0 16px;
+  color: #6b7280;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.signInTitle {
+  margin: 6px;
+  color: #111111;
+  font-size: clamp(38px, 5vw, 46px);
+  font-weight: 500;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+}
+
+.signInText {
+  max-width: 420px;
+  margin: 18px 0 28px;
+  color: #5b6472;
+  font-size: 16px;
+  line-height: 1.65;
+}
+
+.signInGoogleBtn {
+  width: min(450px, 100%);
+  height: 64px;
+  padding: 0 26px;
+  border: 1px solid #9ca3af;
+  border-radius: 999px;
+  background: #c7d8f431;
+  color: #202124;
+  font-size: 18px;
+  font-weight: 500;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  transition: background-color 0.18s ease, border-color 0.18s ease;
+}
+
+.signInGoogleBtn:hover {
+  background: #c7d8f448;
+  border-color: #6b7280;
+}
+
+.googleMark {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 999px;
+  color: #3260ab;
+  font-size: 26px;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.signInClose:focus-visible,
+.signInGoogleBtn:focus-visible {
+  outline: 2px solid rgba(17, 24, 39, 0.18);
+  outline-offset: 2px;
+}
+
+@keyframes signInOverlayIn {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes signInModalIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px) scale(0.96);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@media (max-width: 640px) {
+  .signInModal {
+    width: min(92vw, 420px);
+    min-height: auto;
+    padding: 34px 22px 26px;
+  }
+
+  .signInGoogleBtn {
+    width: 100%;
+    height: 58px;
+    font-size: 17px;
+  }
+}

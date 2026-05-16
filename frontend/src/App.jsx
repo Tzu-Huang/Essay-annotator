@@ -5,9 +5,11 @@
  * 網址 = 指令，App.jsx = 導航員
  */
 
+import { useState } from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 
 import Navbar from "./components/Navbar";
+import SignInModal from "./components/SignInModal";
 import Footer from "./components/Footer/Footer";
 
 import Home from "./pages/Home";
@@ -23,7 +25,7 @@ import "./styles/components.css";
 import "./styles/background.css";
 
 function App() {
-  const bg = "bg-world";
+  const [showSignInModal, setShowSignInModal] = useState(false);
 
   return (
     <BrowserRouter>
@@ -33,8 +35,8 @@ function App() {
             path="/"
             element={
               <>
-                <Navbar />
-                <Home />
+                <Navbar onOpenSignIn={() => setShowSignInModal(true)} />
+                <Home onOpenSignIn={() => setShowSignInModal(true)} />
                 <Footer />
               </>
             }
@@ -44,7 +46,7 @@ function App() {
             path="/login"
             element={
               <>
-                <Navbar />
+                <Navbar onOpenSignIn={() => setShowSignInModal(true)} />
                 <Login />
                 <Footer />
               </>
@@ -55,7 +57,7 @@ function App() {
             path="/faqs"
             element={
               <>
-                <Navbar />
+                <Navbar onOpenSignIn={() => setShowSignInModal(true)} />
                 <FAQsPage />
                 <Footer />
               </>
@@ -66,7 +68,7 @@ function App() {
             path="/editor"
             element={
               <>
-                <Navbar />
+                <Navbar onOpenSignIn={() => setShowSignInModal(true)} />
                 <Editor />
               </>
             }
@@ -76,7 +78,7 @@ function App() {
             path="/essay/:id"
             element={
               <>
-                <Navbar />
+                <Navbar onOpenSignIn={() => setShowSignInModal(true)} />
                 <EssayPage />
                 <Footer />
               </>
@@ -91,13 +93,17 @@ function App() {
             path="/how-it-works" 
             element={
               <>
-                <Navbar />
+                <Navbar onOpenSignIn={() => setShowSignInModal(true)} />
                 <HowItWorks />
 
               </>
             }
           />
         </Routes>
+        <SignInModal
+          isOpen={showSignInModal}
+          onClose={() => setShowSignInModal(false)}
+        />
       </div>
     </BrowserRouter>
   );

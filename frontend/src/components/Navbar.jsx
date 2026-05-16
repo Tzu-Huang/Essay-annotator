@@ -1,6 +1,5 @@
 import { Link, useLocation } from "react-router-dom";
 import {
-  Search,
   HelpCircle,
   UserCircle2,
   BookOpen,
@@ -12,7 +11,7 @@ import avatar from "../assets/dog.png";
 import styles from "../styles/navbar.module.css";
 import { useAuth } from "../hooks/useAuth";
 
-function Navbar() {
+function Navbar({ onOpenSignIn }) {
   const location = useLocation();
   const isEditorPage = location.pathname === "/editor";
   const isHomePage = location.pathname === "/";
@@ -84,12 +83,12 @@ function Navbar() {
               </div>
             ) : (
               <>
-                <Link to="/profile" className={styles.navLink}>
+                <div className={styles.navLink} aria-disabled="true">
                   <span className={styles.navLinkIcon}>
                     <UserCircle2 size={16} strokeWidth={2} />
                   </span>
                   <span>Profile</span>
-                </Link>
+                </div>
 
                 <div className={styles.auth}>
                   {user ? (
@@ -97,9 +96,13 @@ function Navbar() {
                       Editor
                     </Link>
                   ) : (
-                    <Link to="/login" className={styles.signInBtn}>
+                    <button
+                      type="button"
+                      className={styles.signInBtn}
+                      onClick={onOpenSignIn}
+                    >
                       Sign In
-                    </Link>
+                    </button>
                   )}
                 </div>
               </>

@@ -1,3 +1,5 @@
+import Navbar from "../components/Navbar/Navbar";
+
 import { useEffect, useMemo, useState } from "react";
 import { useParams } from "react-router-dom";
 import styles from "../styles/compare.module.css";
@@ -425,6 +427,14 @@ function ComparePage() {
 
   return (
     <div className={styles.comparePage}>
+      <Navbar 
+        variant="compare" 
+          annotationsEnabled={annotationsEnabled}
+          setAnnotationsEnabled={setAnnotationsEnabled}
+          handleResetView={handleResetView}
+          handleCompare={handleCompare}
+          compareLoading={compareLoading}
+      />
       {compareLoading && (
         <div className={styles.loadingOverlay}>
           <div className={styles.loadingCard}>
@@ -436,54 +446,6 @@ function ComparePage() {
           </div>
         </div>
       )}
-
-      <header className={styles.compareTopbar}>
-        <div className={styles.topbarLeft}>
-          <div className={styles.brandBlock}>
-            <img
-              src={logo}
-              alt="Essay Annotator"
-              className={styles.brandLogo}
-            />
-            <span className={styles.brandSub}> / Compare-my-essay</span>
-          </div>
-        </div>
-
-        <div className={styles.topbarRight}>
-          <button
-            type="button"
-            className={styles.ghostButton}
-            onClick={() => setAnnotationsEnabled((prev) => !prev)}
-          >
-            <span
-              className={`${styles.statusDot} ${
-                annotationsEnabled ? styles.statusOn : styles.statusOff
-              }`}
-            />
-            <span>{annotationsEnabled ? "Annotations on" : "Annotations off"}</span>
-          </button>
-
-          <button
-            type="button"
-            className={styles.ghostButton}
-            onClick={handleResetView}
-          >
-            Show Original
-          </button>
-
-          <button
-            type="button"
-            className={`${styles.primaryButton} ${
-              compareLoading ? styles.primaryButtonLoading : ""
-            }`}
-            onClick={handleCompare}
-            disabled={compareLoading}
-          >
-            {compareLoading && <span className={styles.buttonSpinner} />}
-            <span>{compareLoading ? "Loading Suggestions..." : "Load Suggestions"}</span>
-          </button>
-        </div>
-      </header>
 
       {compareError && (
         <div className={styles.globalMessage}>

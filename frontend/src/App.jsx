@@ -7,7 +7,7 @@
 
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 
-import Navbar from "./components/Navbar";
+import Navbar from "./components/Navbar/Navbar";
 import Footer from "./components/Footer/Footer";
 
 import Home from "./pages/Home";
@@ -84,7 +84,15 @@ function App() {
           />
 
           {/* Compare page 不加 Navbar / Footer */}
-          <Route path="/compare/:id" element={<ComparePage />} />
+          <Route 
+            path="/compare/:id" 
+            element={
+              <>
+                <ComparePage />
+                <Footer />
+              </>
+            } 
+          />
 
           {/* How it works page 不加 Navbar / Footer */}
           <Route 

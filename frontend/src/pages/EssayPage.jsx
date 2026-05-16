@@ -140,8 +140,12 @@ function EssayPage() {
               <span>•</span>
               <span>{essay.type || "Example Essay"} </span>
 
-              <span>•</span>
-              <span>{essay.school || "School not listed"}</span>
+              {essay.school && essay.school.toLowerCase() !== "none" && (
+                <>
+                  <span>•</span>
+                  <span>{essay.school}</span>
+                </>
+              )}
 
               <span>{essay.word_count || essay.words || "-"} words</span>
             </div>
@@ -210,9 +214,13 @@ function EssayPage() {
                         {item.generated_title || "Untitled Essay"}
                       </h3>
 
-                      <p>
-                        {item.school || "School not listed"}
-                      </p>
+                      {item.school == "none" && (
+                        <p>Common App</p>
+                      )}
+
+                      {item.school != "none" && (
+                        <p>{item.school}</p>
+                      )}
                     </div>
                   </button>
                 ))}

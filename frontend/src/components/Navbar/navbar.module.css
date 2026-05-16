@@ -267,16 +267,37 @@
   cursor: pointer;
 }
 
+/* =========================
+   Compare Navbar Status Dot
+   ========================= */
+
+.statusDot {
+  width: 10px;
+  height: 10px;
+  border-radius: 999px;
+  flex-shrink: 0;
+}
+
+.statusOn {
+  background: #4caf50;
+}
+
+.statusOff {
+  background: #d64545;
+}
+
 /* Secondary buttons */
 
 .ghostButton {
-  border: 1px solid rgba(20, 25, 50, 0.08);
-
+  border: 2px solid rgba(20, 25, 50, 0.08);
+  gap: 8px;
   background: rgba(255,255,255,0.76);
 
   color: #5f6474;
 
   backdrop-filter: blur(10px);
+  box-shadow:
+    0 10px 24px rgba(5, 5, 5, 0.1);
 }
 
 .ghostButton:hover {

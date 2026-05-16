@@ -78,7 +78,19 @@ function Navbar({
               className={styles.ghostButton}
               onClick={() => setAnnotationsEnabled((prev) => !prev)}
             >
-              {annotationsEnabled ? "Annotations on" : "Annotations off"}
+              <span
+                className={`${styles.statusDot} ${
+                  annotationsEnabled
+                    ? styles.statusOn
+                    : styles.statusOff
+                }`}
+              />
+
+              <span>
+                {annotationsEnabled
+                  ? " Annotations On"
+                  : " Annotations Off"}
+              </span>
             </button>
 
             <button

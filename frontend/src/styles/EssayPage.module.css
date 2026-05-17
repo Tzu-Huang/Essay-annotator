@@ -3,6 +3,7 @@
   background: #f8f8fd;
   color: #151936;
   font-family: Inter, system-ui, sans-serif;
+  animation: pageEnter 500ms ease-out;
 }
 
 /* HERO */
@@ -145,6 +146,7 @@
 .ctaCard {
   position: relative;
   will-change: transform;
+  -webkit-backdrop-filter: blur(14px);
   backdrop-filter: blur(14px);
   padding: 34px 38px;
   border-radius: 18px;
@@ -220,7 +222,7 @@
 .ctaCard {
   position: sticky;
   top: 120px;
-
+  -webkit-backdrop-filter: blur(14px);
   backdrop-filter: blur(14px);
   padding: 34px 30px;
   border-radius: 22px;

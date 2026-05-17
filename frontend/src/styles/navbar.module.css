@@ -205,6 +205,16 @@
   display: flex;
   align-items: center;
   gap: 10px;
+  animation: navItemIn 200ms ease-out;
+}
+
+.loggedOut {
+  display: contents;
+  animation: navItemIn 200ms ease-out;
+}
+
+.accountMenuWrap {
+  position: relative;
 }
 
 .userInfo {
@@ -212,14 +222,28 @@
   align-items: center;
   gap: 8px;
   padding: 7px 10px;
+  border: 0;
   border-radius: 999px;
+  background: transparent;
+  cursor: pointer;
   transition: background 0.16s ease;
+}
+
+.userInfo:hover {
+  background: #f5f6f8;
 }
 
 .username {
   font-size: 12px;
   font-weight: 500;
   color: #111827;
+}
+
+.accountMenuChevron {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #64748b;
 }
 
 .avatar {
@@ -230,6 +254,42 @@
   display: block;
   border: 2px solid white;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12);
+}
+
+.accountMenu {
+  position: absolute;
+  top: calc(100% + 10px);
+  right: 0;
+  min-width: 148px;
+  padding: 8px;
+  border: 1px solid #dbe3ee;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.98);
+  box-shadow: 0 12px 28px rgba(15, 23, 42, 0.12);
+  z-index: 20;
+  animation: accountMenuIn 160ms ease-out;
+  transform-origin: top right;
+}
+
+.accountMenuItem {
+  width: 100%;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border: 0;
+  border-radius: 10px;
+  background: transparent;
+  color: #1f2937;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.16s ease, color 0.16s ease;
+}
+
+.accountMenuItem:hover {
+  background: #f5f6f8;
+  color: #0f172a;
 }
 
 /* responsive */
@@ -340,6 +400,16 @@
   .navDivider {
     display: none;
   }
+}
+
+@keyframes navItemIn {
+  from { opacity: 0; transform: translateY(-4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes accountMenuIn {
+  from { opacity: 0; transform: scale(0.94) translateY(-6px); }
+  to   { opacity: 1; transform: scale(1) translateY(0); }
 }
 
 @media (max-width: 560px) {

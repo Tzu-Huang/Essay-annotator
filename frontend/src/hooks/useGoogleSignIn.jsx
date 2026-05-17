@@ -1,11 +1,14 @@
 import { useGoogleLogin } from "@react-oauth/google";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "./useAuth";
 
 const GOOGLE_USERINFO_URL = "https://www.googleapis.com/oauth2/v3/userinfo";
 
+const REDIRECT_TO_EDITOR_PAGES = new Set(["/", "/login"]);
+
 export function useGoogleSignIn() {
   const navigate = useNavigate();
+  const location = useLocation();
   const { loginUser } = useAuth();
 
   return useGoogleLogin({
@@ -23,7 +26,10 @@ export function useGoogleSignIn() {
 
         const profile = await response.json();
         loginUser(profile);
-        navigate("/editor");
+        const destination = REDIRECT_TO_EDITOR_PAGES.has(location.pathname)
+          ? "/editor"
+          : location.pathname;
+        navigate(destination);
       } catch (error) {
         console.error("Google login failed:", error);
       }

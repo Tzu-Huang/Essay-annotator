@@ -1,3 +1,4 @@
+import { useEffect, useRef, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import {
   HelpCircle,
@@ -5,17 +6,47 @@ import {
   BookOpen,
   Info,
   Sparkles,
+  ChevronDown,
+  LogOut,
 } from "lucide-react";
 import logo from "../assets/logo.png";
 import avatar from "../assets/dog.png";
 import styles from "../styles/navbar.module.css";
 import { useAuth } from "../hooks/useAuth";
 
-function Navbar({ onOpenSignIn }) {
+function Navbar({ onOpenSignIn, onLoggedOut }) {
   const location = useLocation();
-  const isEditorPage = location.pathname === "/editor";
   const isHomePage = location.pathname === "/";
   const { user, logoutUser } = useAuth();
+  const [showAccountMenu, setShowAccountMenu] = useState(false);
+  const accountMenuRef = useRef(null);
+
+  // handle the sign out drop down menu
+  useEffect(() => {
+    if (!showAccountMenu) {
+      return undefined;
+    }
+
+    function handlePointerDown(event) {
+      if (!accountMenuRef.current?.contains(event.target)) {
+        setShowAccountMenu(false);
+      }
+    }
+
+    function handleEscape(event) {
+      if (event.key === "Escape") {
+        setShowAccountMenu(false);
+      }
+    }
+
+    document.addEventListener("mousedown", handlePointerDown);
+    document.addEventListener("keydown", handleEscape);
+
+    return () => {
+      document.removeEventListener("mousedown", handlePointerDown);
+      document.removeEventListener("keydown", handleEscape);
+    };
+  }, [showAccountMenu]);
 
   return (
     <header className={styles.navbarShell}>
@@ -66,23 +97,55 @@ function Navbar({ onOpenSignIn }) {
 
             <div className={styles.navDivider} />
 
-            {(isEditorPage || isHomePage) && user ? (
+            {user ? (
               <div className={styles.userActions}>
-                <div className={styles.userInfo}>
-                  <span className={styles.username}>{user.name}</span>
-                  <img
-                    src={user.picture || avatar}
-                    alt={user.name}
-                    className={styles.avatar}
-                  />
+                <div className={styles.accountMenuWrap} ref={accountMenuRef}>
+                  <button
+                    type="button"
+                    className={styles.userInfo}
+                    onClick={() =>
+                      setShowAccountMenu((currentValue) => !currentValue)
+                    }
+                    aria-expanded={showAccountMenu}
+                    aria-haspopup="menu"
+                  >
+                    <span className={styles.username}>{user.name}</span>
+                    <img
+                      src={user.picture || avatar}
+                      alt={user.name}
+                      className={styles.avatar}
+                    />
+                    <span className={styles.accountMenuChevron}>
+                      <ChevronDown size={14} strokeWidth={2.2} />
+                    </span>
+                  </button>
+
+                  {showAccountMenu ? (
+                    <div className={styles.accountMenu} role="menu">
+                      <button
+                        type="button"
+                        className={styles.accountMenuItem}
+                        onClick={() => {
+                          setShowAccountMenu(false);
+                          logoutUser();
+                          if (!isHomePage) onLoggedOut?.();
+                        }}
+                      >
+                        <LogOut size={15} strokeWidth={2.1} />
+                        <span>Log Out</span>
+                      </button>
+                    </div>
+                  ) : null}
                 </div>
 
-                <button className={styles.signInBtn} onClick={logoutUser}>
-                  Log Out
-                </button>
+                {isHomePage ? (
+                  <Link to="/editor" className={styles.signInBtn}>
+                    Editor
+                  </Link>
+                ) : null}
               </div>
             ) : (
-              <>
+              <div className={styles.loggedOut}>
                 <div className={styles.navLink} aria-disabled="true">
                   <span className={styles.navLinkIcon}>
                     <UserCircle2 size={16} strokeWidth={2} />
@@ -105,7 +168,7 @@ function Navbar({ onOpenSignIn }) {
                     </button>
                   )}
                 </div>
-              </>
+              </div>
             )}
           </nav>
         </div>

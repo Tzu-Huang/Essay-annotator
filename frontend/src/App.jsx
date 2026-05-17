@@ -26,6 +26,25 @@ import "./styles/background.css";
 
 function App() {
   const [showSignInModal, setShowSignInModal] = useState(false);
+  const [signInPostLogout, setSignInPostLogout] = useState(false);
+  const [modalKey, setModalKey] = useState(0);
+
+  function openSignIn() {
+    setSignInPostLogout(false);
+    setModalKey((k) => k + 1);
+    setShowSignInModal(true);
+  }
+
+  function openSignInAfterLogout() {
+    setSignInPostLogout(true);
+    setModalKey((k) => k + 1);
+    setShowSignInModal(true);
+  }
+
+  function closeSignIn() {
+    setShowSignInModal(false);
+    setSignInPostLogout(false);
+  }
 
   return (
     <BrowserRouter>
@@ -35,8 +54,8 @@ function App() {
             path="/"
             element={
               <>
-                <Navbar onOpenSignIn={() => setShowSignInModal(true)} />
-                <Home onOpenSignIn={() => setShowSignInModal(true)} />
+                <Navbar onOpenSignIn={openSignIn} onLoggedOut={openSignInAfterLogout} />
+                <Home onOpenSignIn={openSignIn} />
                 <Footer />
               </>
             }
@@ -46,7 +65,7 @@ function App() {
             path="/login"
             element={
               <>
-                <Navbar onOpenSignIn={() => setShowSignInModal(true)} />
+                <Navbar onOpenSignIn={openSignIn} onLoggedOut={openSignInAfterLogout} />
                 <Login />
                 <Footer />
               </>
@@ -57,7 +76,7 @@ function App() {
             path="/faqs"
             element={
               <>
-                <Navbar onOpenSignIn={() => setShowSignInModal(true)} />
+                <Navbar onOpenSignIn={openSignIn} onLoggedOut={openSignInAfterLogout} />
                 <FAQsPage />
                 <Footer />
               </>
@@ -68,7 +87,7 @@ function App() {
             path="/editor"
             element={
               <>
-                <Navbar onOpenSignIn={() => setShowSignInModal(true)} />
+                <Navbar onOpenSignIn={openSignIn} onLoggedOut={openSignInAfterLogout} />
                 <Editor />
               </>
             }
@@ -78,7 +97,7 @@ function App() {
             path="/essay/:id"
             element={
               <>
-                <Navbar onOpenSignIn={() => setShowSignInModal(true)} />
+                <Navbar onOpenSignIn={openSignIn} onLoggedOut={openSignInAfterLogout} />
                 <EssayPage />
                 <Footer />
               </>
@@ -89,20 +108,21 @@ function App() {
           <Route path="/compare/:id" element={<ComparePage />} />
 
           {/* How it works page 不加 Navbar / Footer */}
-          <Route 
-            path="/how-it-works" 
+          <Route
+            path="/how-it-works"
             element={
               <>
-                <Navbar onOpenSignIn={() => setShowSignInModal(true)} />
+                <Navbar onOpenSignIn={openSignIn} onLoggedOut={openSignInAfterLogout} />
                 <HowItWorks />
-
               </>
             }
           />
         </Routes>
         <SignInModal
+          key={modalKey}
           isOpen={showSignInModal}
-          onClose={() => setShowSignInModal(false)}
+          onClose={closeSignIn}
+          postLogout={signInPostLogout}
         />
       </div>
     </BrowserRouter>

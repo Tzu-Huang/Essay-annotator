@@ -6,6 +6,25 @@ const GOOGLE_USERINFO_URL = "https://www.googleapis.com/oauth2/v3/userinfo";
 
 const REDIRECT_TO_EDITOR_PAGES = new Set(["/", "/login"]);
 
+async function saveUser(profile) {
+  const params = new URLSearchParams({ email: profile.email, name: profile.name });
+  const res = await fetch(`/api/users?${params}`, { method: "POST" });
+
+  if (!res.ok) {
+    throw new Error("Failed to save user to database");
+  }
+
+  const data = await res.json();
+
+  if (data.status === "new") {
+    console.log("Welcome!", data.name);
+  } else {
+    console.log(`Welcome back ${data.name}! Visit #${data.login_count}`);
+  }
+
+  return data;
+}
+
 export function useGoogleSignIn() {
   const navigate = useNavigate();
   const location = useLocation();
@@ -25,7 +44,8 @@ export function useGoogleSignIn() {
         }
 
         const profile = await response.json();
-        loginUser(profile);
+        const dbUser = await saveUser(profile);
+        loginUser({ ...profile, db_id: dbUser.id, login_count: dbUser.login_count });
         const destination = REDIRECT_TO_EDITOR_PAGES.has(location.pathname)
           ? "/editor"
           : location.pathname;

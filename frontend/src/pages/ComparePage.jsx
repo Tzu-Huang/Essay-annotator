@@ -5,7 +5,7 @@ import { useParams } from "react-router-dom";
 import styles from "../styles/compare.module.css";
 
 const API_BASE = "http://44.201.62.0:8000";
-const DEFAULT_LEFT_RATIO = 60;
+const DEFAULT_LEFT_RATIO = 50;
 const MIN_LEFT_RATIO = 35;
 const MAX_LEFT_RATIO = 75;
 
@@ -262,6 +262,9 @@ function ComparePage() {
     [compareData, hoveredAnnotationId]
   );
 
+  const shouldUseAnnotationLayout =
+    annotationsEnabled && compareData.length > 0;
+
   function handleAnnotationHover(annotationId, event) {
     setHoveredAnnotationId(annotationId);
 
@@ -476,7 +479,12 @@ function ComparePage() {
               </div>
             </div>
 
-            <div id="user-panel-grid" className={styles.userPanelGrid}>
+            <div
+              id="user-panel-grid"
+              className={`${styles.userPanelGrid} ${
+                shouldUseAnnotationLayout ? styles.annotationLayout : styles.readingLayout
+              }`}
+            >
               <div className={styles.userEssayMain}>
                 <div className={styles.userEssayBody}>
                   {userParagraphs.map((paragraph, index) => (

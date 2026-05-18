@@ -5,9 +5,11 @@
  * 網址 = 指令，App.jsx = 導航員
  */
 
+import { useState } from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 
 import Navbar from "./components/Navbar";
+import SignInModal from "./components/SignInModal";
 import Footer from "./components/Footer/Footer";
 
 import Home from "./pages/Home";
@@ -23,7 +25,26 @@ import "./styles/components.css";
 import "./styles/background.css";
 
 function App() {
-  const bg = "bg-world";
+  const [showSignInModal, setShowSignInModal] = useState(false);
+  const [signInPostLogout, setSignInPostLogout] = useState(false);
+  const [modalKey, setModalKey] = useState(0);
+
+  function openSignIn() {
+    setSignInPostLogout(false);
+    setModalKey((k) => k + 1);
+    setShowSignInModal(true);
+  }
+
+  function openSignInAfterLogout() {
+    setSignInPostLogout(true);
+    setModalKey((k) => k + 1);
+    setShowSignInModal(true);
+  }
+
+  function closeSignIn() {
+    setShowSignInModal(false);
+    setSignInPostLogout(false);
+  }
 
   return (
     <BrowserRouter>
@@ -33,8 +54,8 @@ function App() {
             path="/"
             element={
               <>
-                <Navbar />
-                <Home />
+                <Navbar onOpenSignIn={openSignIn} onLoggedOut={openSignInAfterLogout} />
+                <Home onOpenSignIn={openSignIn} />
                 <Footer />
               </>
             }
@@ -44,7 +65,7 @@ function App() {
             path="/login"
             element={
               <>
-                <Navbar />
+                <Navbar onOpenSignIn={openSignIn} onLoggedOut={openSignInAfterLogout} />
                 <Login />
                 <Footer />
               </>
@@ -55,7 +76,7 @@ function App() {
             path="/faqs"
             element={
               <>
-                <Navbar />
+                <Navbar onOpenSignIn={openSignIn} onLoggedOut={openSignInAfterLogout} />
                 <FAQsPage />
                 <Footer />
               </>
@@ -66,7 +87,7 @@ function App() {
             path="/editor"
             element={
               <>
-                <Navbar />
+                <Navbar onOpenSignIn={openSignIn} onLoggedOut={openSignInAfterLogout} />
                 <Editor />
               </>
             }
@@ -76,7 +97,7 @@ function App() {
             path="/essay/:id"
             element={
               <>
-                <Navbar />
+                <Navbar onOpenSignIn={openSignIn} onLoggedOut={openSignInAfterLogout} />
                 <EssayPage />
                 <Footer />
               </>
@@ -87,17 +108,22 @@ function App() {
           <Route path="/compare/:id" element={<ComparePage />} />
 
           {/* How it works page 不加 Navbar / Footer */}
-          <Route 
-            path="/how-it-works" 
+          <Route
+            path="/how-it-works"
             element={
               <>
-                <Navbar />
+                <Navbar onOpenSignIn={openSignIn} onLoggedOut={openSignInAfterLogout} />
                 <HowItWorks />
-
               </>
             }
           />
         </Routes>
+        <SignInModal
+          key={modalKey}
+          isOpen={showSignInModal}
+          onClose={closeSignIn}
+          postLogout={signInPostLogout}
+        />
       </div>
     </BrowserRouter>
   );

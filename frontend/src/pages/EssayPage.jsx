@@ -51,7 +51,7 @@ function EssayPage() {
         setRelatedEssays([]);
 
         const response = await fetch(
-          `http://44.201.62.0:8000/essays/${id}?include_content=true`
+          `http://44.201.62.0:8000/essays/${id}?include_content=true`,
         );
 
         if (!response.ok) {
@@ -85,8 +85,7 @@ function EssayPage() {
 
           setRelatedEssays(filtered);
         }
-        // find related essays === 
-
+        // find related essays ===
       } catch (err) {
         console.error("ERROR:", err);
         setError("Failed to load essay.");
@@ -100,9 +99,8 @@ function EssayPage() {
     navigate(`/compare/${id}`);
   };
   const heroImage =
-  essay?.hero_image ||
-  "https://images.unsplash.com/photo-1455390582262-044cdead277a?q=80&w=1600&auto=format&fit=crop";
-
+    essay?.hero_image ||
+    "https://images.unsplash.com/photo-1455390582262-044cdead277a?q=80&w=1600&auto=format&fit=crop";
 
   if (error) {
     return <p className={styles.loading}>{error}</p>;
@@ -123,7 +121,6 @@ function EssayPage() {
               ), url(${heroImage})`,
             }}
           >
-            
             <button className={styles.backBtn} onClick={() => navigate(-1)}>
               ← Back to Results
             </button>
@@ -132,9 +129,7 @@ function EssayPage() {
               {essay.generated_title || essay.title || "Untitled Essay"}
             </h1>
 
-            <p className={styles.prompt}>
-              {essay.topic}
-            </p>
+            <p className={styles.prompt}>{essay.topic}</p>
 
             <div className={styles.meta}>
               <span>•</span>
@@ -152,7 +147,6 @@ function EssayPage() {
           </section>
 
           <div className={styles.contentLayout}>
-
             <article className={styles.article}>
               {essay.content.split("\n\n").map((para, i) => (
                 <p key={i}>{para}</p>
@@ -160,25 +154,16 @@ function EssayPage() {
             </article>
 
             <aside className={styles.sideColumn}>
-              <section 
-                  className={styles.ctaCard}
-                  ref={cardRef}
-                >
+              <section className={styles.ctaCard} ref={cardRef}>
                 <h2>Ready to write your own essay?</h2>
 
-                <p>
-                  Compare your essay with real successful examples.
-                </p>
+                <p>Compare your essay with real successful examples.</p>
 
-                <button
-                  className={styles.ctaBtn}
-                  onClick={handleCompare}
-                >
+                <button className={styles.ctaBtn} onClick={handleCompare}>
                   Compare with My Essay
                 </button>
               </section>
             </aside>
-
           </div>
 
           {relatedEssays.length > 0 && (
@@ -194,33 +179,31 @@ function EssayPage() {
                       const nextId = item.parent_id;
 
                       navigate(`/essay/${nextId}`);
-                    
+
                       window.scrollTo({
                         top: 0,
                         behavior: "smooth",
                       });
                     }}
                   >
-                  <img
-                    className={styles.relatedImage}
-                    src={PLACEHOLDER_IMAGES[index % PLACEHOLDER_IMAGES.length]}
-                    alt=""
-                  />
+                    <img
+                      className={styles.relatedImage}
+                      src={
+                        PLACEHOLDER_IMAGES[index % PLACEHOLDER_IMAGES.length]
+                      }
+                      alt=""
+                    />
 
                     <div className={styles.relatedBody}>
-                      <span>{item.type || item.essay_type || "Example Essay"}</span>
+                      <span>
+                        {item.type || item.essay_type || "Example Essay"}
+                      </span>
 
-                      <h3>
-                        {item.generated_title || "Untitled Essay"}
-                      </h3>
+                      <h3>{item.generated_title || "Untitled Essay"}</h3>
 
-                      {item.school == "none" && (
-                        <p>Common App</p>
-                      )}
+                      {item.school == "none" && <p>Common App</p>}
 
-                      {item.school != "none" && (
-                        <p>{item.school}</p>
-                      )}
+                      {item.school != "none" && <p>{item.school}</p>}
                     </div>
                   </button>
                 ))}

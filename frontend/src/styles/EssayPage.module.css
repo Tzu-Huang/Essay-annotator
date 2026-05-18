@@ -3,7 +3,6 @@
   background: #eeeeed;
   color: #151936;
   font-family: Inter, system-ui, sans-serif;
-  animation: pageEnter 500ms ease-out;
 }
 
 /* HERO */
@@ -146,16 +145,6 @@
 .ctaCard {
   position: sticky;
   will-change: transform;
-  -webkit-backdrop-filter: blur(14px);
-  backdrop-filter: blur(14px);
-  padding: 34px 38px;
-  border-radius: 18px;
-
-  background: linear-gradient(
-    135deg,
-    rgba(106, 90, 249, 0.14),
-    rgba(255, 255, 255, 0.9)
-  );
   top: 120px;
   margin: 30px 0 80px;
   backdrop-filter: blur(14px);
@@ -230,30 +219,8 @@
 }
 
 .sideColumn {
-  height: 100%;
-  padding-top: 60px;
-}
-
-.ctaCard {
-  position: sticky;
-  top: 120px;
-  -webkit-backdrop-filter: blur(14px);
-  backdrop-filter: blur(14px);
-  padding: 34px 30px;
-  border-radius: 22px;
-
-  background: linear-gradient(
-    135deg,
-    rgba(106, 90, 249, 0.14),
-    rgba(255,255,255,0.96)
-  );
-
-  box-shadow:
-    0 18px 42px rgba(31, 35, 60, 0.08);
-
-  transition:
-    box-shadow 0.3s ease;
-    will-change: transform;
+  height: 90%;
+  padding-top: 0;
 }
 
 .ctaCard:hover {

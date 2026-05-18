@@ -6,6 +6,10 @@ from app.state import AppData
 from compare_results.analysis import compare
 from dotenv import load_dotenv
 from embedding.search_similar import load_db_embeddings
+from database.create import get_db, User, create_tables
+from fastapi import Depends
+from sqlalchemy.orm import Session
+from datetime import datetime
 from fastapi import FastAPI, HTTPException, Query, Request
 from fastapi.middleware.cors import CORSMiddleware
 from pathlib import Path
@@ -13,7 +17,7 @@ from pydantic import BaseModel
 from typing import Optional
 
 
-load_dotenv(dotenv_path=Path(__file__).parent / ".env")
+load_dotenv(dotenv_path=Path(__file__).resolve().parent.parent / ".env")
 # print("OPENAI KEY: ", bool(os.environ.get("OPENAI_API_KEY")))
 
 BASE = Path(__file__).resolve().parent.parent
@@ -25,6 +29,7 @@ EMBED_JSONL = BASE / "drive_data/embed_output/embed.jsonl"
 # -----------------------------
 async def lifespan(app: FastAPI):
     print("startup")
+    create_tables()
 
     data = AppData(
         started_at=time.time(),
@@ -117,10 +122,34 @@ def ready():
 
     return {"status": "ready", "essay_count": data.essay_count}
 
+
+# Handling saving user info into our database
+@app.post("/api/users")
+def save_user(email: str, name: str, db: Session = Depends(get_db)):
+    existing = db.query(User).filter(User.email == email).first()
+    if existing:
+        existing.login_count += 1
+        db.commit()
+        db.refresh(existing)
+        return {
+            "status":      "returning",
+            "name":        existing.name,
+            "login_count": existing.login_count,
+            "id":          existing.id,
+        }
+    new_user = User(email=email, name=name)
+    db.add(new_user)
+    db.commit()
+    db.refresh(new_user)
+    return {
+        "status": "new",
+        "name":   new_user.name,
+        "id":     new_user.id,
+    }
+
 DEFAULT_FIELDS = ["id", "topic", "type", "school", "public"]
 ALLOWED_FIELDS = set(DEFAULT_FIELDS + ["content", "source_file", "metadata"])
 
-# TODO: frontend is taking parent id
 @app.get("/essays/{essay_id}")
 def get_essay(
     essay_id: str,

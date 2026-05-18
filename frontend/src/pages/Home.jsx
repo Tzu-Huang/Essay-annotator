@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import {
   FileText,
   FileCheck,
@@ -7,8 +7,21 @@ import {
 } from "lucide-react";
 
 import styles from "../styles/home.module.css";
+import { useAuth } from "../hooks/useAuth";
 
-function Home() {
+function Home({ onOpenSignIn }) {
+  const navigate = useNavigate();
+  const { user } = useAuth();
+
+  const handleStartWriting = () => {
+    if (user) {
+      navigate("/editor");
+      return;
+    }
+
+    onOpenSignIn();
+  };
+
   const curatedEssays = [
     {
       id: "essay_0039",
@@ -130,11 +143,13 @@ function Home() {
           MIT, Stanford, and other top universities.
         </p>
 
-        <Link to="/login" className={styles.startWritingLink}>
-          <button className={styles.primaryBtn}>
-            <span>Start Writing</span>
-          </button>
-        </Link>
+        <button
+          type="button"
+          className={styles.primaryBtn}
+          onClick={handleStartWriting}
+        >
+          <span>Start Writing</span>
+        </button>
 
         <div className={styles.heroBadges}>
           <div>

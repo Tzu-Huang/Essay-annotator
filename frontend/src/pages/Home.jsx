@@ -9,8 +9,7 @@ import {
 
 import styles from "../styles/home.module.css";
 
-function Home() {
-  const curatedEssays = [
+const CURATED_ESSAYS = [
     {
       id: "essay_0039",
       school: "Harvard University",
@@ -111,12 +110,14 @@ function Home() {
         "A love of spice becomes a vivid lens for exploring curiosity, culture, adventure, and personal identity.",
       logo: "/logos/ivy.png",
     },
-  ];
+];
 
+const CARDS_PER_VIEW = 5;
+
+function Home() {
   const [essayIndex, setEssayIndex] = useState(0);
 
-  const cardsPerView = 5;
-  const maxEssayIndex = Math.max(curatedEssays.length - cardsPerView, 0);
+  const maxEssayIndex = Math.max(CURATED_ESSAYS.length - CARDS_PER_VIEW, 0);
 
   const showPrevButton = essayIndex > 0;
   const showNextButton = essayIndex < maxEssayIndex;
@@ -448,10 +449,10 @@ function Home() {
               <div
                 className={styles.scrollTrack}
                 style={{
-                  transform: `translateX(calc(-${essayIndex} * (var(--essay-card-width) + var(--essay-card-gap))))`,
+                  transform: `translateX(calc(${essayIndex} * -1 * (var(--essay-card-width) + var(--essay-card-gap))))`,
                 }}
               >
-                {curatedEssays.map((essay) => (
+                {CURATED_ESSAYS.map((essay) => (
                   <Link
                     to={`/essay/${essay.id}`}
                     className={styles.scrollCard}
@@ -493,7 +494,8 @@ function Home() {
         </div>
 
         <div className={styles.smallSticky}>
-          ...and many <br />
+          ...and <br />
+          many <br />
           more.
         </div>
       </section>

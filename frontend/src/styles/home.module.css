@@ -1,4 +1,4 @@
-@import url("https://fonts.googleapis.com/css2?family=Coming+Soon&family=Handlee&family=Kalam:wght@400;700&family=Nanum+Pen+Script&family=Patrick+Hand&family=Shantell+Sans:wght@400;500;600;700;800&family=Short+Stack&family=Yomogi&family=Caveat:wght@500;600;700&family=Inter:wght@400;500;600;700;800&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Coming+Soon&family=Handlee&family=Kalam:wght@400;700&family=Nanum+Pen+Script&family=Patrick+Hand&family=Shantell+Sans:wght@400;500;600;700;800&family=Short+Stack&family=Yomogi&family=Caveat:wght@500;600;700&family=Inter:wght@400;500;600;700;800&family=Playfair+Display:wght@500;600;700&display=swap");
 :root {
   --ink: #111827;
   --ink-soft: #2f3a4d;
@@ -240,9 +240,6 @@
 
 /* HERO VISUAL */
 
-
-/* HERO VISUAL */
-
 .heroVisual {
   min-height: 610px;
   position: relative;
@@ -265,7 +262,7 @@
   box-shadow:
     0 24px 45px rgba(32, 29, 24, 0.12),
     inset 0 0 0 8px rgba(248, 246, 240, 0.66);
-  transform: rotate(5.2deg) scale(1.0);;
+  transform: rotate(5.2deg) scale(1);
   transform-origin: center center;
 }
 
@@ -1133,11 +1130,12 @@
   font-weight: 700;
   position: relative;
   z-index: 4;
+  white-space: nowrap;
 }
 
 .libraryNote {
   justify-self: end;
-  transform: rotate(-8deg) translateY(18px);
+  transform: rotate(-8deg) translateX(50px) translateY(-30px);
   text-align: left;
 }
 
@@ -1145,14 +1143,14 @@
   justify-self: start;
   width: 108px;
   min-height: 108px;
-  padding: 20px 18px;
+   padding: 20px 18px;
   display: flex;
   align-items: center;
   background: #fbf2df;
   box-shadow:
     0 18px 28px rgba(30, 32, 40, 0.09),
     inset 0 1px 0 rgba(255, 255, 255, 0.65);
-  transform: rotate(-3deg) translateY(20px);
+  transform: rotate(-3deg) translateX(10px) translateY(50px);
 }
 
 .libraryContent {
@@ -1678,21 +1676,7 @@
 }
 
 .ctaTitle::after {
-  width: 350px;
-  height: 10px;
-  margin: 8px auto 0;
-  background:
-    linear-gradient(
-      180deg,
-      transparent 38%,
-      rgba(126, 103, 217, 0.78) 42%,
-      rgba(126, 103, 217, 0.78) 60%,
-      transparent 65%
-    );
-  border-radius: 999px;
-  transform: rotate(-2deg);
-  margin-left: 350px;
-  margin-top: -5px;
+  display: none;
 }
 
 .ctaSection p {
@@ -1746,13 +1730,11 @@
   }
 
   .stepsGrid,
-  .comparePapers,
   .differenceCompareWrap {
     grid-template-columns: 1fr;
   }
 
   .stepArrow,
-  .vsCircle,
   .vsCircleSmall {
     transform: rotate(90deg);
     margin: 0 auto;
@@ -1762,14 +1744,6 @@
     margin-bottom: 0;
   }
 
-  .comparePaperWrap:first-child,
-  .comparePaperWrap:last-child {
-    transform: none;
-  }
-
-  .comparePaperWrap {
-    margin-top: 28px;
-  }
 
   .differenceCardBad,
   .differenceCardGood {
@@ -1785,18 +1759,25 @@
   .smallSticky {
     display: none;
   }
+  
 
   .sectionTitleCenter {
     letter-spacing: 6px;
   }
 
+  .scrollWrapper {
+    --essay-card-width: 190px;
+    --essay-card-gap: 18px;
+  }
+
   .scrollTrack {
-    gap: 18px;
+    gap: var(--essay-card-gap);
     animation-duration: 27s;
   }
 
   .scrollCard {
-    flex-basis: 190px;
+    flex: 0 0 var(--essay-card-width);
+    width: var(--essay-card-width);
     min-height: 305px;
   }
 }
@@ -1823,22 +1804,20 @@
 }
 
 .titleLine1,
-.titleLine2,
-.titleLine3,
-.titleLine4 {
+.titleLine2 {
   font-size: clamp(42px, 13vw, 62px);
   line-height: 0.9;
 }
 
-.titleLine3 {
+.titleLine2 {
+  margin-left: 0;
   width: auto;
 }
 
-.titleLine3::after {
-  width: 95px;
-  height: 9px;
+.titleLine2::after {
   right: 0;
-  bottom: 1px;
+  bottom: 4px;
+  width: 180px;
 }
 
   .heroDescription {
@@ -1925,13 +1904,19 @@
     width: 42px;
   }
 
+  .scrollWrapper {
+    --essay-card-width: 175px;
+    --essay-card-gap: 16px;
+  }
+
   .scrollTrack {
-    gap: 16px;
+    gap: var(--essay-card-gap);
     animation-duration: 23s;
   }
 
   .scrollCard {
-    flex-basis: 175px;
+    flex: 0 0 var(--essay-card-width);
+    width: var(--essay-card-width);
     min-height: 292px;
     padding: 38px 16px 22px;
   }

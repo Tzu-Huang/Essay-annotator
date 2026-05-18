@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Link } from "react-router-dom";
 import {
   FileCheck,
@@ -112,14 +113,27 @@ function Home() {
     },
   ];
 
-  const scrollingEssays = [...curatedEssays, ...curatedEssays];
+  const [essayIndex, setEssayIndex] = useState(0);
+
+  const cardsPerView = 5;
+  const maxEssayIndex = Math.max(curatedEssays.length - cardsPerView, 0);
+
+  const showPrevButton = essayIndex > 0;
+  const showNextButton = essayIndex < maxEssayIndex;
+
+  const handlePrevEssay = () => {
+    setEssayIndex((prev) => Math.max(prev - 1, 0));
+  };
+
+  const handleNextEssay = () => {
+    setEssayIndex((prev) => Math.min(prev + 1, maxEssayIndex));
+  };
 
   return (
     <main className={styles.home}>
       {/* HERO SECTION */}
       <section className={styles.hero}>
         <div className={styles.heroContent}>
-
           <h1 className={styles.heroTitle}>
             <span className={styles.titleLine1}>REAL Essays</span>
             <span className={styles.titleLine2}>REAL Improvement.</span>
@@ -290,7 +304,9 @@ function Home() {
 
             <div className={styles.stepCard}>
               <strong>Essay Insights</strong>
-              <span>See structure, tone, and details that make accepted essays stronger.</span>
+              <span>
+                See structure, tone, and details that make accepted essays stronger.
+              </span>
 
               <div className={styles.analysisLines}>
                 <i></i>
@@ -307,20 +323,17 @@ function Home() {
         </div>
       </section>
 
-
       {/* COMPARE */}
       <section className={styles.compareSection}>
         <div className={styles.compareIntro}>
-          <p className={styles.kicker}>SEE ESSAY ANNOTATOR IN ACTION</p>
-
           <h2 className={styles.sectionTitle}>
-            See the Connections <br />
-            That Help You Grow
+            See What Makes <br />
+            Strong Essays Work
           </h2>
 
           <p>
-            Side-by-side insights show you what successful essays do—and how you can
-            do it, too.
+            Compare your draft with real accepted essays and discover what makes
+            stronger writing stand out.
           </p>
         </div>
 
@@ -330,8 +343,9 @@ function Home() {
               <p className={styles.analysisLabel}>YOUR ESSAY</p>
               <h3>User Draft</h3>
 
-              <div className={styles.analysisDivider}></div>
-
+              <div
+                className={`${styles.analysisDivider} ${styles.leftDivider}`}
+              ></div>
               <p className={styles.analysisText}>
                 Ever since my first day volunteering at the community clinic,
               </p>
@@ -355,36 +369,15 @@ function Home() {
                 <span></span>
                 <span></span>
               </div>
-
-              <div className={styles.demoFooter}>
-                <span>37 words</span>
-                <span>·</span>
-                <span>1 paragraph</span>
-              </div>
             </div>
 
             <div className={styles.analysisMiddle}>
-              <svg
-                className={styles.demoArrowSvg}
-                viewBox="0 0 220 260"
-                aria-hidden="true"
-              >
-                <path
-                  d="M38 62 C78 12, 142 16, 174 54"
-                  className={styles.demoArrowPath}
-                />
-                <path
-                  d="M44 184 C84 224, 148 220, 178 182"
-                  className={styles.demoArrowPath}
-                />
-              </svg>
-
               <div className={styles.suggestionPopup}>
                 <p>EXPRESSION</p>
                 <strong>Stronger opening image</strong>
                 <span>
-                  The database essay is stronger because it turns a general idea into
-                  a vivid, sensory image that pulls readers in.
+                  The database essay is stronger because it turns a general idea
+                  into a vivid, sensory image that pulls readers in.
                 </span>
                 <button type="button">See full analysis →</button>
               </div>
@@ -394,12 +387,14 @@ function Home() {
               <p className={styles.analysisLabel}>DATABASE ESSAY</p>
               <h3>essay_0167</h3>
 
-              <div className={styles.analysisDivider}></div>
+              <div
+                className={`${styles.analysisDivider} ${styles.rightDivider}`}
+              ></div>
 
               <p className={styles.analysisText}>
-                Stepping into the local hospital sophomore year summer, I embraced the
-                role of student volunteer, eager to assist patients.{" "}
-                <span className={styles.blueHighlight}>
+                Stepping into the local hospital sophomore year summer, I embraced
+                the role of student volunteer, eager to assist patients.{" "}
+                <span className={styles.hoverHighlight}>
                   The sterile scent of alcohol greeted me and the vast, maze-like
                   hospital left me disoriented,
                 </span>{" "}
@@ -414,18 +409,12 @@ function Home() {
                 <span></span>
                 <span></span>
               </div>
-
-              <div className={styles.demoFooter}>
-                <span>638 words</span>
-                <span>·</span>
-                <span>Personal Statement</span>
-              </div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* ESSAY LIBRARY - ORIGINAL ANIMATION STYLE */}
+      {/* ESSAY LIBRARY - CAROUSEL STYLE */}
       <section className={styles.featuredScroll}>
         <div className={styles.libraryNote}>
           Browse essays <br />
@@ -444,33 +433,62 @@ function Home() {
           </p>
 
           <div className={styles.scrollWrapper}>
-            <div className={styles.scrollTrack}>
-              {scrollingEssays.map((essay, index) => (
-                <Link
-                  to={`/essay/${essay.id}`}
-                  className={styles.scrollCard}
-                  key={`${essay.id}-${index}`}
-                >
-                  <div className={styles.pin}></div>
+            {showPrevButton && (
+              <button
+                type="button"
+                className={`${styles.carouselBtn} ${styles.carouselBtnLeft}`}
+                onClick={handlePrevEssay}
+                aria-label="Previous essays"
+              >
+                ‹
+              </button>
+            )}
 
-                  <div className={styles.cardHeader}>
-                    <img
-                      src={essay.logo}
-                      alt={`${essay.school} logo`}
-                      className={styles.schoolLogo}
-                    />
+            <div className={styles.carouselViewport}>
+              <div
+                className={styles.scrollTrack}
+                style={{
+                  transform: `translateX(calc(-${essayIndex} * (var(--essay-card-width) + var(--essay-card-gap))))`,
+                }}
+              >
+                {curatedEssays.map((essay) => (
+                  <Link
+                    to={`/essay/${essay.id}`}
+                    className={styles.scrollCard}
+                    key={essay.id}
+                  >
+                    <div className={styles.pin}></div>
 
-                    <h4>{essay.school}</h4>
-                  </div>
+                    <div className={styles.cardHeader}>
+                      <img
+                        src={essay.logo}
+                        alt={`${essay.school} logo`}
+                        className={styles.schoolLogo}
+                      />
 
-                  <p>{essay.title}</p>
+                      <h4>{essay.school}</h4>
+                    </div>
 
-                  <span>{essay.description}</span>
+                    <p>{essay.title}</p>
 
-                  <div className={styles.scrollLink}>Read more →</div>
-                </Link>
-              ))}
+                    <span>{essay.description}</span>
+
+                    <div className={styles.scrollLink}>Read more →</div>
+                  </Link>
+                ))}
+              </div>
             </div>
+
+            {showNextButton && (
+              <button
+                type="button"
+                className={`${styles.carouselBtn} ${styles.carouselBtnRight}`}
+                onClick={handleNextEssay}
+                aria-label="Next essays"
+              >
+                ›
+              </button>
+            )}
           </div>
         </div>
 

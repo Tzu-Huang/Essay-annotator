@@ -67,8 +67,11 @@ const RANK_STYLES = {
   5: { bg: "#e2dcfa", text: "#5b21b6" }, // deeper purple
 };
 
-const NON_ALL_TYPES = ["Personal Statement", "University of California", "Supplemental"];
-
+const NON_ALL_TYPES = [
+  "Personal Statement",
+  "University of California",
+  "Supplemental",
+];
 
 function getSimilarityInfo(similarity) {
   if (similarity === null || similarity === undefined || similarity === "") {
@@ -80,47 +83,47 @@ function getSimilarityInfo(similarity) {
   }
 
   const rawLabel = String(similarity).trim();
-const numeric = Number(rawLabel);
+  const numeric = Number(rawLabel);
 
-if (Number.isNaN(numeric)) {
-  return {
-    label: rawLabel,
-    bg: "#eef2ff",
-    text: "#4f46e5",
-  };
-}
+  if (Number.isNaN(numeric)) {
+    return {
+      label: rawLabel,
+      bg: "#eef2ff",
+      text: "#4f46e5",
+    };
+  }
 
-const label = `${rawLabel}% similar`;
+  const label = `${rawLabel}% similar`;
 
-if (numeric >= 85) {
+  if (numeric >= 85) {
+    return {
+      label,
+      bg: "#dcfce7",
+      text: "#15803d",
+    };
+  }
+
+  if (numeric >= 70) {
+    return {
+      label,
+      bg: "#dbeafe",
+      text: "#1d4ed8",
+    };
+  }
+
+  if (numeric >= 50) {
+    return {
+      label,
+      bg: "#fef3c7",
+      text: "#b45309",
+    };
+  }
+
   return {
     label,
-    bg: "#dcfce7",
-    text: "#15803d",
+    bg: "#fee2e2",
+    text: "#b91c1c",
   };
-}
-
-if (numeric >= 70) {
-  return {
-    label,
-    bg: "#dbeafe",
-    text: "#1d4ed8",
-  };
-}
-
-if (numeric >= 50) {
-  return {
-    label,
-    bg: "#fef3c7",
-    text: "#b45309",
-  };
-}
-
-return {
-  label,
-  bg: "#fee2e2",
-  text: "#b91c1c",
-};
 }
 
 function Editor() {
@@ -162,12 +165,16 @@ function Editor() {
     const trimmedDraft = draft.trim();
 
     if (essayTypes.length === 0) {
-      setModalMessage("Please select at least one essay type before generating.");
+      setModalMessage(
+        "Please select at least one essay type before generating.",
+      );
       return;
     }
 
     if (!trimmedTopic && !trimmedDraft) {
-      setModalMessage("Please enter either a topic or a draft before generating.");
+      setModalMessage(
+        "Please enter either a topic or a draft before generating.",
+      );
       return;
     }
 
@@ -177,7 +184,7 @@ function Editor() {
     try {
       console.log(
         "essay_types being sent:",
-        essayTypes.includes("all") ? ["all"] : essayTypes
+        essayTypes.includes("all") ? ["all"] : essayTypes,
       );
 
       const response = await fetch("http://44.201.62.0:8000/search", {
@@ -198,15 +205,18 @@ function Editor() {
       }
 
       console.log("search response:", data);
-      console.log("types received:", Array.isArray(data) ? data.map((item) => item.type) : []);
+      console.log(
+        "types received:",
+        Array.isArray(data) ? data.map((item) => item.type) : [],
+      );
 
       if (!Array.isArray(data) || data.length === 0) {
         setResults([]);
         setEmptyStateMessage(
-          "No matching essays found. Please try a different topic, add more draft details, or choose broader essay types."
+          "No matching essays found. Please try a different topic, add more draft details, or choose broader essay types.",
         );
         setModalMessage(
-          "We couldn’t find a match for that input. Please try another topic or add a bit more detail to your draft."
+          "We couldn’t find a match for that input. Please try another topic or add a bit more detail to your draft.",
         );
         return;
       }
@@ -216,10 +226,10 @@ function Editor() {
       console.error("ERROR:", error);
       setResults([]);
       setEmptyStateMessage(
-        "Search couldn’t be completed. Please revise your input and try again."
+        "Search couldn’t be completed. Please revise your input and try again.",
       );
       setModalMessage(
-        error.message || "Search failed. Please try another topic or draft."
+        error.message || "Search failed. Please try another topic or draft.",
       );
     } finally {
       setIsLoading(false);
@@ -241,7 +251,10 @@ function Editor() {
         <div className="modal-overlay" onClick={() => setModalMessage("")}>
           <div className="modal-box" onClick={(e) => e.stopPropagation()}>
             <p className="modal-text">{modalMessage}</p>
-            <button className="modal-button" onClick={() => setModalMessage("")}>
+            <button
+              className="modal-button"
+              onClick={() => setModalMessage("")}
+            >
               Got it
             </button>
           </div>
@@ -270,11 +283,19 @@ function Editor() {
                       className={`essay-type-chip ${isSelected ? "chip-selected" : ""}`}
                       onClick={() => toggleEssayType(type.value)}
                     >
-                      <div className="chip-icon" style={{ background: type.bg }}>
-                        {typeof type.icon === "string" && !type.icon.includes("/") ? (
+                      <div
+                        className="chip-icon"
+                        style={{ background: type.bg }}
+                      >
+                        {typeof type.icon === "string" &&
+                        !type.icon.includes("/") ? (
                           <span className="chip-emoji">{type.icon}</span>
                         ) : (
-                          <img src={type.icon} alt={type.label} className="chip-icon-img" />
+                          <img
+                            src={type.icon}
+                            alt={type.label}
+                            className="chip-icon-img"
+                          />
                         )}
                       </div>
 
@@ -313,7 +334,9 @@ function Editor() {
                     <span className="spinner" />
                     Searching...
                   </span>
-                ) : "Generate Matches"}
+                ) : (
+                  "Generate Matches"
+                )}
               </button>
 
               <button className="clear-btn" onClick={handleClear}>
@@ -368,9 +391,12 @@ function Editor() {
 
               {Array.from({ length: topK }).map((_, i) => {
                 const resultType = results[i]?.type;
-                const typeStyle = TYPE_STYLES[resultType] || DEFAULT_RESULT_STYLE;
+                const typeStyle =
+                  TYPE_STYLES[resultType] || DEFAULT_RESULT_STYLE;
                 const rankStyle = RANK_STYLES[i + 1] || RANK_STYLES[5];
-                const similarityInfo = getSimilarityInfo(results[i]?.similarity);
+                const similarityInfo = getSimilarityInfo(
+                  results[i]?.similarity,
+                );
 
                 return (
                   <div
@@ -411,7 +437,9 @@ function Editor() {
                           <h4
                             className="result-topic clickable-text"
                             onClick={() => {
-                              const selection = window.getSelection().toString();
+                              const selection = window
+                                .getSelection()
+                                .toString();
                               if (selection) return;
 
                               if (!results[i]) return;
@@ -421,7 +449,7 @@ function Editor() {
 
                               window.open(
                                 `${window.location.origin}/essay/${results[i].parent_id}`,
-                                "_blank"
+                                "_blank",
                               );
                             }}
                           >
@@ -481,7 +509,9 @@ function Editor() {
                             className="read-more clickable-text"
                             style={{ color: "#6b7280" }}
                             onClick={() => {
-                              const selection = window.getSelection().toString();
+                              const selection = window
+                                .getSelection()
+                                .toString();
                               if (selection) return;
 
                               if (!results[i]) return;
@@ -491,7 +521,7 @@ function Editor() {
 
                               window.open(
                                 `${window.location.origin}/essay/${results[i].parent_id}`,
-                                "_blank"
+                                "_blank",
                               );
                             }}
                           >

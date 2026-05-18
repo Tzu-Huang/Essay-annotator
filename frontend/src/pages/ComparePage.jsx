@@ -50,7 +50,6 @@ function normalizeForSearch(text) {
     .trim();
 }
 
-
 function normalizeCompareResponse(data, essayId) {
   const rawResults = data?.comparisons || [];
 
@@ -105,7 +104,9 @@ function ComparePage() {
         setLoading(true);
         setPageError("");
 
-        const res = await fetch(`${API_BASE}/essays/${id}?include_content=true`);
+        const res = await fetch(
+          `${API_BASE}/essays/${id}?include_content=true`,
+        );
 
         if (!res.ok) {
           throw new Error("Failed to fetch essay.");
@@ -148,7 +149,10 @@ function ComparePage() {
 
       const rect = container.getBoundingClientRect();
       const percent = ((e.clientX - rect.left) / rect.width) * 100;
-      const clamped = Math.max(MIN_LEFT_RATIO, Math.min(MAX_LEFT_RATIO, percent));
+      const clamped = Math.max(
+        MIN_LEFT_RATIO,
+        Math.min(MAX_LEFT_RATIO, percent),
+      );
 
       setLeftRatio(clamped);
     }
@@ -258,18 +262,20 @@ function ComparePage() {
 
   const activeAnnotation = useMemo(
     () => compareData.find((item) => item.id === activeAnnotationId) || null,
-    [compareData, activeAnnotationId]
+    [compareData, activeAnnotationId],
   );
 
   const hoveredAnnotation = useMemo(
     () => compareData.find((item) => item.id === hoveredAnnotationId) || null,
-    [compareData, hoveredAnnotationId]
+    [compareData, hoveredAnnotationId],
   );
 
   function handleAnnotationHover(annotationId, event) {
     setHoveredAnnotationId(annotationId);
 
-    const paragraphEl = event.currentTarget.closest(`.${styles.essayParagraph}`);
+    const paragraphEl = event.currentTarget.closest(
+      `.${styles.essayParagraph}`,
+    );
     const gridEl = document.getElementById("user-panel-grid");
 
     if (!paragraphEl || !gridEl) return;
@@ -312,7 +318,7 @@ function ComparePage() {
         <span
           key={`${annotation.id}-${sentenceKey}`}
           className={`${styles.inlineSentenceHighlight} ${getVariantClass(
-            annotation.type
+            annotation.type,
           )} ${isFocused ? styles.isFocused : ""} ${
             isHovered ? styles.isHovered : ""
           }`}
@@ -325,7 +331,7 @@ function ComparePage() {
           onClick={() => handleSelectAnnotation(annotation.id)}
         >
           {match}
-        </span>
+        </span>,
       );
 
       remainingText = after;
@@ -366,7 +372,7 @@ function ComparePage() {
                 key={annotation.id}
                 type="button"
                 className={`${styles.annotationBadge} ${getVariantClass(
-                  annotation.type
+                  annotation.type,
                 )}`}
                 onMouseEnter={(e) => handleAnnotationHover(annotation.id, e)}
                 onMouseLeave={() => {
@@ -392,7 +398,10 @@ function ComparePage() {
   function renderDbParagraph(paragraph, index) {
     const previewAnnotation = activeAnnotation || hoveredAnnotation;
 
-    if (!previewAnnotation || previewAnnotation.exampleParagraphIndex !== index) {
+    if (
+      !previewAnnotation ||
+      previewAnnotation.exampleParagraphIndex !== index
+    ) {
       return (
         <p className={`${styles.essayParagraph} ${styles.dbParagraph}`}>
           {paragraph}
@@ -402,7 +411,11 @@ function ComparePage() {
 
     return (
       <p className={`${styles.essayParagraph} ${styles.dbParagraph}`}>
-        {renderSentenceHighlights(paragraph, [previewAnnotation], "exampleSentence")}
+        {renderSentenceHighlights(
+          paragraph,
+          [previewAnnotation],
+          "exampleSentence",
+        )}
       </p>
     );
   }
@@ -460,7 +473,9 @@ function ComparePage() {
                 annotationsEnabled ? styles.statusOn : styles.statusOff
               }`}
             />
-            <span>{annotationsEnabled ? "Annotations on" : "Annotations off"}</span>
+            <span>
+              {annotationsEnabled ? "Annotations on" : "Annotations off"}
+            </span>
           </button>
 
           <button
@@ -480,7 +495,9 @@ function ComparePage() {
             disabled={compareLoading}
           >
             {compareLoading && <span className={styles.buttonSpinner} />}
-            <span>{compareLoading ? "Loading Suggestions..." : "Load Suggestions"}</span>
+            <span>
+              {compareLoading ? "Loading Suggestions..." : "Load Suggestions"}
+            </span>
           </button>
         </div>
       </header>
@@ -503,7 +520,7 @@ function ComparePage() {
             <div className={styles.userPanelHeader}>
               <div className={styles.essayCardLabel}>Your Essay</div>
               <div className={styles.essayCardTitle}>
-                  {userTopic || "User Draft"}
+                {userTopic || "User Draft"}
               </div>
 
               <div className={styles.metaChipRow}>
@@ -513,7 +530,6 @@ function ComparePage() {
                 <span className={`${styles.metaChip} ${styles.chipNeutral}`}>
                   User Draft
                 </span>
-
               </div>
             </div>
 
@@ -521,7 +537,9 @@ function ComparePage() {
               <div className={styles.userEssayMain}>
                 <div className={styles.userEssayBody}>
                   {userParagraphs.map((paragraph, index) => (
-                    <div key={index}>{renderUserParagraph(paragraph, index)}</div>
+                    <div key={index}>
+                      {renderUserParagraph(paragraph, index)}
+                    </div>
                   ))}
                 </div>
 
@@ -543,7 +561,7 @@ function ComparePage() {
                     <div className={styles.hoverNoteCard}>
                       <div
                         className={`${styles.hoverNoteAccent} ${getVariantClass(
-                          hoveredAnnotation.type
+                          hoveredAnnotation.type,
                         )}`}
                       />
                       <div className={styles.hoverNoteBody}>
@@ -556,17 +574,21 @@ function ComparePage() {
                         </div>
 
                         <div className={styles.hoverNotePreview}>
-                          {(hoveredAnnotation.analysis || "See suggestion details.").slice(
-                            0,
-                            72
-                          )}
-                          {(hoveredAnnotation.analysis || "").length > 72 ? "..." : ""}
+                          {(
+                            hoveredAnnotation.analysis ||
+                            "See suggestion details."
+                          ).slice(0, 72)}
+                          {(hoveredAnnotation.analysis || "").length > 72
+                            ? "..."
+                            : ""}
                         </div>
 
                         <button
                           type="button"
                           className={styles.hoverNoteButton}
-                          onClick={() => handleSelectAnnotation(hoveredAnnotation.id)}
+                          onClick={() =>
+                            handleSelectAnnotation(hoveredAnnotation.id)
+                          }
                         >
                           See full analysis
                         </button>
@@ -596,7 +618,9 @@ function ComparePage() {
             <div className={styles.essayCard}>
               <div className={styles.essayCardHeader}>
                 <div className={styles.essayCardLabel}>Database Essay</div>
-                <div className={styles.essayCardTitle}>{essayData?.id || id}</div>
+                <div className={styles.essayCardTitle}>
+                  {essayData?.id || id}
+                </div>
 
                 <div className={styles.metaChipRow}>
                   {essayData?.type && (
@@ -642,7 +666,7 @@ function ComparePage() {
               <div className={styles.panelTitleGroup}>
                 <span
                   className={`${styles.panelIndex} ${getVariantClass(
-                    activeAnnotation.type
+                    activeAnnotation.type,
                   )}`}
                 >
                   {activeAnnotation.id}
@@ -652,7 +676,9 @@ function ComparePage() {
                   <div className={styles.panelType}>
                     {activeAnnotation.category || activeAnnotation.type}
                   </div>
-                  <div className={styles.panelTitle}>{activeAnnotation.title}</div>
+                  <div className={styles.panelTitle}>
+                    {activeAnnotation.title}
+                  </div>
                 </div>
               </div>
 
@@ -662,7 +688,7 @@ function ComparePage() {
                   className={styles.panelIconButton}
                   onClick={() => {
                     const currentIndex = compareData.findIndex(
-                      (item) => item.id === activeAnnotation.id
+                      (item) => item.id === activeAnnotation.id,
                     );
                     if (currentIndex > 0) {
                       handleSelectAnnotation(compareData[currentIndex - 1].id);
@@ -677,7 +703,7 @@ function ComparePage() {
                   className={styles.panelIconButton}
                   onClick={() => {
                     const currentIndex = compareData.findIndex(
-                      (item) => item.id === activeAnnotation.id
+                      (item) => item.id === activeAnnotation.id,
                     );
                     if (currentIndex < compareData.length - 1) {
                       handleSelectAnnotation(compareData[currentIndex + 1].id);
@@ -704,14 +730,16 @@ function ComparePage() {
               <div className={styles.panelBlock}>
                 <div className={styles.panelBlockLabel}>Your sentence</div>
                 <div className={styles.panelQuoteBox}>
-                  {activeAnnotation.userSentence || "No highlighted sentence returned."}
+                  {activeAnnotation.userSentence ||
+                    "No highlighted sentence returned."}
                 </div>
               </div>
 
               <div className={styles.panelBlock}>
                 <div className={styles.panelBlockLabel}>Matched sentence</div>
                 <div className={styles.panelQuoteBox}>
-                  {activeAnnotation.exampleSentence || "No matched sentence returned."}
+                  {activeAnnotation.exampleSentence ||
+                    "No matched sentence returned."}
                 </div>
               </div>
 
@@ -721,7 +749,9 @@ function ComparePage() {
                   {activeAnnotation.suggestions?.length > 0 ? (
                     activeAnnotation.suggestions.map((item, index) => (
                       <div key={index} className={styles.panelSuggestionItem}>
-                        <span className={styles.suggestionNumber}>{index + 1}</span>
+                        <span className={styles.suggestionNumber}>
+                          {index + 1}
+                        </span>
                         <span>{item}</span>
                       </div>
                     ))

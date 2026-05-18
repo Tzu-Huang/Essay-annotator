@@ -114,9 +114,7 @@ export default function FAQPage() {
                   className={styles.sectionHeader}
                   onClick={() => handleSectionClick(sectionIndex)}
                 >
-                  <span className={styles.sectionTitle}>
-                    {section.title}
-                  </span>
+                  <span className={styles.sectionTitle}>{section.title}</span>
 
                   <span className={styles.toggleIcon}>
                     {openSection === sectionIndex ? "−" : "+"}
@@ -139,12 +137,16 @@ export default function FAQPage() {
                         }`}
                         onClick={() =>
                           setOpenQuestion(
-                            openQuestion === questionIndex ? null : questionIndex
+                            openQuestion === questionIndex
+                              ? null
+                              : questionIndex,
                           )
                         }
                       >
                         <span>{item.question}</span>
-                        <span>{openQuestion === questionIndex ? "−" : "+"}</span>
+                        <span>
+                          {openQuestion === questionIndex ? "−" : "+"}
+                        </span>
                       </button>
 
                       <div

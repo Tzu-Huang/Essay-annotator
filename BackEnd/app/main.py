@@ -9,7 +9,7 @@ from embedding.search_similar import load_db_embeddings
 from database.create import get_db, User, create_tables
 from fastapi import Depends
 from sqlalchemy.orm import Session
-from datetime import datetime
+from datetime import datetime, timezone
 from fastapi import FastAPI, HTTPException, Query, Request
 from fastapi.middleware.cors import CORSMiddleware
 from pathlib import Path
@@ -129,12 +129,14 @@ def save_user(email: str, name: str, db: Session = Depends(get_db)):
     existing = db.query(User).filter(User.email == email).first()
     if existing:
         existing.login_count += 1
+        existing.last_login = datetime.now(timezone.utc)
         db.commit()
         db.refresh(existing)
         return {
             "status":      "returning",
             "name":        existing.name,
             "login_count": existing.login_count,
+            "last_login":  existing.last_login.isoformat(),
             "id":          existing.id,
         }
     new_user = User(email=email, name=name)
@@ -142,9 +144,10 @@ def save_user(email: str, name: str, db: Session = Depends(get_db)):
     db.commit()
     db.refresh(new_user)
     return {
-        "status": "new",
-        "name":   new_user.name,
-        "id":     new_user.id,
+        "status":     "new",
+        "name":       new_user.name,
+        "last_login": new_user.last_login.isoformat(),
+        "id":         new_user.id,
     }
 
 DEFAULT_FIELDS = ["id", "topic", "type", "school", "public"]

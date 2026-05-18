@@ -1,12 +1,13 @@
 """
-This is a file that creates the database for us to track users. 
+This is a file that creates the database for us to track users.
 
-Includes: 
+Includes:
     1. specific uuid(prevent data leak)
     2. user email
     3. user name
     4. when did they create the account
     5. login counts (track returning users)
+    6. last login time
 
 """
 from sqlalchemy import Column, String, DateTime, Integer
@@ -14,7 +15,7 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy import create_engine
 from dotenv import load_dotenv
-from datetime import datetime
+from datetime import datetime, timezone
 from pathlib import Path
 import uuid
 import os
@@ -35,8 +36,9 @@ class User(Base):
     id          = Column(String,   primary_key=True, default=lambda: str(uuid.uuid4()))
     email       = Column(String,   unique=True, nullable=False)
     name        = Column(String,   nullable=False)
-    created_at  = Column(DateTime, default=datetime.utcnow)
+    created_at  = Column(DateTime, default=lambda: datetime.now(timezone.utc))
     login_count = Column(Integer,  default=1)
+    last_login  = Column(DateTime, default=lambda: datetime.now(timezone.utc))
 
 # runs it when every time a user log in
 def get_db():

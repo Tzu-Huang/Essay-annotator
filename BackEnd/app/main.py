@@ -1,16 +1,12 @@
 import time
+import time
 import json
 from app.helpers import load_essays
-from service.search_service import run_search, get_client
-from service.generate_topic import get_topic
+from service.search_service import run_search
 from app.state import AppData
 from compare_results.analysis import compare
 from dotenv import load_dotenv
 from embedding.search_similar import load_db_embeddings
-from database.create import get_db, User, create_tables
-from fastapi import Depends
-from sqlalchemy.orm import Session
-from datetime import datetime, timezone
 from fastapi import FastAPI, HTTPException, Query, Request
 from fastapi.middleware.cors import CORSMiddleware
 from pathlib import Path
@@ -18,7 +14,7 @@ from pydantic import BaseModel
 from typing import Optional
 
 
-load_dotenv(dotenv_path=Path(__file__).resolve().parent.parent / ".env")
+load_dotenv(dotenv_path=Path(__file__).parent / ".env")
 # print("OPENAI KEY: ", bool(os.environ.get("OPENAI_API_KEY")))
 
 BASE = Path(__file__).resolve().parent.parent
@@ -30,7 +26,6 @@ EMBED_JSONL = BASE / "drive_data/embed_output/embed.jsonl"
 # -----------------------------
 async def lifespan(app: FastAPI):
     print("startup")
-    create_tables()
 
     data = AppData(
         started_at=time.time(),
@@ -47,15 +42,12 @@ async def lifespan(app: FastAPI):
         data.ids = ids
         data.parent = parent
         data.previews = previews
-        data.topic_texts = topic_texts
+        data.topic_texts = topic_texts       
         data.types = types
         data.schools = schools
         data.topic_V = topic_V
         data.content_V = content_V
-        data.essay_count = len(essays)
-        data.data_path = str(DB_JSONL)
         data.ready = True
-
         print(f"loaded {data.essay_count} essays")
 
     except Exception as e:
@@ -161,7 +153,6 @@ def get_essay(
     essay_id: str,
     fields: Optional[str] = Query(default=None, description="Comma-separated fields, e.g. topic,school,content"),
     include_content: bool = Query(default=False),
-    generate_title: bool = Query(default=False),
 ):
     data = app.state.data
     essay = data.essays.get(essay_id)
@@ -185,24 +176,10 @@ def get_essay(
     for k in selected:
         result[k] = essay.get(k)
 
+    # originally this get "id" will get the chunked id ? 
     result["id"] = essay.get("id", essay_id)
-
-    content = essay.get("content", "")
-    result["word_count"] = len(content.split()) if content else 0
-
-    # hero_image: pass through from stored essay data if it exists
-    result["hero_image"] = essay.get("hero_image", "")
-
-    if generate_title:
-        client = get_client()
-        result["generated_title"] = get_topic(
-            topic=essay.get("topic", ""),
-            content=content,
-            client=client,
-        )
-
     return result
-
+    
 # ===========================
 # Search endpoint
 # ===========================
@@ -212,22 +189,16 @@ class Search(BaseModel):
     essay_types: list
     topic: str
     content: str
-    # When True, each result gets a generated_title via OpenAI.
-    # Only pass True from callers that display it (EssayPage related essays).
-    # Editor.jsx main search does not need it, so it stays False by default.
-    generate_title: bool = False
-
+    
 @app.post("/search")
 def search(req: Search, request: Request):
     """
     Search for similar essays based on topic/content input.
-    Returns { results: [...] } where each item contains:
-      id, parent_id, topic, content_preview, school, type,
-      similarity, word_count, hero_image, generated_title (if generate_title=True)
+    Delegates the full search logic to search_service.run_search().
     """
 
-    try:
-        results = run_search(req, request.app.state.data, req.generate_title)
+    try: 
+        results = run_search(req, request.app.state.data)
 
         print(results)
         return results
@@ -238,7 +209,6 @@ def search(req: Search, request: Request):
             status_code=500,
             detail=str(e)
         )
-
 # ===========================
 # Compare endpoint
 # ===========================

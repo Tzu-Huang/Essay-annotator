@@ -31,18 +31,6 @@ function getAnnotationTitle(index) {
   return ANNOTATION_TITLES[index % ANNOTATION_TITLES.length];
 }
 
-function mapCategoryToType(category, index) {
-  const raw = (category || "").toLowerCase().trim();
-
-  if (raw.includes("expression")) return "expression";
-  if (raw.includes("reflection")) return "reflection";
-  if (raw.includes("ending")) return "ending";
-  if (raw.includes("structure")) return "structure";
-
-  const fallback = ["expression", "reflection", "ending", "structure"];
-  return fallback[index % fallback.length];
-}
-
 function normalizeForSearch(text) {
   return (text || "")
     .replace(/[“”]/g, '"')

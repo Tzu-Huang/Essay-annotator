@@ -369,7 +369,7 @@
   min-height: 720px;
   display: flex;
   flex-direction: column;
-  background: #faf8ef;
+  background: #ffff;
   /* background: var(--surface); */
 }
 

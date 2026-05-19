@@ -1,5 +1,4 @@
 import time
-import time
 import json
 from app.helpers import load_essays
 from service.search_service import run_search

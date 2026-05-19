@@ -169,15 +169,14 @@
 /* 1. User title area */
 .userPanelHeader {
   width: calc(100% - 3px);
-  margin: 6px 0 0 0;
+  margin: 5px 0 0 5px;
   padding: 26px 28px 18px;
-
-  background:
-  linear-gradient(
-    180deg,
-    #e8f7e8 0%,
-    #f9f9f1 0%,
-    #f0f5e3 100%
+  background: 
+    linear-gradient(
+      180deg,
+      #d9ddde 0%,
+      #c1c6c8 55%,
+      #bbbcbd 100%
   );
 
   border-radius: 22px;
@@ -196,14 +195,13 @@
 /* 2. Similar Essay title area */
 .essayHeaderCard {
   width: calc(100% - 3px);
-  margin: 6px auto 0;
-
+  margin: 5px 0 2.5px -2.5px;
   background:
     linear-gradient(
       180deg,
-      #f9e0e6 0%,
-      #f9e8ec 55%,
-      #f9e8ec 100%
+      #f5e1e6 0%,
+      #d6c1c6 55%,
+      #d0b7bc 100%
     );
 
   border-radius: 22px;
@@ -364,8 +362,10 @@
 }
 
 .chipNeutral {
-  background: #e4ced4;
-  color: #605c56;
+  /*background: #f5f4f4;*/
+  background: #f5f4f4;
+  color: #577eaa;
+  /*color: #577eaa;*/
 }
 
 /* =========================

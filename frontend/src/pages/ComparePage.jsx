@@ -9,13 +9,6 @@ const DEFAULT_LEFT_RATIO = 50;
 const MIN_LEFT_RATIO = 35;
 const MAX_LEFT_RATIO = 75;
 
-const ANNOTATION_TITLES = [
-  "Stronger opening image",
-  "Show, don’t just tell",
-  "Deeper reflection",
-  "Stronger closing vision",
-];
-
 function splitParagraphs(text) {
   return (text || "")
     .split(/\n\s*\n/)

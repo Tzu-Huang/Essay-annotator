@@ -311,11 +311,14 @@
 .primaryButton {
   border: none;
 
+  background: #577eaa;
+  /*
   background: linear-gradient(
     135deg,
     #6a5af9,
     #8d7dff
   );
+  */
 
   color: white;
 

@@ -17,14 +17,13 @@ import EssayPage from "./pages/EssayPage";
 import ComparePage from "./pages/ComparePage";
 import FAQsPage from "./pages/FAQsPage";
 import HowItWorks from "./pages/HowItWorks";
+import AboutUs from "./pages/AboutUs";
 
 import "./styles/global.css";
 import "./styles/components.css";
 import "./styles/background.css";
 
 function App() {
-  const bg = "bg-world";
-
   return (
     <BrowserRouter>
       <div className="app-shell">
@@ -63,6 +62,17 @@ function App() {
           />
 
           <Route
+            path="/about"
+            element={
+              <>
+                <Navbar />
+                <AboutUs />
+                <Footer />
+              </>
+            }
+          />
+
+          <Route
             path="/editor"
             element={
               <>
@@ -86,14 +96,13 @@ function App() {
           {/* Compare page 不加 Navbar / Footer */}
           <Route path="/compare/:id" element={<ComparePage />} />
 
-          {/* How it works page 不加 Navbar / Footer */}
-          <Route 
-            path="/how-it-works" 
+          {/* How it works page */}
+          <Route
+            path="/how-it-works"
             element={
               <>
                 <Navbar />
                 <HowItWorks />
-
               </>
             }
           />

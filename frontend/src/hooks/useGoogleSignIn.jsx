@@ -8,9 +8,14 @@ const REDIRECT_TO_EDITOR_PAGES = new Set(["/", "/login"]);
 
 async function saveUser(profile) {
   const params = new URLSearchParams({ email: profile.email, name: profile.name });
-  const res = await fetch(`${import.meta.env.VITE_API_URL}/api/users?${params}`, { method: "POST" });
+  const url = `${import.meta.env.VITE_API_URL}/api/users?${params}`;
+  console.log("[saveUser] POST", url);
+  const res = await fetch(url, { method: "POST" });
+  console.log("[saveUser] response status:", res.status);
 
   if (!res.ok) {
+    const text = await res.text();
+    console.error("[saveUser] error body:", text);
     throw new Error("Failed to save user to database");
   }
 

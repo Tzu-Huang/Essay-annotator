@@ -8,7 +8,7 @@ const REDIRECT_TO_EDITOR_PAGES = new Set(["/", "/login"]);
 
 async function saveUser(profile) {
   const params = new URLSearchParams({ email: profile.email, name: profile.name });
-  const res = await fetch(`/api/users?${params}`, { method: "POST" });
+  const res = await fetch(`${import.meta.env.VITE_API_URL}/api/users?${params}`, { method: "POST" });
 
   if (!res.ok) {
     throw new Error("Failed to save user to database");

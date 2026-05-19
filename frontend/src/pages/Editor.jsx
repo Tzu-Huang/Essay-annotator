@@ -187,7 +187,7 @@ function Editor() {
         essayTypes.includes("all") ? ["all"] : essayTypes,
       );
 
-      const response = await fetch("http://44.201.62.0:8000/search", {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/search`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -204,13 +204,16 @@ function Editor() {
         throw new Error(data?.detail || "Search failed");
       }
 
-      console.log("search response:", data);
+      // Search API returns { results: [...] } — unwrap before using
+      const results = data.results ?? data;
+
+      console.log("search response:", results);
       console.log(
         "types received:",
-        Array.isArray(data) ? data.map((item) => item.type) : [],
+        Array.isArray(results) ? results.map((item) => item.type) : [],
       );
 
-      if (!Array.isArray(data) || data.length === 0) {
+      if (!Array.isArray(results) || results.length === 0) {
         setResults([]);
         setEmptyStateMessage(
           "No matching essays found. Please try a different topic, add more draft details, or choose broader essay types.",
@@ -221,7 +224,7 @@ function Editor() {
         return;
       }
 
-      setResults(data);
+      setResults(results);
     } catch (error) {
       console.error("ERROR:", error);
       setResults([]);
@@ -546,3 +549,4 @@ function Editor() {
 }
 
 export default Editor;
+

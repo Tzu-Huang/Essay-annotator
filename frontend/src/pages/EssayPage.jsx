@@ -50,8 +50,9 @@ function EssayPage() {
         setEssay(null);
         setRelatedEssays([]);
 
+        // generate_title=true triggers OpenAI title generation for the main essay <h1>
         const response = await fetch(
-          `http://44.201.62.0:8000/essays/${id}?include_content=true`,
+          `${import.meta.env.VITE_API_URL}/essays/${id}?include_content=true&generate_title=true`,
         );
 
         if (!response.ok) {
@@ -62,7 +63,7 @@ function EssayPage() {
         setEssay(data);
 
         // Find related essays
-        const searchResponse = await fetch(`http://44.201.62.0:8000/search`, {
+        const searchResponse = await fetch(`${import.meta.env.VITE_API_URL}/search`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -72,6 +73,7 @@ function EssayPage() {
             essay_types: ["all"],
             topic: data.topic || "",
             content: data.content || "",
+            generate_title: true
           }),
         });
 
@@ -80,7 +82,7 @@ function EssayPage() {
           const results = searchData.results || searchData || [];
 
           const filtered = results
-            .filter((item) => item.id !== id && item.essay_id !== id)
+            .filter((item) => item.parent_id !== id)
             .slice(0, 3);
 
           setRelatedEssays(filtered);
@@ -142,6 +144,7 @@ function EssayPage() {
                 </>
               )}
 
+              <span>•</span>
               <span>{essay.word_count || essay.words || "-"} words</span>
             </div>
           </section>

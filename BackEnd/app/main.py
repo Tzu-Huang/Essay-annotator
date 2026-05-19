@@ -5,7 +5,7 @@ from service.search_service import run_search
 from app.state import AppData
 from compare_results.analysis import compare
 from dotenv import load_dotenv
-from embedding.search_similar import 
+from embedding.search_similar import load_db_embeddings
 from database.create import get_db, User, create_tables
 from fastapi import FastAPI, HTTPException, Query, Request
 from fastapi.middleware.cors import CORSMiddleware

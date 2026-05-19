@@ -113,14 +113,18 @@ const CURATED_ESSAYS = [
 ];
 
 const CARDS_PER_VIEW = 5;
+const REPEAT_COUNT = 80;
 
 function Home() {
-  const [essayIndex, setEssayIndex] = useState(0);
+  const loopedEssays = Array.from(
+    { length: REPEAT_COUNT },
+    () => CURATED_ESSAYS
+  ).flat();
 
-  const maxEssayIndex = Math.max(CURATED_ESSAYS.length - CARDS_PER_VIEW, 0);
+  const startIndex = CURATED_ESSAYS.length * 20;
+  const maxEssayIndex = loopedEssays.length - CARDS_PER_VIEW;
 
-  const showPrevButton = essayIndex > 0;
-  const showNextButton = essayIndex < maxEssayIndex;
+  const [essayIndex, setEssayIndex] = useState(startIndex);
 
   const handlePrevEssay = () => {
     setEssayIndex((prev) => Math.max(prev - 1, 0));
@@ -417,12 +421,6 @@ function Home() {
 
       {/* ESSAY LIBRARY - CAROUSEL STYLE */}
       <section className={styles.featuredScroll}>
-        <div className={styles.libraryNote}>
-          Browse essays <br />
-          from top <br />
-          colleges.
-        </div>
-
         <div className={styles.libraryContent}>
           <h2 className={styles.sectionTitleCenter}>
             EXPLORE REAL ACCEPTED ESSAYS
@@ -434,16 +432,14 @@ function Home() {
           </p>
 
           <div className={styles.scrollWrapper}>
-            {showPrevButton && (
-              <button
-                type="button"
-                className={`${styles.carouselBtn} ${styles.carouselBtnLeft}`}
-                onClick={handlePrevEssay}
-                aria-label="Previous essays"
-              >
-                ‹
-              </button>
-            )}
+            <button
+              type="button"
+              className={`${styles.carouselBtn} ${styles.carouselBtnLeft}`}
+              onClick={handlePrevEssay}
+              aria-label="Previous essays"
+            >
+              ‹
+            </button>
 
             <div className={styles.carouselViewport}>
               <div
@@ -452,11 +448,11 @@ function Home() {
                   transform: `translateX(calc(${essayIndex} * -1 * (var(--essay-card-width) + var(--essay-card-gap))))`,
                 }}
               >
-                {CURATED_ESSAYS.map((essay) => (
+                {loopedEssays.map((essay, index) => (
                   <Link
                     to={`/essay/${essay.id}`}
                     className={styles.scrollCard}
-                    key={essay.id}
+                    key={`${essay.id}-${index}`}
                   >
                     <div className={styles.pin}></div>
 
@@ -480,24 +476,17 @@ function Home() {
               </div>
             </div>
 
-            {showNextButton && (
-              <button
-                type="button"
-                className={`${styles.carouselBtn} ${styles.carouselBtnRight}`}
-                onClick={handleNextEssay}
-                aria-label="Next essays"
-              >
-                ›
-              </button>
-            )}
+            <button
+              type="button"
+              className={`${styles.carouselBtn} ${styles.carouselBtnRight}`}
+              onClick={handleNextEssay}
+              aria-label="Next essays"
+            >
+              ›
+            </button>
           </div>
         </div>
 
-        <div className={styles.smallSticky}>
-          ...and <br />
-          many <br />
-          more.
-        </div>
       </section>
 
       {/* WHY DIFFERENT */}

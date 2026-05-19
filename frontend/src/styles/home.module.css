@@ -891,9 +891,9 @@
 
 .analysisColumn h3 {
   margin: 0;
-  font-family: "Playfair Display", Georgia, serif;
+  font-family: "Inter", sans-serif;
   color: var(--ink);
-  font-size: 26px;
+  font-size: 23px;
   line-height: 1;
 }
 
@@ -1110,7 +1110,7 @@
   margin: 0 auto 88px;
   padding: 34px 0 64px;
   display: grid;
-  grid-template-columns: 90px minmax(0, 1fr) 90px;
+  grid-template-columns: 1fr;
   gap: 14px;
   align-items: center;
   overflow: hidden;
@@ -1402,7 +1402,7 @@
 
 /* left button: cream sticky note */
 .carouselBtnLeft {
-  left: -72px;
+  left: -110px;
 
   background:
     linear-gradient(135deg, rgba(255, 255, 255, 0.42), transparent 36%),
@@ -1425,7 +1425,7 @@
 
 /* right button: pastel blue sticky note */
 .carouselBtnRight {
-  right: -72px;
+  right: -110px;
 
   background:
     linear-gradient(135deg, rgba(255, 255, 255, 0.44), transparent 36%),

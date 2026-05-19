@@ -131,7 +131,7 @@
   min-height: calc(100vh - 140px);
   border: 1px solid var(--border);
   border-radius: 20px;
-  overflow: hidden;
+  overflow: visible;
   background: var(--surface);
   box-shadow: var(--shadow);
   position: relative;
@@ -145,6 +145,7 @@
    3. User Content + Footer
    4. Database Content + Footer
 ========================= */
+
 
 .userPanel,
 .databasePanel {
@@ -169,26 +170,38 @@
 .userPanelHeader {
   padding: 26px 28px 18px;
   /* background: #f2f6f8; */
-  background: #b6b8b964;
-  backdrop-filter: blur(14px);
-  Opacity: 0.95;
-  border-bottom: 1px solid var(--border);
+  background:
+  linear-gradient(
+    180deg,
+    #f8faf8 0%,
+    #fdfdfb 0%,
+    #f4f8eb 100%
+  );
+  border-bottom: 1px solid rgba(0,0,0,0.04);
   position: relative;
   z-index: 2;
-
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.559);
+  box-shadow:
+    0 0.5px 0 rgba(255,255,255,0.9),
+    0 10px 24px rgba(25, 35, 45, 0.08),
+    0 10px 6px rgba(25, 35, 45, 0.04);
 }
 
 /* 2. Similar Essay title area */
 .essayHeaderCard {
-  background: #e8d6dc;
-  /*background: #dee7e9;*/
-  backdrop-filter: blur(14px);
-  Opacity: 0.95;
-  border-bottom: 1px solid var(--border);
+  background:
+    linear-gradient(
+      180deg,
+      #f6e9ec 0%,
+      #fcf2f4 55%,
+      #f8f8f0 100%
+    );
+  border-bottom: 1px solid rgba(0,0,0,0.04);
   position: relative;
   z-index: 2;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.559);
+  box-shadow:
+    0 0.5px 0 rgba(255,255,255,0.9),
+    0 10px 24px rgba(25, 35, 45, 0.08),
+    0 10px 6px rgba(25, 35, 45, 0.04);
 }
 
 .essayCardHeader {

@@ -3,7 +3,7 @@ import { useParams } from "react-router-dom";
 import styles from "../styles/compare.module.css";
 import logo from "../assets/logo.png";
 
-const API_BASE = "http://44.201.62.0:8000";
+const API_BASE = import.meta.env.VITE_API_URL;
 const DEFAULT_LEFT_RATIO = 60;
 const MIN_LEFT_RATIO = 35;
 const MAX_LEFT_RATIO = 75;

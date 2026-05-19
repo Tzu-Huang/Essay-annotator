@@ -1,7 +1,8 @@
 import time
 import json
 from app.helpers import load_essays
-from service.search_service import run_search
+from service.search_service import run_search, get_client
+from service.generate_topic import get_topic
 from app.state import AppData
 from compare_results.analysis import compare
 from dotenv import load_dotenv
@@ -46,11 +47,13 @@ async def lifespan(app: FastAPI):
         data.ids = ids
         data.parent = parent
         data.previews = previews
-        data.topic_texts = topic_texts       
+        data.topic_texts = topic_texts
         data.types = types
         data.schools = schools
         data.topic_V = topic_V
         data.content_V = content_V
+        data.essay_count = len(essays)
+        data.data_path = str(DB_JSONL)
         data.ready = True
 
         print(f"loaded {data.essay_count} essays")
@@ -158,6 +161,7 @@ def get_essay(
     essay_id: str,
     fields: Optional[str] = Query(default=None, description="Comma-separated fields, e.g. topic,school,content"),
     include_content: bool = Query(default=False),
+    generate_title: bool = Query(default=False),
 ):
     data = app.state.data
     essay = data.essays.get(essay_id)
@@ -181,8 +185,22 @@ def get_essay(
     for k in selected:
         result[k] = essay.get(k)
 
-    # originally this get "id" will get the chunked id ? 
     result["id"] = essay.get("id", essay_id)
+
+    content = essay.get("content", "")
+    result["word_count"] = len(content.split()) if content else 0
+
+    # hero_image: pass through from stored essay data if it exists
+    result["hero_image"] = essay.get("hero_image", "")
+
+    if generate_title:
+        client = get_client()
+        result["generated_title"] = get_topic(
+            topic=essay.get("topic", ""),
+            content=content,
+            client=client,
+        )
+
     return result
 
 # ===========================
@@ -194,16 +212,22 @@ class Search(BaseModel):
     essay_types: list
     topic: str
     content: str
-    
+    # When True, each result gets a generated_title via OpenAI.
+    # Only pass True from callers that display it (EssayPage related essays).
+    # Editor.jsx main search does not need it, so it stays False by default.
+    generate_title: bool = False
+
 @app.post("/search")
 def search(req: Search, request: Request):
     """
     Search for similar essays based on topic/content input.
-    Delegates the full search logic to search_service.run_search().
+    Returns { results: [...] } where each item contains:
+      id, parent_id, topic, content_preview, school, type,
+      similarity, word_count, hero_image, generated_title (if generate_title=True)
     """
 
-    try: 
-        results = run_search(req, request.app.state.data)
+    try:
+        results = run_search(req, request.app.state.data, req.generate_title)
 
         print(results)
         return results

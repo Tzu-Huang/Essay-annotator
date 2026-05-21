@@ -50,6 +50,13 @@ function Navbar({
             </Link>
           </div>
 
+          {/* PAGE LABEL */}
+          {isComparePage && (
+            <div className={styles.comparePageLabel}>
+              <span className={styles.compareSlash}>/</span>
+              <span>Compare-essays</span>
+            </div>
+          )}
           {/* LEFT LINKS */}
           {!isComparePage && (
             <nav className={styles.leftNavLinks}>
@@ -69,6 +76,9 @@ function Navbar({
             </nav>
           )}
         </div>
+        
+        {/* CENTER STATS */}
+
 
         {/* RIGHT */}
         {isComparePage ? (

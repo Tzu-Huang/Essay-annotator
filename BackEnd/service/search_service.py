@@ -17,7 +17,7 @@ def get_optional_query_embedding(text: str | None, client, dim: int) -> np.ndarr
         return get_query_embedding(text, client)
     return np.zeros(dim, dtype=np.float32)
     
-def run_search(req, app_state, generate_title: bool):
+def run_search(req, app_state):
     client = get_client()
     
     # Parameters
@@ -63,13 +63,12 @@ def run_search(req, app_state, generate_title: bool):
     if essay_types and "all" not in essay_types:
         results = [r for r in results if r["type"] in essay_types]
 
-    if generate_title:
-        for result in results:
-            essay = app_state.essays.get(result["parent_id"], {})
-            result["generated_title"] = get_topic(
-                topic=essay.get("topic", ""),
-                content=essay.get("content", ""),
-                client=client,
-            )
+    for result in results:
+        essay = app_state.essays.get(result["parent_id"], {})
+        result["generated_title"] = get_topic(
+            topic=essay.get("topic", ""),
+            content=essay.get("content", ""),
+            client=client,
+        )
 
     return {"results": results}

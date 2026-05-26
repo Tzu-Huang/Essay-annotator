@@ -11,7 +11,11 @@ from fastapi.middleware.cors import CORSMiddleware
 from pathlib import Path
 from pydantic import BaseModel
 from typing import Optional
-
+from compare_results.analysis import (
+    MIN_COMPARE_WORDS,
+    prepare_compare_context,
+    finalize_compare_result,
+)
 
 load_dotenv(dotenv_path=Path(__file__).parent / ".env")
 # print("OPENAI KEY: ", bool(os.environ.get("OPENAI_API_KEY")))
@@ -194,27 +198,52 @@ class CompareRequest(BaseModel):
 def compare_api(essay_id: str, req: CompareRequest):
     # Load essays from app.state
     data = app.state.data
-    
+
     # Error handling
     if not hasattr(data, "essays"):
         raise HTTPException(status_code=500, detail="Server essays data not initialized")
 
     essay = data.essays.get(essay_id)
-    print(essay)
+
     if not essay:
         raise HTTPException(status_code=404, detail="Essay not found")
-    
+
     if not req.user_input.strip():
         raise HTTPException(status_code=400, detail="user_input cannot be empty")
 
     essay_text = essay.get("content", "")
+
+    # Prepare context before calling LLM
+    context = prepare_compare_context(
+        user_essay=req.user_input,
+        database_essay=essay_text
+    )
+
+    # Check if user input is too short
+    if context["user_word_count"] < MIN_COMPARE_WORDS:
+        return {
+            "essay_id": essay_id,
+            "too_short": True,
+            "message": "Please provide more content so I can give meaningful feedback.",
+            "comparisons": []
+        }
+
     try:
-        # Call the actual function that do the actual comparison
-        result = compare(user_essay=req.user_input, sample_essay=essay_text)
-        # result.append({
-        #     "similarity":
-        # })
+        # Call the actual function that does the actual comparison
+        raw_result = compare(
+            user_essay=req.user_input,
+            sample_essay=essay_text
+        )
+
+        # Clean and normalize result for frontend
+        result = finalize_compare_result(
+            raw_result=raw_result,
+            essay_id=essay_id,
+            context=context
+        )
+
         return result
+
     except Exception as e:
         print(e)
         raise HTTPException(status_code=500, detail=f"Compare failed: {str(e)}")

@@ -1,5 +1,6 @@
 import time
 import json
+import os
 from service.generate_topic import get_topic
 from openai import OpenAI
 from app.helpers import load_essays

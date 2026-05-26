@@ -11,7 +11,7 @@ from database.create import get_db, User, create_tables
 from fastapi import Depends
 from sqlalchemy.orm import Session
 from datetime import datetime, timezone
-from fastapi import FastAPI, HTTPException, Query, Request
+from fastapi import FastAPI, HTTPException, Query, Request, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from pathlib import Path
 from pydantic import BaseModel

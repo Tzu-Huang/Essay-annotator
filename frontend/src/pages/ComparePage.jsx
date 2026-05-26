@@ -1,19 +1,13 @@
+import Navbar from "../components/Navbar/Navbar";
+
 import { useEffect, useMemo, useState } from "react";
 import { useParams } from "react-router-dom";
 import styles from "../styles/compare.module.css";
-import logo from "../assets/logo.png";
 
 const API_BASE = import.meta.env.VITE_API_URL;
-const DEFAULT_LEFT_RATIO = 60;
+const DEFAULT_LEFT_RATIO = 50;
 const MIN_LEFT_RATIO = 35;
 const MAX_LEFT_RATIO = 75;
-
-const ANNOTATION_TITLES = [
-  "Stronger opening image",
-  "Show, don’t just tell",
-  "Deeper reflection",
-  "Stronger closing vision",
-];
 
 function splitParagraphs(text) {
   return (text || "")
@@ -28,18 +22,6 @@ function countWords(text) {
 
 function getAnnotationTitle(index) {
   return ANNOTATION_TITLES[index % ANNOTATION_TITLES.length];
-}
-
-function mapCategoryToType(category, index) {
-  const raw = (category || "").toLowerCase().trim();
-
-  if (raw.includes("expression")) return "expression";
-  if (raw.includes("reflection")) return "reflection";
-  if (raw.includes("ending")) return "ending";
-  if (raw.includes("structure")) return "structure";
-
-  const fallback = ["expression", "reflection", "ending", "structure"];
-  return fallback[index % fallback.length];
 }
 
 function normalizeForSearch(text) {
@@ -181,10 +163,6 @@ function ComparePage() {
     return styles.variantStructure;
   }
 
-  function getAnnotationCountByType(type) {
-    return compareData.filter((item) => item.type === type).length;
-  }
-
   async function handleCompare() {
     try {
       setCompareLoading(true);
@@ -270,6 +248,9 @@ function ComparePage() {
     [compareData, hoveredAnnotationId],
   );
 
+  const shouldUseAnnotationLayout =
+    annotationsEnabled && compareData.length > 0;
+
   function handleAnnotationHover(annotationId, event) {
     setHoveredAnnotationId(annotationId);
 
@@ -285,6 +266,7 @@ function ComparePage() {
 
     setHoverCardTop(paragraphRect.top - gridRect.top);
   }
+
   function renderSentenceHighlights(paragraph, annotations, sentenceKey) {
     if (!annotations.length) {
       return paragraph;
@@ -438,6 +420,15 @@ function ComparePage() {
 
   return (
     <div className={styles.comparePage}>
+      <Navbar
+        variant="compare"
+        annotationsEnabled={annotationsEnabled}
+        setAnnotationsEnabled={setAnnotationsEnabled}
+        handleResetView={handleResetView}
+        handleCompare={handleCompare}
+        compareLoading={compareLoading}
+      />
+
       {compareLoading && (
         <div className={styles.loadingOverlay}>
           <div className={styles.loadingCard}>
@@ -449,58 +440,6 @@ function ComparePage() {
           </div>
         </div>
       )}
-
-      <header className={styles.compareTopbar}>
-        <div className={styles.topbarLeft}>
-          <div className={styles.brandBlock}>
-            <img
-              src={logo}
-              alt="Essay Annotator"
-              className={styles.brandLogo}
-            />
-            <span className={styles.brandSub}> / Compare-my-essay</span>
-          </div>
-        </div>
-
-        <div className={styles.topbarRight}>
-          <button
-            type="button"
-            className={styles.ghostButton}
-            onClick={() => setAnnotationsEnabled((prev) => !prev)}
-          >
-            <span
-              className={`${styles.statusDot} ${
-                annotationsEnabled ? styles.statusOn : styles.statusOff
-              }`}
-            />
-            <span>
-              {annotationsEnabled ? "Annotations on" : "Annotations off"}
-            </span>
-          </button>
-
-          <button
-            type="button"
-            className={styles.ghostButton}
-            onClick={handleResetView}
-          >
-            Show Original
-          </button>
-
-          <button
-            type="button"
-            className={`${styles.primaryButton} ${
-              compareLoading ? styles.primaryButtonLoading : ""
-            }`}
-            onClick={handleCompare}
-            disabled={compareLoading}
-          >
-            {compareLoading && <span className={styles.buttonSpinner} />}
-            <span>
-              {compareLoading ? "Loading Suggestions..." : "Load Suggestions"}
-            </span>
-          </button>
-        </div>
-      </header>
 
       {compareError && (
         <div className={styles.globalMessage}>
@@ -519,6 +458,7 @@ function ComparePage() {
           <section className={styles.userPanel}>
             <div className={styles.userPanelHeader}>
               <div className={styles.essayCardLabel}>Your Essay</div>
+
               <div className={styles.essayCardTitle}>
                 {userTopic || "User Draft"}
               </div>
@@ -527,13 +467,19 @@ function ComparePage() {
                 <span className={`${styles.metaChip} ${styles.chipNeutral}`}>
                   {userWordCount} words
                 </span>
+
                 <span className={`${styles.metaChip} ${styles.chipNeutral}`}>
                   User Draft
                 </span>
               </div>
             </div>
 
-            <div id="user-panel-grid" className={styles.userPanelGrid}>
+            <div
+              id="user-panel-grid"
+              className={`${styles.userPanelGrid} ${
+                shouldUseAnnotationLayout ? styles.annotationLayout : styles.readingLayout
+              }`}
+            >
               <div className={styles.userEssayMain}>
                 <div className={styles.userEssayBody}>
                   {userParagraphs.map((paragraph, index) => (
@@ -564,6 +510,7 @@ function ComparePage() {
                           hoveredAnnotation.type,
                         )}`}
                       />
+
                       <div className={styles.hoverNoteBody}>
                         <div className={styles.hoverNoteCategory}>
                           {hoveredAnnotation.category || hoveredAnnotation.type}
@@ -607,6 +554,7 @@ function ComparePage() {
             onMouseDown={handleDividerMouseDown}
           >
             <div className={styles.resizeDividerLine} />
+
             <div className={styles.resizeDividerHandle}>
               <span className={styles.resizeArrow}>‹</span>
               <span className={styles.resizeDots}>⋮</span>
@@ -615,11 +563,12 @@ function ComparePage() {
           </div>
 
           <section className={styles.databasePanel}>
-            <div className={styles.essayCard}>
+            <div className={styles.essayHeaderCard}>
               <div className={styles.essayCardHeader}>
-                <div className={styles.essayCardLabel}>Database Essay</div>
+                <div className={styles.essayCardLabel}>Similar Essay</div>
+
                 <div className={styles.essayCardTitle}>
-                  {essayData?.id || id}
+                  {essayData?.generated_title || "Untitled Essay"}
                 </div>
 
                 <div className={styles.metaChipRow}>
@@ -629,30 +578,32 @@ function ComparePage() {
                     </span>
                   )}
 
-                  {essayData?.school && (
-                    <span className={`${styles.metaChip} ${styles.chipSchool}`}>
-                      {essayData.school}
-                    </span>
-                  )}
+                  {essayData?.school &&
+                    essayData.school.toLowerCase() !== "none" && (
+                      <span className={`${styles.metaChip} ${styles.chipSchool}`}>
+                        {essayData.school}
+                      </span>
+                    )}
 
                   <span className={`${styles.metaChip} ${styles.chipRef}`}>
                     Reference essay
                   </span>
                 </div>
               </div>
-
-              <div className={styles.essayCardBody}>
-                {dbParagraphs.map((paragraph, index) => (
-                  <div key={index}>{renderDbParagraph(paragraph, index)}</div>
-                ))}
-              </div>
-
-              <div className={styles.essayCardFooter}>
-                {dbWordCount} words
-                <span className={styles.metaSep}>·</span>
-                {dbParagraphs.length} paragraphs
-              </div>
             </div>
+ 
+            <div className={styles.essayCardBody}>
+              {dbParagraphs.map((paragraph, index) => (
+                <div key={index}>{renderDbParagraph(paragraph, index)}</div>
+              ))}
+            </div>
+
+            <div className={styles.essayCardFooter}>
+              {dbWordCount} words
+              <span className={styles.metaSep}>·</span>
+              {dbParagraphs.length} paragraphs
+            </div>
+            
           </section>
         </div>
       </main>
@@ -690,6 +641,7 @@ function ComparePage() {
                     const currentIndex = compareData.findIndex(
                       (item) => item.id === activeAnnotation.id,
                     );
+
                     if (currentIndex > 0) {
                       handleSelectAnnotation(compareData[currentIndex - 1].id);
                     }
@@ -705,6 +657,7 @@ function ComparePage() {
                     const currentIndex = compareData.findIndex(
                       (item) => item.id === activeAnnotation.id,
                     );
+
                     if (currentIndex < compareData.length - 1) {
                       handleSelectAnnotation(compareData[currentIndex + 1].id);
                     }
@@ -727,24 +680,27 @@ function ComparePage() {
             </div>
 
             <div className={styles.bottomPanelGrid}>
-              <div className={styles.panelBlock}>
+              <div className={`${styles.panelBlock} ${styles.panelUser}`}>
                 <div className={styles.panelBlockLabel}>Your sentence</div>
+
                 <div className={styles.panelQuoteBox}>
                   {activeAnnotation.userSentence ||
                     "No highlighted sentence returned."}
                 </div>
               </div>
 
-              <div className={styles.panelBlock}>
+              <div className={`${styles.panelBlock} ${styles.panelMatch}`}>
                 <div className={styles.panelBlockLabel}>Matched sentence</div>
+
                 <div className={styles.panelQuoteBox}>
                   {activeAnnotation.exampleSentence ||
                     "No matched sentence returned."}
                 </div>
               </div>
 
-              <div className={styles.panelBlock}>
+              <div className={`${styles.panelBlock} ${styles.panelSuggestion}`}>
                 <div className={styles.panelBlockLabel}>Suggestions</div>
+
                 <div className={styles.panelSuggestionList}>
                   {activeAnnotation.suggestions?.length > 0 ? (
                     activeAnnotation.suggestions.map((item, index) => (

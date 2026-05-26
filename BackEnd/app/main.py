@@ -184,10 +184,16 @@ def get_essay(
     for k in selected:
         result[k] = essay.get(k)
 
-    # originally this get "id" will get the chunked id ? 
     result["id"] = essay.get("id", essay_id)
+
+    client = OpenAI(api_key=os.environ["OPENAI_API_KEY"])
+    result["generated_title"] = get_topic(
+        topic=essay.get("topic", ""),
+        content=essay.get("content", ""),
+        client=client,
+    )
+
     return result
-    
 # ===========================
 # Search endpoint
 # ===========================

@@ -12,7 +12,6 @@ from sqlalchemy.orm import Session
 from datetime import datetime, timezone
 from fastapi import FastAPI, HTTPException, Query, Request, Depends
 from fastapi.middleware.cors import CORSMiddleware
-from sqlalchemy.orm import Session
 from datetime import datetime, timezone
 from pathlib import Path
 from pydantic import BaseModel

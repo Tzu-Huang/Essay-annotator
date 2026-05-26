@@ -171,50 +171,18 @@
   width: calc(100% - 3px);
   margin: 5px 0 0 5px;
   padding: 26px 28px 18px;
-  background: 
-    linear-gradient(
-      180deg,
-      #d9ddde 0%,
-      #c1c6c8 55%,
-      #bbbcbd 100%
-  );
-
-  border-radius: 22px;
-  position: relative;
-  z-index: 5;
-
-  border-bottom: 1px solid rgba(0,0,0,0.04);
-  box-shadow:
-    0 0.5px 0 rgba(255,255,255,0.9),
-    0 8px 12px rgba(25, 35, 45, 0.08),
-    0 6px 3px rgba(25, 35, 45, 0.04);
-
-  backdrop-filter: blur(4px);
+  
+  background: #d1d3d4;
+  border-bottom: 1px solid var(--border);
 }
 
 /* 2. Similar Essay title area */
 .essayHeaderCard {
   width: calc(100% - 3px);
   margin: 5px 0 2.5px -2.5px;
-  background:
-    linear-gradient(
-      180deg,
-      #f5e1e6 0%,
-      #d6c1c6 55%,
-      #d0b7bc 100%
-    );
 
-  border-radius: 22px;
-  border-bottom: 1px solid rgba(0,0,0,0.04);
-  position: relative;
-  z-index: 5;
-
-  box-shadow:
-    0 0.5px 0 rgba(255,255,255,0.9),
-    0 8px 12px rgba(25, 35, 45, 0.08),
-    0 6px 3px rgba(25, 35, 45, 0.04);
-
-  backdrop-filter: blur(4px);
+  background: #e7cfcf;
+  border-bottom: 1px solid var(--border);
 }
 
 .essayCardHeader {

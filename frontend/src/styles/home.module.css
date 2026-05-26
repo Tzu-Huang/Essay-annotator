@@ -67,33 +67,6 @@ body::before {
   top: 120px;
 }
 
-<<<<<<< Updated upstream
-.heroDecor::after {
-  width: 360px;
-  height: 360px;
-  right: -120px;
-  bottom: 40px;
-}
-
-.hero h1 {
-  font-size: 45px;
-  max-width: 800px;
-  margin: 0 auto;
-  line-height: 1.3;
-  color: #101828;
-  font-weight: 800;
-  letter-spacing: -0.03em;
-}
-
-.hero h1 span {
-  color: #4f46e5;
-}
-
-.hero p {
-  margin: 22px auto 0;
-  max-width: 760px;
-  color: #59627a;
-=======
 .hero {
   width: min(1360px, calc(100% - 72px));
   min-height: 90vh;
@@ -205,7 +178,6 @@ body::before {
 .heroDescription {
   max-width: 480px;
   color: var(--ink-soft);
->>>>>>> Stashed changes
   font-size: 18px;
   line-height: 1.6;
 }
@@ -229,9 +201,6 @@ body::before {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-<<<<<<< Updated upstream
-  gap: 12px;
-=======
   min-width: 190px;
   padding: 16px 30px;
   text-decoration: none;
@@ -255,7 +224,6 @@ body::before {
     0% 34%,
     5% 22%
   );
->>>>>>> Stashed changes
   transition:
     transform 0.2s ease,
     box-shadow 0.2s ease;
@@ -270,10 +238,6 @@ body::before {
    BADGES
    ========================= */
 
-<<<<<<< Updated upstream
-.heroBadges {
-  margin-top: 26px;
-=======
 /* HERO VISUAL */
 
 .heroVisual {
@@ -320,23 +284,12 @@ body::before {
 }
 
 .pillRow {
->>>>>>> Stashed changes
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
   gap: 20px;
 }
 
-<<<<<<< Updated upstream
-.heroBadges div {
-  background: rgba(255, 255, 255, 0.92);
-  padding: 14px 20px;
-  border-radius: 16px;
-  font-size: 14px;
-  color: #25314d;
-  border: 1px solid #e6e9f5;
-  box-shadow: 0 10px 24px rgba(17, 24, 39, 0.06);
-=======
 .pillRow span {
   font-size: 10px;
   font-weight: 700;
@@ -446,7 +399,6 @@ body::before {
 }
 
 .matchHeader {
->>>>>>> Stashed changes
   display: flex;
   align-items: center;
   gap: 10px;
@@ -500,13 +452,6 @@ body::before {
   box-shadow: 0 22px 46px rgba(15, 23, 42, 0.1);
 }
 
-<<<<<<< Updated upstream
-.exampleBoxPurple {
-  background: linear-gradient(
-    180deg,
-    rgba(255, 255, 255, 0.94) 0%,
-    rgba(245, 241, 255, 0.96) 100%
-=======
 .matchItem:nth-child(4) span {
   background: #eba6d8;
 }
@@ -575,7 +520,6 @@ body::before {
     24% 98%,
     11% 100%,
     0 98%
->>>>>>> Stashed changes
   );
 }
 
@@ -634,11 +578,6 @@ body::before {
   font-weight: 800;
 }
 
-<<<<<<< Updated upstream
-.boxSubtitle {
-  margin: 6px 0 0;
-  font-size: 15px;
-=======
 .stepCard span {
   display: block;
   color: var(--muted);
@@ -847,19 +786,10 @@ body::before {
   color: var(--ink-soft);
   font-size: 20px;
   line-height: 1.75;
->>>>>>> Stashed changes
   font-weight: 500;
   color: #5b6480;
 }
 
-<<<<<<< Updated upstream
-.placeholder {
-  border-radius: 22px;
-  overflow: hidden;
-  display: flex;
-  align-items: stretch;
-  justify-content: stretch;
-=======
 .analysisDemo {
   position: relative;
   z-index: 3;
@@ -889,7 +819,6 @@ body::before {
 }
 
 .analysisColumn {
->>>>>>> Stashed changes
   position: relative;
   background: rgba(255, 255, 255, 0.76);
   border: 1px solid #eef1f7;
@@ -906,11 +835,6 @@ body::before {
   box-sizing: border-box;
 }
 
-<<<<<<< Updated upstream
-.mockEssayLineWide {
-  width: 100%;
-  height: 10px;
-=======
 .analysisMiddle::before {
   content: "";
   position: absolute;
@@ -1005,7 +929,6 @@ body::before {
 .demoSoftLines span {
   display: block;
   height: 9px;
->>>>>>> Stashed changes
   border-radius: 999px;
   background: #dddaf5;
   margin-bottom: 28px;
@@ -1017,14 +940,6 @@ body::before {
   align-items: flex-start;
 }
 
-<<<<<<< Updated upstream
-.mockEssayThumbPurple,
-.mockEssayThumbBlue {
-  width: 82px;
-  height: 70px;
-  border-radius: 14px;
-  flex-shrink: 0;
-=======
 .analysisMiddle {
   position: relative;
   z-index: 4;
@@ -1088,7 +1003,6 @@ body::before {
   font-size: 12px;
   font-weight: 900;
   letter-spacing: 1.2px;
->>>>>>> Stashed changes
 }
 
 .mockEssayThumbPurple {
@@ -1112,20 +1026,12 @@ body::before {
   margin-bottom: 14px;
 }
 
-<<<<<<< Updated upstream
-.mockEssayLineShort {
-  width: 68%;
-  height: 10px;
-  border-radius: 999px;
-  background: #e5e7f2;
-=======
 /* 讓它有「滑到左邊黃色句子，小框框浮出」的感覺 */
 .analysisPaper:has(.hoverHighlight:hover) .suggestionPopup {
   transform: translateX(-6px) translateY(-2px) scale(1.025);
   box-shadow:
     0 15px 20px rgba(73, 91, 118, 0.2),
     inset 0 1px 0 rgba(255, 255, 255, 0.9);
->>>>>>> Stashed changes
 }
 
 .mockCardDivider {
@@ -1140,8 +1046,6 @@ body::before {
    ========================= */
 
 .featuredScroll {
-<<<<<<< Updated upstream
-=======
   scroll-snap-align: start;
   scroll-margin-top: 72px;
   width: 100%;
@@ -1193,7 +1097,6 @@ body::before {
 
 .libraryContent {
   min-width: 0;
->>>>>>> Stashed changes
   text-align: center;
   padding: 10px 0 50px;
   overflow: hidden;
@@ -1330,8 +1233,6 @@ body::before {
   color: #4f46e5;
   font-size: 14px;
   font-weight: 700;
-<<<<<<< Updated upstream
-=======
   transform: rotate(-3deg);
 }
 /* CAROUSEL BUTTON - SMALL PINNED STICKY NOTE STYLE */
@@ -1533,20 +1434,10 @@ body::before {
 .differenceCardGood {
   min-height: 210px;
   padding: 34px 40px;
->>>>>>> Stashed changes
   position: relative;
   z-index: 1;
 }
 
-<<<<<<< Updated upstream
-/* Harvard */
-.scrollCard:nth-child(10n + 1) {
-  background: linear-gradient(to bottom, #fff7f7, #ffffff);
-}
-
-.scrollCard:nth-child(10n + 1)::before {
-  background: #a51c30;
-=======
 .differenceCardBad {
   background:
     radial-gradient(
@@ -1567,7 +1458,6 @@ body::before {
     ),
     rgba(247, 252, 242, 0.88);
   border-radius: 0 14px 14px 0;
->>>>>>> Stashed changes
 }
 
 .scrollCard:nth-child(10n + 1)::after {
@@ -1583,10 +1473,6 @@ body::before {
   background: linear-gradient(to bottom, #fff8f8, #ffffff);
 }
 
-<<<<<<< Updated upstream
-.scrollCard:nth-child(10n + 2)::before {
-  background: #8c1515;
-=======
 .differenceCardBad h3,
 .differenceCardGood h3 {
   max-width: 76%;
@@ -1594,7 +1480,6 @@ body::before {
   font-size: 27px;
   line-height: 1.2;
   color: var(--ink);
->>>>>>> Stashed changes
 }
 
 .scrollCard:nth-child(10n + 2)::after {
@@ -1627,103 +1512,16 @@ body::before {
   background: linear-gradient(to bottom, #f5f8ff, #ffffff);
 }
 
-<<<<<<< Updated upstream
-.scrollCard:nth-child(10n + 4)::before {
-  background: #011f5b;
-}
-
-.scrollCard:nth-child(10n + 4)::after {
-  background: rgba(1, 31, 91, 0.08);
-}
-
-.scrollCard:nth-child(10n + 4) .scrollLink {
-  color: #011f5b;
-}
-
-/* Johns Hopkins */
-.scrollCard:nth-child(10n + 5),
-.scrollCard:nth-child(10n + 6),
-.scrollCard:nth-child(10n + 7) {
-  background: linear-gradient(to bottom, #f4f8ff, #ffffff);
-}
-
-.scrollCard:nth-child(10n + 5)::before,
-.scrollCard:nth-child(10n + 6)::before,
-.scrollCard:nth-child(10n + 7)::before {
-  background: #002d72;
-}
-
-.scrollCard:nth-child(10n + 5)::after,
-.scrollCard:nth-child(10n + 6)::after,
-.scrollCard:nth-child(10n + 7)::after {
-  background: rgba(0, 45, 114, 0.08);
-}
-
-.scrollCard:nth-child(10n + 5) .scrollLink,
-.scrollCard:nth-child(10n + 6) .scrollLink,
-.scrollCard:nth-child(10n + 7) .scrollLink {
-  color: #002d72;
-}
-
-/* Ivy League */
-.scrollCard:nth-child(10n + 8),
-.scrollCard:nth-child(10n + 9),
-.scrollCard:nth-child(10n + 10) {
-  background: linear-gradient(to bottom, #f5fbf7, #ffffff);
-}
-
-.scrollCard:nth-child(10n + 8)::before,
-.scrollCard:nth-child(10n + 9)::before,
-.scrollCard:nth-child(10n + 10)::before {
-  background: #1f4d3a;
-}
-
-.scrollCard:nth-child(10n + 8)::after,
-.scrollCard:nth-child(10n + 9)::after,
-.scrollCard:nth-child(10n + 10)::after {
-  background: rgba(31, 77, 58, 0.08);
-}
-
-.scrollCard:nth-child(10n + 8) .scrollLink,
-.scrollCard:nth-child(10n + 9) .scrollLink,
-.scrollCard:nth-child(10n + 10) .scrollLink {
-  color: #1f4d3a;
-}
-
-@keyframes scroll-left {
-  from {
-    transform: translateX(0);
-  }
-
-  to {
-    transform: translateX(-50%);
-  }
-}
-
-/* =========================
-   COMPARISON
-   ========================= */
-
-.comparison {
-=======
 .ctaSection {
   scroll-snap-align: start;
   scroll-margin-top: 72px;
   width: min(900px, calc(100% - 64px));
   margin: 0 auto;
   padding: 28px 0 100px;
->>>>>>> Stashed changes
   text-align: center;
   padding: 56px 20px 88px;
 }
 
-<<<<<<< Updated upstream
-.compareBox {
-  display: flex;
-  justify-content: center;
-  gap: 30px;
-  margin-top: 28px;
-=======
 .bottomPaperDecorLeft {
   position: absolute;
   left: -140px;
@@ -1741,7 +1539,6 @@ body::before {
   transform: rotate(-8deg);
   border-radius: 6px;
   box-shadow: 0 10px 24px rgba(50, 40, 28, 0.08);
->>>>>>> Stashed changes
 }
 
 .bad,
@@ -1752,17 +1549,12 @@ body::before {
   text-align: left;
 }
 
-<<<<<<< Updated upstream
-.bad {
-  background: #fee2e2;
-=======
 .ctaTitle {
   margin: 0 0 10px;
   font-family: Inter, serif;
   font-size: 46px;
   line-height: 1.08;
   color: var(--ink);
->>>>>>> Stashed changes
 }
 
 .good {
@@ -1780,37 +1572,6 @@ body::before {
   padding-left: 20px;
 }
 
-<<<<<<< Updated upstream
-.bad li,
-.good li {
-  margin-bottom: 8px;
-  font-size: 14px;
-}
-
-/* =========================
-   RESPONSIVE
-   ========================= */
-
-@media (max-width: 1100px) {
-  .hero h1 {
-    font-size: 48px;
-  }
-
-  .exampleSection {
-    grid-template-columns: 1fr;
-    max-width: 760px;
-  }
-}
-
-@media (max-width: 900px) {
-  .compareBox {
-    flex-direction: column;
-    align-items: center;
-  }
-
-  .hero {
-    padding-top: 28px;
-=======
 /* ── 1120px: small desktop / tablet landscape ──────────────────── */
 @media (max-width: 1120px) {
   .hero {
@@ -1822,23 +1583,12 @@ body::before {
   .compareSection,
   .differenceSection {
     width: min(860px, 88%);
->>>>>>> Stashed changes
   }
 
   .hero h1 {
     font-size: 40px;
   }
 
-<<<<<<< Updated upstream
-  .hero p {
-    font-size: 16px;
-  }
-}
-
-@media (max-width: 600px) {
-  .hero {
-    padding: 24px 16px 20px;
-=======
   .compareIntro p:last-of-type {
     margin-left: auto;
     margin-right: auto;
@@ -1849,7 +1599,6 @@ body::before {
     margin-left: auto;
     margin-right: auto;
     
->>>>>>> Stashed changes
   }
 
   .hero h1 {
@@ -1870,9 +1619,6 @@ body::before {
     justify-content: center;
   }
 
-<<<<<<< Updated upstream
-  .primaryBtn {
-=======
   .heroVisual {
     transform: none;
     min-height: 620px;
@@ -2072,7 +1818,6 @@ body::before {
   }
 
   .heroPaper {
->>>>>>> Stashed changes
     width: 100%;
     max-width: 240px;
   }
@@ -2094,12 +1839,6 @@ body::before {
     padding: 18px;
   }
 
-<<<<<<< Updated upstream
-  .mockEssayThumbPurple,
-  .mockEssayThumbBlue {
-    width: 62px;
-    height: 56px;
-=======
   .howItWorks {
     padding: 58px 22px 30px;
     min-height: auto;
@@ -2151,7 +1890,6 @@ body::before {
   .scrollWrapper {
     --essay-card-width: 175px;
     --essay-card-gap: 16px;
->>>>>>> Stashed changes
   }
 
   .scrollCard {
@@ -2159,12 +1897,6 @@ body::before {
     min-height: 230px;
   }
 
-<<<<<<< Updated upstream
-  .bad,
-  .good {
-    width: 100%;
-    max-width: 320px;
-=======
   .schoolLogo {
     width: 52px;
     height: 52px;
@@ -2204,7 +1936,6 @@ body::before {
     height: 58px;
     right: 22px;
     top: 22px;
->>>>>>> Stashed changes
   }
 }
 

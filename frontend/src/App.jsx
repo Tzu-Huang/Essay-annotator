@@ -9,6 +9,7 @@ import { useState } from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Navbar from "./components/Navbar/Navbar";
 import Footer from "./components/Footer/Footer";
+import SignInModal from "./components/SignInModal";
 
 import Home from "./pages/Home";
 import Login from "./pages/Login";

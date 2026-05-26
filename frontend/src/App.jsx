@@ -8,6 +8,7 @@
 import { useState } from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Navbar from "./components/Navbar/Navbar";
+import SignInModal from "./components/context/SignInModal/SignInModal";
 import Footer from "./components/Footer/Footer";
 
 import Home from "./pages/Home";

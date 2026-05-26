@@ -52,7 +52,7 @@ function EssayPage() {
 
         // generate_title=true triggers OpenAI title generation for the main essay <h1>
         const response = await fetch(
-          `${import.meta.env.VITE_API_URL}/essays/${id}?include_content=true&generate_title=true`,
+          `${import.meta.env.VITE_API_URL}/essays/${id}?include_content=true`,
         );
 
         if (!response.ok) {
@@ -73,7 +73,6 @@ function EssayPage() {
             essay_types: ["all"],
             topic: data.topic || "",
             content: data.content || "",
-            generate_title: true
           }),
         });
 

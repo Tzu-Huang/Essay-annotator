@@ -1,5 +1,5 @@
-import { Link, useNavigate } from "react-router-dom";
 import { useState, useEffect, useRef } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import {
   FileCheck,
   Search,
@@ -121,7 +121,8 @@ const CURATED_ESSAYS = [
 
 const CARDS_PER_VIEW = 5;
 const REPEAT_COUNT = 80;
-const WORDS = ["Improvement.", "Stories.", "Confidence.", "Voice."];
+
+const WORDS = ["Improvement.", "Stories.", "Confidence."];
 
 function useTypewriter(words) {
   const [display, setDisplay] = useState("");
@@ -168,7 +169,7 @@ function Home({ onOpenSignIn }) {
 
   const loopedEssays = Array.from(
     { length: REPEAT_COUNT },
-    () => CURATED_ESSAYS
+    () => CURATED_ESSAYS,
   ).flat();
 
   const startIndex = CURATED_ESSAYS.length * 20;
@@ -194,6 +195,7 @@ function Home({ onOpenSignIn }) {
   const differenceSectionRef = useRef(null);
   const ctaSectionRef = useRef(null);
 
+  // Enable scroll snapping only on this page
   useEffect(() => {
     document.documentElement.style.scrollSnapType = "y proximity";
     return () => {
@@ -203,6 +205,7 @@ function Home({ onOpenSignIn }) {
 
   useEffect(() => {
     const ctx = gsap.context(() => {
+      // Hero content — fades up on load
       gsap.from(heroContentRef.current, {
         opacity: 0,
         y: 32,
@@ -211,6 +214,7 @@ function Home({ onOpenSignIn }) {
         delay: 0.1,
       });
 
+      // Hero visual elements — staggered, each keeps its own rotation
       gsap.from(heroPaperRef.current, {
         opacity: 0,
         y: 40,
@@ -243,6 +247,7 @@ function Home({ onOpenSignIn }) {
         delay: 0.85,
       });
 
+      // How it works section — reverses when scrolling back up
       gsap.from(howItWorksRef.current, {
         opacity: 0,
         y: 40,
@@ -255,6 +260,7 @@ function Home({ onOpenSignIn }) {
         },
       });
 
+      // Step cards staggered — each reverses individually
       gsap.from(stepsRef.current.filter(Boolean), {
         opacity: 0,
         y: 36,
@@ -268,6 +274,7 @@ function Home({ onOpenSignIn }) {
         },
       });
 
+      // Compare section
       gsap.from(compareSectionRef.current, {
         opacity: 0,
         y: 36,
@@ -280,6 +287,7 @@ function Home({ onOpenSignIn }) {
         },
       });
 
+      // Featured essays section
       gsap.from(featuredRef.current, {
         opacity: 0,
         y: 28,
@@ -292,6 +300,7 @@ function Home({ onOpenSignIn }) {
         },
       });
 
+      // Difference section
       gsap.from(differenceSectionRef.current, {
         opacity: 0,
         y: 36,
@@ -304,6 +313,7 @@ function Home({ onOpenSignIn }) {
         },
       });
 
+      // CTA
       gsap.from(ctaSectionRef.current, {
         opacity: 0,
         y: 28,
@@ -324,8 +334,6 @@ function Home({ onOpenSignIn }) {
     <div className={styles.home}>
       {/* HERO */}
       <section className={styles.hero}>
-        <div className={styles.heroDecor} />
-
         <div className={styles.heroContent} ref={heroContentRef}>
           <h1 className={styles.heroTitle}>
             <span className={styles.titleLine1}>REAL Essays</span>
@@ -616,7 +624,7 @@ function Home({ onOpenSignIn }) {
         </div>
       </section>
 
-      {/* ESSAY LIBRARY */}
+      {/* ESSAY LIBRARY - CAROUSEL STYLE */}
       <section className={styles.featuredScroll} ref={featuredRef}>
         <div className={styles.libraryContent}>
           <h2 className={styles.sectionTitleCenter}>
@@ -747,21 +755,6 @@ function Home({ onOpenSignIn }) {
         >
           <span>Start Writing</span>
         </button>
-
-        <div className={styles.heroBadges}>
-          <div>
-            <Search size={18} />
-            <span>Find Matches</span>
-          </div>
-          <div>
-            <FileCheck size={18} />
-            <span>Real Student Submissions</span>
-          </div>
-          <div>
-            <TrendingUp size={18} />
-            <span>Compare & Improve</span>
-          </div>
-        </div>
       </section>
     </div>
   );

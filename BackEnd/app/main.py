@@ -189,10 +189,13 @@ def get_essay(
 
     result["id"] = essay.get("id", essay_id)
 
+    content = essay.get("content", "")
+    result["word_count"] = len(content.split()) if content else 0
+
     client = OpenAI(api_key=os.environ["OPENAI_API_KEY"])
     result["generated_title"] = get_topic(
         topic=essay.get("topic", ""),
-        content=essay.get("content", ""),
+        content=content,
         client=client,
     )
 

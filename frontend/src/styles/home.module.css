@@ -1718,7 +1718,7 @@
 
 .ctaTitle {
   margin: 0 0 10px;
-  font-family: "Playfair Display", serif;
+  /* font-family: "Playfair Display", serif; */
   font-size: 46px;
   line-height: 1.08;
   color: var(--ink);

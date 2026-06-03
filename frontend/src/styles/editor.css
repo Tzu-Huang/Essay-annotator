@@ -13,7 +13,6 @@ body {
 
 .editor-container {
   padding: 24px 40px 40px 40px;
-  animation: pageEnter 500ms ease-out;
 }
 
 .editor-main {
@@ -41,15 +40,13 @@ body {
 }
 
 .text-input {
-  resize: none;
   width: 95%;
-  height: 70px;
-  padding: 15px;
+  padding: 12px;
   margin-bottom: 12px;
   border-radius: 10px;
   border: 1px solid #e5e7eb;
-  font-size: 13px;
-  line-height: 1.6;
+  font-size: 14px;
+  font-family: "SF Mono", Monaco, "Cascadia Code", "Roboto Mono", Courier, monospace;
   transition:
     border-color 0.16s ease,
     background-color 0.16s ease;
@@ -65,10 +62,11 @@ body {
   resize: none;
   width: 95%;
   height: 280px;
-  padding: 15px;
+  padding: 12px;
   border-radius: 10px;
   border: 1px solid #e5e7eb;
-  font-size: 13px;
+  font-size: 14px;
+  font-family: "SF Mono", Monaco, "Cascadia Code", "Roboto Mono", Courier, monospace;
   line-height: 1.6;
   transition:
     border-color 0.16s ease,
@@ -100,37 +98,34 @@ body {
   font-size: 1.2em;
 }
 
-.input-panel .btn-row {
-  margin-top: 25px;
-}
-
+/* Generate 按鈕 - 已更新顏色與選擇器權重 */
 .input-panel .btn-row .primary-btn {
+  margin-top: 0;
   padding: 16px;
-  border-radius: 20px;
+  border-radius: 999px;
   border: none;
-  outline: none;
-  background-image: linear-gradient(
-    to right,
-    #99c0f7 0%,
-    rgb(102, 142, 210) 45%,
-    #4364ce 100%
-  );
-  background-size: 200% auto;
+  /* 更換為深紫到藍紫色漸層 */
+  background: linear-gradient(
+    90deg,
+    #7577ea 0%,
+    #60a5fa 50%,
+    #5cc8f5 100%
+  ) !important;
   color: white;
-  font-weight: 600;
-  font-size: 15px;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
+  font-weight: 700;
+  font-size: 16px;
   cursor: pointer;
-  box-shadow: 0 0 20px rgba(75, 108, 183, 0.3);
+  box-shadow: 0 4px 10px rgba(19, 32, 76, 0.14);
   transition:
-    background-position 0.6s ease,
-    box-shadow 0.3s ease;
+    background 0.16s ease,
+    box-shadow 0.16s ease,
+    transform 0.16s ease;
 }
 
 .input-panel .btn-row .primary-btn:hover:not(:disabled) {
-  background-position: right center;
-  box-shadow: 0 0 24px rgba(75, 108, 183, 0.5);
+  background: linear-gradient(90deg, #9f45e8 0%, #5a19e3 100%) !important;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(92, 200, 245, 0.18);
 }
 
 .primary-btn.loading {
@@ -164,7 +159,7 @@ body {
 
 .clear-btn:hover {
   border-color: #f87171;
-  color: #eb5252;
+  color: #ef4444;
   background: #fff5f5;
 }
 
@@ -367,12 +362,12 @@ body {
     border-color 0.16s ease;
 }
 
-.result-clickable:has(.placeholder-text) {
-  cursor: default;
-}
-
 .result-clickable {
   cursor: pointer;
+}
+
+.result-clickable:has(.placeholder-text) {
+  cursor: default;
 }
 
 .result-clickable:hover {
@@ -622,10 +617,7 @@ body {
   flex-direction: column;
 }
 
-.result-title-block:has(.placeholder-text) {
-  cursor: default;
-}
-. .meta-badges {
+.meta-badges {
   display: flex;
   gap: 8px;
   margin-top: 6px;

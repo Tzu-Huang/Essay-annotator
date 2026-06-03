@@ -119,14 +119,13 @@
   max-width: 80%;
   height: 16px;
   margin-top: 6px;
-  background:
-    linear-gradient(
-      180deg,
-      transparent 42%,
-      var(--purple) 46%,
-      var(--purple) 58%,
-      transparent 62%
-    );
+  background: linear-gradient(
+    180deg,
+    transparent 42%,
+    var(--purple) 46%,
+    var(--purple) 58%,
+    transparent 62%
+  );
   border-radius: 50%;
   transform: rotate(-3deg);
 }
@@ -185,8 +184,13 @@
 }
 
 @keyframes blink {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0; }
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0;
+  }
 }
 
 .titleLine1 {
@@ -204,10 +208,6 @@
 .titleLine2::after {
   display: none;
 }
-
-
-
-
 
 .heroDescription {
   max-width: 480px;
@@ -236,6 +236,7 @@
   background: var(--navy);
   font-weight: 800;
   box-shadow: 0 12px 22px rgba(19, 35, 61, 0.18);
+  cursor: pointer;
   clip-path: polygon(
     3% 8%,
     97% 0%,
@@ -252,7 +253,9 @@
     0% 34%,
     5% 22%
   );
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  transition:
+    transform 0.3s ease,
+    box-shadow 0.3s ease;
 }
 
 .primaryBtn:hover {
@@ -278,7 +281,7 @@
 /* 最大張白色底紙 */
 .heroPaper {
   position: absolute;
-  right: 20px;
+  right: 0px;
   top: 18px;
   width: min(700px, 100%);
   min-height: 430px;
@@ -377,7 +380,7 @@
 
 /* 右上綠色便利貼 */
 .stickyNoteGreen {
-  right: 0px;
+  right: -40px;
   top: -10px;
   width: 180px;
   min-height: 128px;
@@ -398,7 +401,7 @@
 
 /* 右下紫色便利貼 */
 .stickyNotePurple {
-  right: 23px;
+  right: -5px;
   bottom: 72px;
   width: 210px;
   min-height: 118px;
@@ -420,7 +423,7 @@
 /* Top Matches 前景卡片 */
 .matchCard {
   position: absolute;
-  left: -60px;
+  left: -20px;
   bottom: 32px;
   width: 400px;
   z-index: 10;
@@ -779,7 +782,6 @@
   background: rgba(243, 222, 131, 0.85);
 }
 
-
 /* COMPARE - blue analysis demo style */
 
 .compareSection {
@@ -801,7 +803,11 @@
   top: -70px;
   width: 420px;
   height: 420px;
-  background: radial-gradient(circle, rgba(179, 210, 248, 0.45), transparent 68%);
+  background: radial-gradient(
+    circle,
+    rgba(179, 210, 248, 0.45),
+    transparent 68%
+  );
   pointer-events: none;
 }
 
@@ -812,7 +818,11 @@
   bottom: -90px;
   width: 520px;
   height: 360px;
-  background: radial-gradient(circle, rgba(177, 207, 245, 0.36), transparent 70%);
+  background: radial-gradient(
+    circle,
+    rgba(177, 207, 245, 0.36),
+    transparent 70%
+  );
   pointer-events: none;
 }
 
@@ -847,7 +857,6 @@
   white-space: nowrap;
 }
 
-
 .sectionTitle::after {
   display: none;
 }
@@ -876,7 +885,11 @@
   border-radius: 22px;
   overflow: hidden;
   background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.84), rgba(247, 251, 255, 0.72)),
+    linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.84),
+      rgba(247, 251, 255, 0.72)
+    ),
     rgba(255, 255, 255, 0.82);
   border: 1px solid rgba(157, 190, 230, 0.52);
   box-shadow:
@@ -1027,13 +1040,12 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background:
-    linear-gradient(
-      90deg,
-      rgba(244, 249, 255, 0.46),
-      rgba(255, 255, 255, 0.2),
-      rgba(244, 249, 255, 0.46)
-    );
+  background: linear-gradient(
+    90deg,
+    rgba(244, 249, 255, 0.46),
+    rgba(255, 255, 255, 0.2),
+    rgba(244, 249, 255, 0.46)
+  );
 }
 .suggestionPopup {
   position: relative;
@@ -1172,7 +1184,7 @@
   justify-self: start;
   width: 108px;
   min-height: 108px;
-   padding: 20px 18px;
+  padding: 20px 18px;
   display: flex;
   align-items: center;
   background: #fbf2df;
@@ -1396,14 +1408,13 @@
 
   border-radius: 50%;
 
-  background:
-    radial-gradient(
-      circle at 34% 28%,
-      #d7e8ff 0%,
-      #a7c9f2 35%,
-      #6f9ed5 68%,
-      #4776b5 100%
-    );
+  background: radial-gradient(
+    circle at 34% 28%,
+    #d7e8ff 0%,
+    #a7c9f2 35%,
+    #6f9ed5 68%,
+    #4776b5 100%
+  );
 
   box-shadow:
     0 1px 0 rgba(255, 255, 255, 0.6) inset,
@@ -1441,13 +1452,12 @@
 }
 
 .carouselBtnLeft::after {
-  background:
-    linear-gradient(
-      135deg,
-      rgba(204, 177, 105, 0.12) 0%,
-      rgba(255, 250, 237, 0.95) 46%,
-      #ead78d 100%
-    );
+  background: linear-gradient(
+    135deg,
+    rgba(204, 177, 105, 0.12) 0%,
+    rgba(255, 250, 237, 0.95) 46%,
+    #ead78d 100%
+  );
 
   box-shadow: -2px -2px 4px rgba(196, 173, 112, 0.16);
 }
@@ -1465,13 +1475,12 @@
 }
 
 .carouselBtnRight::after {
-  background:
-    linear-gradient(
-      135deg,
-      rgba(116, 151, 194, 0.13) 0%,
-      rgba(247, 251, 255, 0.96) 46%,
-      #bdd4f1 100%
-    );
+  background: linear-gradient(
+    135deg,
+    rgba(116, 151, 194, 0.13) 0%,
+    rgba(247, 251, 255, 0.96) 46%,
+    #bdd4f1 100%
+  );
 
   box-shadow: -2px -2px 4px rgba(129, 160, 204, 0.16);
 }
@@ -1527,14 +1536,13 @@
   width: 170px;
   height: 10px;
   margin-top: -10px;
-  background:
-    linear-gradient(
-      180deg,
-      transparent 38%,
-      rgba(126, 103, 217, 0.78) 42%,
-      rgba(126, 103, 217, 0.78) 60%,
-      transparent 65%
-    );
+  background: linear-gradient(
+    180deg,
+    transparent 38%,
+    rgba(126, 103, 217, 0.78) 42%,
+    rgba(126, 103, 217, 0.78) 60%,
+    transparent 65%
+  );
   transform: rotate(-2deg);
   margin-left: 45px;
 }
@@ -1558,14 +1566,22 @@
 
 .differenceCardBad {
   background:
-    radial-gradient(circle at 85% 18%, rgba(231, 225, 218, 0.72), transparent 20%),
+    radial-gradient(
+      circle at 85% 18%,
+      rgba(231, 225, 218, 0.72),
+      transparent 20%
+    ),
     rgba(255, 253, 248, 0.86);
   border-radius: 14px 0 0 14px;
 }
 
 .differenceCardGood {
   background:
-    radial-gradient(circle at 86% 18%, rgba(214, 224, 208, 0.84), transparent 20%),
+    radial-gradient(
+      circle at 86% 18%,
+      rgba(214, 224, 208, 0.84),
+      transparent 20%
+    ),
     rgba(247, 252, 242, 0.88);
   border-radius: 0 14px 14px 0;
 }
@@ -1598,7 +1614,7 @@
 .differenceCardGood h3 {
   max-width: 76%;
   margin: 0 0 28px;
-  font-family: "Playfair Display", serif;
+  /* font-family: "Playfair Display", serif; */
   font-size: 27px;
   line-height: 1.15;
   color: var(--ink);
@@ -1676,7 +1692,11 @@
   width: 220px;
   height: 180px;
   background:
-    linear-gradient(135deg, rgba(255, 255, 255, 0.55), rgba(255, 255, 255, 0.2)),
+    linear-gradient(
+      135deg,
+      rgba(255, 255, 255, 0.55),
+      rgba(255, 255, 255, 0.2)
+    ),
     rgba(244, 236, 223, 0.75);
   border: 1px solid rgba(221, 212, 198, 0.7);
   transform: rotate(-8deg);
@@ -1773,7 +1793,6 @@
     margin-bottom: 0;
   }
 
-
   .differenceCardBad,
   .differenceCardGood {
     border-radius: 14px;
@@ -1788,7 +1807,6 @@
   .smallSticky {
     display: none;
   }
-  
 
   .sectionTitleCenter {
     letter-spacing: 6px;
@@ -1824,30 +1842,30 @@
     padding-top: 34px;
   }
 
-.heroTitle {
-  max-width: 100%;
-}
+  .heroTitle {
+    max-width: 100%;
+  }
 
-.heroTitle span {
-  letter-spacing: -0.045em;
-}
+  .heroTitle span {
+    letter-spacing: -0.045em;
+  }
 
-.titleLine1,
-.titleLine2 {
-  font-size: clamp(42px, 13vw, 62px);
-  line-height: 0.9;
-}
+  .titleLine1,
+  .titleLine2 {
+    font-size: clamp(42px, 13vw, 62px);
+    line-height: 0.9;
+  }
 
-.titleLine2 {
-  margin-left: 0;
-  width: auto;
-}
+  .titleLine2 {
+    margin-left: 0;
+    width: auto;
+  }
 
-.titleLine2::after {
-  right: 0;
-  bottom: 4px;
-  width: 180px;
-}
+  .titleLine2::after {
+    right: 0;
+    bottom: 4px;
+    width: 180px;
+  }
 
   .heroDescription {
     font-size: 16px;
@@ -1861,7 +1879,7 @@
     width: 100%;
     right: 0;
     grid-template-columns: 1fr;
-    padding: 30px;
+    padding: 15px;
     transform: rotate(2deg);
   }
 
@@ -1873,9 +1891,9 @@
   }
 
   .matchCard {
-    left: 0;
+    left: 100px;
     bottom: 112px;
-    width: calc(100% - 52px);
+    width: calc(100% - 55px);
   }
 
   .stickyNoteGreen {

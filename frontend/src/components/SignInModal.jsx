@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { X } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useGoogleSignIn } from "../hooks/useGoogleSignIn";
+import google_icon from "../assets/google_icon.png";
 import styles from "../styles/signInModal.module.css";
 
 const AUTO_REDIRECT_SECONDS = 5;
@@ -173,9 +174,12 @@ function SignInModal({ isOpen, onClose, postLogout = false }) {
             googleSignIn();
           }}
         >
-          <span className={styles.googleMark} aria-hidden="true">
-            G
-          </span>
+          <img
+            src={google_icon}
+            className={styles.googleMark}
+            alt=""
+            aria-hidden="true"
+          />
           Continue with Google
         </button>
       </div>

@@ -9,7 +9,6 @@ function Login() {
   const navigate = useNavigate();
   const { user, loginUser } = useAuth();
 
-
   const googleLogin = useGoogleLogin({
     onSuccess: async (tokenResponse) => {
       try {
@@ -52,10 +51,7 @@ function Login() {
         <input type="text" placeholder="account" />
         <input type="password" placeholder="password" />
 
-        <button
-          className="primary-btn"
-          onClick={() => navigate("/editor")}
-        >
+        <button className="primary-btn" onClick={() => navigate("/editor")}>
           Sign In
         </button>
 

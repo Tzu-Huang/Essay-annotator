@@ -10,25 +10,25 @@ const ESSAY_TYPES = [
     value: "all",
     label: "All",
     icon: "🌍",
-    bg: "linear-gradient(135deg, #81d4fa, #4dd0c4)",
+    bg: "#c7e2fb",
   },
   {
     value: "Personal Statement",
     label: "Personal Statement",
     icon: personalIcon,
-    bg: "linear-gradient(135deg, #d7b4f3, #f4a8c7)",
+    bg: "#fbe6ed",
   },
   {
     value: "University of California",
     label: "UC",
     icon: ucIcon,
-    bg: "linear-gradient(135deg, #b3d9f5, #a8d8ea)",
+    bg: "#C5E8FF",
   },
   {
     value: "Supplemental",
     label: "Supplemental",
     icon: supplementalIcon,
-    bg: "linear-gradient(45deg, #eeeec4, #f3f040)",
+    bg: "#fee8ab",
   },
 ];
 
@@ -60,11 +60,11 @@ const DEFAULT_RESULT_STYLE = {
 };
 
 const RANK_STYLES = {
-  1: { bg: "#fde68a", text: "#713f12" }, // deeper gold
-  2: { bg: "#fed7aa", text: "#7c2d12" }, // deeper bronze
-  3: { bg: "#fad1e8", text: "#701a75" }, // deeper pink
-  4: { bg: "#d0d9fc", text: "#3730a3" }, // deeper violet
-  5: { bg: "#e2dcfa", text: "#5b21b6" }, // deeper purple
+  1: { bg: "#fbe89c", text: "#713f12" }, // deeper gold
+  2: { bg: "#ffdbb3", text: "#7c2d12" }, // deeper bronze
+  3: { bg: "#ffd5ed", text: "#701a75" }, // deeper pink
+  4: { bg: "#d0ecfa", text: "#2f288d" }, // deeper violet
+  5: { bg: "#e8e3fd", text: "#5722ac" }, // deeper purple
 };
 
 const NON_ALL_TYPES = [
@@ -311,9 +311,8 @@ function Editor() {
               </div>
             </div>
 
-            <input
+            <textarea
               className="text-input"
-              type="text"
               placeholder="Topic"
               value={topic}
               onChange={(e) => setTopic(e.target.value)}

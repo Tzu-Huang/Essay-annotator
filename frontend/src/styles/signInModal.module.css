@@ -9,7 +9,7 @@
   background: rgba(15, 23, 42, 0.28);
   -webkit-backdrop-filter: blur(5px);
   backdrop-filter: blur(5px);
-  animation: signInOverlayIn 220ms ease-out;
+  animation: signInOverlayIn 280ms ease-out;
 }
 
 .signInModal {
@@ -26,7 +26,7 @@
   align-items: center;
   justify-content: center;
   text-align: center;
-  animation: signInModalIn 240ms ease-out;
+  animation: signInModalIn 280ms ease-out;
 }
 
 .signInClose {
@@ -59,12 +59,12 @@
 }
 
 .signInTitle {
-  margin: 6px;
+  margin: 4px;
   color: #111111;
   font-size: clamp(38px, 5vw, 46px);
   font-weight: 500;
   line-height: 1.1;
-  letter-spacing: -0.02em;
+  letter-spacing: -0.015em;
 }
 
 .signInText {
@@ -102,8 +102,8 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 35px;
-  height: 35px;
+  width: 33px;
+  height: 33px;
   border-radius: 999px;
   color: #3260ab;
   font-size: 26px;

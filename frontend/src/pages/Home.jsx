@@ -349,9 +349,13 @@ function Home({ onOpenSignIn }) {
           </p>
 
           <div className={styles.heroActions}>
-            <Link to="/login" className={styles.primaryBtn}>
+            <button
+              type="button"
+              className={styles.primaryBtn}
+              onClick={handleStartWriting}
+            >
               Start Writing
-            </Link>
+            </button>
 
             <a href="#how-it-works" className={styles.secondaryLink}>
               See how it works →

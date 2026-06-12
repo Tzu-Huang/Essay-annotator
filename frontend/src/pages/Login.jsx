@@ -1,6 +1,6 @@
 import { Navigate, useNavigate } from "react-router-dom";
 import { useGoogleLogin } from "@react-oauth/google";
-import styles from "../styles/login.module.css";
+import "../styles/login.css";
 import { useAuth } from "../hooks/useAuth";
 
 const GOOGLE_USERINFO_URL = "https://www.googleapis.com/oauth2/v3/userinfo";
@@ -44,25 +44,22 @@ function Login() {
   };
 
   return (
-    <div className={styles.loginContainer}>
-      <div className={styles.loginCard}>
+    <div className="login-container">
+      <div className="login-card">
         <h2>Sign In</h2>
 
         <input type="text" placeholder="account" />
         <input type="password" placeholder="password" />
 
-        <button
-          className={styles.primaryBtn}
-          onClick={() => navigate("/editor")}
-        >
+        <button className="primary-btn" onClick={() => navigate("/editor")}>
           Sign In
         </button>
 
-        <button className={styles.googleBtn} onClick={handleGoogleLogin}>
+        <button className="google-btn" onClick={handleGoogleLogin}>
           Continue with Google
         </button>
 
-        <p className={styles.signupLink}>Sign Up</p>
+        <p className="signup-link">Sign Up</p>
       </div>
     </div>
   );

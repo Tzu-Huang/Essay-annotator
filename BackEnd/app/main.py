@@ -1,17 +1,29 @@
 import time
 import json
+import os
+from service.generate_topic import get_topic
+from openai import OpenAI
 from app.helpers import load_essays
 from service.search_service import run_search
 from app.state import AppData
 from compare_results.analysis import compare
 from dotenv import load_dotenv
 from embedding.search_similar import load_db_embeddings
-from fastapi import FastAPI, HTTPException, Query, Request
+from database.create import get_db, User, create_tables
+from fastapi import Depends
+from sqlalchemy.orm import Session
+from datetime import datetime, timezone
+from fastapi import FastAPI, HTTPException, Query, Request, Depends
 from fastapi.middleware.cors import CORSMiddleware
+from datetime import datetime, timezone
 from pathlib import Path
 from pydantic import BaseModel
 from typing import Optional
-
+from compare_results.analysis import (
+    MIN_COMPARE_WORDS,
+    prepare_compare_context,
+    finalize_compare_result,
+)
 
 load_dotenv(dotenv_path=Path(__file__).parent / ".env")
 # print("OPENAI KEY: ", bool(os.environ.get("OPENAI_API_KEY")))
@@ -47,7 +59,6 @@ async def lifespan(app: FastAPI):
         data.topic_V = topic_V
         data.content_V = content_V
         data.ready = True
-
         print(f"loaded {data.essay_count} essays")
 
     except Exception as e:
@@ -117,10 +128,37 @@ def ready():
 
     return {"status": "ready", "essay_count": data.essay_count}
 
+
+# Handling saving user info into our database
+@app.post("/api/users")
+def save_user(email: str, name: str, db: Session = Depends(get_db)):
+    existing = db.query(User).filter(User.email == email).first()
+    if existing:
+        existing.login_count += 1
+        existing.last_login = datetime.now(timezone.utc)
+        db.commit()
+        db.refresh(existing)
+        return {
+            "status":      "returning",
+            "name":        existing.name,
+            "login_count": existing.login_count,
+            "last_login":  existing.last_login.isoformat(),
+            "id":          existing.id,
+        }
+    new_user = User(email=email, name=name)
+    db.add(new_user)
+    db.commit()
+    db.refresh(new_user)
+    return {
+        "status":     "new",
+        "name":       new_user.name,
+        "last_login": new_user.last_login.isoformat(),
+        "id":         new_user.id,
+    }
+
 DEFAULT_FIELDS = ["id", "topic", "type", "school", "public"]
 ALLOWED_FIELDS = set(DEFAULT_FIELDS + ["content", "source_file", "metadata"])
 
-# TODO: frontend is taking parent id
 @app.get("/essays/{essay_id}")
 def get_essay(
     essay_id: str,
@@ -149,10 +187,19 @@ def get_essay(
     for k in selected:
         result[k] = essay.get(k)
 
-    # originally this get "id" will get the chunked id ? 
     result["id"] = essay.get("id", essay_id)
-    return result
 
+    content = essay.get("content", "")
+    result["word_count"] = len(content.split()) if content else 0
+
+    client = OpenAI(api_key=os.environ["OPENAI_API_KEY"])
+    result["generated_title"] = get_topic(
+        topic=essay.get("topic", ""),
+        content=content,
+        client=client,
+    )
+
+    return result
 # ===========================
 # Search endpoint
 # ===========================
@@ -182,7 +229,6 @@ def search(req: Search, request: Request):
             status_code=500,
             detail=str(e)
         )
-
 # ===========================
 # Compare endpoint
 # ===========================
@@ -194,27 +240,52 @@ class CompareRequest(BaseModel):
 def compare_api(essay_id: str, req: CompareRequest):
     # Load essays from app.state
     data = app.state.data
-    
+
     # Error handling
     if not hasattr(data, "essays"):
         raise HTTPException(status_code=500, detail="Server essays data not initialized")
 
     essay = data.essays.get(essay_id)
-    print(essay)
+
     if not essay:
         raise HTTPException(status_code=404, detail="Essay not found")
-    
+
     if not req.user_input.strip():
         raise HTTPException(status_code=400, detail="user_input cannot be empty")
 
     essay_text = essay.get("content", "")
+
+    # Prepare context before calling LLM
+    context = prepare_compare_context(
+        user_essay=req.user_input,
+        database_essay=essay_text
+    )
+
+    # Check if user input is too short
+    if context["user_word_count"] < MIN_COMPARE_WORDS:
+        return {
+            "essay_id": essay_id,
+            "too_short": True,
+            "message": "Please provide more content so I can give meaningful feedback.",
+            "comparisons": []
+        }
+
     try:
-        # Call the actual function that do the actual comparison
-        result = compare(user_essay=req.user_input, sample_essay=essay_text)
-        # result.append({
-        #     "similarity":
-        # })
+        # Call the actual function that does the actual comparison
+        raw_result = compare(
+            user_essay=req.user_input,
+            sample_essay=essay_text
+        )
+
+        # Clean and normalize result for frontend
+        result = finalize_compare_result(
+            raw_result=raw_result,
+            essay_id=essay_id,
+            context=context
+        )
+
         return result
+
     except Exception as e:
         print(e)
         raise HTTPException(status_code=500, detail=f"Compare failed: {str(e)}")

@@ -1,0 +1,832 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Essay Library Preview</title>
+    <style>
+      :root {
+        --bg: #f8fafc;
+        --surface: #ffffff;
+        --surface-soft: #f1f5f9;
+        --text: #111827;
+        --muted: #64748b;
+        --line: #dbe3ee;
+        --accent: #315c7c;
+        --accent-dark: #173c57;
+        --accent-soft: #e7f0f7;
+        --navy: #0f2233;
+        --footer: #0f172a;
+        --shadow: 0 14px 36px rgba(15, 23, 42, 0.08);
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        background: var(--bg);
+        color: var(--text);
+        font-family:
+          Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
+          "Segoe UI", sans-serif;
+      }
+
+      a {
+        color: inherit;
+        text-decoration: none;
+      }
+
+      button,
+      input {
+        font: inherit;
+      }
+
+      .navbar-shell {
+        position: sticky;
+        top: 0;
+        z-index: 10;
+        width: 100%;
+        background: rgba(248, 250, 252, 0.9);
+        border-bottom: 1px solid rgba(219, 227, 238, 0.8);
+        backdrop-filter: blur(16px);
+      }
+
+      .navbar {
+        display: grid;
+        grid-template-columns: minmax(180px, 1fr) auto minmax(180px, 1fr);
+        align-items: center;
+        max-width: 1180px;
+        min-height: 72px;
+        margin: 0 auto;
+        padding: 0 28px;
+      }
+
+      .brand {
+        display: inline-flex;
+        align-items: center;
+        gap: 11px;
+        width: fit-content;
+        font-size: 18px;
+        font-weight: 800;
+        letter-spacing: 0;
+      }
+
+      .brand-mark {
+        display: grid;
+        width: 38px;
+        height: 38px;
+        place-items: center;
+        border-radius: 12px;
+        background: var(--navy);
+        color: #fff;
+        font-weight: 900;
+      }
+
+      .nav-links {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 4px;
+      }
+
+      .nav-links a {
+        padding: 10px 13px;
+        border-radius: 999px;
+        color: #475569;
+        font-size: 14px;
+        font-weight: 750;
+      }
+
+      .nav-links a.active {
+        background: #e8eef4;
+        color: var(--accent-dark);
+      }
+
+      .nav-actions {
+        display: flex;
+        justify-content: flex-end;
+      }
+
+      .sign-in {
+        min-height: 40px;
+        border: 1px solid var(--line);
+        border-radius: 999px;
+        background: #fff;
+        color: var(--text);
+        padding: 0 18px;
+        font-weight: 800;
+        cursor: pointer;
+      }
+
+      main {
+        max-width: 1060px;
+        margin: 0 auto;
+        padding: 36px 28px 54px;
+      }
+
+      .library-header {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) auto;
+        gap: 24px;
+        align-items: end;
+        margin-bottom: 18px;
+      }
+
+      .eyebrow {
+        margin-bottom: 8px;
+        color: var(--accent);
+        font-size: 12px;
+        font-weight: 850;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+
+      h1 {
+        margin: 0;
+        color: var(--text);
+        font-size: clamp(32px, 4vw, 48px);
+        line-height: 1.02;
+        letter-spacing: 0;
+      }
+
+      .intro {
+        max-width: 640px;
+        margin: 10px 0 0;
+        color: var(--muted);
+        font-size: 15px;
+        line-height: 1.6;
+      }
+
+      .summary-panel {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(78px, 1fr));
+        gap: 8px;
+        min-width: 280px;
+      }
+
+      .summary-stat {
+        padding: 12px;
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        background: var(--surface);
+        box-shadow: 0 8px 24px rgba(15, 23, 42, 0.045);
+      }
+
+      .summary-stat strong {
+        display: block;
+        color: var(--text);
+        font-size: 20px;
+        line-height: 1;
+      }
+
+      .summary-stat span {
+        display: block;
+        margin-top: 5px;
+        color: var(--muted);
+        font-size: 11px;
+        font-weight: 800;
+        text-transform: uppercase;
+      }
+
+      .controls {
+        display: grid;
+        gap: 12px;
+        padding: 16px;
+        border: 1px solid var(--line);
+        border-radius: 16px;
+        background: rgba(255, 255, 255, 0.92);
+        box-shadow: var(--shadow);
+      }
+
+      .search-row {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) auto;
+        gap: 12px;
+        align-items: center;
+      }
+
+      .search-field {
+        position: relative;
+      }
+
+      .search-field svg {
+        position: absolute;
+        top: 50%;
+        left: 15px;
+        width: 18px;
+        height: 18px;
+        color: #718096;
+        transform: translateY(-50%);
+      }
+
+      input {
+        width: 100%;
+        height: 46px;
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        background: var(--surface-soft);
+        color: var(--text);
+        padding: 0 16px 0 44px;
+        font-size: 15px;
+        font-weight: 650;
+        outline: none;
+      }
+
+      input:focus {
+        border-color: rgba(49, 92, 124, 0.55);
+        background: #fff;
+        box-shadow: 0 0 0 4px rgba(49, 92, 124, 0.12);
+      }
+
+      .limit {
+        color: var(--muted);
+        font-size: 12px;
+        font-weight: 800;
+        white-space: nowrap;
+      }
+
+      .school-filters {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+
+      .school-button {
+        min-height: 34px;
+        border: 1px solid var(--line);
+        border-radius: 999px;
+        background: #fff;
+        color: #475569;
+        padding: 0 13px;
+        font-size: 13px;
+        font-weight: 800;
+        cursor: pointer;
+      }
+
+      .school-button.active {
+        border-color: rgba(49, 92, 124, 0.4);
+        background: var(--accent);
+        color: #fff;
+      }
+
+      .list-head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+        margin: 20px 0 10px;
+      }
+
+      h2 {
+        margin: 0;
+        font-size: 17px;
+        letter-spacing: 0;
+      }
+
+      .count {
+        color: var(--muted);
+        font-size: 13px;
+        font-weight: 800;
+      }
+
+      .essay-list {
+        display: grid;
+        gap: 9px;
+      }
+
+      .essay-item {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) auto;
+        gap: 18px;
+        align-items: center;
+        min-height: 118px;
+        padding: 17px 18px;
+        border: 1px solid rgba(219, 227, 238, 0.95);
+        border-radius: 12px;
+        background: #fff;
+        box-shadow: 0 8px 22px rgba(15, 23, 42, 0.04);
+        transition:
+          border-color 160ms ease,
+          box-shadow 160ms ease,
+          transform 160ms ease;
+      }
+
+      .essay-item:hover {
+        border-color: rgba(49, 92, 124, 0.45);
+        box-shadow: 0 16px 36px rgba(15, 23, 42, 0.08);
+        transform: translateY(-1px);
+      }
+
+      .essay-title {
+        margin: 0 0 7px;
+        font-size: 17px;
+        font-weight: 850;
+        letter-spacing: 0;
+      }
+
+      .meta {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 7px;
+        margin-bottom: 8px;
+      }
+
+      .pill {
+        display: inline-flex;
+        align-items: center;
+        min-height: 24px;
+        padding: 3px 9px;
+        border-radius: 999px;
+        background: var(--surface-soft);
+        color: #475569;
+        font-size: 12px;
+        font-weight: 800;
+      }
+
+      .pill.type {
+        background: var(--accent-soft);
+        color: var(--accent-dark);
+      }
+
+      .preview {
+        display: -webkit-box;
+        max-width: 820px;
+        margin: 0;
+        overflow: hidden;
+        color: var(--muted);
+        font-size: 14px;
+        line-height: 1.5;
+        -webkit-box-orient: vertical;
+        -webkit-line-clamp: 2;
+      }
+
+      .open-icon {
+        display: grid;
+        width: 34px;
+        height: 34px;
+        place-items: center;
+        border: 1px solid var(--line);
+        border-radius: 999px;
+        background: #fff;
+        color: var(--accent-dark);
+        font-size: 18px;
+        font-weight: 800;
+      }
+
+      .empty-state {
+        display: none;
+        padding: 24px;
+        border: 1px dashed var(--line);
+        border-radius: 12px;
+        background: #fff;
+        color: var(--muted);
+        text-align: center;
+        font-weight: 800;
+      }
+
+      .footer {
+        margin-top: 40px;
+        background: var(--footer);
+        color: #d8e0ea;
+      }
+
+      .footer-container {
+        display: grid;
+        grid-template-columns: 1.4fr 1fr 1fr;
+        gap: 32px;
+        max-width: 1180px;
+        margin: 0 auto;
+        padding: 42px 28px 30px;
+      }
+
+      .footer h2,
+      .footer h3 {
+        margin: 0 0 12px;
+        color: #fff;
+        letter-spacing: 0;
+      }
+
+      .footer h2 {
+        font-size: 22px;
+      }
+
+      .footer h3 {
+        font-size: 14px;
+        text-transform: uppercase;
+      }
+
+      .footer p,
+      .footer a {
+        color: #aebacc;
+        font-size: 14px;
+        line-height: 1.7;
+      }
+
+      .footer ul {
+        display: grid;
+        gap: 8px;
+        margin: 0;
+        padding: 0;
+        list-style: none;
+      }
+
+      .footer-bottom {
+        max-width: 1180px;
+        margin: 0 auto;
+        padding: 16px 28px 24px;
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
+        color: #94a3b8;
+        font-size: 13px;
+      }
+
+      @media (max-width: 860px) {
+        .navbar {
+          grid-template-columns: 1fr;
+          gap: 12px;
+          padding: 14px 20px;
+        }
+
+        .brand,
+        .nav-actions {
+          justify-self: center;
+        }
+
+        .nav-links {
+          max-width: 100%;
+          overflow-x: auto;
+          justify-content: flex-start;
+        }
+
+        main {
+          padding: 26px 18px 42px;
+        }
+
+        .library-header {
+          grid-template-columns: 1fr;
+        }
+
+        .summary-panel {
+          min-width: 0;
+        }
+
+        .search-row {
+          grid-template-columns: 1fr;
+        }
+
+        .essay-item {
+          grid-template-columns: 1fr;
+        }
+
+        .open-icon {
+          justify-self: end;
+        }
+
+        .footer-container {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header class="navbar-shell">
+      <div class="navbar">
+        <a class="brand" href="#">
+          <span class="brand-mark">EA</span>
+          <span>Essay Annotator</span>
+        </a>
+        <nav class="nav-links" aria-label="Primary navigation">
+          <a href="#">Home</a>
+          <a href="#">Essay</a>
+          <a href="#">Compare</a>
+          <a class="active" href="#">Library</a>
+        </nav>
+        <div class="nav-actions">
+          <button class="sign-in" type="button">Sign in</button>
+        </div>
+      </div>
+    </header>
+
+    <main>
+      <section class="library-header">
+        <div>
+          <div class="eyebrow">Essay Examples</div>
+          <h1>Essay Library</h1>
+          <p class="intro">
+            Search by title, topic, or school, then open a sample in the existing essay page.
+          </p>
+        </div>
+        <div class="summary-panel" aria-label="Library summary">
+          <div class="summary-stat">
+            <strong>12</strong>
+            <span>Essays</span>
+          </div>
+          <div class="summary-stat">
+            <strong>7</strong>
+            <span>Schools</span>
+          </div>
+          <div class="summary-stat">
+            <strong>3</strong>
+            <span>Types</span>
+          </div>
+        </div>
+      </section>
+
+      <section class="controls" aria-label="Search and filter essays">
+        <div class="search-row">
+          <label class="search-field">
+            <svg aria-hidden="true" viewBox="0 0 24 24" fill="none">
+              <path
+                d="m21 21-4.35-4.35m1.35-5.65a7 7 0 1 1-14 0 7 7 0 0 1 14 0Z"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+              />
+            </svg>
+            <input
+              id="essaySearch"
+              type="search"
+              maxlength="80"
+              placeholder="Search title, topic, or school..."
+              autocomplete="off"
+            />
+          </label>
+          <div class="limit"><span id="charCount">0</span>/80 characters</div>
+        </div>
+
+        <div class="school-filters" aria-label="School filters">
+          <button class="school-button active" type="button" data-school="all">All</button>
+          <button class="school-button" type="button" data-school="Stanford">Stanford</button>
+          <button class="school-button" type="button" data-school="Harvard">Harvard</button>
+          <button class="school-button" type="button" data-school="UC Berkeley">UC Berkeley</button>
+          <button class="school-button" type="button" data-school="UCLA">UCLA</button>
+          <button class="school-button" type="button" data-school="MIT">MIT</button>
+          <button class="school-button" type="button" data-school="Columbia">Columbia</button>
+        </div>
+      </section>
+
+      <section aria-labelledby="availableEssays">
+        <div class="list-head">
+          <h2 id="availableEssays">Available Essays</h2>
+          <div class="count"><span id="visibleCount">8</span> essays</div>
+        </div>
+
+        <div class="essay-list" id="essayList">
+          <a
+            class="essay-item"
+            href="#essay-page"
+            data-title="Building a Community Through Robotics"
+            data-topic="engineering teamwork community robotics"
+            data-school="Stanford"
+          >
+            <div>
+              <h3 class="essay-title">Building a Community Through Robotics</h3>
+              <div class="meta">
+                <span class="pill">Stanford</span>
+                <span class="pill type">Personal Statement</span>
+                <span class="pill">648 words</span>
+              </div>
+              <p class="preview">
+                A personal statement about discovering leadership through a student robotics team and
+                learning how technical work can create belonging.
+              </p>
+            </div>
+            <span class="open-icon" aria-hidden="true">→</span>
+          </a>
+
+          <a
+            class="essay-item"
+            href="#essay-page"
+            data-title="Why Public Health Starts Locally"
+            data-topic="public health neighborhood policy service"
+            data-school="Harvard"
+          >
+            <div>
+              <h3 class="essay-title">Why Public Health Starts Locally</h3>
+              <div class="meta">
+                <span class="pill">Harvard</span>
+                <span class="pill type">Supplement</span>
+                <span class="pill">392 words</span>
+              </div>
+              <p class="preview">
+                This supplement connects neighborhood volunteer work with a broader interest in public
+                health systems and community-based prevention.
+              </p>
+            </div>
+            <span class="open-icon" aria-hidden="true">→</span>
+          </a>
+
+          <a
+            class="essay-item"
+            href="#essay-page"
+            data-title="Creativity in Constraint"
+            data-topic="design art constraint problem solving"
+            data-school="UC Berkeley"
+          >
+            <div>
+              <h3 class="essay-title">Creativity in Constraint</h3>
+              <div class="meta">
+                <span class="pill">UC Berkeley</span>
+                <span class="pill type">UC</span>
+                <span class="pill">347 words</span>
+              </div>
+              <p class="preview">
+                A UC response about using limited materials to build a school art installation and
+                learning to treat constraints as part of the creative process.
+              </p>
+            </div>
+            <span class="open-icon" aria-hidden="true">→</span>
+          </a>
+
+          <a
+            class="essay-item"
+            href="#essay-page"
+            data-title="The Bus Route That Changed My Schedule"
+            data-topic="transportation family responsibility resilience"
+            data-school="UCLA"
+          >
+            <div>
+              <h3 class="essay-title">The Bus Route That Changed My Schedule</h3>
+              <div class="meta">
+                <span class="pill">UCLA</span>
+                <span class="pill type">UC</span>
+                <span class="pill">356 words</span>
+              </div>
+              <p class="preview">
+                A concise UC essay about balancing family duties, school, and a long commute while
+                developing discipline and practical independence.
+              </p>
+            </div>
+            <span class="open-icon" aria-hidden="true">→</span>
+          </a>
+
+          <a
+            class="essay-item"
+            href="#essay-page"
+            data-title="A Lab Notebook Full of Questions"
+            data-topic="science research curiosity biology"
+            data-school="MIT"
+          >
+            <div>
+              <h3 class="essay-title">A Lab Notebook Full of Questions</h3>
+              <div class="meta">
+                <span class="pill">MIT</span>
+                <span class="pill type">Supplement</span>
+                <span class="pill">286 words</span>
+              </div>
+              <p class="preview">
+                This supplement shows a student's habit of asking sharper scientific questions after a
+                summer biology research project.
+              </p>
+            </div>
+            <span class="open-icon" aria-hidden="true">→</span>
+          </a>
+
+          <a
+            class="essay-item"
+            href="#essay-page"
+            data-title="Translating at the Clinic Desk"
+            data-topic="language healthcare family service identity"
+            data-school="Columbia"
+          >
+            <div>
+              <h3 class="essay-title">Translating at the Clinic Desk</h3>
+              <div class="meta">
+                <span class="pill">Columbia</span>
+                <span class="pill type">Personal Statement</span>
+                <span class="pill">701 words</span>
+              </div>
+              <p class="preview">
+                A personal statement about translating for family members and discovering how language,
+                access, and dignity intersect in healthcare settings.
+              </p>
+            </div>
+            <span class="open-icon" aria-hidden="true">→</span>
+          </a>
+
+          <a
+            class="essay-item"
+            href="#essay-page"
+            data-title="Learning Leadership From a Failed Club"
+            data-topic="leadership club failure growth"
+            data-school="Stanford"
+          >
+            <div>
+              <h3 class="essay-title">Learning Leadership From a Failed Club</h3>
+              <div class="meta">
+                <span class="pill">Stanford</span>
+                <span class="pill type">Personal Statement</span>
+                <span class="pill">675 words</span>
+              </div>
+              <p class="preview">
+                This essay focuses on a failed student club launch and the quieter lessons about
+                listening, accountability, and rebuilding trust.
+              </p>
+            </div>
+            <span class="open-icon" aria-hidden="true">→</span>
+          </a>
+
+          <a
+            class="essay-item"
+            href="#essay-page"
+            data-title="Books I Could Not Find at Home"
+            data-topic="reading education access culture"
+            data-school="Harvard"
+          >
+            <div>
+              <h3 class="essay-title">Books I Could Not Find at Home</h3>
+              <div class="meta">
+                <span class="pill">Harvard</span>
+                <span class="pill type">Supplement</span>
+                <span class="pill">311 words</span>
+              </div>
+              <p class="preview">
+                A short supplement about building a reading list through public libraries and using
+                books to bridge family history with academic curiosity.
+              </p>
+            </div>
+            <span class="open-icon" aria-hidden="true">→</span>
+          </a>
+        </div>
+
+        <div class="empty-state" id="emptyState">
+          No essays match that title, topic, or school.
+        </div>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-container">
+        <section>
+          <h2>Essay Annotator</h2>
+          <p>
+            A focused workspace for reading, comparing, and improving application essays.
+          </p>
+        </section>
+        <section>
+          <h3>Product</h3>
+          <ul>
+            <li><a href="#">Essay</a></li>
+            <li><a href="#">Compare</a></li>
+            <li><a href="#">Library</a></li>
+          </ul>
+        </section>
+        <section>
+          <h3>Resources</h3>
+          <ul>
+            <li><a href="#">How it works</a></li>
+            <li><a href="#">Examples</a></li>
+            <li><a href="#">Support</a></li>
+          </ul>
+        </section>
+      </div>
+      <div class="footer-bottom">© 2026 Essay Annotator. All rights reserved.</div>
+    </footer>
+
+    <script>
+      const input = document.querySelector("#essaySearch");
+      const charCount = document.querySelector("#charCount");
+      const visibleCount = document.querySelector("#visibleCount");
+      const emptyState = document.querySelector("#emptyState");
+      const essays = Array.from(document.querySelectorAll(".essay-item"));
+      const schoolButtons = Array.from(document.querySelectorAll(".school-button"));
+      let activeSchool = "all";
+
+      function normalize(value) {
+        return value.trim().toLowerCase();
+      }
+
+      function updateList() {
+        const query = normalize(input.value);
+        let matches = 0;
+
+        essays.forEach((essay) => {
+          const searchable = `${essay.dataset.title} ${essay.dataset.topic} ${essay.dataset.school}`.toLowerCase();
+          const schoolMatches = activeSchool === "all" || essay.dataset.school === activeSchool;
+          const queryMatches = !query || searchable.includes(query);
+          const isMatch = schoolMatches && queryMatches;
+
+          essay.style.display = isMatch ? "grid" : "none";
+          if (isMatch) matches += 1;
+        });
+
+        charCount.textContent = input.value.length;
+        visibleCount.textContent = matches;
+        emptyState.style.display = matches === 0 ? "block" : "none";
+      }
+
+      schoolButtons.forEach((button) => {
+        button.addEventListener("click", () => {
+          activeSchool = button.dataset.school;
+          schoolButtons.forEach((item) => item.classList.toggle("active", item === button));
+          updateList();
+        });
+      });
+
+      input.addEventListener("input", updateList);
+      updateList();
+    </script>
+  </body>
+</html>

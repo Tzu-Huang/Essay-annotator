@@ -1,21 +1,58 @@
 import { useParams, useNavigate } from "react-router-dom";
-import { useEffect, useState } from "react";
-import { Copy, Download, Share2 } from "lucide-react";
+import { useEffect, useState, useRef } from "react";
 import styles from "../styles/EssayPage.module.css";
+
+const PLACEHOLDER_IMAGES = [
+  "https://images.unsplash.com/photo-1455390582262-044cdead277a?q=80&w=1200&auto=format&fit=crop",
+  "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?q=80&w=1200&auto=format&fit=crop",
+  "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?q=80&w=1200&auto=format&fit=crop",
+];
 
 function EssayPage() {
   const { id } = useParams();
   const navigate = useNavigate();
   const [essay, setEssay] = useState(null);
   const [error, setError] = useState("");
+  const [relatedEssays, setRelatedEssays] = useState([]);
+  const cardRef = useRef(null);
 
+  useEffect(() => {
+    let currentY = 0;
+    let targetY = 0;
+    let animationFrame;
+
+    const handleScroll = () => {
+      targetY = window.scrollY * 0.1;
+    };
+
+    const animate = () => {
+      currentY += (targetY - currentY) * 0.15;
+
+      if (cardRef.current) {
+        cardRef.current.style.transform = `translateY(${currentY}px)`;
+      }
+
+      animationFrame = requestAnimationFrame(animate);
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    animate();
+
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+      cancelAnimationFrame(animationFrame);
+    };
+  }, []);
   useEffect(() => {
     const fetchEssay = async () => {
       try {
         setError("");
+        setEssay(null);
+        setRelatedEssays([]);
 
+        // generate_title=true triggers OpenAI title generation for the main essay <h1>
         const response = await fetch(
-          `http://44.201.62.0:8000/essays/${id}?include_content=true`
+          `${import.meta.env.VITE_API_URL}/essays/${id}?include_content=true`,
         );
 
         if (!response.ok) {
@@ -24,6 +61,32 @@ function EssayPage() {
 
         const data = await response.json();
         setEssay(data);
+
+        // Find related essays
+        const searchResponse = await fetch(`${import.meta.env.VITE_API_URL}/search`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            topK: 4,
+            essay_types: ["all"],
+            topic: data.topic || "",
+            content: data.content || "",
+          }),
+        });
+
+        if (searchResponse.ok) {
+          const searchData = await searchResponse.json();
+          const results = searchData.results || searchData || [];
+
+          const filtered = results
+            .filter((item) => item.parent_id !== id)
+            .slice(0, 3);
+
+          setRelatedEssays(filtered);
+        }
+        // find related essays ===
       } catch (err) {
         console.error("ERROR:", err);
         setError("Failed to load essay.");
@@ -36,159 +99,124 @@ function EssayPage() {
   const handleCompare = () => {
     navigate(`/compare/${id}`);
   };
+  const heroImage =
+    essay?.hero_image ||
+    "https://images.unsplash.com/photo-1455390582262-044cdead277a?q=80&w=1600&auto=format&fit=crop";
 
   if (error) {
     return <p className={styles.loading}>{error}</p>;
   }
 
   return (
-    <div className={styles.essayPage}>
+    <main className={styles.essayPage}>
       {essay ? (
         <>
-          {/* NAV */}
-          <div className={styles.essayNav}>
-            <div className={styles.logo}>
-              Essay <span>AI</span>
-            </div>
-
-            <div className={styles.navLinks}>
-              <span>Home</span>
-              <span>My Essays</span>
-              <span>Examples</span>
-              <span>About Us</span>
-            </div>
-          </div>
-
-          {/* HERO */}
-          <div className={styles.essayHero}>
+          <section
+            className={styles.hero}
+            style={{
+              backgroundImage: `linear-gradient(
+                90deg,
+                rgba(248, 248, 253, 0.86) 0%,
+                rgba(248, 248, 253, 0.82) 42%,
+                rgba(248, 248, 253, 0.25) 100%
+              ), url(${heroImage})`,
+            }}
+          >
             <button className={styles.backBtn} onClick={() => navigate(-1)}>
               ← Back to Results
             </button>
 
-            <h1 title={essay.topic}>{essay.topic}</h1>
+            <h1 className={styles.title}>
+              {essay.generated_title || essay.title || "Untitled Essay"}
+            </h1>
 
-            <div className={styles.metaRow}>
-              {essay.essay_type && (
-                <span className={`${styles.badge} ${styles.type}`}>
-                  {essay.essay_type}
-                </span>
+            <p className={styles.prompt}>{essay.topic}</p>
+
+            <div className={styles.meta}>
+              <span>•</span>
+              <span>{essay.type || "Example Essay"} </span>
+
+              {essay.school && essay.school.toLowerCase() !== "none" && (
+                <>
+                  <span>•</span>
+                  <span>{essay.school}</span>
+                </>
               )}
 
-              {essay.word_count && (
-                <span className={`${styles.badge} ${styles.words}`}>
-                  {essay.word_count} words
-                </span>
-              )}
+              <span>•</span>
+              <span>{essay.word_count || essay.words || "-"} words</span>
             </div>
+          </section>
+
+          <div className={styles.contentLayout}>
+            <article className={styles.article}>
+              {essay.content.split("\n\n").map((para, i) => (
+                <p key={i}>{para}</p>
+              ))}
+            </article>
+
+            <aside className={styles.sideColumn}>
+              <section className={styles.ctaCard} ref={cardRef}>
+                <h2>Ready to write your own essay?</h2>
+
+                <p>Compare your essay with real successful examples.</p>
+
+                <button className={styles.ctaBtn} onClick={handleCompare}>
+                  Compare with My Essay
+                </button>
+              </section>
+            </aside>
           </div>
 
-          {/* MAIN */}
-          <div className={styles.essayLayout}>
-            {/* LEFT SIDEBAR */}
-            <div className={styles.sidebar}>
-              <div className={`${styles.card} ${styles.infoCard}`}>
-                <h3>Essay Info</h3>
+          {relatedEssays.length > 0 && (
+            <section className={styles.relatedSection}>
+              <h2>You may also enjoy these essays related to this topic</h2>
 
-                <div className={styles.infoRow}>
-                  <div className={styles.infoIcon}>▣</div>
-                  <div>
-                    <span>Word Count</span>
-                    <b>{essay.word_count || essay.words || "-"}</b>
-                  </div>
-                </div>
+              <div className={styles.relatedList}>
+                {relatedEssays.map((item, index) => (
+                  <button
+                    key={item.id || item.essay_id || index}
+                    className={styles.relatedCard}
+                    onClick={() => {
+                      const nextId = item.parent_id;
 
-                <div className={styles.infoRow}>
-                  <div className={styles.infoIcon}>Aa</div>
-                  <div>
-                    <span>Type</span>
-                    <b>{essay.essay_type || essay.type || "-"}</b>
-                  </div>
-                </div>
+                      navigate(`/essay/${nextId}`);
 
-                <div className={styles.infoRow}>
-                  <div className={styles.infoIcon}>⌂</div>
-                  <div>
-                    <span>School</span>
-                    <b>{essay.school || "-"}</b>
-                  </div>
-                </div>
-              </div>
+                      window.scrollTo({
+                        top: 0,
+                        behavior: "smooth",
+                      });
+                    }}
+                  >
+                    <img
+                      className={styles.relatedImage}
+                      src={
+                        PLACEHOLDER_IMAGES[index % PLACEHOLDER_IMAGES.length]
+                      }
+                      alt=""
+                    />
 
-              <div className={`${styles.card} ${styles.noteCard}`}>
-                <h3>Reading Guide</h3>
-                <p>
-                  This essay example is provided for learning structure, tone,
-                  and storytelling techniques.
-                </p>
-              </div>
-            </div>
+                    <div className={styles.relatedBody}>
+                      <span>
+                        {item.type || item.essay_type || "Example Essay"}
+                      </span>
 
-            {/* RIGHT CONTENT */}
-            <div className={styles.contentCard}>
-              <div className={styles.essayText}>
-                {essay.content.split("\n\n").map((para, i) => (
-                  <p key={i}>{para}</p>
+                      <h3>{item.generated_title || "Untitled Essay"}</h3>
+
+                      {item.school == "none" && <p>Common App</p>}
+
+                      {item.school != "none" && <p>{item.school}</p>}
+                    </div>
+                  </button>
                 ))}
               </div>
-
-              <div className={styles.actionBar}>
-                <button className={styles.primaryBtn} onClick={handleCompare}>
-                  ⚡ Compare with My Essay
-                </button>
-
-                <div className={styles.secondaryBtns}>
-                  <button>
-                    <Copy size={16} />
-                    Copy
-                  </button>
-
-                  <button>
-                    <Download size={16} />
-                    Download
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div className={styles.featureStrip}>
-            <div className={styles.featureItem}>
-              🛡
-              <div>
-                <b>AI-Powered</b>
-                <p>Smart comparison support</p>
-              </div>
-            </div>
-
-            <div className={styles.featureItem}>
-              ✦
-              <div>
-                <b>High Quality</b>
-                <p>Curated essay examples</p>
-              </div>
-            </div>
-
-            <div className={styles.featureItem}>
-              📖
-              <div>
-                <b>Learning Focused</b>
-                <p>Improve through examples</p>
-              </div>
-            </div>
-
-            <div className={styles.featureItem}>
-              🔒
-              <div>
-                <b>Your Privacy</b>
-                <p>Your essay stays secure</p>
-              </div>
-            </div>
-          </div>
+            </section>
+          )}
         </>
       ) : (
         <p className={styles.loading}>Loading...</p>
       )}
-    </div>
+    </main>
   );
 }
 

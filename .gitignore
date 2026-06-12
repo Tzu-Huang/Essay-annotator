@@ -40,6 +40,10 @@ client_secret*.json
 token.json
 *.jsonl
 *.json
+node_modules/
+template/
+.codex
+openspec/
 
 # ---------------------------------------------------------
 # VS Code settings (optional)

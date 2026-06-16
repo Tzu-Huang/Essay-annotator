@@ -1,27 +1,33 @@
 import { useEffect, useRef, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
-import {
-  HelpCircle,
-  UserCircle2,
-  BookOpen,
-  Info,
-  Sparkles,
-  ChevronDown,
-  LogOut,
-} from "lucide-react";
+import { LogOut } from "lucide-react";
+
 import logo from "../../assets/logo.png";
 import avatar from "../../assets/dog.png";
+
 import styles from "./navbar.module.css";
+
 import { useAuth } from "../../hooks/useAuth";
 
-function Navbar({ onOpenSignIn, onLoggedOut }) {
+function Navbar({
+  onOpenSignIn,
+  onLoggedOut,
+  variant = "default",
+  annotationsEnabled,
+  setAnnotationsEnabled,
+  handleResetView,
+  handleCompare,
+  compareLoading,
+}) {
+  const isComparePage = variant === "compare";
+
   const location = useLocation();
-  const isHomePage = location.pathname === "/";
+  const isEditorPage = location.pathname === "/editor";
+
   const { user, logoutUser } = useAuth();
   const [showAccountMenu, setShowAccountMenu] = useState(false);
   const accountMenuRef = useRef(null);
 
-  // handle the sign out drop down menu
   useEffect(() => {
     if (!showAccountMenu) {
       return undefined;
@@ -49,7 +55,11 @@ function Navbar({ onOpenSignIn, onLoggedOut }) {
   }, [showAccountMenu]);
 
   return (
-    <header className={styles.navbarShell}>
+    <header
+      className={`${styles.navbarShell} ${
+        isComparePage ? styles.compareNavbarShell : ""
+      }`}
+    >
       <div className={styles.navbar}>
         <div className={styles.navbarLeft}>
           <div className={styles.logo}>
@@ -62,116 +72,130 @@ function Navbar({ onOpenSignIn, onLoggedOut }) {
             </Link>
           </div>
 
-          <nav className={styles.leftNavLinks}>
-            <Link to="/examples" className={styles.leftNavLink}>
-              <span className={styles.leftNavIcon}>
-                <BookOpen size={16} strokeWidth={2} />
-              </span>
-              <span>Example Essays</span>
-            </Link>
-
-            <Link to="/how-it-works" className={styles.leftNavLink}>
-              <span className={styles.leftNavIcon}>
-                <Sparkles size={16} strokeWidth={2} />
-              </span>
-              <span>How It Works</span>
-            </Link>
-          </nav>
+          {/* PAGE LABEL */}
+          {isComparePage && (
+            <div className={styles.comparePageLabel}>
+              <span className={styles.compareSlash}>/</span>
+              <span>Compare-essays</span>
+            </div>
+          )}
         </div>
 
-        <div className={styles.navbarRight}>
-          <nav className={styles.navbarLinks}>
-            <Link to="/about" className={styles.navLink}>
-              <span className={styles.navLinkIcon}>
-                <Info size={16} strokeWidth={2} />
+        {isComparePage ? (
+          <div className={styles.compareNavbarActions}>
+            <button
+              type="button"
+              className={styles.ghostButton}
+              onClick={() => setAnnotationsEnabled((prev) => !prev)}
+            >
+              <span
+                className={`${styles.statusDot} ${
+                  annotationsEnabled ? styles.statusOn : styles.statusOff
+                }`}
+              />
+
+              <span>
+                {annotationsEnabled ? " Annotations On" : " Annotations Off"}
               </span>
-              <span>About Us</span>
-            </Link>
+            </button>
 
-            <Link to="/faqs" className={styles.navLink}>
-              <span className={styles.navLinkIcon}>
-                <HelpCircle size={16} strokeWidth={2} />
-              </span>
-              <span>FAQs</span>
-            </Link>
+            <button
+              type="button"
+              className={styles.ghostButton}
+              onClick={handleResetView}
+            >
+              Show Original
+            </button>
 
-            <div className={styles.navDivider} />
+            <button
+              type="button"
+              className={`${styles.primaryButton} ${
+                compareLoading ? styles.primaryButtonLoading : ""
+              }`}
+              onClick={handleCompare}
+              disabled={compareLoading}
+            >
+              {compareLoading ? "Loading Suggestions..." : "Load Suggestions"}
+            </button>
+          </div>
+        ) : (
+          <div className={styles.navbarRight}>
+            <nav className={styles.navbarLinks}>
+              <Link to="/how-it-works" className={styles.navLink}>
+                How It Works
+              </Link>
 
-            {user ? (
-              <div className={styles.userActions}>
-                <div className={styles.accountMenuWrap} ref={accountMenuRef}>
-                  <button
-                    type="button"
-                    className={styles.userInfo}
-                    onClick={() =>
-                      setShowAccountMenu((currentValue) => !currentValue)
-                    }
-                    aria-expanded={showAccountMenu}
-                    aria-haspopup="menu"
-                  >
-                    <span className={styles.username}>{user.name}</span>
-                    <img
-                      src={user.picture || avatar}
-                      alt={user.name}
-                      className={styles.avatar}
-                    />
-                    <span className={styles.accountMenuChevron}>
-                      <ChevronDown size={14} strokeWidth={2.2} />
-                    </span>
-                  </button>
+              <a
+                href="https://github.com/Tzu-Huang/Essay-annotator"
+                className={styles.navLink}
+                target="_blank"
+                rel="noreferrer"
+              >
+                GitHub
+              </a>
 
-                  {showAccountMenu ? (
-                    <div className={styles.accountMenu} role="menu">
-                      <button
-                        type="button"
-                        className={styles.accountMenuItem}
-                        onClick={() => {
-                          setShowAccountMenu(false);
-                          logoutUser();
-                          if (!isHomePage) onLoggedOut?.();
-                        }}
-                      >
-                        <LogOut size={15} strokeWidth={2.1} />
-                        <span>Log Out</span>
-                      </button>
-                    </div>
-                  ) : null}
-                </div>
+              <Link to="/faqs" className={styles.navLink}>
+                FAQs
+              </Link>
 
-                {isHomePage ? (
-                  <Link to="/editor" className={styles.signInBtn}>
-                    Editor
-                  </Link>
-                ) : null}
-              </div>
-            ) : (
-              <div className={styles.loggedOut}>
-                <div className={styles.navLink} aria-disabled="true">
-                  <span className={styles.navLinkIcon}>
-                    <UserCircle2 size={16} strokeWidth={2} />
-                  </span>
-                  <span>Profile</span>
-                </div>
-
-                <div className={styles.auth}>
-                  {user ? (
+              {user ? (
+                <div className={styles.userActions}>
+                  {!isEditorPage ? (
                     <Link to="/editor" className={styles.signInBtn}>
-                      Editor
+                      Start Writing
                     </Link>
-                  ) : (
+                  ) : null}
+
+                  <div className={styles.accountMenuWrap} ref={accountMenuRef}>
                     <button
                       type="button"
-                      className={styles.signInBtn}
-                      onClick={onOpenSignIn}
+                      className={styles.userInfo}
+                      onClick={() =>
+                        setShowAccountMenu((currentValue) => !currentValue)
+                      }
+                      aria-expanded={showAccountMenu}
+                      aria-haspopup="menu"
                     >
-                      Sign In
+                      <img
+                        src={user.picture || avatar}
+                        alt={user.name}
+                        className={styles.avatar}
+                      />
                     </button>
-                  )}
+
+                    {showAccountMenu ? (
+                      <div className={styles.accountMenu} role="menu">
+                        <button
+                          type="button"
+                          className={styles.accountMenuItem}
+                          onClick={() => {
+                            setShowAccountMenu(false);
+                            logoutUser();
+                            onLoggedOut?.();
+                          }}
+                          role="menuitem"
+                        >
+                          <LogOut size={15} strokeWidth={2.1} />
+                          <span>Log Out</span>
+                        </button>
+                      </div>
+                    ) : null}
+                  </div>
                 </div>
-              </div>
-            )}
-          </nav>
-        </div>
+              ) : (
+                <div className={styles.auth}>
+                  <button
+                    type="button"
+                    className={styles.signInBtn}
+                    onClick={onOpenSignIn}
+                  >
+                    Sign In
+                  </button>
+                </div>
+              )}
+            </nav>
+          </div>
+        )}
       </div>
     </header>
   );

@@ -44,7 +44,7 @@ token.json
 openspec/
 template/
 .claude
-
+node_modules
 
 # ---------------------------------------------------------
 # VS Code settings (optional)

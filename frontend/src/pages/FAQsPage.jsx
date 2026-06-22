@@ -114,9 +114,13 @@ export default function FAQPage() {
                   className={styles.sectionHeader}
                   onClick={() => handleSectionClick(sectionIndex)}
                 >
+<<<<<<< HEAD
                   <span className={styles.sectionTitle}>
                     {section.title}
                   </span>
+=======
+                  <span className={styles.sectionTitle}>{section.title}</span>
+>>>>>>> feature/Footer
 
                   <span className={styles.toggleIcon}>
                     {openSection === sectionIndex ? "−" : "+"}
@@ -139,12 +143,24 @@ export default function FAQPage() {
                         }`}
                         onClick={() =>
                           setOpenQuestion(
+<<<<<<< HEAD
                             openQuestion === questionIndex ? null : questionIndex
+=======
+                            openQuestion === questionIndex
+                              ? null
+                              : questionIndex,
+>>>>>>> feature/Footer
                           )
                         }
                       >
                         <span>{item.question}</span>
+<<<<<<< HEAD
                         <span>{openQuestion === questionIndex ? "−" : "+"}</span>
+=======
+                        <span>
+                          {openQuestion === questionIndex ? "−" : "+"}
+                        </span>
+>>>>>>> feature/Footer
                       </button>
 
                       <div
@@ -187,4 +203,8 @@ export default function FAQPage() {
       </div>
     </div>
   );
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> feature/Footer

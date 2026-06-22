@@ -12,4 +12,18 @@ body {
   );
 
   font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+<<<<<<< HEAD
+=======
+}
+
+@keyframes pageEnter {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+>>>>>>> feature/Footer
 }

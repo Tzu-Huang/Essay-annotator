@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import { useEffect, useMemo, useState } from "react";
 import { useParams } from "react-router-dom";
 import styles from "../styles/compare.module.css";
@@ -15,6 +16,20 @@ const ANNOTATION_TITLES = [
   "Stronger closing vision",
 ];
 
+=======
+import Navbar from "../components/Navbar/Navbar";
+
+import { useEffect, useMemo, useState } from "react";
+import { useParams } from "react-router-dom";
+import styles from "../styles/compare.module.css";
+
+const API_BASE = import.meta.env.VITE_API_URL;
+
+const DEFAULT_LEFT_RATIO = 50;
+const MIN_LEFT_RATIO = 35;
+const MAX_LEFT_RATIO = 75;
+
+>>>>>>> feature/Footer
 function splitParagraphs(text) {
   return (text || "")
     .split(/\n\s*\n/)
@@ -26,6 +41,7 @@ function countWords(text) {
   return (text || "").trim().split(/\s+/).filter(Boolean).length;
 }
 
+<<<<<<< HEAD
 function getAnnotationTitle(index) {
   return ANNOTATION_TITLES[index % ANNOTATION_TITLES.length];
 }
@@ -42,6 +58,8 @@ function mapCategoryToType(category, index) {
   return fallback[index % fallback.length];
 }
 
+=======
+>>>>>>> feature/Footer
 function normalizeForSearch(text) {
   return (text || "")
     .replace(/[“”]/g, '"')
@@ -50,9 +68,14 @@ function normalizeForSearch(text) {
     .trim();
 }
 
+<<<<<<< HEAD
 
 function normalizeCompareResponse(data, essayId) {
   const rawResults = data?.comparisons || [];
+=======
+function normalizeCompareResponse(data, essayId) {
+  const rawResults = Array.isArray(data?.comparisons) ? data.comparisons : [];
+>>>>>>> feature/Footer
 
   return rawResults.map((item, index) => ({
     id: item.id ?? index + 1,
@@ -69,9 +92,14 @@ function normalizeCompareResponse(data, essayId) {
     analysis: item.comparison || "",
     suggestions: Array.isArray(item.suggestions) ? item.suggestions : [],
 
+<<<<<<< HEAD
     category: item.category || "",
     type: mapCategoryToType(item.category, index),
     title: getAnnotationTitle(index),
+=======
+    type: index % 4,
+    title: `Suggestion ${index + 1}`,
+>>>>>>> feature/Footer
   }));
 }
 
@@ -148,7 +176,14 @@ function ComparePage() {
 
       const rect = container.getBoundingClientRect();
       const percent = ((e.clientX - rect.left) / rect.width) * 100;
+<<<<<<< HEAD
       const clamped = Math.max(MIN_LEFT_RATIO, Math.min(MAX_LEFT_RATIO, percent));
+=======
+      const clamped = Math.max(
+        MIN_LEFT_RATIO,
+        Math.min(MAX_LEFT_RATIO, percent)
+      );
+>>>>>>> feature/Footer
 
       setLeftRatio(clamped);
     }
@@ -166,10 +201,48 @@ function ComparePage() {
     };
   }, [isDraggingDivider]);
 
+<<<<<<< HEAD
+=======
+  const userParagraphs = useMemo(() => {
+    return splitParagraphs(submittedUserInput || userInput);
+  }, [submittedUserInput, userInput]);
+
+  const dbParagraphs = useMemo(() => {
+    return splitParagraphs(essayData?.content || "");
+  }, [essayData]);
+
+  const userWordCount = useMemo(() => {
+    return countWords(submittedUserInput || userInput);
+  }, [submittedUserInput, userInput]);
+
+  const dbWordCount = useMemo(() => {
+    return countWords(essayData?.content || "");
+  }, [essayData]);
+
+  const activeAnnotation = useMemo(() => {
+    return compareData.find((item) => item.id === activeAnnotationId) || null;
+  }, [compareData, activeAnnotationId]);
+
+  const hoveredAnnotation = useMemo(() => {
+    return compareData.find((item) => item.id === hoveredAnnotationId) || null;
+  }, [compareData, hoveredAnnotationId]);
+
+  const shouldUseAnnotationLayout =
+    annotationsEnabled && compareData.length > 0;
+
+  function getVariantClass(type) {
+    if (type === 0) return styles.variantExpression;
+    if (type === 1) return styles.variantReflection;
+    if (type === 2) return styles.variantEnding;
+    return styles.variantStructure;
+  }
+
+>>>>>>> feature/Footer
   function handleDividerMouseDown() {
     setIsDraggingDivider(true);
   }
 
+<<<<<<< HEAD
   function getVariantClass(type) {
     if (type === "expression") return styles.variantExpression;
     if (type === "reflection") return styles.variantReflection;
@@ -179,6 +252,35 @@ function ComparePage() {
 
   function getAnnotationCountByType(type) {
     return compareData.filter((item) => item.type === type).length;
+=======
+  function handleSelectAnnotation(annotationId) {
+    setActiveAnnotationId(annotationId);
+    setHoveredAnnotationId(annotationId);
+  }
+
+  function handleResetView() {
+    setCompareData([]);
+    setActiveAnnotationId(null);
+    setHoveredAnnotationId(null);
+    setSubmittedUserInput("");
+    setCompareError("");
+  }
+
+  function handleAnnotationHover(annotationId, event) {
+    setHoveredAnnotationId(annotationId);
+
+    const paragraphEl = event.currentTarget.closest(
+      `.${styles.essayParagraph}`
+    );
+    const gridEl = document.getElementById("user-panel-grid");
+
+    if (!paragraphEl || !gridEl) return;
+
+    const paragraphRect = paragraphEl.getBoundingClientRect();
+    const gridRect = gridEl.getBoundingClientRect();
+
+    setHoverCardTop(paragraphRect.top - gridRect.top);
+>>>>>>> feature/Footer
   }
 
   async function handleCompare() {
@@ -210,7 +312,19 @@ function ComparePage() {
       console.log("compare response:", data);
 
       if (!res.ok) {
+<<<<<<< HEAD
         throw new Error(data?.detail || "Compare failed");
+=======
+        throw new Error(data?.detail || "Compare failed.");
+      }
+
+      if (data?.too_short) {
+        setCompareData([]);
+        setCompareError(
+          data.message || "Please provide more content before comparing."
+        );
+        return;
+>>>>>>> feature/Footer
       }
 
       const normalized = normalizeCompareResponse(data, id);
@@ -226,6 +340,7 @@ function ComparePage() {
     }
   }
 
+<<<<<<< HEAD
   function handleSelectAnnotation(annotationId) {
     setActiveAnnotationId(annotationId);
     setHoveredAnnotationId(annotationId);
@@ -279,6 +394,8 @@ function ComparePage() {
 
     setHoverCardTop(paragraphRect.top - gridRect.top);
   }
+=======
+>>>>>>> feature/Footer
   function renderSentenceHighlights(paragraph, annotations, sentenceKey) {
     if (!annotations.length) {
       return paragraph;
@@ -392,7 +509,14 @@ function ComparePage() {
   function renderDbParagraph(paragraph, index) {
     const previewAnnotation = activeAnnotation || hoveredAnnotation;
 
+<<<<<<< HEAD
     if (!previewAnnotation || previewAnnotation.exampleParagraphIndex !== index) {
+=======
+    if (
+      !previewAnnotation ||
+      previewAnnotation.exampleParagraphIndex !== index
+    ) {
+>>>>>>> feature/Footer
       return (
         <p className={`${styles.essayParagraph} ${styles.dbParagraph}`}>
           {paragraph}
@@ -402,7 +526,15 @@ function ComparePage() {
 
     return (
       <p className={`${styles.essayParagraph} ${styles.dbParagraph}`}>
+<<<<<<< HEAD
         {renderSentenceHighlights(paragraph, [previewAnnotation], "exampleSentence")}
+=======
+        {renderSentenceHighlights(
+          paragraph,
+          [previewAnnotation],
+          "exampleSentence"
+        )}
+>>>>>>> feature/Footer
       </p>
     );
   }
@@ -425,6 +557,18 @@ function ComparePage() {
 
   return (
     <div className={styles.comparePage}>
+<<<<<<< HEAD
+=======
+      <Navbar
+        variant="compare"
+        annotationsEnabled={annotationsEnabled}
+        setAnnotationsEnabled={setAnnotationsEnabled}
+        handleResetView={handleResetView}
+        handleCompare={handleCompare}
+        compareLoading={compareLoading}
+      />
+
+>>>>>>> feature/Footer
       {compareLoading && (
         <div className={styles.loadingOverlay}>
           <div className={styles.loadingCard}>
@@ -437,6 +581,7 @@ function ComparePage() {
         </div>
       )}
 
+<<<<<<< HEAD
       <header className={styles.compareTopbar}>
         <div className={styles.topbarLeft}>
           <div className={styles.brandBlock}>
@@ -502,6 +647,8 @@ function ComparePage() {
         </div>
       </header>
 
+=======
+>>>>>>> feature/Footer
       {compareError && (
         <div className={styles.globalMessage}>
           <div className={styles.compareErrorInline}>{compareError}</div>
@@ -519,14 +666,21 @@ function ComparePage() {
           <section className={styles.userPanel}>
             <div className={styles.userPanelHeader}>
               <div className={styles.essayCardLabel}>Your Essay</div>
+<<<<<<< HEAD
               <div className={styles.essayCardTitle}>
                   {userTopic || "User Draft"}
+=======
+
+              <div className={styles.essayCardTitle}>
+                {userTopic || "User Draft"}
+>>>>>>> feature/Footer
               </div>
 
               <div className={styles.metaChipRow}>
                 <span className={`${styles.metaChip} ${styles.chipNeutral}`}>
                   {userWordCount} words
                 </span>
+<<<<<<< HEAD
                 <span className={`${styles.metaChip} ${styles.chipNeutral}`}>
                   User Draft
                 </span>
@@ -535,6 +689,23 @@ function ComparePage() {
             </div>
 
             <div id="user-panel-grid" className={styles.userPanelGrid}>
+=======
+
+                <span className={`${styles.metaChip} ${styles.chipNeutral}`}>
+                  User Draft
+                </span>
+              </div>
+            </div>
+
+            <div
+              id="user-panel-grid"
+              className={`${styles.userPanelGrid} ${
+                shouldUseAnnotationLayout
+                  ? styles.annotationLayout
+                  : styles.readingLayout
+              }`}
+            >
+>>>>>>> feature/Footer
               <div className={styles.userEssayMain}>
                 <div className={styles.userEssayBody}>
                   {userParagraphs.map((paragraph, index) => (
@@ -563,9 +734,16 @@ function ComparePage() {
                           hoveredAnnotation.type
                         )}`}
                       />
+<<<<<<< HEAD
                       <div className={styles.hoverNoteBody}>
                         <div className={styles.hoverNoteCategory}>
                           {hoveredAnnotation.category || hoveredAnnotation.type}
+=======
+
+                      <div className={styles.hoverNoteBody}>
+                        <div className={styles.hoverNoteCategory}>
+                          Suggestion {hoveredAnnotation.id}
+>>>>>>> feature/Footer
                         </div>
 
                         <div className={styles.hoverNoteTitle}>
@@ -573,17 +751,33 @@ function ComparePage() {
                         </div>
 
                         <div className={styles.hoverNotePreview}>
+<<<<<<< HEAD
                           {(hoveredAnnotation.analysis || "See suggestion details.").slice(
                             0,
                             72
                           )}
                           {(hoveredAnnotation.analysis || "").length > 72 ? "..." : ""}
+=======
+                          {(
+                            hoveredAnnotation.analysis ||
+                            "See suggestion details."
+                          ).slice(0, 72)}
+                          {(hoveredAnnotation.analysis || "").length > 72
+                            ? "..."
+                            : ""}
+>>>>>>> feature/Footer
                         </div>
 
                         <button
                           type="button"
                           className={styles.hoverNoteButton}
+<<<<<<< HEAD
                           onClick={() => handleSelectAnnotation(hoveredAnnotation.id)}
+=======
+                          onClick={() =>
+                            handleSelectAnnotation(hoveredAnnotation.id)
+                          }
+>>>>>>> feature/Footer
                         >
                           See full analysis
                         </button>
@@ -602,6 +796,10 @@ function ComparePage() {
             onMouseDown={handleDividerMouseDown}
           >
             <div className={styles.resizeDividerLine} />
+<<<<<<< HEAD
+=======
+
+>>>>>>> feature/Footer
             <div className={styles.resizeDividerHandle}>
               <span className={styles.resizeArrow}>‹</span>
               <span className={styles.resizeDots}>⋮</span>
@@ -610,10 +808,20 @@ function ComparePage() {
           </div>
 
           <section className={styles.databasePanel}>
+<<<<<<< HEAD
             <div className={styles.essayCard}>
               <div className={styles.essayCardHeader}>
                 <div className={styles.essayCardLabel}>Database Essay</div>
                 <div className={styles.essayCardTitle}>{essayData?.id || id}</div>
+=======
+            <div className={styles.essayHeaderCard}>
+              <div className={styles.essayCardHeader}>
+                <div className={styles.essayCardLabel}>Database Essay</div>
+
+                <div className={styles.essayCardTitle}>
+                  {essayData?.generated_title || "Untitled Essay"}
+                </div>
+>>>>>>> feature/Footer
 
                 <div className={styles.metaChipRow}>
                   {essayData?.type && (
@@ -622,17 +830,27 @@ function ComparePage() {
                     </span>
                   )}
 
+<<<<<<< HEAD
                   {essayData?.school && (
                     <span className={`${styles.metaChip} ${styles.chipSchool}`}>
                       {essayData.school}
                     </span>
                   )}
+=======
+                  {essayData?.school &&
+                    essayData.school.toLowerCase() !== "none" && (
+                      <span className={`${styles.metaChip} ${styles.chipSchool}`}>
+                        {essayData.school}
+                      </span>
+                    )}
+>>>>>>> feature/Footer
 
                   <span className={`${styles.metaChip} ${styles.chipRef}`}>
                     Reference essay
                   </span>
                 </div>
               </div>
+<<<<<<< HEAD
 
               <div className={styles.essayCardBody}>
                 {dbParagraphs.map((paragraph, index) => (
@@ -645,6 +863,20 @@ function ComparePage() {
                 <span className={styles.metaSep}>·</span>
                 {dbParagraphs.length} paragraphs
               </div>
+=======
+            </div>
+
+            <div className={styles.essayCardBody}>
+              {dbParagraphs.map((paragraph, index) => (
+                <div key={index}>{renderDbParagraph(paragraph, index)}</div>
+              ))}
+            </div>
+
+            <div className={styles.essayCardFooter}>
+              {dbWordCount} words
+              <span className={styles.metaSep}>·</span>
+              {dbParagraphs.length} paragraphs
+>>>>>>> feature/Footer
             </div>
           </section>
         </div>
@@ -667,9 +899,18 @@ function ComparePage() {
 
                 <div>
                   <div className={styles.panelType}>
+<<<<<<< HEAD
                     {activeAnnotation.category || activeAnnotation.type}
                   </div>
                   <div className={styles.panelTitle}>{activeAnnotation.title}</div>
+=======
+                    Suggestion {activeAnnotation.id}
+                  </div>
+
+                  <div className={styles.panelTitle}>
+                    {activeAnnotation.title}
+                  </div>
+>>>>>>> feature/Footer
                 </div>
               </div>
 
@@ -681,6 +922,10 @@ function ComparePage() {
                     const currentIndex = compareData.findIndex(
                       (item) => item.id === activeAnnotation.id
                     );
+<<<<<<< HEAD
+=======
+
+>>>>>>> feature/Footer
                     if (currentIndex > 0) {
                       handleSelectAnnotation(compareData[currentIndex - 1].id);
                     }
@@ -696,6 +941,10 @@ function ComparePage() {
                     const currentIndex = compareData.findIndex(
                       (item) => item.id === activeAnnotation.id
                     );
+<<<<<<< HEAD
+=======
+
+>>>>>>> feature/Footer
                     if (currentIndex < compareData.length - 1) {
                       handleSelectAnnotation(compareData[currentIndex + 1].id);
                     }
@@ -718,6 +967,7 @@ function ComparePage() {
             </div>
 
             <div className={styles.bottomPanelGrid}>
+<<<<<<< HEAD
               <div className={styles.panelBlock}>
                 <div className={styles.panelBlockLabel}>Your sentence</div>
                 <div className={styles.panelQuoteBox}>
@@ -739,6 +989,36 @@ function ComparePage() {
                     activeAnnotation.suggestions.map((item, index) => (
                       <div key={index} className={styles.panelSuggestionItem}>
                         <span className={styles.suggestionNumber}>{index + 1}</span>
+=======
+              <div className={`${styles.panelBlock} ${styles.panelUser}`}>
+                <div className={styles.panelBlockLabel}>Your sentence</div>
+
+                <div className={styles.panelQuoteBox}>
+                  {activeAnnotation.userSentence ||
+                    "No highlighted sentence returned."}
+                </div>
+              </div>
+
+              <div className={`${styles.panelBlock} ${styles.panelMatch}`}>
+                <div className={styles.panelBlockLabel}>Matched sentence</div>
+
+                <div className={styles.panelQuoteBox}>
+                  {activeAnnotation.exampleSentence ||
+                    "No matched sentence returned."}
+                </div>
+              </div>
+
+              <div className={`${styles.panelBlock} ${styles.panelSuggestion}`}>
+                <div className={styles.panelBlockLabel}>Suggestions</div>
+
+                <div className={styles.panelSuggestionList}>
+                  {activeAnnotation.suggestions.length > 0 ? (
+                    activeAnnotation.suggestions.map((item, index) => (
+                      <div key={index} className={styles.panelSuggestionItem}>
+                        <span className={styles.suggestionNumber}>
+                          {index + 1}
+                        </span>
+>>>>>>> feature/Footer
                         <span>{item}</span>
                       </div>
                     ))

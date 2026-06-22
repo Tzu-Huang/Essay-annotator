@@ -1,71 +1,37 @@
-import { Link } from "react-router-dom";
-
 import "./Footer.css";
+import { FaGithub } from "react-icons/fa";
+import logo from "../../logo/logo.png";
 
-function Footer() {
+export default function Footer() {
   return (
     <footer className="footer">
-      <div className="footer-container">
-
-        {/* Brand Section */}
-        <div className="footer-section footer-brand">
-          <h2>Essay Annotator</h2>
-
-          <p>
-            EssayAnnotator helps students explore successful college essays,
-            understand strong writing patterns, and improve their own essays
-            through AI-powered comparison.
-          </p>
-
+      <div className="footer-top">
+        <div className="footer-brand">
+          <img src={logo} alt="Storyteller logo" className="footer-logo" />
+          <span className="footer-title">storyteller</span>
         </div>
 
-        {/* Navigation */}
-        <div className="footer-section">
-          <h3>Pages</h3>
-
-          <ul>
-            <li>
-              <Link to="/">Home</Link>
-            </li>
-
-            <li>
-              <Link to="/how-it-works">How It Works</Link>
-            </li>
-
-            <li>
-              <Link to="/faqs">FAQs</Link>
-            </li>
-
-            <li>
-              <Link to="/editor">Editor</Link>
-            </li>
-          </ul>
-        </div>
-
-        {/* Project Info */}
-        <div className="footer-section">
-          <h3>Project</h3>
-
-          <ul>
-            <li>Built with React + FastAPI + OpenAI</li>
-
-            <li>Semantic Essay Retrieval System</li>
-
-            <li>
-              Contributors:
-              <br />
-              Zackery Liu, Amanda Tsai, Olivia Chu
-            </li>
-          </ul>
-        </div>
+        <nav className="footer-nav" aria-label="Footer navigation">
+          <a href="#">Portal</a>
+          <a href="#">FAQs</a>
+          <a href="#">Home</a>
+          <a href="#">Contact Us</a>
+        </nav>
       </div>
 
-      {/* Bottom */}
+      <div className="footer-line" />
+
       <div className="footer-bottom">
-        © 2026 EssayAnnotator — Built for educational purposes.
+        <p>©2026 Storyteller</p>
+
+        <div className="footer-links">
+          <a href="https://github.com" aria-label="GitHub" className="github-icon">
+            <FaGithub aria-hidden="true" />
+          </a>
+          <a href="/privacy">Terms of Privacy</a>
+          <a href="/terms">Terms &amp; Condition</a>
+        </div>
       </div>
     </footer>
   );
 }
-
-export default Footer;

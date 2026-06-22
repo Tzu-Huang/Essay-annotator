@@ -1,149 +1,153 @@
 .footer {
-  width: 100%;
-
-  overflow: hidden;
-
-  margin-top: 0;
-
-  background: rgba(75, 78, 101, 0.92);
-
-  border-top: 1px solid rgba(255,255,255,0.08);
-
-  backdrop-filter: blur(10px);
-
-  color: white;
+  background:
+    radial-gradient(circle at 20% 0%, rgba(255, 255, 255, 0.045), transparent 28%),
+    linear-gradient(180deg, #202630 0%, #1c222b 100%);
+  color: #f6f7f8;
+  padding: 42px 76px 32px;
+  font-family: "Montserrat", "Helvetica Neue", Arial, sans-serif;
 }
 
-/* =========================
-   Main Layout
-========================= */
-
-.footer-container {
-  max-width: 1400px;
-
-  margin: 0 auto;
-
-  padding: 20px 20px;
-
-  display: grid;
-
-  grid-template-columns: 2fr 1fr 1fr;
-
-  gap: 60px;
-}
-
-/* =========================
-   Titles
-========================= */
-
-.footer-section h3 {
-  font-size: 17px;
-
-  margin-bottom: 22px;
-
-  color: rgba(255,255,255,0.95);
-
-  letter-spacing: 0.03em;
-}
-
-/* =========================
-   Brand Section
-========================= */
-
-.footer-brand h2 {
-  font-size: 15px;
-
-  margin-bottom: 20px;
-
-  font-weight: 700;
-}
-
-.footer-brand p {
-  color: rgba(255,255,255,0.68);
-
-  line-height: 1.8;
-
-  max-width: 500px;
-
-  margin-bottom: 28px;
-}
-
-/* =========================
-   Navigation
-========================= */
-
-.footer-section ul {
-  list-style: none;
-
-  padding: 0;
-
-  margin: 0;
-}
-
-.footer-section li {
-  margin-bottom: 14px;
-
-  color: rgba(255,255,255,0.68);
-
-  line-height: 1.7;
-}
-
-.footer-section a {
-  display: inline-block;
-
-  color: rgba(255,255,255,0.68);
-
-  text-decoration: none;
-
-  transition: all 0.25s ease;
-}
-
-.footer-section a:hover {
-  color: white;
-
-  transform: translateX(3px);
-}
-
-/* =========================
-   Bottom
-========================= */
-
+.footer-top,
 .footer-bottom {
-  border-top: 2px solid rgba(189, 66, 66, 0.06);
-
-  background: rgba(75, 78, 101, 0.92);
-  
-  text-align: center;
-
-  padding: 22px;
-
-  font-size: 14px;
-
-  color: rgba(255,255,255,0.45);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
 }
 
-/* =========================
-   Responsive
-========================= */
+.footer-brand {
+  display: flex;
+  align-items: center;
+  gap: 28px;
+}
+
+.footer-logo {
+  width: 58px;
+  height: auto;
+  display: block;
+  filter: brightness(0) invert(1);
+}
+
+.footer-title {
+  color: #f7f8f9;
+  font-size: 23px;
+  font-weight: 400;
+  line-height: 1;
+  letter-spacing: 0;
+}
+
+.footer-nav,
+.footer-links {
+  display: flex;
+  align-items: center;
+}
+
+.footer-nav {
+  gap: clamp(42px, 5vw, 76px);
+}
+
+.footer-links {
+  gap: clamp(36px, 4vw, 64px);
+}
+
+.footer-nav a,
+.footer-links a {
+  color: rgba(247, 248, 249, 0.92);
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 1;
+  letter-spacing: 0;
+  text-decoration: none;
+  transition:
+    color 160ms ease,
+    opacity 160ms ease;
+}
+
+.footer-nav a:hover,
+.footer-links a:hover {
+  color: #ffffff;
+}
+
+.footer-line {
+  height: 1px;
+  background: rgba(255, 255, 255, 0.27);
+  margin: 30px 0 24px;
+}
+
+.footer-bottom p {
+  margin: 0;
+  color: rgba(235, 238, 242, 0.84);
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1;
+}
+
+.github-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  color: #ffffff;
+}
+
+.github-icon svg {
+  width: 27px;
+  height: 27px;
+  display: block;
+}
 
 @media (max-width: 900px) {
-  .footer-container {
-    grid-template-columns: 1fr;
-
-    gap: 50px;
+  .footer {
+    padding: 34px 32px 30px;
   }
 
-  .footer {
-    margin-top: 80px;
+  .footer-top,
+  .footer-bottom {
+    align-items: flex-start;
+    gap: 34px;
+  }
+
+  .footer-top {
+    flex-direction: column;
+  }
+
+  .footer-bottom {
+    flex-direction: column-reverse;
+  }
+
+  .footer-nav,
+  .footer-links {
+    flex-wrap: wrap;
+    gap: 18px 30px;
+  }
+
+  .footer-line {
+    margin: 26px 0 24px;
   }
 }
 
-@media (max-width: 600px) {
-  .footer-container {
-    padding: 50px 24px;
+@media (max-width: 520px) {
+  .footer {
+    padding: 30px 24px 28px;
   }
 
-  .footer-brand h2 {
-    font-size: 28px;
+  .footer-brand {
+    gap: 18px;
+  }
+
+  .footer-logo {
+    width: 48px;
+  }
+
+  .footer-title {
+    font-size: 21px;
+  }
+
+  .footer-nav,
+  .footer-links {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 18px;
   }
 }

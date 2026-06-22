@@ -6,6 +6,10 @@ import os
 from service.build_results import build_results
 from embedding.search_similar import cosine_search, classify_query_input
 from embedding.make_embedding import get_query_embedding
+<<<<<<< HEAD
+=======
+from service.generate_topic import get_topic
+>>>>>>> feature/Footer
 
 
 def get_client():
@@ -15,7 +19,11 @@ def get_optional_query_embedding(text: str | None, client, dim: int) -> np.ndarr
     if isinstance(text, str) and text.strip():
         return get_query_embedding(text, client)
     return np.zeros(dim, dtype=np.float32)
+<<<<<<< HEAD
 
+=======
+    
+>>>>>>> feature/Footer
 def run_search(req, app_state):
     client = get_client()
     
@@ -62,4 +70,16 @@ def run_search(req, app_state):
     if essay_types and "all" not in essay_types:
         results = [r for r in results if r["type"] in essay_types]
 
+<<<<<<< HEAD
     return results
+=======
+    for result in results:
+        essay = app_state.essays.get(result["parent_id"], {})
+        result["generated_title"] = get_topic(
+            topic=essay.get("topic", ""),
+            content=essay.get("content", ""),
+            client=client,
+        )
+
+    return {"results": results}
+>>>>>>> feature/Footer

@@ -1,5 +1,6 @@
 .essayPage {
   min-height: 100vh;
+<<<<<<< HEAD
 
   background: #f8f8fd;
 
@@ -134,10 +135,287 @@
   box-shadow:
     0 10px 25px rgba(30, 34, 90, 0.06),
     0 2px 6px rgba(30, 34, 90, 0.04);
+=======
+  background: #eeeeed;
+  color: #151936;
+  font-family: Inter, system-ui, sans-serif;
+}
+
+/* HERO */
+
+.hero {
+  max-width: none;
+  margin: 0 auto;
+  padding: 72px 17% 72px;
+
+  background-size: cover;
+  background-position: center right;
+  background-repeat: no-repeat;
+}
+
+.backBtn {
+  border: none;
+  background: transparent;
+  color: #6a5af9;
+  font-weight: 700;
+  cursor: pointer;
+  padding: 0;
+  margin-bottom: 42px;
+}
+
+.kicker {
+  margin: 0 0 18px;
+  color: #6a5af9;
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.title {
+  max-width: 850px;
+  margin: 0;
+
+  font-family: Inter, system-ui, sans-serif;
+  font-size: clamp(48px, 6.6vw, 82px);
+  line-height: 0.98;
+  letter-spacing: -0.05em;
+  font-weight: 850;
+
+  color: #090a17;
+}
+
+.prompt {
+  max-width: 780px;
+  margin: 28px 0 0;
+
+  font-size: 18px;
+  line-height: 1.65;
+  font-weight: 500;
+
+  color: #575b6c;
+}
+
+.meta {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+
+  margin-top: 26px;
+
+  font-size: 15px;
+  font-weight: 700;
+  color: #577eaa;
+}
+
+/* ARTICLE */
+
+.article {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: clamp(32px, 5vw, 72px) 160px clamp(24px, 4vw, 48px);
+
+  border-top: 1px solid rgba(28, 35, 64, 0.1);
+}
+
+
+.article p {
+  margin: 0 0 35px;
+
+  font-family: Inter, system-ui, sans-serif;
+  font-size: 19px;
+  line-height: 1.9;
+  font-weight: 400;
+
+  letter-spacing: -0.01em;
+
+  color: #26304f;
+}
+
+.article p:first-child::first-letter {
+  float: left;
+
+  font-size: 92px;
+
+  line-height: 0.82;
+
+  padding-right: 10px;
+
+  margin-top: 10px;
+
+  font-weight: 700;
+
+  font-family: "Cormorant Garamond", serif;
+
+  color: #010102;
+}
+
+/* ACTION */
+
+.actionArea {
+  max-width: 820px;
+  margin: 0 auto;
+  padding: 34px 28px 90px;
+
+  border-top: 1px solid rgba(28, 35, 64, 0.1);
+
+  display: flex;
+  justify-content: center;
+}
+
+.compareBtn {
+  border: none;
+  border-radius: 999px;
+  padding: 15px 26px;
+
+  background: linear-gradient(135deg, #6a5af9, #4d39e8);
+  color: white;
+
+  font-size: 15px;
+  font-weight: 800;
+  cursor: pointer;
+
+  box-shadow: 0 14px 28px rgba(89, 74, 238, 0.22);
+}
+
+.ctaCard {
+  position: sticky;
+  will-change: transform;
+  top: 120px;
+  margin: 30px 0 80px;
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  padding: 34px 20px;
+  border-radius: 22px;
+
+  Opacity: 0.95;
+  background: #b6b8b964;
+
+  border: 1px solid rgba(1, 1, 1, 0);
+
+  box-shadow:
+      0 10px 30px rgba(0,0,0,0),
+      0 24px 60px rgba(0,0,0,0);
+
+  transition:
+    box-shadow 1s ease;
+    will-change: transform;
+}
+
+.ctaCard h2 {
+  margin: 0 0 16px;
+  font-size: 23px;
+  line-height: 1.05;
+  font-weight: 850;
+  letter-spacing: -0.04em;
+
+  color: #050505;
+}
+
+.ctaCard p {
+  margin: 0 0 26px;
+
+  font-size: 15px;
+  line-height: 1.55;
+  font-weight: 500;
+
+  color: #363a46;
+}
+
+.ctaBtn {
+  width: 100%;
+
+  border: none;
+  border-radius: 999px;
+
+  padding: 15px 22px;
+
+  background: linear-gradient(
+    135deg,
+    #ceadb7,
+    #b07981
+  );
+  color: white;
+
+  font-size: 13px;
+  font-weight: 850;
+
+  cursor: pointer;
+
+  box-shadow: 0 5px 10px rgba(21, 21, 21, 0.6);
+}
+
+.contentLayout {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 28px;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 300px;
+  gap: 8px;
+  align-items: start;
+}
+
+.sideColumn {
+  height: 90%;
+  padding-top: 0;
+}
+
+.ctaCard:hover {
+  box-shadow:
+    0 24px 52px rgba(31, 35, 60, 0.12);
+}
+/* =========================
+   RELATED ESSAYS
+========================= */
+
+.relatedSection {
+  max-width: 1200px;
+
+  margin: clamp(24px, 5vw, 60px) auto 0;
+  
+  padding: 0 28px 80px;
+}
+
+.relatedSection h2 {
+  margin: 0 0 28px;
+
+  font-size: 34px;
+  line-height: 1.05;
+  font-weight: 850;
+  letter-spacing: -0.05em;
+
+  text-align: center;
+  color: #151936;
+}
+
+.relatedList {
+  display: grid;
+
+  grid-template-columns: repeat(3, 1fr);
+
+  gap: 24px;
+}
+
+.relatedCard {
+  width: 100%;
+  padding: 0;
+
+  border: 1px solid rgba(28, 35, 64, 0.08);
+  border-radius: 20px;
+
+  overflow: hidden;
+  background: white;
+
+  text-align: left;
+  cursor: pointer;
+
+  box-shadow: 0 12px 30px rgba(31, 35, 60, 0.07);
+>>>>>>> feature/Footer
 
   transition: all 0.25s ease;
 }
 
+<<<<<<< HEAD
 .sidebar .card:hover {
   box-shadow:
     0 18px 40px rgba(30, 34, 90, 0.1),
@@ -401,5 +679,115 @@
 
   .featureStrip {
     grid-template-columns: 1fr;
+=======
+.relatedCard:hover {
+  transform: translateY(-5px);
+
+  box-shadow: 0 18px 42px rgba(31, 35, 60, 0.12);
+}
+
+.relatedImage {
+  width: 100%;
+  height: 190px;
+
+  object-fit: cover;
+
+  display: block;
+}
+
+.relatedBody {
+  padding: 20px 12px 22px;
+}
+
+.relatedBody span {
+  display: block;
+
+  margin-bottom: 10px;
+
+  font-size: 11px;
+  font-weight: 850;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+
+  color: #6a5af9;
+}
+
+.relatedBody h3 {
+  margin: 0 0 12px;
+  font-size: 22px;
+  line-height: 1.15;
+  font-weight: 850;
+  letter-spacing: -0.04em;
+
+  color: #151936;
+}
+
+.relatedBody p {
+  margin: 0;
+
+  font-size: 14px;
+  font-weight: 650;
+
+  color: #577eaa;
+}
+
+/* MOBILE */
+
+@media (max-width: 1000px) {
+  .relatedList {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 1200px) {
+  .relatedSidebar {
+    position: static;
+
+    width: auto;
+    max-width: 820px;
+
+    margin: 20px auto 80px;
+    padding: 0 28px;
+  }
+
+  .relatedList {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 700px) {
+  .relatedList {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* LOADING */
+
+.loading {
+  text-align: center;
+  padding-top: 120px;
+}
+
+/* RESPONSIVE */
+
+@media (max-width: 700px) {
+  .hero {
+    padding-top: 52px;
+  }
+
+  .title {
+    font-size: clamp(42px, 12vw, 62px);
+    letter-spacing: -0.055em;
+  }
+
+  .prompt {
+    font-size: 16px;
+  }
+
+  .article p {
+    font-size: 17px;
+    line-height: 1.85;
+>>>>>>> feature/Footer
   }
 }

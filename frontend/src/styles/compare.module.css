@@ -33,6 +33,7 @@
   background: var(--bg);
   color: var(--text);
   font-family: "Inter", sans-serif;
+<<<<<<< HEAD
   padding-bottom: 320px;
 }
 
@@ -205,11 +206,23 @@
 /* =========================
    Loading + error
    ========================= */
+=======
+  padding-bottom: 150px;
+}
+
+/* =========================
+Loading Error
+========================= */
+>>>>>>> feature/Footer
 
 .loadingOverlay {
   position: fixed;
   inset: 0;
   background: rgba(246, 245, 243, 0.62);
+<<<<<<< HEAD
+=======
+  -webkit-backdrop-filter: blur(4px);
+>>>>>>> feature/Footer
   backdrop-filter: blur(4px);
   z-index: 200;
   display: flex;
@@ -282,8 +295,13 @@
 }
 
 /* =========================
+<<<<<<< HEAD
    Main layout
    ========================= */
+=======
+   Main Layout
+========================= */
+>>>>>>> feature/Footer
 
 .compareMain {
   max-width: 1600px;
@@ -294,14 +312,22 @@
 .compareSplitLayout {
   display: grid;
   align-items: stretch;
+<<<<<<< HEAD
   border: 1px solid var(--border);
   border-radius: 20px;
   overflow: hidden;
+=======
+  min-height: calc(100vh - 140px);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  overflow: visible;
+>>>>>>> feature/Footer
   background: var(--surface);
   box-shadow: var(--shadow);
   position: relative;
 }
 
+<<<<<<< HEAD
 .userPanel,
 .databasePanel {
   min-width: 0;
@@ -332,19 +358,112 @@
   background: var(--border);
 }
 
+=======
+/* =========================
+   Main 4 Sections Layout
+
+   1. User Header
+   2. Similar Essay Header
+   3. User Content + Footer
+   4. Database Content + Footer
+========================= */
+
+
+.userPanel,
+.databasePanel {
+  min-width: 0;
+  min-height: 0;
+  background: #fffffc;
+}
+
+/* Left card */
+.userPanel {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+}
+
+/* Right card */
+.databasePanel {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+}
+
+/* 1. User title area */
+.userPanelHeader {
+  width: calc(100% - 3px);
+  margin: 5px 0 0 5px;
+  padding: 26px 28px 18px;
+  
+  background: #d1d3d4;
+  border-bottom: 1px solid var(--border);
+}
+
+/* 2. Similar Essay title area */
+.essayHeaderCard {
+  width: calc(100% - 3px);
+  margin: 5px 0 2.5px -2.5px;
+
+  background: #e7cfcf;
+  border-bottom: 1px solid var(--border);
+}
+
+.essayCardHeader {
+  padding: 26px 28px 18px;
+}
+
+/* 3. User content + footer area */
+>>>>>>> feature/Footer
 .userPanelGrid {
   display: grid;
   grid-template-columns: minmax(0, 1fr) 220px;
   gap: 18px;
+<<<<<<< HEAD
   align-items: start;
   padding: 26px 28px 0;
+=======
+  min-height: 0;
+  padding: 26px 28px 0;
+  background: #fffffb;
+}
+
+/* 有 suggestion + annotation on：保留右邊 annotation rail */
+.annotationLayout {
+  grid-template-columns: minmax(0, 1fr) 220px;
+  padding-right: 28px;
+}
+
+/* 沒 load suggestion 或 annotation off：文字靠近中線 */
+.readingLayout {
+  grid-template-columns: minmax(0, 1fr) 0px;
+  gap: 0;
+  padding-right: 12px;
+}
+
+.readingLayout .userHoverRail {
+  display: none;
+>>>>>>> feature/Footer
 }
 
 .userEssayMain {
   min-width: 0;
+<<<<<<< HEAD
 }
 
 .userEssayBody {
+=======
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.userEssayBody {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding-bottom: 30px;
+  /*font-family: Inter, system-ui, sans-serif;*/
+  letter-spacing: -0.05em;
+>>>>>>> feature/Footer
   font-family: "Source Serif 4", Georgia, serif;
   font-size: 18px;
   line-height: 1.95;
@@ -353,12 +472,41 @@
   color: #2f2b28;
 }
 
+<<<<<<< HEAD
+=======
+/* 4. Database content + footer area */
+.essayCardBody {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  background: #fffffb;
+  padding: 26px 30px 30px;
+  font-family: "Source Serif 4", Georgia, serif;
+  font-size: 18px;
+  line-height: 1.95;
+  font-weight: 400;
+  letter-spacing: -0.01em;
+  color: #2f2b28;
+}
+
+/* Shared footer */
+.essayCardFooter {
+  padding: 14px 28px;
+  border-top: 1px solid var(--border);
+  font-size: 14px;
+  color: var(--muted);
+  background: #ffffff;
+  margin-top: auto;
+}
+
+>>>>>>> feature/Footer
 .userHoverRail {
   position: relative;
   min-height: 100%;
 }
 
 /* =========================
+<<<<<<< HEAD
    Shared cards
    ========================= */
 
@@ -383,13 +531,21 @@
   height: 1px;
   background: var(--border);
 }
+=======
+   Essay Header Text
+========================= */
+>>>>>>> feature/Footer
 
 .essayCardLabel {
   font-size: 12px;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.08em;
+<<<<<<< HEAD
   color: var(--muted2);
+=======
+  color: #6c6a6a;
+>>>>>>> feature/Footer
   margin-bottom: 8px;
 }
 
@@ -400,6 +556,7 @@
   letter-spacing: -0.02em;
 }
 
+<<<<<<< HEAD
 .essayCardBody {
   flex: 1;
   padding: 26px 30px 30px;
@@ -418,14 +575,21 @@
   color: var(--muted);
 }
 
+=======
+>>>>>>> feature/Footer
 .metaSep {
   margin: 0 8px;
   color: #b6b0a8;
 }
 
 /* =========================
+<<<<<<< HEAD
    Chips
    ========================= */
+=======
+   Metadata Chips
+========================= */
+>>>>>>> feature/Footer
 
 .metaChipRow {
   display: flex;
@@ -444,6 +608,7 @@
   align-items: center;
 }
 
+<<<<<<< HEAD
 .chipSchool {
   background: #f3f0c9;
   color: #7a7a2f;
@@ -467,6 +632,33 @@
 /* =========================
    Divider
    ========================= */
+=======
+.chipSchool,
+.chipType {
+  background: #f5f4f4;
+  /* background: #e4ced4; */
+  /*color: #605c56;*/
+  color: #577eaa;
+}
+
+.chipRef {
+  background: #f5f4f4;
+  /*background: #e4ced4;*/
+  /*color: #605c56;*/
+  color: #577eaa;
+}
+
+.chipNeutral {
+  /*background: #f5f4f4;*/
+  background: #f5f4f4;
+  color: #577eaa;
+  /*color: #577eaa;*/
+}
+
+/* =========================
+   Resize Divider
+========================= */
+>>>>>>> feature/Footer
 
 .resizeDivider {
   position: relative;
@@ -475,6 +667,10 @@
   display: flex;
   align-items: center;
   justify-content: center;
+<<<<<<< HEAD
+=======
+  -webkit-user-select: none;
+>>>>>>> feature/Footer
   user-select: none;
 }
 
@@ -498,6 +694,10 @@
   gap: 4px;
   color: #5f5a53;
   font-size: 14px;
+<<<<<<< HEAD
+=======
+  -webkit-user-select: none;
+>>>>>>> feature/Footer
   user-select: none;
   transition: all 0.15s ease;
 }
@@ -530,8 +730,13 @@
 }
 
 /* =========================
+<<<<<<< HEAD
    Paragraph interaction
    ========================= */
+=======
+   Paragraph + Annotation
+========================= */
+>>>>>>> feature/Footer
 
 .essayParagraph {
   margin: 0 0 26px 0;
@@ -543,6 +748,16 @@
   gap: 10px;
 }
 
+<<<<<<< HEAD
+=======
+.annotationGroup {
+  display: inline-flex;
+  flex-direction: column;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+>>>>>>> feature/Footer
 .annotationBadge {
   border: none;
   width: 26px;
@@ -555,12 +770,24 @@
   cursor: pointer;
 }
 
+<<<<<<< HEAD
 .essayHighlight {
   display: inline;
   padding: 2px 4px;
   border-radius: 7px;
   cursor: pointer;
   transition: background 0.15s ease, filter 0.15s ease, box-shadow 0.15s ease;
+=======
+.essaySentenceBlock {
+  display: inline;
+}
+
+.inlineSentenceHighlight {
+  border-radius: 6px;
+  padding: 2px 4px;
+  cursor: pointer;
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.04);
+>>>>>>> feature/Footer
 }
 
 .isHovered {
@@ -577,10 +804,13 @@
   transition: 0.15s ease;
 }
 
+<<<<<<< HEAD
 .isLinked {
   box-shadow: inset 0 0 0 1.5px rgba(0, 0, 0, 0.05);
 }
 
+=======
+>>>>>>> feature/Footer
 .variantExpression {
   background: var(--orangeBg);
   color: #9c5a16;
@@ -602,8 +832,13 @@
 }
 
 /* =========================
+<<<<<<< HEAD
    Hover note card
    ========================= */
+=======
+   Hover Note Card
+========================= */
+>>>>>>> feature/Footer
 
 .hoverNoteRail {
   position: absolute;
@@ -611,7 +846,14 @@
   width: 210px;
   opacity: 0;
   transform: translateY(-4px);
+<<<<<<< HEAD
   transition: opacity 0.14s ease, transform 0.14s ease, top 0.14s ease;
+=======
+  transition:
+    opacity 0.14s ease,
+    transform 0.14s ease,
+    top 0.14s ease;
+>>>>>>> feature/Footer
   pointer-events: none;
 }
 
@@ -636,6 +878,25 @@
   background: #e86b2c;
 }
 
+<<<<<<< HEAD
+=======
+.hoverNoteAccent.variantExpression {
+  background: #ef8f2f;
+}
+
+.hoverNoteAccent.variantReflection {
+  background: #4a7ddc;
+}
+
+.hoverNoteAccent.variantEnding {
+  background: #4e9a6e;
+}
+
+.hoverNoteAccent.variantStructure {
+  background: #8a63d2;
+}
+
+>>>>>>> feature/Footer
 .hoverNoteBody {
   padding: 14px 14px 12px;
 }
@@ -682,6 +943,7 @@
   filter: brightness(0.98);
 }
 
+<<<<<<< HEAD
 .essaySentenceBlock {
   display: inline;
 }
@@ -723,6 +985,11 @@
 /* =========================
    Bottom detail panel
    ========================= */
+=======
+/* =========================
+   Bottom Detail Panel
+========================= */
+>>>>>>> feature/Footer
 
 .bottomPanel {
   position: fixed;
@@ -730,6 +997,10 @@
   right: 18px;
   bottom: 18px;
   background: rgba(255, 255, 255, 0.96);
+<<<<<<< HEAD
+=======
+  -webkit-backdrop-filter: blur(10px);
+>>>>>>> feature/Footer
   backdrop-filter: blur(10px);
   border: 1px solid var(--border);
   border-radius: 24px;
@@ -739,6 +1010,10 @@
 }
 
 .bottomPanelOpen {
+<<<<<<< HEAD
+=======
+  display: block;
+>>>>>>> feature/Footer
 }
 
 .bottomPanelHandle {
@@ -805,6 +1080,14 @@
   border: 1px solid var(--border);
   background: #fff;
   color: #666159;
+<<<<<<< HEAD
+=======
+  border-radius: 12px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.18s ease;
+>>>>>>> feature/Footer
 }
 
 .panelIconButton:hover {
@@ -819,13 +1102,44 @@
 }
 
 .panelBlock {
+<<<<<<< HEAD
   padding: 0 22px;
+=======
+  padding: 18px 22px;
+>>>>>>> feature/Footer
 }
 
 .panelBlock + .panelBlock {
   border-left: 1px solid var(--border);
 }
 
+<<<<<<< HEAD
+=======
+.panelUser {
+  background: linear-gradient(
+    180deg,
+    rgba(255, 243, 236, 0.92),
+    rgba(255, 248, 245, 0.92)
+  );
+}
+
+.panelMatch {
+  background: linear-gradient(
+    180deg,
+    rgba(238, 245, 255, 0.92),
+    rgba(245, 249, 255, 0.92)
+  );
+}
+
+.panelSuggestion {
+  background: linear-gradient(
+    180deg,
+    rgba(238, 250, 241, 0.92),
+    rgba(246, 252, 247, 0.92)
+  );
+}
+
+>>>>>>> feature/Footer
 .panelBlockLabel {
   font-size: 12px;
   text-transform: uppercase;
@@ -836,7 +1150,12 @@
 }
 
 .panelQuoteBox {
+<<<<<<< HEAD
   background: #edf2fb;
+=======
+  background: var(--shadow);
+  /*background: #edf2fb;*/
+>>>>>>> feature/Footer
   border-radius: 12px;
   padding: 16px 18px;
   font-size: 15px;
@@ -882,7 +1201,11 @@
 
 /* =========================
    Responsive
+<<<<<<< HEAD
    ========================= */
+=======
+========================= */
+>>>>>>> feature/Footer
 
 @media (max-width: 1280px) {
   .userPanelGrid {
@@ -895,6 +1218,7 @@
 }
 
 @media (max-width: 1200px) {
+<<<<<<< HEAD
   .compareTopbar {
     grid-template-columns: 1fr;
     height: auto;
@@ -908,6 +1232,8 @@
     justify-content: center;
   }
 
+=======
+>>>>>>> feature/Footer
   .bottomPanelGrid {
     grid-template-columns: 1fr;
     gap: 18px;
@@ -916,11 +1242,15 @@
   .panelBlock + .panelBlock {
     border-left: none;
     border-top: 1px solid var(--border);
+<<<<<<< HEAD
     padding-top: 18px;
+=======
+>>>>>>> feature/Footer
   }
 }
 
 @media (max-width: 720px) {
+<<<<<<< HEAD
   .pillGroup {
     flex-wrap: wrap;
     justify-content: center;
@@ -928,12 +1258,23 @@
 
   .topbarRight {
     flex-wrap: wrap;
+=======
+  .compareSplitLayout {
+    grid-template-columns: 1fr !important;
+  }
+
+  .resizeDivider {
+    display: none;
+>>>>>>> feature/Footer
   }
 
   .essayCardBody,
   .userEssayBody {
     font-size: 18px;
+<<<<<<< HEAD
     padding: 18px 20px 20px;
+=======
+>>>>>>> feature/Footer
   }
 
   .essayCardHeader,
@@ -958,4 +1299,8 @@
     flex-direction: column;
     align-items: flex-start;
   }
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> feature/Footer

@@ -2,6 +2,10 @@
   min-height: calc(100vh - 78px);
   background: #f7f7fb;
   padding: 34px 28px 60px;
+<<<<<<< HEAD
+=======
+  animation: pageEnter 500ms ease-out;
+>>>>>>> feature/Footer
 }
 
 .how-wrapper {

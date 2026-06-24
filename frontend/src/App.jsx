@@ -88,6 +88,7 @@ function App() {
               <>
                 <Navbar onOpenSignIn={openSignIn} onLoggedOut={openSignInAfterLogout} />
                 <Editor />
+                <Footer />
               </>
             }
           />

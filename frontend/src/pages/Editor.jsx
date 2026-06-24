@@ -121,6 +121,9 @@ function Editor() {
   const [modalMessage, setModalMessage] = useState("");
   const [emptyStateMessage, setEmptyStateMessage] = useState("");
   const total = 5;
+  const topKProgress = `${((topK - 1) / (total - 1)) * 100}%`;
+  const isSearchReady =
+    essayTypes.length > 0 && (topic.trim() !== "" || draft.trim() !== "");
 
   const toggleEssayType = (value) => {
     setEssayTypes((prev) => {
@@ -272,7 +275,14 @@ function Editor() {
             </p>
           </div>
 
-          <div className="editor-status-pill">Similarity Search Ready</div>
+          <div
+            className={`editor-status-pill ${
+              isSearchReady ? "ready" : "not-ready"
+            }`}
+          >
+            <span className="editor-status-dot" aria-hidden="true" />
+            Similarity Search {isSearchReady ? "Ready" : "Not Ready"}
+          </div>
         </section>
 
         <section className="editor-app">
@@ -309,7 +319,7 @@ function Editor() {
             </div>
 
             <div className="editor-block">
-              <div className="editor-section-label">Top K Results</div>
+              <div className="editor-section-label">Top Results</div>
 
               <div className="topk-card">
                 <div className="topk-head">
@@ -324,6 +334,7 @@ function Editor() {
                   max="5"
                   step="1"
                   value={topK}
+                  style={{ "--topk-progress": topKProgress }}
                   onChange={(e) => setTopK(Number(e.target.value))}
                 />
 
@@ -365,12 +376,17 @@ function Editor() {
               </p>
 
               <div className="editor-actions">
-                <button className="secondary-btn" onClick={handleClear}>
+                <button
+                  type="button"
+                  className="editor-secondary-btn"
+                  onClick={handleClear}
+                >
                   Clear
                 </button>
 
                 <button
-                  className={`primary-btn ${isLoading ? "loading" : ""}`}
+                  type="button"
+                  className={`editor-primary-btn ${isLoading ? "loading" : ""}`}
                   onClick={testEndpoints}
                   disabled={isLoading}
                 >

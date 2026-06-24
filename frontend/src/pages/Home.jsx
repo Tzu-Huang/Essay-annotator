@@ -13,6 +13,7 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 
 import styles from "../styles/home.module.css";
 import { useAuth } from "../hooks/useAuth";
+import HeroMockup from "../components/HeroMockup";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -184,10 +185,7 @@ function Home({ onOpenSignIn }) {
   const typed = useTypewriter(WORDS);
 
   const heroContentRef = useRef(null);
-  const heroPaperRef = useRef(null);
-  const stickyGreenRef = useRef(null);
-  const matchCardRef = useRef(null);
-  const stickyPurpleRef = useRef(null);
+  const heroImageRef = useRef(null);
   const howItWorksRef = useRef(null);
   const stepsRef = useRef([]);
   const compareSectionRef = useRef(null);
@@ -214,37 +212,13 @@ function Home({ onOpenSignIn }) {
         delay: 0.1,
       });
 
-      // Hero visual elements — staggered, each keeps its own rotation
-      gsap.from(heroPaperRef.current, {
+      // Hero image — fades up on load
+      gsap.from(heroImageRef.current, {
         opacity: 0,
         y: 40,
         duration: 0.85,
         ease: "power3.out",
         delay: 0.3,
-      });
-      gsap.from(stickyGreenRef.current, {
-        opacity: 0,
-        x: 24,
-        y: -16,
-        duration: 0.7,
-        ease: "power2.out",
-        delay: 0.55,
-      });
-      gsap.from(matchCardRef.current, {
-        opacity: 0,
-        x: -28,
-        y: 20,
-        duration: 0.75,
-        ease: "power2.out",
-        delay: 0.7,
-      });
-      gsap.from(stickyPurpleRef.current, {
-        opacity: 0,
-        x: 20,
-        y: 16,
-        duration: 0.7,
-        ease: "power2.out",
-        delay: 0.85,
       });
 
       // How it works section — reverses when scrolling back up
@@ -363,76 +337,7 @@ function Home({ onOpenSignIn }) {
           </div>
         </div>
 
-        <div className={styles.heroVisual}>
-          <div className={styles.stickyNoteGreen} ref={stickyGreenRef}>
-            Learn from essays that actually got in.
-          </div>
-
-          <div className={styles.heroPaper} ref={heroPaperRef}>
-            <div className={styles.paperColumn}>
-              <p className={styles.paperMiniTitle}>Your Essay</p>
-              <h3 className={styles.paperMainTitle}>music</h3>
-
-              <div className={styles.pillRow}>
-                <span>0 words</span>
-                <span>User Draft</span>
-              </div>
-
-              <div className={styles.fakeLineShort}></div>
-              <div className={styles.fakeLine}></div>
-              <div className={styles.fakeLine}></div>
-              <div className={styles.fakeLineMedium}></div>
-            </div>
-
-            <div className={styles.paperColumn}>
-              <p className={styles.paperMiniTitle}>Similar Accepted Essays</p>
-              <h3 className={styles.paperMainTitle}>essay_0155</h3>
-
-              <div className={styles.pillRow}>
-                <span>University of California</span>
-                <span>Reference essay</span>
-              </div>
-
-              <p className={styles.paperText}>
-                Born in New York, I have lived abroad most of my life: Shanghai
-                for 8 years and Taiwan making up most of the rest.
-              </p>
-
-              <div className={styles.fakeLine}></div>
-              <div className={styles.fakeLine}></div>
-              <div className={styles.fakeLineMedium}></div>
-            </div>
-          </div>
-
-          <div className={styles.matchCard} ref={matchCardRef}>
-            <div className={styles.matchHeader}>
-              <strong>Top Matches</strong>
-              <span className={styles.matchCount}>3</span>
-            </div>
-
-            <div className={styles.matchItem}>
-              <span className={styles.matchIndex}>1</span>
-              <p>What would you say is your greatest talent...</p>
-              <b className={styles.matchPercent}>49% similar</b>
-            </div>
-
-            <div className={styles.matchItem}>
-              <span className={styles.matchIndex}>2</span>
-              <p>In addition to my major, my academic interests include...</p>
-              <b className={styles.matchPercent}>46% similar</b>
-            </div>
-
-            <div className={styles.matchItem}>
-              <span className={styles.matchIndex}>3</span>
-              <p>Some students have a background, identity, interest...</p>
-              <b className={styles.matchPercent}>44% similar</b>
-            </div>
-          </div>
-
-          <div className={styles.stickyNotePurple} ref={stickyPurpleRef}>
-            See what makes <br /> successful essays <br /> stand out.
-          </div>
-        </div>
+        <HeroMockup ref={heroImageRef} onOpenSignIn={onOpenSignIn} />
       </section>
 
       {/* HOW IT WORKS */}

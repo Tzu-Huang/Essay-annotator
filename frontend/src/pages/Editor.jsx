@@ -178,6 +178,7 @@ function Editor() {
     }
 
     setIsLoading(true);
+    
     setEmptyStateMessage("");
 
     try {

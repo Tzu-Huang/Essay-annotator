@@ -10,7 +10,13 @@ const ESSAY_TYPES = [
   },
   {
     value: "Personal Statement",
-    label: "Personal Statement",
+    label: (
+      <>
+        Personal
+        <br />
+        Statement
+      </>
+    ),
     shortLabel: "PS",
     dotClass: "ps",
   },

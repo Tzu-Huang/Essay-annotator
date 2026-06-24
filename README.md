@@ -1,7 +1,7 @@
 # Essay-Annotator 
 
 <p align="center">
-  <img src='BackEnd/picture/website.png' width = "700">
+  <img src='Editor.png' width = "700">
   
 </p>
 

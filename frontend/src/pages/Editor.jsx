@@ -1,70 +1,55 @@
 import { useState } from "react";
 import "../styles/editor.css";
-//import allIcon from "../assets/essayTypes/all.png";
-import personalIcon from "../assets/essayTypes/personal-statement.png";
-import ucIcon from "../assets/essayTypes/uc.png";
-import supplementalIcon from "../assets/essayTypes/supplemental.png";
 
 const ESSAY_TYPES = [
   {
     value: "all",
     label: "All",
-    icon: "🌍",
-    bg: "#c7e2fb",
+    shortLabel: "ALL",
+    dotClass: "all",
   },
   {
     value: "Personal Statement",
     label: "Personal Statement",
-    icon: personalIcon,
-    bg: "#fbe6ed",
+    shortLabel: "PS",
+    dotClass: "ps",
   },
   {
     value: "University of California",
     label: "UC",
-    icon: ucIcon,
-    bg: "#C5E8FF",
+    shortLabel: "UC",
+    dotClass: "uc",
   },
   {
     value: "Supplemental",
     label: "Supplemental",
-    icon: supplementalIcon,
-    bg: "#fee8ab",
+    shortLabel: "SU",
+    dotClass: "su",
   },
 ];
 
 const TYPE_STYLES = {
   "Personal Statement": {
-    //accentGradient: "linear-gradient(180deg, #efd6e9 0%, #f4a8c7 100%)",
-    accentGradient: "linear-gradient(180deg, #6366f1 0%, #38bdf8 100%)",
-    badgeBg: "#f8e4f3",
-    badgeText: "#a8558f",
+    badgeBg: "#f4efff",
+    badgeText: "#7c3aed",
+    matchText: "#7c3aed",
   },
   "University of California": {
-    //accentGradient: "linear-gradient(180deg, #d1e5f3 0%, #8dcee5 100%)",
-    accentGradient: "linear-gradient(180deg, #6366f1 0%, #38bdf8 100%)",
-    badgeBg: "#e8f4fb",
-    badgeText: "#4b8fb0",
+    badgeBg: "#edf3ff",
+    badgeText: "#4f7cff",
+    matchText: "#4f7cff",
   },
   Supplemental: {
-    //accentGradient: "linear-gradient(180deg, #ffffd6 0%, #f3f040 100%)",
-    accentGradient: "linear-gradient(180deg, #6366f1 0%, #38bdf8 100%)",
-    badgeBg: "#f9f8cf",
-    badgeText: "#8a8613",
+    badgeBg: "#eefcf9",
+    badgeText: "#14b8a6",
+    matchText: "#14b8a6",
   },
 };
 
 const DEFAULT_RESULT_STYLE = {
-  accentGradient: "linear-gradient(180deg, #6366f1 0%, #a1d9f1 100%)",
-  badgeBg: "#eef2ff",
-  badgeText: "#4f46e5",
-};
-
-const RANK_STYLES = {
-  1: { bg: "#fbe89c", text: "#713f12" }, // deeper gold
-  2: { bg: "#ffdbb3", text: "#7c2d12" }, // deeper bronze
-  3: { bg: "#ffd5ed", text: "#701a75" }, // deeper pink
-  4: { bg: "#d0ecfa", text: "#2f288d" }, // deeper violet
-  5: { bg: "#e8e3fd", text: "#5722ac" }, // deeper purple
+  badgeBg: "#edf3ff",
+  badgeText: "#4f7cff",
+  matchText: "#4f7cff",
 };
 
 const NON_ALL_TYPES = [
@@ -77,8 +62,8 @@ function getSimilarityInfo(similarity) {
   if (similarity === null || similarity === undefined || similarity === "") {
     return {
       label: "",
-      bg: "#eef2ff",
-      text: "#4f46e5",
+      bg: "#edf3ff",
+      text: "#4f7cff",
     };
   }
 
@@ -88,8 +73,8 @@ function getSimilarityInfo(similarity) {
   if (Number.isNaN(numeric)) {
     return {
       label: rawLabel,
-      bg: "#eef2ff",
-      text: "#4f46e5",
+      bg: "#edf3ff",
+      text: "#4f7cff",
     };
   }
 
@@ -98,31 +83,31 @@ function getSimilarityInfo(similarity) {
   if (numeric >= 85) {
     return {
       label,
-      bg: "#dcfce7",
-      text: "#15803d",
+      bg: "#eefcf9",
+      text: "#14b8a6",
     };
   }
 
   if (numeric >= 70) {
     return {
       label,
-      bg: "#dbeafe",
-      text: "#1d4ed8",
+      bg: "#edf3ff",
+      text: "#4f7cff",
     };
   }
 
   if (numeric >= 50) {
     return {
       label,
-      bg: "#fef3c7",
-      text: "#b45309",
+      bg: "#fff7ed",
+      text: "#ea580c",
     };
   }
 
   return {
     label,
-    bg: "#fee2e2",
-    text: "#b91c1c",
+    bg: "#fef2f2",
+    text: "#dc2626",
   };
 }
 
@@ -248,6 +233,16 @@ function Editor() {
     setEmptyStateMessage("");
   };
 
+  const openResult = (result) => {
+    const selection = window.getSelection().toString();
+    if (selection || !result) return;
+
+    localStorage.setItem("userDraft", draft);
+    localStorage.setItem("userTopic", topic);
+
+    window.open(`${window.location.origin}/essay/${result.parent_id}`, "_blank");
+  };
+
   return (
     <>
       {modalMessage && (
@@ -264,18 +259,31 @@ function Editor() {
         </div>
       )}
 
-      <div className="editor-container">
-        <div className="editor-main">
-          {/* Input */}
-          <div className="input-panel">
-            <h3>Draft Workspace</h3>
+      <main className="editor-page">
+        <section className="editor-hero">
+          <div>
+            <p className="editor-eyebrow">Writing Workspace</p>
+            <h1 className="editor-hero-title">
+              Find essays that match your idea.
+            </h1>
+            <p className="editor-hero-subtitle">
+              Select your essay type, set how many matches you want, and compare
+              your draft with similar essays from the database.
+            </p>
+          </div>
 
-            <div className="essay-type-inline">
-              <div className="essay-type-inline-label">
+          <div className="editor-status-pill">Similarity Search Ready</div>
+        </section>
+
+        <section className="editor-app">
+          {/* Left setup column */}
+          <aside className="editor-setup-panel">
+            <div className="editor-block">
+              <div className="editor-section-label">
                 Essay Type <span className="required">*</span>
               </div>
 
-              <div className="essay-type-inline-grid">
+              <div className="essay-chip-list">
                 {ESSAY_TYPES.map((type) => {
                   const isSelected = essayTypes.includes(type.value);
 
@@ -283,107 +291,118 @@ function Editor() {
                     <button
                       type="button"
                       key={type.value}
-                      className={`essay-type-chip ${isSelected ? "chip-selected" : ""}`}
+                      className={`essay-chip ${isSelected ? "selected" : ""}`}
                       onClick={() => toggleEssayType(type.value)}
                     >
-                      <div
-                        className="chip-icon"
-                        style={{ background: type.bg }}
-                      >
-                        {typeof type.icon === "string" &&
-                        !type.icon.includes("/") ? (
-                          <span className="chip-emoji">{type.icon}</span>
-                        ) : (
-                          <img
-                            src={type.icon}
-                            alt={type.label}
-                            className="chip-icon-img"
-                          />
-                        )}
-                      </div>
+                      <span className="essay-chip-left">
+                        <span className={`essay-dot ${type.dotClass}`}>
+                          {type.shortLabel}
+                        </span>
+                        <span className="essay-chip-name">{type.label}</span>
+                      </span>
 
-                      <span className="chip-label">{type.label}</span>
-
-                      {isSelected && <span className="chip-check">✓</span>}
+                      {isSelected && <span className="essay-chip-check">✓</span>}
                     </button>
                   );
                 })}
               </div>
             </div>
 
-            <textarea
-              className="text-input"
-              placeholder="Topic"
-              value={topic}
-              onChange={(e) => setTopic(e.target.value)}
-            />
+            <div className="editor-block">
+              <div className="editor-section-label">Top K Results</div>
 
-            <textarea
-              className="text-area"
-              placeholder="Write your essay..."
-              value={draft}
-              onChange={(e) => setDraft(e.target.value)}
-            />
-
-            <div className="btn-row">
-              <button
-                className={`primary-btn ${isLoading ? "loading" : ""}`}
-                onClick={testEndpoints}
-                disabled={isLoading}
-              >
-                {isLoading ? (
-                  <span className="btn-loading">
-                    <span className="spinner" />
-                    Searching...
-                  </span>
-                ) : (
-                  "Generate Matches"
-                )}
-              </button>
-
-              <button className="clear-btn" onClick={handleClear}>
-                Clear
-              </button>
-            </div>
-          </div>
-
-          {/* Output */}
-          <div className="output-panel">
-            <div className="top-bar">
-              <h3 className="top-title">Top Results</h3>
-
-              <div className="slider-box">
-                <div className="slider-header">
-                  <span className="slider-label">Top K Results</span>
-                  <span className="slider-value">{topK}</span>
+              <div className="topk-card">
+                <div className="topk-head">
+                  <span className="topk-title">Show Matches</span>
+                  <span className="topk-value">{topK}</span>
                 </div>
 
-                <div className="slider-wrapper">
-                  <input
-                    className="slider"
-                    type="range"
-                    min="1"
-                    max="5"
-                    step="1"
-                    value={topK}
-                    onChange={(e) => setTopK(Number(e.target.value))}
-                  />
+                <input
+                  className="topk-slider"
+                  type="range"
+                  min="1"
+                  max="5"
+                  step="1"
+                  value={topK}
+                  onChange={(e) => setTopK(Number(e.target.value))}
+                />
 
-                  <div className="slider-ticks">
-                    {[...Array(total)].map((_, i) => (
-                      <span
-                        key={i}
-                        style={{ left: `${(i / (total - 1)) * 100}%` }}
-                      >
-                        {i + 1}
-                      </span>
-                    ))}
-                  </div>
+                <div className="topk-labels">
+                  {[...Array(total)].map((_, i) => (
+                    <span key={i}>{i + 1}</span>
+                  ))}
                 </div>
               </div>
             </div>
+          </aside>
 
-            <div className="output-scroll">
+          {/* Center writing column */}
+          <section className="editor-draft-panel">
+            <div className="editor-field">
+              <label className="editor-field-label">Topic</label>
+              <textarea
+                className="topic-input"
+                placeholder="Topic"
+                value={topic}
+                onChange={(e) => setTopic(e.target.value)}
+              />
+            </div>
+
+            <div className="editor-field editor-field-grow">
+              <label className="editor-field-label">Draft Workspace</label>
+              <textarea
+                className="draft-input"
+                placeholder="Write your essay..."
+                value={draft}
+                onChange={(e) => setDraft(e.target.value)}
+              />
+            </div>
+
+            <div className="editor-action-bar">
+              <p className="editor-action-note">
+                Your topic and draft will be used to search for similar essays.
+                Open a result to compare it with your writing.
+              </p>
+
+              <div className="editor-actions">
+                <button className="secondary-btn" onClick={handleClear}>
+                  Clear
+                </button>
+
+                <button
+                  className={`primary-btn ${isLoading ? "loading" : ""}`}
+                  onClick={testEndpoints}
+                  disabled={isLoading}
+                >
+                  {isLoading ? (
+                    <span className="btn-loading">
+                      <span className="spinner" />
+                      Searching...
+                    </span>
+                  ) : (
+                    "Generate Matches"
+                  )}
+                </button>
+              </div>
+            </div>
+          </section>
+
+          {/* Right results column */}
+          <aside className="editor-results-panel">
+            <div className="results-head">
+              <div>
+                <h2>Similar Essays</h2>
+                <p>
+                  {results.length > 0
+                    ? `${Math.min(topK, results.length)} strong matches found`
+                    : "Results will appear here"}
+                </p>
+              </div>
+
+              <span className="live-pill">Live Preview</span>
+            </div>
+
+            <div className="results-list">
               {emptyStateMessage && (
                 <div className="empty-state-box">
                   <p className="empty-state-title">No results yet</p>
@@ -392,160 +411,87 @@ function Editor() {
               )}
 
               {Array.from({ length: topK }).map((_, i) => {
-                const resultType = results[i]?.type;
+                const result = results[i];
+                const resultType = result?.type;
                 const typeStyle =
                   TYPE_STYLES[resultType] || DEFAULT_RESULT_STYLE;
-                const rankStyle = RANK_STYLES[i + 1] || RANK_STYLES[5];
-                const similarityInfo = getSimilarityInfo(
-                  results[i]?.similarity,
-                );
+                const similarityInfo = getSimilarityInfo(result?.similarity);
 
                 return (
-                  <div
-                    className="result-box result-clickable"
+                  <article
+                    className={`result-card ${result ? "result-clickable" : ""}`}
                     key={i}
-                    style={{
-                      position: "relative",
-                      overflow: "hidden",
-                      borderLeft: "none",
-                    }}
+                    onClick={() => openResult(result)}
                   >
                     <div
-                      style={{
-                        position: "absolute",
-                        left: "0",
-                        top: "0",
-                        bottom: "0",
-                        width: "6px",
-                        borderRadius: "14px 0 0 14px",
-                        background: typeStyle.accentGradient,
-                      }}
-                    />
-
-                    <div className="result-header">
-                      <div className="result-header-left">
-                        <span
-                          className="rank-circle"
-                          style={{
-                            background: rankStyle.bg,
-                            color: rankStyle.text,
-                          }}
-                        >
-                          {i + 1}
-                        </span>
-
-                        <div className="result-title-block">
-                          {/* ✅ Topic（可點 + 可複製） */}
-                          <h4
-                            className="result-topic clickable-text"
-                            onClick={() => {
-                              const selection = window
-                                .getSelection()
-                                .toString();
-                              if (selection) return;
-
-                              if (!results[i]) return;
-
-                              localStorage.setItem("userDraft", draft);
-                              localStorage.setItem("userTopic", topic);
-
-                              window.open(
-                                `${window.location.origin}/essay/${results[i].parent_id}`,
-                                "_blank",
-                              );
-                            }}
-                          >
-                            {results[i]?.topic || "Topic"}
-                          </h4>
-
-                          {/* school + type */}
-                          <div className="meta-badges">
-                            {results[i]?.school &&
-                              results[i].school.toLowerCase() !== "none" && (
-                                <span
-                                  className="meta-badge"
-                                  style={{
-                                    background: typeStyle.badgeBg,
-                                    color: typeStyle.badgeText,
-                                  }}
-                                >
-                                  {results[i].school}
-                                </span>
-                              )}
-
-                            {results[i]?.type &&
-                              results[i].type.toLowerCase() !== "none" && (
-                                <span
-                                  className="meta-badge"
-                                  style={{
-                                    background: typeStyle.badgeBg,
-                                    color: typeStyle.badgeText,
-                                  }}
-                                >
-                                  {results[i].type}
-                                </span>
-                              )}
-                          </div>
-                        </div>
-                      </div>
-
-                      {/* score */}
-                      <div
-                        className="school-badge"
-                        style={{
-                          background: similarityInfo.bg,
-                          color: similarityInfo.text,
-                        }}
-                      >
-                        {similarityInfo.label}
-                      </div>
+                      className="result-match"
+                      style={{ color: typeStyle.matchText }}
+                    >
+                      {similarityInfo.label || `Match ${i + 1}`}
                     </div>
 
-                    <div className="result-preview">
-                      {results[i] ? (
-                        <>
-                          <pre>{results[i].content_preview}</pre>
+                    <h3 className="result-topic">
+                      {result?.topic || "Result will appear here"}
+                    </h3>
 
-                          {/* ✅ Read more */}
+                    <div className="result-meta">
+                      {result?.school &&
+                        result.school.toLowerCase() !== "none" && (
                           <span
-                            className="read-more clickable-text"
-                            style={{ color: "#6b7280" }}
-                            onClick={() => {
-                              const selection = window
-                                .getSelection()
-                                .toString();
-                              if (selection) return;
-
-                              if (!results[i]) return;
-
-                              localStorage.setItem("userDraft", draft);
-                              localStorage.setItem("userTopic", topic);
-
-                              window.open(
-                                `${window.location.origin}/essay/${results[i].parent_id}`,
-                                "_blank",
-                              );
+                            className="meta-chip"
+                            style={{
+                              background: typeStyle.badgeBg,
+                              color: typeStyle.badgeText,
                             }}
                           >
-                            Read more →
+                            {result.school}
                           </span>
-                        </>
-                      ) : (
-                        <span className="placeholder-text">
-                          Result will appear here
+                        )}
+
+                      {result?.type && result.type.toLowerCase() !== "none" && (
+                        <span
+                          className="meta-chip"
+                          style={{
+                            background: typeStyle.badgeBg,
+                            color: typeStyle.badgeText,
+                          }}
+                        >
+                          {result.type}
                         </span>
                       )}
                     </div>
-                  </div>
+
+                    <div className="result-preview">
+                      {result ? (
+                        <p>{result.content_preview}</p>
+                      ) : (
+                        <p className="placeholder-text">
+                          Generate matches to see a similar essay preview.
+                        </p>
+                      )}
+                    </div>
+
+                    {result && (
+                      <button
+                        type="button"
+                        className="read-more"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          openResult(result);
+                        }}
+                      >
+                        Read Essay →
+                      </button>
+                    )}
+                  </article>
                 );
               })}
             </div>
-          </div>
-        </div>
-      </div>
+          </aside>
+        </section>
+      </main>
     </>
   );
 }
 
 export default Editor;
-

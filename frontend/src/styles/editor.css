@@ -182,7 +182,7 @@ body {
     minmax(210px, 18%)
     minmax(0, 54%)
     minmax(280px, 28%);
-  height: clamp(640px, calc(100vh - 190px), 860px);
+  height: clamp(720px, calc(100vh - 130px), 960px);
   border: 1px solid var(--editor-border);
   border-radius: 24px;
   overflow: hidden;
@@ -483,7 +483,7 @@ body {
 .draft-input {
   flex: 1 1 auto;
   height: 100%;
-  min-height: clamp(260px, 38vh, 500px);
+  min-height: clamp(380px, 50vh, 620px);
   resize: none;
   border-radius: 20px;
   padding: 24px 26px;
@@ -704,6 +704,25 @@ body {
   font-weight: 800;
 }
 
+.result-topic-toggle {
+  display: inline;
+  border: none;
+  background: transparent;
+  padding: 0;
+  color: var(--editor-text);
+  font-family: inherit;
+  font-size: 15px;
+  font-weight: inherit;
+  letter-spacing: inherit;
+  text-transform: none;
+  cursor: pointer;
+}
+
+.result-topic-toggle:hover {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
 .result-meta {
   display: flex;
   flex-wrap: wrap;
@@ -798,7 +817,7 @@ body {
 @media (max-width: 1200px) {
   .editor-app {
     height: auto;
-    min-height: clamp(640px, calc(100vh - 190px), 860px);
+    min-height: clamp(720px, calc(100vh - 130px), 960px);
     grid-template-columns: minmax(210px, 28%) minmax(0, 72%);
   }
 

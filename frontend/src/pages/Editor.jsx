@@ -64,6 +64,10 @@ const NON_ALL_TYPES = [
   "Supplemental",
 ];
 
+function countWords(text) {
+  return (text || "").trim().split(/\s+/).filter(Boolean).length;
+}
+
 function getSimilarityInfo(similarity) {
   if (similarity === null || similarity === undefined || similarity === "") {
     return {
@@ -128,6 +132,7 @@ function Editor() {
   const [emptyStateMessage, setEmptyStateMessage] = useState("");
   const total = 5;
   const topKProgress = `${((topK - 1) / (total - 1)) * 100}%`;
+  const draftWordCount = countWords(draft);
   const isSearchReady =
     essayTypes.length > 0 && (topic.trim() !== "" || draft.trim() !== "");
 
@@ -373,6 +378,10 @@ function Editor() {
                 value={draft}
                 onChange={(e) => setDraft(e.target.value)}
               />
+
+              <div className="editor-input-footer" aria-live="polite">
+                <span>{draftWordCount} words</span>
+              </div>
             </div>
 
             <div className="editor-action-bar">

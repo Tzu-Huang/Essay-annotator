@@ -18,6 +18,7 @@ import EssayPage from "./pages/EssayPage";
 import ComparePage from "./pages/ComparePage";
 import FAQsPage from "./pages/FAQsPage";
 import HowItWorks from "./pages/HowItWorks";
+import NotFound from "./pages/NotFound";
 
 import "./styles/global.css";
 import "./styles/components.css";
@@ -122,6 +123,17 @@ function App() {
               <>
                 <Navbar onOpenSignIn={openSignIn} onLoggedOut={openSignInAfterLogout} />
                 <HowItWorks />
+              </>
+            }
+          />
+
+          <Route
+            path="*"
+            element={
+              <>
+                <Navbar onOpenSignIn={openSignIn} onLoggedOut={openSignInAfterLogout} />
+                <NotFound />
+                <Footer />
               </>
             }
           />

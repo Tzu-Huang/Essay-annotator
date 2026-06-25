@@ -1,6 +1,6 @@
 .essayPage {
   min-height: 100vh;
-  background: #eeeeed;
+  background: #eff0f0;
   color: #151936;
   font-family: Inter, system-ui, sans-serif;
 }
@@ -153,7 +153,7 @@
   border-radius: 22px;
 
   Opacity: 0.95;
-  background: #b6b8b964;
+  background: #e0e5ebef;
 
   border: 1px solid rgba(1, 1, 1, 0);
 

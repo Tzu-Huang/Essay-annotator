@@ -10,7 +10,13 @@ const ESSAY_TYPES = [
   },
   {
     value: "Personal Statement",
-    label: "Personal Statement",
+    label: (
+      <>
+        Personal
+        <br />
+        Statement
+      </>
+    ),
     shortLabel: "PS",
     dotClass: "ps",
   },
@@ -57,6 +63,17 @@ const NON_ALL_TYPES = [
   "University of California",
   "Supplemental",
 ];
+
+const RESULT_TOPIC_PREVIEW_LIMIT = 120;
+
+function countWords(text) {
+  return (text || "").trim().split(/\s+/).filter(Boolean).length;
+}
+
+function getPreviewText(text, limit) {
+  if (!text || text.length <= limit) return text;
+  return `${text.slice(0, limit).trimEnd()}...`;
+}
 
 function getSimilarityInfo(similarity) {
   if (similarity === null || similarity === undefined || similarity === "") {
@@ -120,8 +137,10 @@ function Editor() {
   const [isLoading, setIsLoading] = useState(false);
   const [modalMessage, setModalMessage] = useState("");
   const [emptyStateMessage, setEmptyStateMessage] = useState("");
+  const [expandedResultTopics, setExpandedResultTopics] = useState({});
   const total = 5;
   const topKProgress = `${((topK - 1) / (total - 1)) * 100}%`;
+  const draftWordCount = countWords(draft);
   const isSearchReady =
     essayTypes.length > 0 && (topic.trim() !== "" || draft.trim() !== "");
 
@@ -168,6 +187,7 @@ function Editor() {
 
     setIsLoading(true);
     setEmptyStateMessage("");
+    setExpandedResultTopics({});
 
     try {
       console.log(
@@ -234,6 +254,14 @@ function Editor() {
     setTopK(3);
     setResults([]);
     setEmptyStateMessage("");
+    setExpandedResultTopics({});
+  };
+
+  const toggleResultTopic = (key) => {
+    setExpandedResultTopics((prev) => ({
+      ...prev,
+      [key]: !prev[key],
+    }));
   };
 
   const openResult = (result) => {
@@ -367,6 +395,10 @@ function Editor() {
                 value={draft}
                 onChange={(e) => setDraft(e.target.value)}
               />
+
+              <div className="editor-input-footer" aria-live="polite">
+                <span>{draftWordCount} words</span>
+              </div>
             </div>
 
             <div className="editor-action-bar">
@@ -432,6 +464,15 @@ function Editor() {
                 const typeStyle =
                   TYPE_STYLES[resultType] || DEFAULT_RESULT_STYLE;
                 const similarityInfo = getSimilarityInfo(result?.similarity);
+                const resultKey = result?.parent_id ?? result?.id ?? i;
+                const topicText = result?.topic || "Result will appear here";
+                const isLongTopic =
+                  result && topicText.length > RESULT_TOPIC_PREVIEW_LIMIT;
+                const isTopicExpanded = Boolean(expandedResultTopics[resultKey]);
+                const displayedTopic =
+                  isLongTopic && !isTopicExpanded
+                    ? getPreviewText(topicText, RESULT_TOPIC_PREVIEW_LIMIT)
+                    : topicText;
 
                 return (
                   <article
@@ -447,7 +488,22 @@ function Editor() {
                     </div>
 
                     <h3 className="result-topic">
-                      {result?.topic || "Result will appear here"}
+                      {displayedTopic}
+                      {isLongTopic && (
+                        <>
+                          {" "}
+                          <button
+                            type="button"
+                            className="result-topic-toggle"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              toggleResultTopic(resultKey);
+                            }}
+                          >
+                            {isTopicExpanded ? "Show less" : "Show more"}
+                          </button>
+                        </>
+                      )}
                     </h3>
 
                     <div className="result-meta">

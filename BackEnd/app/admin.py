@@ -1,5 +1,6 @@
 import json
 import os
+import urllib.error
 import urllib.parse
 import urllib.request
 from datetime import datetime, timedelta, timezone
@@ -94,7 +95,10 @@ def _integration_status() -> dict:
     return {
         "postgres": {"configured": bool(os.getenv("POSTGRES_URL"))},
         "openai_api": {"configured": bool(os.getenv("OPENAI_API_KEY"))},
-        "openai_usage": {"configured": bool(os.getenv("OPENAI_ADMIN_API_KEY") or os.getenv("OPENAI_API_KEY"))},
+        "openai_usage": {
+            "configured": bool(os.getenv("OPENAI_ADMIN_API_KEY")),
+            "requires": "OPENAI_ADMIN_API_KEY",
+        },
         "cloudwatch": {
             "configured": bool(os.getenv("AWS_REGION") and os.getenv("AWS_CLOUDWATCH_LOG_GROUP")),
             "region": os.getenv("AWS_REGION") or None,
@@ -349,9 +353,13 @@ def openai_usage(
 
 
 def _fetch_openai_costs(start: datetime, end: datetime) -> dict:
-    api_key = os.getenv("OPENAI_ADMIN_API_KEY") or os.getenv("OPENAI_API_KEY")
+    api_key = os.getenv("OPENAI_ADMIN_API_KEY")
     if not api_key:
-        return {"configured": False, "error": "OpenAI usage credentials are not configured", "source": "official_openai"}
+        return {
+            "configured": False,
+            "error": "OPENAI_ADMIN_API_KEY is required for official organization cost data. OPENAI_API_KEY is still used for normal model calls, but it cannot read billing costs.",
+            "source": "official_openai",
+        }
 
     params = urllib.parse.urlencode(
         {
@@ -367,6 +375,16 @@ def _fetch_openai_costs(start: datetime, end: datetime) -> dict:
     try:
         with urllib.request.urlopen(request, timeout=10) as response:
             return {"configured": True, "source": "official_openai", "data": json.loads(response.read().decode("utf-8"))}
+    except urllib.error.HTTPError as exc:
+        body = exc.read().decode("utf-8", errors="replace")
+        if exc.code == 403:
+            error = (
+                "OpenAI returned 403 for organization costs. Use an admin/organization key with billing or usage read permission "
+                "as OPENAI_ADMIN_API_KEY; a normal project API key cannot read this endpoint."
+            )
+        else:
+            error = f"OpenAI costs request failed with HTTP {exc.code}: {body}"
+        return {"configured": True, "source": "official_openai", "error": error, "status": exc.code}
     except Exception as exc:
         return {"configured": True, "source": "official_openai", "error": str(exc)}
 

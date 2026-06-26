@@ -19,6 +19,7 @@ import ComparePage from "./pages/ComparePage";
 import FAQsPage from "./pages/FAQsPage";
 import HowItWorks from "./pages/HowItWorks";
 import NotFound from "./pages/NotFound";
+import AdminConsole from "./pages/AdminConsole";
 
 import "./styles/global.css";
 import "./styles/components.css";
@@ -125,6 +126,11 @@ function App() {
                 <HowItWorks />
               </>
             }
+          />
+
+          <Route
+            path="/admin"
+            element={<AdminConsole />}
           />
 
           <Route

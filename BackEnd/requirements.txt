@@ -1,0 +1,11 @@
+fastapi
+uvicorn[standard]
+sqlalchemy
+psycopg2-binary
+python-dotenv
+openai
+numpy
+tiktoken
+pydantic
+boto3
+requests

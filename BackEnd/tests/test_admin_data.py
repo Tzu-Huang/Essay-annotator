@@ -11,6 +11,7 @@ from app.admin import (
     AdminActor,
     EssayCreate,
     EssayUpdate,
+    _fetch_openai_costs,
     _infer_severity,
     _integration_status,
     cloudwatch_logs,
@@ -102,8 +103,18 @@ class AdminDataTests(unittest.TestCase):
         encoded = json.dumps(status)
 
         self.assertIn("openai_api", status)
+        self.assertFalse(status["openai_usage"]["configured"])
         self.assertNotIn("sk-secret", encoded)
         self.assertNotIn("password", encoded)
+
+    def test_openai_costs_requires_admin_key(self):
+        os.environ["OPENAI_API_KEY"] = "sk-project-key"
+        os.environ.pop("OPENAI_ADMIN_API_KEY", None)
+
+        response = _fetch_openai_costs(utcnow(), utcnow())
+
+        self.assertFalse(response["configured"])
+        self.assertIn("OPENAI_ADMIN_API_KEY", response["error"])
 
     def test_audit_log_records_before_after(self):
         audit_log(

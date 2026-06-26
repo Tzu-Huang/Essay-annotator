@@ -45,6 +45,7 @@ openspec/
 template/
 .claude
 node_modules
+docs/developer-admin-console.md
 
 # ---------------------------------------------------------
 # VS Code settings (optional)

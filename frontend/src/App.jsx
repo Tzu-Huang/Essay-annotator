@@ -17,7 +17,6 @@ import Editor from "./pages/Editor";
 import EssayPage from "./pages/EssayPage";
 import ComparePage from "./pages/ComparePage";
 import FAQsPage from "./pages/FAQsPage";
-import HowItWorks from "./pages/HowItWorks";
 import NotFound from "./pages/NotFound";
 import AdminConsole from "./pages/AdminConsole";
 
@@ -115,17 +114,6 @@ function App() {
                 <Footer />
               </>
             } 
-          />
-
-          {/* How it works page 不加 Navbar / Footer */}
-          <Route
-            path="/how-it-works"
-            element={
-              <>
-                <Navbar onOpenSignIn={openSignIn} onLoggedOut={openSignInAfterLogout} />
-                <HowItWorks />
-              </>
-            }
           />
 
           <Route

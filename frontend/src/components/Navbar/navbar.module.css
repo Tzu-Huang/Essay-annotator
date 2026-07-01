@@ -1,3 +1,5 @@
+@import url("https://fonts.googleapis.com/css2?family=Changa:wght@600;700;800&display=swap");
+
 .navbarShell {
   width: 100%;
   box-sizing: border-box;
@@ -14,8 +16,13 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 32px;
+  gap: 24px;
   position: relative;
+  overflow: visible;
+}
+
+.navbarLinks {
+  flex-wrap: nowrap;
 }
 
 .navbarLeft {
@@ -42,13 +49,29 @@
 
 .logo a {
   display: flex;
+  flex-direction: column;
   align-items: center;
+  gap: 0px;
+  text-decoration: none;
 }
 
 .logoImg {
-  height: 56px;
+  height: 36px;
+  margin-left: -12px;
   width: auto;
   display: block;
+}
+
+.logoText {
+  font-family: "Changa", sans-serif;
+  font-size: 9.5px;
+  font-weight: 600;
+  color: #385dc2;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  margin-top: 4px;
+  line-height: 1;
 }
 
 /* right links */
@@ -63,9 +86,11 @@
   display: inline-flex;
   align-items: center;
   text-decoration: none;
-  color: #2f2f3d;
-  font-size: 14px;
-  font-weight: 600;
+  color: #32353a;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
   padding: 9px 12px;
   border-radius: 12px;
   transition:
@@ -74,9 +99,41 @@
     transform 0.2s ease;
 }
 
+.navLinkPill {
+  padding: 3px 0;
+  border: none;
+  background: none;
+  border-radius: 0;
+}
+
+.navLinkPill:hover {
+  transform: none;
+}
+
+.navLinkGit {
+  margin: 3px;
+  padding: 0 15px;
+  height: 35px;
+  min-width: 65px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  border-radius: 10px;
+  border: 2px solid #111111;
+}
+
+.githubIcon {
+  display: none;
+  flex-shrink: 0;
+}
+
+.githubText {
+  display: inline;
+}
+
 .navLink:hover {
-  color: #444647;
-  /* background: #f3f4f6; */
+  color: #1a1a22;
   transform: translateY(-1px);
 }
 
@@ -93,6 +150,12 @@
   height: 22px;
   background: #eadfce;
   margin: 0 2px;
+}
+
+.navDividerLeft {
+  height: 28px;
+  background: rgba(47, 47, 61, 0.13);
+  margin: 0 12px;
 }
 
 /* sign in */
@@ -114,9 +177,11 @@
   background: #2f2f3d;
   color: #fafafb;
   text-decoration: none;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
   font-size: 13px;
   font-weight: 700;
-  box-shadow: 0 5px 10px rgba(17, 24, 39, 0.1);
+  box-shadow: 0 5px 8px rgba(17, 24, 39, 0.1);
   cursor: pointer;
   transition:
     background 0.16s ease,
@@ -451,72 +516,50 @@
 
 /* responsive */
 @media (max-width: 1200px) {
-  .navbarLeft {
-    gap: 16px;
-  }
+  .navbarLeft { gap: 14px; }
+  .navbarLinks { gap: 12px; }
+  .navbar { gap: 20px; }
 }
 
-@media (max-width: 1100px) {
-  .navbarShell {
-    padding: 0 18px;
-  }
-
-  .navbar {
-    height: auto;
-    min-height: 82px;
-    display: grid;
-    grid-template-columns: auto 1fr;
-    gap: 10px;
-    padding: 12px 0;
-  }
-
-  .navbarLeft,
-  .navbarRight {
-    width: auto;
-    margin: 0;
-  }
-
-  .navbarLeft {
-    justify-content: flex-start;
-  }
-
-  .navbarRight {
-    justify-content: flex-end;
-  }
-
-  .navbarLinks {
-    flex-wrap: wrap;
-    justify-content: center;
-  }
+/* ≤ 900px: hide HOW IT WORKS pill + divider, tighten gaps */
+@media (max-width: 900px) {
+  .navbarShell { padding: 0 20px; }
+  .navbarLeft { gap: 10px; }
+  .navbarLinks { gap: 10px; }
+  .navbar { gap: 12px; }
+  .navDividerLeft { display: none; }
+  .navLinkPill { display: none; }
 }
 
+/* ≤ 700px: collapse GitHub to icon only, shrink sign-in */
 @media (max-width: 700px) {
-  .navbarShell {
-    padding: 0 14px;
-  }
-
-  .logoImg {
-    height: 38px;
-  }
-
-  .navbarLeft {
-    gap: 12px;
-  }
-
+  .navbarShell { padding: 0 14px; }
+  .navbar { gap: 8px; }
+  .navbarLeft { gap: 8px; }
+  .navbarLinks { gap: 8px; }
+  .navDivider { display: none; }
   .signInBtn {
-    height: 36px;
-    min-width: 94px;
-    font-size: 12px;
-    padding: 0 12px;
+    min-width: 78px;
+    height: 32px;
+    padding: 0 10px;
+    font-size: 10px;
   }
+  .navLinkGit {
+    min-width: 0;
+    padding: 0 10px;
+    border-radius: 8px;
+    border-color: transparent;
+  }
+  .githubIcon { display: block; }
+  .githubText { display: none; }
+}
 
-  .navLink {
-    font-size: 12px;
-  }
-
-  .navDivider {
-    display: none;
-  }
+/* ≤ 480px: hide logo text label, tightest layout */
+@media (max-width: 480px) {
+  .navbarShell { padding: 0 12px; }
+  .logoText { display: none; }
+  .logoImg { height: 32px; margin-top: 0; }
+  .navLink { padding: 6px 8px; }
 }
 
 @keyframes navItemIn {
@@ -538,11 +581,5 @@
   to {
     opacity: 1;
     transform: translateX(50%) scale(1) translateY(0);
-  }
-}
-
-@media (max-width: 560px) {
-  .navbarLinks {
-    gap: 10px;
   }
 }

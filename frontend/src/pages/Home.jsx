@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { FileCheck, Sparkles } from "lucide-react";
+import { Bot, FileCheck } from "lucide-react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 
@@ -210,7 +210,13 @@ function Home({ onOpenSignIn }) {
   const analysisDemoRef = useRef(null);
   const featuredRef = useRef(null);
   const differenceSectionRef = useRef(null);
+  const differenceCompareRef = useRef(null);
+  const [differenceInView, setDifferenceInView] = useState(false);
   const ctaSectionRef = useRef(null);
+  const ctaTitleRef = useRef(null);
+  const ctaTextRef = useRef(null);
+  const ctaStatsRef = useRef(null);
+  const ctaBtnRef = useRef(null);
 
 
   useEffect(() => {
@@ -287,21 +293,71 @@ function Home({ onOpenSignIn }) {
         },
       });
 
-      // CTA
-      gsap.from(ctaSectionRef.current, {
-        opacity: 0,
-        y: 28,
-        duration: 0.75,
-        ease: "power2.out",
+      // CTA — staggered entrance for title, copy, and button
+      const ctaTl = gsap.timeline({
         scrollTrigger: {
           trigger: ctaSectionRef.current,
-          start: "top 86%",
+          start: "top 80%",
           toggleActions: "play reverse play reverse",
         },
       });
+      ctaTl
+        .from(ctaTitleRef.current, {
+          opacity: 0,
+          y: 34,
+          duration: 0.7,
+          ease: "power3.out",
+        })
+        .from(
+          ctaTextRef.current,
+          { opacity: 0, y: 20, duration: 0.6, ease: "power2.out" },
+          0.18
+        )
+        .from(
+          ctaStatsRef.current
+            ? ctaStatsRef.current.children
+            : [],
+          {
+            opacity: 0,
+            y: 14,
+            duration: 0.5,
+            ease: "power2.out",
+            stagger: 0.08,
+          },
+          0.3
+        )
+        .from(
+          ctaBtnRef.current,
+          {
+            opacity: 0,
+            y: 16,
+            scale: 0.88,
+            duration: 0.55,
+            ease: "back.out(1.7)",
+          },
+          0.5
+        );
     });
 
     return () => ctx.revert();
+  }, []);
+
+  useEffect(() => {
+    const el = differenceCompareRef.current;
+    if (!el) return;
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            setDifferenceInView(true);
+            observer.disconnect();
+          }
+        });
+      },
+      { threshold: 0.35 }
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
   }, []);
 
   useEffect(() => {
@@ -981,43 +1037,94 @@ function Home({ onOpenSignIn }) {
 
       {/* WHY DIFFERENT */}
       <section className={styles.differenceSection} ref={differenceSectionRef}>
-        <div className={styles.differenceTitle}>
+        <div className={styles.differenceHeader}>
+          <span className={styles.differenceEyebrow}>The Difference</span>
           <h2 className={styles.sectionTitleSmall}>
-            Why Essay Annotator <br />
-            Is Different
+            Why Essay Annotator Is Different ? 
           </h2>
         </div>
 
-        <div className={styles.differenceCompareWrap}>
-          <div className={styles.differenceCardBad}>
+        <div
+          className={`${styles.differenceCompareWrap} ${
+            differenceInView ? styles.spInView : ""
+          }`}
+          ref={differenceCompareRef}
+        >
+          <div className={`${styles.spCard} ${styles.spCardBad}`}>
+            <span className={styles.spCardLabel}>The Old Way</span>
+
             <div className={styles.iconBadgeMuted}>
-              <Sparkles size={26} />
+              <Bot size={26} />
             </div>
 
             <h3>Generic AI Advice</h3>
 
             <ul>
-              <li>Vague, one-size-fits-all tips</li>
-              <li>Not based on real admissions outcomes</li>
-              <li>Doesn&apos;t show proven examples</li>
-              <li>Hard to know what actually works</li>
+              <li>
+                <span className={styles.spBullet}>×</span>
+                <span className={styles.spTxt}>Vague, one-size-fits-all tips</span>
+              </li>
+              <li>
+                <span className={styles.spBullet}>×</span>
+                <span className={styles.spTxt}>
+                  Not based on real admissions outcomes
+                </span>
+              </li>
+              <li>
+                <span className={styles.spBullet}>×</span>
+                <span className={styles.spTxt}>
+                  Doesn&apos;t show proven examples
+                </span>
+              </li>
+              <li>
+                <span className={styles.spBullet}>×</span>
+                <span className={styles.spTxt}>
+                  Hard to know what actually works
+                </span>
+              </li>
             </ul>
           </div>
 
-          <div className={styles.vsCircleSmall}>VS.</div>
+          <div className={styles.spVs} aria-hidden="true">
+            VS
+          </div>
 
-          <div className={styles.differenceCardGood}>
+          <div className={`${styles.spCard} ${styles.spCardGood}`}>
+            <span className={styles.spCardLabel}>
+              The Essay Annotator Way
+            </span>
+
             <div className={styles.iconBadgeGreen}>
               <FileCheck size={26} />
             </div>
 
-            <h3>Learning From Real Accepted Essays</h3>
+            <h3>Learn From <br></br>Real Accepted Essays</h3>
 
             <ul>
-              <li>Based on essays that got students in</li>
-              <li>See real responses to real prompts</li>
-              <li>Discover what makes essays effective</li>
-              <li>Learn and strengthen your unique voice</li>
+              <li>
+                <span className={styles.spBullet}>✓</span>
+                <span className={styles.spTxt}>
+                  Based on essays that got students in
+                </span>
+              </li>
+              <li>
+                <span className={styles.spBullet}>✓</span>
+                <span className={styles.spTxt}>
+                  See real responses to real prompts
+                </span>
+              </li>
+              <li>
+                <span className={styles.spBullet}>✓</span>
+                <span className={styles.spTxt}>
+                  Discover what makes essays effective
+                </span>
+              </li>
+              <li>
+                <span className={styles.spBullet}>✓</span>
+                <span className={styles.spTxt}>
+                  Learn and strengthen your unique voice
+                </span>
+              </li>
             </ul>
           </div>
         </div>
@@ -1027,17 +1134,37 @@ function Home({ onOpenSignIn }) {
       <section className={styles.ctaSection} ref={ctaSectionRef}>
         <div className={styles.bottomPaperDecorLeft}></div>
 
-        <h2 className={styles.ctaTitle}>Ready to improve your essay?</h2>
+        <h2 className={styles.ctaTitle} ref={ctaTitleRef}>
+          Ready to improve your essay?
+        </h2>
 
-        <p>
+        <p ref={ctaTextRef}>
           Access a curated database of 200+ real essays accepted into Harvard,
           MIT, Stanford, and other top universities.
         </p>
 
+        <div className={styles.ctaStats} ref={ctaStatsRef}>
+          <div className={styles.ctaStat}>
+            <span className={styles.ctaStatNum}>200+</span>
+            <span className={styles.ctaStatLabel}>Accepted essays</span>
+          </div>
+          <span className={styles.ctaStatDivider} aria-hidden="true" />
+          <div className={styles.ctaStat}>
+            <span className={styles.ctaStatNum}>6</span>
+            <span className={styles.ctaStatLabel}>Top universities</span>
+          </div>
+          <span className={styles.ctaStatDivider} aria-hidden="true" />
+          <div className={styles.ctaStat}>
+            <span className={styles.ctaStatNum}>Free</span>
+            <span className={styles.ctaStatLabel}>To get started</span>
+          </div>
+        </div>
+
         <button
           type="button"
-          className={styles.primaryBtn}
+          className={`${styles.primaryBtn} ${styles.ctaPrimaryBtn}`}
           onClick={handleStartWriting}
+          ref={ctaBtnRef}
         >
           <span>Start Writing</span>
         </button>

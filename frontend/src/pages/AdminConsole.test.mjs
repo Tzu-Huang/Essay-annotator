@@ -30,6 +30,7 @@ test("admin console has the project admin allowlist and AWS API fallback", () =>
     "zackeryliu98@gmail.com",
     "zackery032895@gmail.com",
     "tzuhuangliu@gmail.com",
+    "amanda.tsai11@gmail.com",
   ]);
   assert.match(source, /http:\/\/44\.201\.62\.0:8000/);
   assert.match(source, /FALLBACK_ADMIN_EMAILS/);

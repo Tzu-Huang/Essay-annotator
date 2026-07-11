@@ -161,7 +161,7 @@
   align-items: center;
   justify-content: center;
   color: #577eaa;
-  transition: transform 0.18s ease;
+  transition: transform 0.12s ease;
 }
 
 .sectionHeader[aria-expanded="true"] .toggleIcon,
@@ -175,8 +175,8 @@
   opacity: 1;
   background: #ffffff;
   transition:
-    max-height 0.28s ease,
-    opacity 0.22s ease;
+    max-height 0.18s ease,
+    opacity 0.14s ease;
 }
 
 .questionsPanel.open {
@@ -206,8 +206,8 @@
   text-align: left;
   cursor: pointer;
   transition:
-    background 0.16s ease,
-    color 0.16s ease;
+    background 0.12s ease,
+    color 0.12s ease;
 }
 
 .question:hover {
@@ -215,7 +215,7 @@
 }
 
 .featured {
-  background: #edf4ff;
+  background: #f8fbff;
   color: #245f9f;
 }
 
@@ -225,8 +225,8 @@
   opacity: 0;
   background: #ffffff;
   transition:
-    max-height 0.24s ease,
-    opacity 0.18s ease;
+    max-height 0.14s ease,
+    opacity 0.1s ease;
 }
 
 .answerOpen {

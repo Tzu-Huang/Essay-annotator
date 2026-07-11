@@ -101,7 +101,9 @@ const faqSections = [
 ];
 
 export default function FAQPage() {
-  const [openQuestion, setOpenQuestion] = useState(0);
+  const [openQuestions, setOpenQuestions] = useState(
+    () => new Set([`${faqSections[0].title}-${faqSections[0].questions[0].question}`]),
+  );
   const [query, setQuery] = useState("");
 
   const normalizedQuery = query.trim().toLowerCase();
@@ -147,7 +149,7 @@ export default function FAQPage() {
           </p>
 
           <div className={styles.card}>
-            {visibleSections.map((section, sectionIndex) => (
+            {visibleSections.map((section) => (
               <div key={section.title} className={styles.section}>
                 <div className={styles.sectionHeader}>
                   <span className={styles.sectionTitle}>{section.title}</span>
@@ -157,42 +159,49 @@ export default function FAQPage() {
                 </div>
 
                 <div className={`${styles.questionsPanel} ${styles.open}`}>
-                  {section.questions.map((item, questionIndex) => (
-                    <div key={item.question} className={styles.questionBlock}>
-                      <button
-                        className={`${styles.question} ${
-                          openQuestion === `${sectionIndex}-${questionIndex}`
-                            ? styles.featured
-                            : ""
-                        }`}
-                        onClick={() =>
-                          setOpenQuestion(
-                            openQuestion === `${sectionIndex}-${questionIndex}`
-                              ? null
-                              : `${sectionIndex}-${questionIndex}`,
-                          )
-                        }
-                        aria-expanded={
-                          openQuestion === `${sectionIndex}-${questionIndex}`
-                        }
-                      >
-                        <span>{item.question}</span>
-                        <span>
-                          <ChevronDown aria-hidden="true" size={18} />
-                        </span>
-                      </button>
+                  {section.questions.map((item) => {
+                    const questionId = `${section.title}-${item.question}`;
+                    const isOpen = openQuestions.has(questionId);
 
-                      <div
-                        className={`${styles.answer} ${
-                          openQuestion === `${sectionIndex}-${questionIndex}`
-                            ? styles.answerOpen
-                            : ""
-                        }`}
-                      >
-                        <p>{item.answer}</p>
+                    return (
+                      <div key={item.question} className={styles.questionBlock}>
+                        <button
+                          className={`${styles.question} ${
+                            isOpen ? styles.featured : ""
+                          }`}
+                          onClick={() =>
+                            setOpenQuestions((currentOpenQuestions) => {
+                              const nextOpenQuestions = new Set(
+                                currentOpenQuestions,
+                              );
+
+                              if (nextOpenQuestions.has(questionId)) {
+                                nextOpenQuestions.delete(questionId);
+                              } else {
+                                nextOpenQuestions.add(questionId);
+                              }
+
+                              return nextOpenQuestions;
+                            })
+                          }
+                          aria-expanded={isOpen}
+                        >
+                          <span>{item.question}</span>
+                          <span>
+                            <ChevronDown aria-hidden="true" size={18} />
+                          </span>
+                        </button>
+
+                        <div
+                          className={`${styles.answer} ${
+                            isOpen ? styles.answerOpen : ""
+                          }`}
+                        >
+                          <p>{item.answer}</p>
+                        </div>
                       </div>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
               </div>
             ))}

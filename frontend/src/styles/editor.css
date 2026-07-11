@@ -577,7 +577,7 @@ body {
 
 .editor-primary-btn {
   border-color: transparent;
-  background: linear-gradient(135deg, var(--editor-blue), var(--editor-violet));
+  background: #000000;
   color: #ffffff;
   box-shadow: 0 10px 24px rgba(79, 124, 255, 0.2);
 }

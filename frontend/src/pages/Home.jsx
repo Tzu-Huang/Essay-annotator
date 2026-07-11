@@ -1,1176 +1,604 @@
-import { useState, useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { Bot, FileCheck } from "lucide-react";
-import gsap from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
 
-import styles from "../styles/home.module.css";
 import { useAuth } from "../hooks/useAuth";
-import HeroMockup from "../components/HeroMockup";
+import styles from "../styles/home.module.css";
 
-gsap.registerPlugin(ScrollTrigger);
+const FALLBACK_ESSAY_COUNT = 219;
+const API_BASE = import.meta.env.VITE_API_URL;
 
-const CURATED_ESSAYS = [
+const ESSAYS = [
   {
     id: "essay_0039",
     school: "Harvard University",
-    topic:
-      "Describe a topic, idea, or concept you find so engaging that it makes you lose all track of time. Why does it captivate you?",
     title: "Nanotech Research Passion",
     description:
       "A research experience in nanotechnology reveals the writer's deep fascination with science and lifelong ambition for discovery.",
-    logo: "/logos/harvard.svg",
   },
   {
     id: "essay_0042",
     school: "Stanford University",
-    topic:
-      "The Stanford community is deeply curious and driven to learn in and out of the classroom. Reflect on an idea or experience that makes you genuinely excited about learning.",
     title: "What Real Learning Means",
     description:
-      "A summer science program transforms the writer's view of learning from memorization into curiosity, collaboration, and discovery.",
-    logo: "/logos/stanford.png",
+      "A summer science program transforms the writer's view of learning into curiosity and discovery.",
   },
   {
     id: "essay_0185",
     school: "Columbia University",
-    topic:
-      "Share an essay on any topic of your choice. It can be one you've already written, one that responds to a different prompt, or one of your own design.",
     title: "Music for Healing",
     description:
       "A hospital performance inspires the writer to use music to support a child with a rare disease.",
-    logo: "/logos/columbia.jpg",
   },
   {
     id: "essay_0043",
     school: "University of Pennsylvania",
-    topic:
-      "Discuss an accomplishment, event, or realization that sparked a period of personal growth and a new understanding of yourself or others.",
     title: "Small Changes, Big Impact",
     description:
-      "From public health service to medical research, the writer learns that meaningful change often begins with small, practical solutions.",
-    logo: "/logos/upenn.svg",
+      "From public health service to medical research, meaningful change often begins with small solutions.",
   },
   {
     id: "essay_0026",
     school: "Johns Hopkins",
-    topic:
-      "Reflect on a time when you questioned or challenged a belief or idea. What prompted your thinking? What was the outcome?",
     title: "Standing Out and Fitting In",
     description:
-      "A journey through self-expression, insecurity, and belonging helps the writer discover that authenticity and community can coexist.",
-    logo: "/logos/jhu.webp",
-  },
-  {
-    id: "essay_0025",
-    school: "Johns Hopkins",
-    topic:
-      "The lessons we take from obstacles we encounter can be fundamental to later success. Recount a time when you faced a challenge, setback, or failure.",
-    title: "Learning Through Frustration",
-    description:
-      "Struggles in art and data science teach the writer that patience and perseverance can turn frustration into growth.",
-    logo: "/logos/jhu.webp",
-  },
-  {
-    id: "essay_0029",
-    school: "Johns Hopkins",
-    topic:
-      "Discuss an accomplishment, event, or realization that sparked a period of personal growth and a new understanding of yourself or others.",
-    title: "Building Community Through Music",
-    description:
-      "Through carefully curated playlists, the writer uses music to unite teammates, classmates, and younger students across different communities.",
-    logo: "/logos/jhu.webp",
-  },
-  {
-    id: "essay_0004",
-    school: "Ivy League",
-    topic:
-      "Reflect on a time when you questioned or challenged a belief or idea. What prompted your thinking? What was the outcome?",
-    title: "Justice, Courage, and Compassion",
-    description:
-      "A school discipline hearing reshapes the writer's view of justice as a balance between accountability and empathy.",
-    logo: "/logos/ivy.png",
+      "A journey through self-expression and belonging helps the writer discover authenticity and community coexist.",
   },
   {
     id: "essay_0009",
     school: "Ivy League",
-    topic:
-      "Some students have a background, identity, interest, or talent that is so meaningful they believe their application would be incomplete without it.",
     title: "Finding Identity Underwater",
     description:
-      "Scuba diving becomes a refuge of peace and equality for a writer navigating cultural identity and life between two worlds.",
-    logo: "/logos/ivy.png",
-  },
-  {
-    id: "essay_0005",
-    school: "Ivy League",
-    topic:
-      "Some students have a background, identity, interest, or talent that is so meaningful they believe their application would be incomplete without it.",
-    title: "The Hot Sauce Sommelier",
-    description:
-      "A love of spice becomes a vivid lens for exploring curiosity, culture, adventure, and personal identity.",
-    logo: "/logos/ivy.png",
+      "Scuba diving becomes a refuge of peace for a writer navigating cultural identity between two worlds.",
   },
 ];
-
-const CARDS_PER_VIEW = 5;
-const REPEAT_COUNT = 80;
-
-const WORDS = ["Improvement.", "Stories.", "Confidence."];
-
-
-function useTypewriter(words) {
-  const [display, setDisplay] = useState("");
-  useEffect(() => {
-    let wi = 0,
-      ci = 0,
-      deleting = false,
-      t;
-    const tick = () => {
-      const word = words[wi];
-      if (!deleting) {
-        setDisplay(word.slice(0, ++ci));
-        if (ci === word.length) {
-          deleting = true;
-          t = setTimeout(tick, 1800);
-          return;
-        }
-      } else {
-        setDisplay(word.slice(0, --ci));
-        if (ci === 0) {
-          deleting = false;
-          wi = (wi + 1) % words.length;
-        }
-      }
-      t = setTimeout(tick, deleting ? 55 : 90);
-    };
-    t = setTimeout(tick, 600);
-    return () => clearTimeout(t);
-  }, [words]);
-  return display;
-}
 
 function Home({ onOpenSignIn }) {
   const navigate = useNavigate();
   const { user } = useAuth();
+  const [essayCount, setEssayCount] = useState(FALLBACK_ESSAY_COUNT);
+
+  useEffect(() => {
+    if (!API_BASE) return undefined;
+
+    const controller = new AbortController();
+
+    async function fetchEssayCount() {
+      try {
+        const response = await fetch(`${API_BASE}/ready`, {
+          signal: controller.signal,
+        });
+
+        if (!response.ok) return;
+
+        const data = await response.json();
+        if (Number.isFinite(data.essay_count) && data.essay_count > 0) {
+          setEssayCount(data.essay_count);
+        }
+      } catch (error) {
+        if (error.name !== "AbortError") {
+          console.warn("Unable to load essay count; using fallback.", error);
+        }
+      }
+    }
+
+    fetchEssayCount();
+
+    return () => controller.abort();
+  }, []);
 
   const handleStartWriting = () => {
     if (user) {
       navigate("/editor");
       return;
     }
+
     onOpenSignIn();
   };
 
-  const loopedEssays = Array.from(
-    { length: REPEAT_COUNT },
-    () => CURATED_ESSAYS,
-  ).flat();
-
-  const startIndex = CURATED_ESSAYS.length * 20;
-  const maxEssayIndex = loopedEssays.length - CARDS_PER_VIEW;
-
-  const [essayIndex, setEssayIndex] = useState(startIndex);
-
-  const handlePrevEssay = () => setEssayIndex((prev) => Math.max(prev - 1, 0));
-  const handleNextEssay = () =>
-    setEssayIndex((prev) => Math.min(prev + 1, maxEssayIndex));
-
-  const typed = useTypewriter(WORDS);
-
-  const heroContentRef = useRef(null);
-  const heroImageRef = useRef(null);
-  const howWrapperRef = useRef(null);
-  const howItWorksRef = useRef(null);
-  const howLeftRef = useRef(null);
-  const howRightRef = useRef(null);
-  const stepFlashRef = useRef(null);
-  const stepEyebrowRef = useRef(null);
-  const eyebrowDotRef = useRef(null);
-  const stepNumRef = useRef(null);
-  const stepTitleRef = useRef(null);
-  const stepAccentLineRef = useRef(null);
-  const stepDescRef = useRef(null);
-  const stepBadgeRef = useRef(null);
-  const cardGlowRef = useRef(null);
-  const stepDotRefs = useRef([]);
-  const stackedCardRefs = useRef([]);
-  const terminalLineRef = useRef(null);
-  const terminalDoneRef = useRef(null);
-  const scanBarsRef = useRef([]);
-  const scanFillRef = useRef(null);
-  const scanNumRef = useRef(null);
-  const hudToneRef = useRef(null);
-  const hudHookRef = useRef(null);
-  const hudMetricOneRef = useRef(null);
-  const hudMetricTwoRef = useRef(null);
-  const hudMetricThreeRef = useRef(null);
-  const compareSectionRef = useRef(null);
-  const compareIntroRef = useRef(null);
-  const analysisDemoRef = useRef(null);
-  const featuredRef = useRef(null);
-  const differenceSectionRef = useRef(null);
-  const differenceCompareRef = useRef(null);
-  const [differenceInView, setDifferenceInView] = useState(false);
-  const ctaSectionRef = useRef(null);
-  const ctaTitleRef = useRef(null);
-  const ctaTextRef = useRef(null);
-  const ctaStatsRef = useRef(null);
-  const ctaBtnRef = useRef(null);
-
-
-  useEffect(() => {
-    const ctx = gsap.context(() => {
-      // Hero content — fades up on load
-      gsap.from(heroContentRef.current, {
-        opacity: 0,
-        y: 32,
-        duration: 0.9,
-        ease: "power3.out",
-        delay: 0.1,
-      });
-
-      // Hero image — fades up on load
-      gsap.from(heroImageRef.current, {
-        opacity: 0,
-        y: 40,
-        duration: 0.85,
-        ease: "power3.out",
-        delay: 0.3,
-      });
-
-      // Compare section — staggered two-column entrance
-      const compareTl = gsap.timeline({
-        scrollTrigger: {
-          trigger: compareSectionRef.current,
-          start: "top 80%",
-          toggleActions: "play reverse play reverse",
-        },
-      });
-      compareTl
-        .from(compareIntroRef.current, {
-          opacity: 0,
-          x: -32,
-          duration: 0.78,
-          ease: "power2.out",
-        })
-        .from(
-          analysisDemoRef.current,
-          {
-            opacity: 0,
-            y: 48,
-            scale: 0.96,
-            duration: 0.85,
-            ease: "power2.out",
-            transformOrigin: "center top",
-          },
-          0.14
-        );
-
-      // Featured essays section
-      gsap.from(featuredRef.current, {
-        opacity: 0,
-        y: 28,
-        duration: 0.75,
-        ease: "power2.out",
-        scrollTrigger: {
-          trigger: featuredRef.current,
-          start: "top 84%",
-          toggleActions: "play reverse play reverse",
-        },
-      });
-
-      // Difference section
-      gsap.from(differenceSectionRef.current, {
-        opacity: 0,
-        y: 36,
-        duration: 0.8,
-        ease: "power2.out",
-        scrollTrigger: {
-          trigger: differenceSectionRef.current,
-          start: "top 82%",
-          toggleActions: "play reverse play reverse",
-        },
-      });
-
-      // CTA — staggered entrance for title, copy, and button
-      const ctaTl = gsap.timeline({
-        scrollTrigger: {
-          trigger: ctaSectionRef.current,
-          start: "top 80%",
-          toggleActions: "play reverse play reverse",
-        },
-      });
-      ctaTl
-        .from(ctaTitleRef.current, {
-          opacity: 0,
-          y: 34,
-          duration: 0.7,
-          ease: "power3.out",
-        })
-        .from(
-          ctaTextRef.current,
-          { opacity: 0, y: 20, duration: 0.6, ease: "power2.out" },
-          0.18
-        )
-        .from(
-          ctaStatsRef.current
-            ? ctaStatsRef.current.children
-            : [],
-          {
-            opacity: 0,
-            y: 14,
-            duration: 0.5,
-            ease: "power2.out",
-            stagger: 0.08,
-          },
-          0.3
-        )
-        .from(
-          ctaBtnRef.current,
-          {
-            opacity: 0,
-            y: 16,
-            scale: 0.88,
-            duration: 0.55,
-            ease: "back.out(1.7)",
-          },
-          0.5
-        );
-    });
-
-    return () => ctx.revert();
-  }, []);
-
-  useEffect(() => {
-    const el = differenceCompareRef.current;
-    if (!el) return;
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            setDifferenceInView(true);
-            observer.disconnect();
-          }
-        });
-      },
-      { threshold: 0.35 }
-    );
-    observer.observe(el);
-    return () => observer.disconnect();
-  }, []);
-
-  useEffect(() => {
-    const STEPS = [
-      {
-        title: "Paste your draft",
-        desc: "Essay Annotator maps your voice, structure, and story from the first line. Paste any draft — rough or polished.",
-        badge: "Any draft, any stage",
-        color: "#4a6bc8",
-        badgeBg: "#dde4f8",
-        glowColor: "rgba(74,107,200,0.14)",
-        bgClass: styles.howStepBg0,
-        bgNum: "01",
-      },
-      {
-        title: "Find similar accepted essays",
-        desc: "We surface accepted essays that mirror your topic, tone, and structure — not just keywords.",
-        badge: "200+ real essays indexed",
-        color: "#2d8a6e",
-        badgeBg: "#ddf2ea",
-        glowColor: "rgba(45,138,110,0.14)",
-        bgClass: styles.howStepBg1,
-        bgNum: "02",
-      },
-      {
-        title: "Learn what works",
-        desc: "See the exact patterns that make accepted essays land, highlighted directly on your own writing.",
-        badge: "Tone, hooks, voice — all mapped",
-        color: "#675ce6",
-        badgeBg: "#dddcee",
-        glowColor: "rgba(122,75,200,0.14)",
-        bgClass: styles.howStepBg2,
-        bgNum: "03",
-      },
-    ];
-
-    const POSITIONS = {
-      "-2": { x: -44, y: -84, rot: -13, scale: 0.74, blur: 12, opacity: 0.16, z: 1 },
-      "-1": { x: -20, y: -42, rot: -6, scale: 0.88, blur: 5, opacity: 0.4, z: 2 },
-      "0": { x: 0, y: 0, rot: 0, scale: 1, blur: 0, opacity: 1, z: 5 },
-      "1": { x: -20, y: 42, rot: 6, scale: 0.88, blur: 5, opacity: 0.4, z: 2 },
-      "2": { x: -44, y: 84, rot: 13, scale: 0.74, blur: 12, opacity: 0.16, z: 1 },
-    };
-
-    let currentStep = -1;
-    let currentTitleLine = null;
-    let termTimer = null;
-    let scanTimer = null;
-    let hudPulse = null;
-    let hudCount = null;
-
-    const buildTitleLine = (text) => {
-      const line = document.createElement("div");
-      line.className = styles.titleLine;
-      text.split(" ").forEach((word, i, arr) => {
-        const span = document.createElement("span");
-        span.className = styles.titleWord;
-        span.textContent = word;
-        line.appendChild(span);
-        if (i < arr.length - 1) line.appendChild(document.createTextNode(" "));
-      });
-      return line;
-    };
-
-    const setTitleInstant = (text) => {
-      const el = stepTitleRef.current;
-      if (!el) return;
-      el.innerHTML = "";
-      const line = buildTitleLine(text);
-      el.appendChild(line);
-      gsap.set(line, { opacity: 1 });
-      currentTitleLine = line;
-    };
-
-    const animateTitle = (newText) => {
-      const el = stepTitleRef.current;
-      if (!el) return;
-      el.querySelectorAll(`.${styles.titleLine}`).forEach((l) => {
-        gsap.killTweensOf(l);
-        if (l !== currentTitleLine) l.remove();
-      });
-      if (currentTitleLine) gsap.set(currentTitleLine, { opacity: 1 });
-      const oldLine = currentTitleLine;
-      const newLine = buildTitleLine(newText);
-      el.appendChild(newLine);
-      gsap.set(newLine, { opacity: 0 });
-      const tl = gsap.timeline({
-        onComplete: () => {
-          if (oldLine && oldLine.parentNode) oldLine.remove();
-          currentTitleLine = newLine;
-        },
-      });
-      if (oldLine) tl.to(oldLine, { opacity: 0, duration: 0.22, ease: "power1.in" }, 0);
-      tl.to(newLine, { opacity: 1, duration: 0.36, ease: "power2.out" }, 0.16);
-    };
-
-    const updateCards = (step, animate) => {
-      stackedCardRefs.current.forEach((card, i) => {
-        if (!card) return;
-        const offset = Math.max(-2, Math.min(2, i - step));
-        const p = POSITIONS[String(offset)];
-        card.style.zIndex = p.z;
-        if (animate) {
-          gsap.to(card, {
-            x: p.x, y: p.y, rotation: p.rot, scale: p.scale,
-            opacity: p.opacity, filter: `blur(${p.blur}px)`,
-            duration: 0.55, ease: "power3.out",
-          });
-        } else {
-          gsap.set(card, {
-            x: p.x, y: p.y, rotation: p.rot, scale: p.scale,
-            opacity: p.opacity, filter: `blur(${p.blur}px)`,
-          });
-        }
-      });
-    };
-
-    const runTerminal = () => {
-      if (termTimer) clearInterval(termTimer);
-      const msgs = ["Reading essay...", "Parsing structure...", "Mapping voice..."];
-      let mi = 0;
-      const line = terminalLineRef.current;
-      const done = terminalDoneRef.current;
-      if (!line || !done) return;
-      done.classList.remove(styles.stackTermDoneShow);
-      line.innerHTML = `${msgs[0]}<span class="${styles.stackTermCursor}"></span>`;
-      termTimer = setInterval(() => {
-        mi++;
-        if (mi >= msgs.length) {
-          clearInterval(termTimer);
-          line.innerHTML = `${msgs[msgs.length - 1]}<span class="${styles.stackTermCursor}"></span>`;
-          setTimeout(() => done.classList.add(styles.stackTermDoneShow), 400);
-          return;
-        }
-        line.innerHTML = `${msgs[mi]}<span class="${styles.stackTermCursor}"></span>`;
-      }, 900);
-    };
-
-    const runScanner = () => {
-      if (scanTimer) clearInterval(scanTimer);
-      const bars = scanBarsRef.current.filter(Boolean);
-      if (scanFillRef.current) scanFillRef.current.style.width = "0%";
-      if (scanNumRef.current) scanNumRef.current.textContent = "0%";
-      bars.forEach((b) => { b.style.transition = "none"; b.style.width = "0%"; });
-      let prog = 0;
-      setTimeout(() => {
-        bars.forEach((b) => {
-          b.style.transition = "width 1.4s cubic-bezier(0.22,1,0.36,1)";
-          b.style.width = `${b.dataset.w || 0}%`;
-        });
-      }, 200);
-      scanTimer = setInterval(() => {
-        prog = Math.min(100, prog + 2);
-        if (scanFillRef.current) scanFillRef.current.style.width = `${prog}%`;
-        if (scanNumRef.current) scanNumRef.current.textContent = `${prog}%`;
-        if (prog >= 100) clearInterval(scanTimer);
-      }, 44);
-    };
-
-    const runHUD = () => {
-      if (hudPulse) clearInterval(hudPulse);
-      if (hudCount) clearInterval(hudCount);
-      const tone = hudToneRef.current;
-      const hook = hudHookRef.current;
-      const m1 = hudMetricOneRef.current;
-      const m2 = hudMetricTwoRef.current;
-      const m3 = hudMetricThreeRef.current;
-      if (!tone) return;
-      if (m1) m1.textContent = "0";
-      if (m2) m2.textContent = "0";
-      if (m3) m3.textContent = "0%";
-      tone.classList.remove(styles.stackHudHlOn);
-      if (hook) hook.classList.remove(styles.stackHudHlAltOn);
-
-      const pulse = () => {
-        tone.classList.add(styles.stackHudHlOn);
-        hook?.classList.remove(styles.stackHudHlAltOn);
-        setTimeout(() => {
-          hook?.classList.add(styles.stackHudHlAltOn);
-          tone.classList.remove(styles.stackHudHlOn);
-        }, 1400);
-      };
-      pulse();
-      hudPulse = setInterval(pulse, 2800);
-
-      let v1 = 0, v2 = 0, v3 = 0;
-      hudCount = setInterval(() => {
-        if (v1 < 4) { v1++; if (m1) m1.textContent = String(v1); }
-        if (v2 < 3) { v2++; if (m2) m2.textContent = String(v2); }
-        if (v3 < 87) { v3++; if (m3) m3.textContent = `${v3}%`; }
-        if (v1 >= 4 && v2 >= 3 && v3 >= 87) clearInterval(hudCount);
-      }, 28);
-    };
-
-    const goToStep = (step, instant) => {
-      if (step === currentStep) return;
-      const s = STEPS[step];
-
-      stackedCardRefs.current.forEach((card) => { if (card) gsap.killTweensOf(card); });
-
-      if (howItWorksRef.current) {
-        howItWorksRef.current.className = `${styles.howSection} ${s.bgClass}`;
-      }
-
-      if (stepEyebrowRef.current) stepEyebrowRef.current.style.color = s.color;
-      if (eyebrowDotRef.current) eyebrowDotRef.current.style.background = s.color;
-
-      stepDotRefs.current.forEach((dot, i) => {
-        if (!dot) return;
-        dot.style.background = i <= step ? s.color : "rgba(0,0,0,0.12)";
-        dot.style.width = i === step ? "44px" : "28px";
-      });
-
-      if (instant) { setTitleInstant(s.title); } else { animateTitle(s.title); }
-
-      if (stepNumRef.current) {
-        stepNumRef.current.textContent = s.bgNum;
-        stepNumRef.current.style.color = s.color;
-        if (!instant) {
-          gsap.fromTo(stepNumRef.current, { scale: 1.5, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.3, ease: "back.out(2)" });
-        }
-      }
-
-      if (stepFlashRef.current && !instant) {
-        stepFlashRef.current.style.background = s.color;
-        gsap.fromTo(stepFlashRef.current, { opacity: 0.08 }, { opacity: 0, duration: 1.0, ease: "power2.out" });
-      }
-
-      if (stepAccentLineRef.current) {
-        stepAccentLineRef.current.style.background = s.color;
-        if (instant) gsap.set(stepAccentLineRef.current, { width: 48 });
-        else gsap.fromTo(stepAccentLineRef.current, { width: 0 }, { width: 48, duration: 0.4, ease: "power2.out", delay: 0.28 });
-      }
-
-      if (!instant) {
-        const activeDot = stepDotRefs.current[step];
-        if (activeDot) gsap.fromTo(activeDot, { scaleX: 0.3 }, { scaleX: 1, duration: 0.55, ease: "elastic.out(1.4, 0.5)" });
-      }
-
-      const desc = stepDescRef.current;
-      const badge = stepBadgeRef.current;
-      if (desc && badge) {
-        gsap.killTweensOf([desc, badge]);
-        gsap.set(desc, { opacity: 0 });
-        gsap.set(badge, { opacity: 0 });
-        setTimeout(() => {
-          desc.textContent = s.desc;
-          badge.textContent = s.badge;
-          badge.style.background = s.badgeBg;
-          badge.style.color = s.color;
-          gsap.fromTo(desc, { opacity: 0, x: instant ? 0 : 22 }, { opacity: 1, x: 0, duration: 0.5, ease: "power2.out" });
-          gsap.fromTo(badge, { opacity: 0, scale: 0.93, y: 4 }, { opacity: 1, scale: 1, y: 0, duration: 0.3, ease: "power2.out", delay: instant ? 0 : 0.12 });
-        }, instant ? 0 : 180);
-      }
-
-      if (cardGlowRef.current) {
-        cardGlowRef.current.style.background = `radial-gradient(ellipse at center, ${s.glowColor} 0%, transparent 70%)`;
-      }
-
-      updateCards(step, !instant);
-
-      if (step === 0) runTerminal();
-      if (step === 1) runScanner();
-      if (step === 2) runHUD();
-
-      currentStep = step;
-    };
-
-    const enterSection = () => {
-      if (howLeftRef.current) gsap.to(howLeftRef.current, { opacity: 1, y: 0, duration: 0.65, ease: "power2.out" });
-      if (howRightRef.current) gsap.to(howRightRef.current, { opacity: 1, y: 0, scale: 1, duration: 0.72, ease: "back.out(1.2)", delay: 0.1 });
-    };
-
-    // Initialize positions and state
-    updateCards(0, false);
-
-    const s0 = STEPS[0];
-    if (stepEyebrowRef.current) stepEyebrowRef.current.style.color = s0.color;
-    if (eyebrowDotRef.current) eyebrowDotRef.current.style.background = s0.color;
-    if (stepDotRefs.current[0]) stepDotRefs.current[0].style.background = s0.color;
-    if (stepNumRef.current) { stepNumRef.current.textContent = s0.bgNum; stepNumRef.current.style.color = s0.color; }
-    if (stepAccentLineRef.current) { stepAccentLineRef.current.style.background = s0.color; gsap.set(stepAccentLineRef.current, { width: 48 }); }
-    if (stepBadgeRef.current) {
-      stepBadgeRef.current.style.background = s0.badgeBg;
-      stepBadgeRef.current.style.color = s0.color;
-      stepBadgeRef.current.textContent = s0.badge;
-      gsap.set(stepBadgeRef.current, { opacity: 1, scale: 1, y: 0 });
-    }
-    if (stepDescRef.current) { stepDescRef.current.textContent = s0.desc; gsap.set(stepDescRef.current, { opacity: 1, x: 0 }); }
-    if (cardGlowRef.current) { cardGlowRef.current.style.background = `radial-gradient(ellipse at center, ${s0.glowColor} 0%, transparent 70%)`; }
-    if (howItWorksRef.current) howItWorksRef.current.className = `${styles.howSection} ${s0.bgClass}`;
-    setTitleInstant(s0.title);
-
-    if (howLeftRef.current) gsap.set(howLeftRef.current, { opacity: 0, y: 28 });
-    if (howRightRef.current) gsap.set(howRightRef.current, { opacity: 0, y: 28, scale: 0.93 });
-
-    // Scroll listener — matches mockup HTML exactly
-    let lastStep = -99;
-    let hasEntered = false;
-
-    const onScroll = () => {
-      if (!howWrapperRef.current) return;
-      const wrapper = howWrapperRef.current;
-      const rect = wrapper.getBoundingClientRect();
-      const totalScroll = wrapper.offsetHeight - window.innerHeight;
-      const scrolled = -rect.top;
-      const inSection = scrolled >= 0 && scrolled <= totalScroll;
-
-      if (!inSection) {
-        if (scrolled < 0) lastStep = -99;
-        return;
-      }
-
-      const step = Math.min(2, Math.floor((scrolled / totalScroll) * 3));
-      if (step !== lastStep) {
-        const isFirst = lastStep === -99;
-        goToStep(step, isFirst);
-        if (isFirst && !hasEntered) {
-          enterSection();
-          hasEntered = true;
-        }
-        lastStep = step;
-      }
-    };
-
-    window.addEventListener('scroll', onScroll, { passive: true });
-    onScroll();
-
-    return () => {
-      window.removeEventListener('scroll', onScroll);
-      if (termTimer) clearInterval(termTimer);
-      if (scanTimer) clearInterval(scanTimer);
-      if (hudPulse) clearInterval(hudPulse);
-      if (hudCount) clearInterval(hudCount);
-    };
-  }, []);
-
   return (
-    <div className={styles.home}>
-      {/* HERO */}
-      <section className={styles.hero}>
-        <div className={styles.heroContent} ref={heroContentRef}>
-          <h1 className={styles.heroTitle}>
-            <span className={styles.titleLine1}>REAL Essays</span>
-            <span className={styles.titleLine2}>
-              REAL <span className={styles.typedWord}>{typed}</span>
-              <span className={styles.cursor} aria-hidden="true" />
-            </span>
-          </h1>
+    <main className={styles.home}>
+      <div className={styles.introScroll}>
+        <div className={styles.introScreen}>
+          <span className={`${styles.ambientBlob} ${styles.blobOne}`} />
+          <span className={`${styles.ambientBlob} ${styles.blobTwo}`} />
 
-          <p className={styles.heroDescription}>
-            Upload your draft, find similar successful essays, and see what
-            makes them work.Start 
-          </p>
+          <section className={styles.hero}>
+            <div className={styles.wrap}>
+              <h1>
+                Real essays.
+                <br />
+                Real <span className={styles.accent}>improvement.</span>
+              </h1>
 
-          <div className={styles.heroActions}>
-            <button
-              type="button"
-              className={styles.primaryBtn}
-              onClick={handleStartWriting}
-            >
-              Start Writing
-            </button>
+              <p className={styles.dek}>
+                Upload your draft, find similar successful essays, and see
+                exactly what makes them work, reviewed against the standard of
+                essays already admitted.
+              </p>
 
-            <a href="#how-it-works" className={styles.secondaryLink}>
-              See how it works →
-            </a>
+              <div className={styles.heroActions}>
+                <button
+                  type="button"
+                  className={styles.primaryButton}
+                  onClick={handleStartWriting}
+                >
+                  Start writing
+                </button>
+                <a href="#how-it-works" className={styles.outlineButton}>
+                  See how it works
+                </a>
+              </div>
+
+              <div className={styles.credentialRow}>
+                <div className={styles.credential}>
+                  <b>
+                    <CountUpNumber value={essayCount} />
+                    <span className={styles.countPlus}>+</span>
+                  </b>
+                  <span>Accepted essays</span>
+                </div>
+                <div className={styles.credential}>
+                  <b>6</b>
+                  <span>Top universities</span>
+                </div>
+                <div className={styles.credential}>
+                  <b>Free</b>
+                  <span>To get started</span>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <div className={styles.peekWrap}>
+            <div className={styles.peekPanel}>
+              <span className={styles.peekMatch}>88% match | Live preview</span>
+              <span className={styles.peekStat}>
+                <b>200+</b> essays analyzed
+              </span>
+
+              <div className={styles.peekTopbar}>
+                <span className={`${styles.peekDot} ${styles.red}`} />
+                <span className={`${styles.peekDot} ${styles.yellow}`} />
+                <span className={`${styles.peekDot} ${styles.green}`} />
+                <span className={styles.peekUrl}>essayannotator.com/compare</span>
+              </div>
+
+              <div className={styles.peekBody}>
+                <div className={`${styles.peekPane} ${styles.mine}`}>
+                  <p className={styles.peekPaneHead}>Your Essay</p>
+                  <p className={styles.peekText}>
+                    Ever since my first day volunteering at the community
+                    clinic, I knew I wanted to make a difference in people's
+                    lives. <span className={styles.peekBadge}>1</span>{" "}
+                    <span className={`${styles.peekHighlight} ${styles.orange}`}>
+                      The experience opened my eyes
+                    </span>{" "}
+                    to how small acts of kindness can have a big impact.{" "}
+                    <span className={`${styles.peekBadge} ${styles.alt}`}>2</span>
+                    <span className={styles.peekCursor} />
+                  </p>
+                </div>
+
+                <div className={`${styles.peekPane} ${styles.theirs}`}>
+                  <p className={styles.peekPaneHead}>Sample Essay</p>
+                  <p className={styles.peekText}>
+                    Stepping into the local hospital sophomore summer, I
+                    embraced the role of student volunteer, eager to assist
+                    patients. <span className={styles.peekBadge}>1</span>{" "}
+                    <span className={`${styles.peekHighlight} ${styles.greenText}`}>
+                      The sterile scent of alcohol greeted me
+                    </span>{" "}
+                    and the vast, maze-like hospital left me disoriented.{" "}
+                    <span className={`${styles.peekBadge} ${styles.alt}`}>2</span>
+                  </p>
+                </div>
+              </div>
+
+              <div className={styles.peekComments}>
+                <div className={styles.peekComment}>
+                  <span className={`${styles.peekCommentDot} ${styles.orange}`} />
+                  Specific, sensory detail stands out immediately
+                </div>
+                <div className={styles.peekComment}>
+                  <span className={`${styles.peekCommentDot} ${styles.greenText}`} />
+                  Matches the opening style of top-ranked essays
+                </div>
+              </div>
+            </div>
           </div>
         </div>
-
-        <HeroMockup ref={heroImageRef} onOpenSignIn={onOpenSignIn} />
-      </section>
-
-      {/* HOW IT WORKS - Animated Scroll */}
-      <div className={styles.howWrapper} id="how-it-works" ref={howWrapperRef}>
-        <section className={styles.howSection} ref={howItWorksRef}>
-          <div className={styles.stepFlash} ref={stepFlashRef} />
-          <div className={styles.howInner}>
-            {/* LEFT PANEL */}
-            <div className={styles.howLeft} ref={howLeftRef}>
-              <div className={styles.stepDots}>
-                {[0, 1, 2].map((i) => (
-                  <div
-                    key={i}
-                    className={styles.stepDot}
-                    ref={(el) => { stepDotRefs.current[i] = el; }}
-                  />
-                ))}
-              </div>
-              <div className={styles.stepEyebrow} ref={stepEyebrowRef}>
-                <span className={styles.eyebrowDotAnim} ref={eyebrowDotRef} />
-                How it works
-              </div>
-              <div className={styles.stepTitleWrapper}>
-                <span className={styles.stepNum} ref={stepNumRef}>01</span>
-                <h2 className={styles.stepTitle} ref={stepTitleRef} />
-              </div>
-              <div className={styles.stepAccentLine} ref={stepAccentLineRef} />
-              <p className={styles.stepDesc} ref={stepDescRef} />
-              <div className={styles.stepBadge} ref={stepBadgeRef} />
-            </div>
-
-            {/* RIGHT PANEL */}
-            <div className={styles.howRight} ref={howRightRef}>
-              <div className={styles.cardsStage}>
-                <div className={styles.cardGlowAnim} ref={cardGlowRef} />
-
-                {/* Card 0: Terminal */}
-                <div
-                  className={`${styles.howCard} ${styles.stackTerminal}`}
-                  ref={(el) => { stackedCardRefs.current[0] = el; }}
-                >
-                  <div className={styles.stackTerminalBar}>
-                    <div className={`${styles.stackTdot} ${styles.stackTdotR}`} />
-                    <div className={`${styles.stackTdot} ${styles.stackTdotY}`} />
-                    <div className={`${styles.stackTdot} ${styles.stackTdotG}`} />
-                    <span className={styles.stackTermLabel}>essay_draft.txt</span>
-                  </div>
-                  <div className={styles.stackTermLine}>
-                    <span style={{ color: "#8aabde" }}>$</span> annotate --input draft.txt
-                  </div>
-                  <div
-                    className={`${styles.stackTermLine} ${styles.stackTermHighlight}`}
-                    ref={terminalLineRef}
-                  >
-                    Reading essay...<span className={styles.stackTermCursor} />
-                  </div>
-                  <div className={styles.stackTermDone} ref={terminalDoneRef}>
-                    ✓ 482 words parsed
-                  </div>
-                </div>
-
-                {/* Card 1: Scanner */}
-                <div
-                  className={`${styles.howCard} ${styles.stackScanner}`}
-                  ref={(el) => { stackedCardRefs.current[1] = el; }}
-                >
-                  <div className={styles.stackScHead}>
-                    <span className={styles.stackScTitle}>Match Engine</span>
-                    <span className={styles.stackScLive}>
-                      <span className={styles.stackLiveDot} /> Live
-                    </span>
-                  </div>
-                  <div className={styles.stackScBody}>
-                    {[{ w: 84 }, { w: 79 }, { w: 76 }].map((bar, i) => (
-                      <div key={i} className={styles.stackScItem}>
-                        <div className={`${styles.stackScRank} ${styles[`stackRank${i + 1}`]}`}>
-                          {i + 1}
-                        </div>
-                        <div className={styles.stackScBarWrap}>
-                          <div
-                            className={styles.stackScBar}
-                            data-w={bar.w}
-                            ref={(el) => { scanBarsRef.current[i] = el; }}
-                          />
-                        </div>
-                        <div className={styles.stackScPct}>{bar.w}%</div>
-                      </div>
-                    ))}
-                    <div className={styles.stackScProg}>
-                      <span className={styles.stackScProgLabel}>Scanning 200+ essays</span>
-                      <div className={styles.stackScProgTrack}>
-                        <div className={styles.stackScProgFill} ref={scanFillRef} />
-                      </div>
-                      <span className={styles.stackScProgNum} ref={scanNumRef}>0%</span>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Card 2: HUD */}
-                <div
-                  className={`${styles.howCard} ${styles.stackHud}`}
-                  ref={(el) => { stackedCardRefs.current[2] = el; }}
-                >
-                  <div className={styles.stackHudHead}>
-                    <span className={styles.stackHudTitle}>Insight HUD</span>
-                    <span className={styles.stackHudBadge}>3 patterns found</span>
-                  </div>
-                  <div className={styles.stackHudBody}>
-                    <p className={styles.stackHudText}>
-                      <span className={styles.stackHudHl} ref={hudToneRef}>
-                        Born in New York,
-                      </span>{" "}
-                      I have lived abroad most of my life.{" "}
-                      <span className={styles.stackHudHlAlt} ref={hudHookRef}>
-                        Shanghai for 8 years
-                      </span>{" "}
-                      and Taiwan making up the rest...
-                    </p>
-                    <div className={styles.stackHudMetrics}>
-                      <div className={styles.stackMetric}>
-                        <div className={styles.stackMVal} ref={hudMetricOneRef}>0</div>
-                        <div className={styles.stackMLabel}>Tone shifts</div>
-                      </div>
-                      <div className={styles.stackMetric}>
-                        <div className={styles.stackMVal} ref={hudMetricTwoRef}>0</div>
-                        <div className={styles.stackMLabel}>Strong hooks</div>
-                      </div>
-                      <div className={styles.stackMetric}>
-                        <div className={styles.stackMVal} ref={hudMetricThreeRef}>0%</div>
-                        <div className={styles.stackMLabel}>Voice match</div>
-                      </div>
-                    </div>
-                    <div className={styles.stackHudTags}>
-                      <span className={styles.htagYellow}>Tone shift</span>
-                      <span className={styles.htagBlue}>Strong hook</span>
-                      <span className={styles.htagGreen}>Voice marker</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
       </div>
 
-      {/* COMPARE */}
-      <section className={styles.compareSection} ref={compareSectionRef}>
-        <div className={styles.compareIntro} ref={compareIntroRef}>
-          <h2 className={styles.sectionTitle}>
-            See What Makes <br />
-            Strong Essays Work
-          </h2>
+      <section id="how-it-works" className={styles.section}>
+        <div className={styles.wrap}>
+          <SectionHead
+            eyebrow="Procedure"
+            title="How the review is conducted"
+            copy="Three stages, modeled on how an admissions reader actually evaluates a personal statement."
+          />
 
-          <p>
-            Compare your draft with real accepted essays and discover what makes
-            stronger writing stand out.
-          </p>
+          <div className={styles.steps}>
+            <Step
+              rank="I"
+              title="Paste your draft"
+              copy="Essay Annotator maps your voice, structure, and story from the first line, any draft, any stage."
+            />
+            <Step
+              rank="II"
+              title="Find similar accepted essays"
+              copy="We surface accepted essays that mirror your topic, tone, and structure, not just keywords."
+            />
+            <Step
+              rank="III"
+              title="Learn what works"
+              copy="See the exact patterns that make accepted essays land, highlighted directly on your writing."
+            />
+          </div>
         </div>
+      </section>
 
-        <div className={styles.analysisDemo} ref={analysisDemoRef}>
-          <div className={styles.analysisPaper}>
-            <div className={styles.analysisColumn}>
-              <p className={styles.analysisLabel}>YOUR ESSAY</p>
-              <h3>User Draft</h3>
+      <Divider />
 
-              <div
-                className={`${styles.analysisDivider} ${styles.leftDivider}`}
-              ></div>
-              <p className={styles.analysisText}>
-                Ever since my first day volunteering at the community clinic,
-              </p>
+      <section className={styles.section}>
+        <div className={styles.wrap}>
+          <SectionHead
+            eyebrow="Comparative Review"
+            title="See what makes strong essays work"
+            copy="Your draft, reviewed side by side with a real accepted essay."
+          />
 
-              <p className={styles.analysisText}>
-                I knew I wanted to make a difference in people&apos;s lives.
-              </p>
-
-              <p className={styles.analysisText}>
-                <span className={styles.hoverHighlight}>
-                  The experience opened my eyes to how small acts of kindness
-                  can have a big impact.
-                </span>
-              </p>
-
-              <p className={styles.analysisText}>
-                I hope to continue this journey in college and beyond.
-              </p>
-
-              <div className={styles.demoSoftLines}>
-                <span></span>
-                <span></span>
-              </div>
+          <div className={styles.certificate}>
+            <div className={styles.certHead}>
+              <p>Comparative Reading | Prompt Matched</p>
             </div>
 
-            <div className={styles.analysisMiddle}>
-              <div className={styles.suggestionPopup}>
-                <p>EXPRESSION</p>
-                <strong>Stronger opening image</strong>
+            <div className={styles.certBody}>
+              <div className={styles.certCol}>
+                <h4>Candidate draft</h4>
+                <h3>Your essay</h3>
+                <p>Ever since my first day volunteering at the community clinic,</p>
+                <p>I knew I wanted to make a difference in people's lives.</p>
+                <p>
+                  <span className={styles.certHighlight}>
+                    The experience opened my eyes to how small acts of kindness
+                    can have a big impact.
+                  </span>
+                </p>
+                <p>I hope to continue this journey in college and beyond.</p>
+              </div>
+
+              <div className={styles.certDivider} />
+
+              <div className={styles.certCol}>
+                <h4>Admitted essay</h4>
+                <h3>essay_0167</h3>
+                <p>
+                  Stepping into the local hospital sophomore summer, I embraced
+                  the role of student volunteer, eager to assist patients.{" "}
+                  <span className={styles.certHighlight}>
+                    The sterile scent of alcohol greeted me and the vast,
+                    maze-like hospital left me disoriented,
+                  </span>{" "}
+                  so I struggled to find the desired locations in the
+                  labyrinthine hallways.
+                </p>
+                <p className={styles.ellipsis}>...</p>
+              </div>
+
+              <div className={styles.certNote}>
+                <b>Stronger opening image</b>
                 <span>
-                  The sample essay is stronger as it turns a general idea
-                  into a vivid, sensory image that pulls readers in.
+                  essay_0167 turns a general idea into a vivid, sensory image
+                  that pulls readers in.{" "}
+                  <Link to="/editor">See full analysis</Link>
                 </span>
-                <Link to="/editor" onClick={() => window.scrollTo(0, 0)}>See full analysis</Link>
-              </div>
-            </div>
-
-            <div className={styles.analysisColumn}>
-              <p className={styles.analysisLabel}>DATABASE ESSAY</p>
-              <h3>essay_0167</h3>
-
-              <div
-                className={`${styles.analysisDivider} ${styles.rightDivider}`}
-              ></div>
-
-              <p className={styles.analysisText}>
-                Stepping into the local hospital sophomore year summer, I
-                embraced the role of student volunteer, eager to assist
-                patients.{" "}
-                <span className={styles.hoverHighlight}>
-                  The sterile scent of alcohol greeted me and the vast,
-                  maze-like hospital left me disoriented,
-                </span>{" "}
-                so I struggled to find the desired locations in the labyrinthine
-                hallways.
-              </p>
-
-              <p className={styles.analysisTextMuted}>...</p>
-
-              <div className={styles.demoSoftLines}>
-                <span></span>
-                <span></span>
-                <span></span>
               </div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* ESSAY LIBRARY - CAROUSEL STYLE */}
-      <section className={styles.featuredScroll} ref={featuredRef}>
-        <div className={styles.libraryContent}>
-          <h2 className={styles.sectionTitleCenter}>
-            EXPLORE REAL ACCEPTED ESSAYS
-          </h2>
+      <Divider />
 
-          <p className={styles.featuredSubtitle}>
-            Explore real essays from top schools and click any card to read
-            more.
+      <section id="library" className={styles.section}>
+        <div className={styles.wrap}>
+          <SectionHead
+            eyebrow="The Archive"
+            title="Explore real accepted essays"
+            copy="Essays from students admitted to top universities."
+          />
+
+          <div className={styles.libraryGrid}>
+            {ESSAYS.map((essay) => (
+              <Link to={`/essay/${essay.id}`} className={styles.card} key={essay.id}>
+                <span className={styles.school}>{essay.school}</span>
+                <h3>{essay.title}</h3>
+                <p>{essay.description}</p>
+                <span className={styles.go}>Read more</span>
+              </Link>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <Divider />
+
+      <section className={styles.section}>
+        <div className={styles.wrap}>
+          <SectionHead
+            eyebrow="Committee Notes"
+            title="Why this review is different"
+            copy="Generic AI advice versus feedback grounded in real admitted outcomes."
+          />
+
+          <div className={styles.compareGrid}>
+            <div className={styles.compareCol}>
+              <span className={styles.compareLabel}>The Old Way</span>
+              <h3>Generic AI Advice</h3>
+              <ul>
+                <li>
+                  <span className={styles.bad}>x</span> Vague, one-size-fits-all tips
+                </li>
+                <li>
+                  <span className={styles.bad}>x</span> Not based on real admissions outcomes
+                </li>
+                <li>
+                  <span className={styles.bad}>x</span> Doesn't show proven examples
+                </li>
+                <li>
+                  <span className={styles.bad}>x</span> Hard to know what actually works
+                </li>
+              </ul>
+            </div>
+
+            <div className={`${styles.compareCol} ${styles.good}`}>
+              <span className={styles.compareLabel}>The Essay Annotator Way</span>
+              <h3>Learn From Real Accepted Essays</h3>
+              <ul>
+                <li>
+                  <span className={styles.check}>✓</span> Based on essays that got students in
+                </li>
+                <li>
+                  <span className={styles.check}>✓</span> See real responses to real prompts
+                </li>
+                <li>
+                  <span className={styles.check}>✓</span> Discover what makes essays effective
+                </li>
+                <li>
+                  <span className={styles.check}>✓</span> Strengthen your own unique voice
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section className={styles.cta}>
+        <div className={styles.wrap}>
+          <h2>
+            Ready to improve
+            <br />
+            your essay?
+          </h2>
+          <p>
+            Access a curated database of 200+ real essays accepted into Harvard,
+            MIT, Stanford, and other top universities.
           </p>
 
-          <div className={styles.scrollWrapper}>
-            <button
-              type="button"
-              className={`${styles.carouselBtn} ${styles.carouselBtnLeft}`}
-              onClick={handlePrevEssay}
-              aria-label="Previous essays"
-            >
-              ‹
-            </button>
-
-            <div className={styles.carouselViewport}>
-              <div
-                className={styles.scrollTrack}
-                style={{
-                  transform: `translateX(calc(${essayIndex} * -1 * (var(--essay-card-width) + var(--essay-card-gap))))`,
-                }}
-              >
-                {loopedEssays.map((essay, index) => (
-                  <Link
-                    to={`/essay/${essay.id}`}
-                    className={styles.scrollCard}
-                    key={`${essay.id}-${index}`}
-                  >
-                    <div className={styles.pin}></div>
-
-                    <div className={styles.cardHeader}>
-                      <img
-                        src={essay.logo}
-                        alt={`${essay.school} logo`}
-                        className={styles.schoolLogo}
-                      />
-
-                      <h4>{essay.school}</h4>
-                    </div>
-
-                    <p>{essay.title}</p>
-
-                    <span>{essay.description}</span>
-
-                    <div className={styles.scrollLink}>Read more →</div>
-                  </Link>
-                ))}
-              </div>
+          <div className={styles.ctaStats}>
+            <div className={styles.stat}>
+              <b>
+                <CountUpNumber value={essayCount} />
+                <span className={styles.countPlus}>+</span>
+              </b>
+              <span>Accepted essays</span>
             </div>
-
-            <button
-              type="button"
-              className={`${styles.carouselBtn} ${styles.carouselBtnRight}`}
-              onClick={handleNextEssay}
-              aria-label="Next essays"
-            >
-              ›
-            </button>
+            <div className={styles.stat}>
+              <b>6</b>
+              <span>Top universities</span>
+            </div>
+            <div className={styles.stat}>
+              <b>Free</b>
+              <span>To get started</span>
+            </div>
           </div>
+
+          <button
+            type="button"
+            className={styles.primaryButton}
+            onClick={handleStartWriting}
+          >
+            Start writing
+          </button>
         </div>
       </section>
+    </main>
+  );
+}
 
-      {/* WHY DIFFERENT */}
-      <section className={styles.differenceSection} ref={differenceSectionRef}>
-        <div className={styles.differenceHeader}>
-          <span className={styles.differenceEyebrow}>The Difference</span>
-          <h2 className={styles.sectionTitleSmall}>
-            Why Essay Annotator Is Different ? 
-          </h2>
-        </div>
-
-        <div
-          className={`${styles.differenceCompareWrap} ${
-            differenceInView ? styles.spInView : ""
-          }`}
-          ref={differenceCompareRef}
-        >
-          <div className={`${styles.spCard} ${styles.spCardBad}`}>
-            <span className={styles.spCardLabel}>The Old Way</span>
-
-            <div className={styles.iconBadgeMuted}>
-              <Bot size={26} />
-            </div>
-
-            <h3>Generic AI Advice</h3>
-
-            <ul>
-              <li>
-                <span className={styles.spBullet}>×</span>
-                <span className={styles.spTxt}>Vague, one-size-fits-all tips</span>
-              </li>
-              <li>
-                <span className={styles.spBullet}>×</span>
-                <span className={styles.spTxt}>
-                  Not based on real admissions outcomes
-                </span>
-              </li>
-              <li>
-                <span className={styles.spBullet}>×</span>
-                <span className={styles.spTxt}>
-                  Doesn&apos;t show proven examples
-                </span>
-              </li>
-              <li>
-                <span className={styles.spBullet}>×</span>
-                <span className={styles.spTxt}>
-                  Hard to know what actually works
-                </span>
-              </li>
-            </ul>
-          </div>
-
-          <div className={styles.spVs} aria-hidden="true">
-            VS
-          </div>
-
-          <div className={`${styles.spCard} ${styles.spCardGood}`}>
-            <span className={styles.spCardLabel}>
-              The Essay Annotator Way
-            </span>
-
-            <div className={styles.iconBadgeGreen}>
-              <FileCheck size={26} />
-            </div>
-
-            <h3>Learn From <br></br>Real Accepted Essays</h3>
-
-            <ul>
-              <li>
-                <span className={styles.spBullet}>✓</span>
-                <span className={styles.spTxt}>
-                  Based on essays that got students in
-                </span>
-              </li>
-              <li>
-                <span className={styles.spBullet}>✓</span>
-                <span className={styles.spTxt}>
-                  See real responses to real prompts
-                </span>
-              </li>
-              <li>
-                <span className={styles.spBullet}>✓</span>
-                <span className={styles.spTxt}>
-                  Discover what makes essays effective
-                </span>
-              </li>
-              <li>
-                <span className={styles.spBullet}>✓</span>
-                <span className={styles.spTxt}>
-                  Learn and strengthen your unique voice
-                </span>
-              </li>
-            </ul>
-          </div>
-        </div>
-      </section>
-
-      {/* CTA */}
-      <section className={styles.ctaSection} ref={ctaSectionRef}>
-        <div className={styles.bottomPaperDecorLeft}></div>
-
-        <h2 className={styles.ctaTitle} ref={ctaTitleRef}>
-          Ready to improve your essay?
-        </h2>
-
-        <p ref={ctaTextRef}>
-          Access a curated database of 200+ real essays accepted into Harvard,
-          MIT, Stanford, and other top universities.
-        </p>
-
-        <div className={styles.ctaStats} ref={ctaStatsRef}>
-          <div className={styles.ctaStat}>
-            <span className={styles.ctaStatNum}>200+</span>
-            <span className={styles.ctaStatLabel}>Accepted essays</span>
-          </div>
-          <span className={styles.ctaStatDivider} aria-hidden="true" />
-          <div className={styles.ctaStat}>
-            <span className={styles.ctaStatNum}>6</span>
-            <span className={styles.ctaStatLabel}>Top universities</span>
-          </div>
-          <span className={styles.ctaStatDivider} aria-hidden="true" />
-          <div className={styles.ctaStat}>
-            <span className={styles.ctaStatNum}>Free</span>
-            <span className={styles.ctaStatLabel}>To get started</span>
-          </div>
-        </div>
-
-        <button
-          type="button"
-          className={`${styles.primaryBtn} ${styles.ctaPrimaryBtn}`}
-          onClick={handleStartWriting}
-          ref={ctaBtnRef}
-        >
-          <span>Start Writing</span>
-        </button>
-      </section>
+function SectionHead({ eyebrow, title, copy }) {
+  return (
+    <div className={styles.sectionHead}>
+      <p>{eyebrow}</p>
+      <h2>{title}</h2>
+      <span>{copy}</span>
     </div>
   );
+}
+
+function CountUpNumber({ value, duration = 5500, pause = 2400, resetPause = 520 }) {
+  const [displayValue, setDisplayValue] = useState(0);
+  const [isResetting, setIsResetting] = useState(true);
+  const elementRef = useRef(null);
+  const frameRef = useRef(null);
+  const timeoutsRef = useRef([]);
+  const lastDisplayRef = useRef(0);
+
+  useEffect(() => {
+    const element = elementRef.current;
+    if (!element) return undefined;
+
+    const prefersReducedMotion = window.matchMedia(
+      "(prefers-reduced-motion: reduce)",
+    ).matches;
+
+    if (prefersReducedMotion) {
+      setIsResetting(false);
+      setDisplayValue(value);
+      return undefined;
+    }
+
+    let isVisible = false;
+    let isCancelled = false;
+
+    const clearTimers = () => {
+      if (frameRef.current) {
+        cancelAnimationFrame(frameRef.current);
+        frameRef.current = null;
+      }
+
+      timeoutsRef.current.forEach((timeoutId) => clearTimeout(timeoutId));
+      timeoutsRef.current = [];
+    };
+
+    const runAnimation = () => {
+      setIsResetting(true);
+      lastDisplayRef.current = 0;
+      setDisplayValue(0);
+
+      timeoutsRef.current.push(
+        setTimeout(() => {
+          if (isCancelled || !isVisible) return;
+          setIsResetting(false);
+          let startedAt;
+
+          const animate = (timestamp) => {
+            if (isCancelled || !isVisible) return;
+            if (!startedAt) startedAt = timestamp;
+
+            const progress = Math.min((timestamp - startedAt) / duration, 1);
+            const tailStart = 0.68;
+            const tailValue = Math.max(0, value - 9);
+            let nextValue;
+
+            if (progress < tailStart) {
+              const phase = progress / tailStart;
+              nextValue = Math.floor(tailValue * phase ** 2.8);
+            } else {
+              const phase = (progress - tailStart) / (1 - tailStart);
+              const easedTail = 1 - (1 - phase) ** 1.1;
+              nextValue = Math.floor(tailValue + (value - tailValue) * easedTail);
+            }
+
+            nextValue = Math.min(value, nextValue);
+            if (nextValue !== lastDisplayRef.current || progress === 1) {
+              lastDisplayRef.current = nextValue;
+              setDisplayValue(progress === 1 ? value : nextValue);
+            }
+
+            if (progress < 1) {
+              frameRef.current = requestAnimationFrame(animate);
+            }
+          };
+
+          frameRef.current = requestAnimationFrame(animate);
+        }, resetPause),
+      );
+
+      timeoutsRef.current.push(
+        setTimeout(() => {
+          if (isCancelled || !isVisible) return;
+          runAnimation();
+        }, resetPause + duration + pause),
+      );
+    };
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const entry = entries[0];
+
+        if (entry?.isIntersecting) {
+          if (isVisible) return;
+          isVisible = true;
+          clearTimers();
+          runAnimation();
+          return;
+        }
+
+        isVisible = false;
+        clearTimers();
+        setIsResetting(true);
+        lastDisplayRef.current = 0;
+        setDisplayValue(0);
+      },
+      { threshold: 0.55 },
+    );
+
+    observer.observe(element);
+
+    return () => {
+      isCancelled = true;
+      observer.disconnect();
+      clearTimers();
+    };
+  }, [duration, pause, resetPause, value]);
+
+  const targetDigits = String(value).split("");
+  const lastIndex = targetDigits.length - 1;
+
+  return (
+    <span ref={elementRef} className={styles.countNumber}>
+      {targetDigits.map((_, index) => {
+        const distanceFromRight = lastIndex - index;
+        const placeValue = 10 ** distanceFromRight;
+        const targetStep = Math.floor(displayValue / placeValue);
+        const isLeadingHidden = displayValue < placeValue && distanceFromRight > 0;
+        const sequence = Array.from({ length: targetStep + 1 }, (_, step) =>
+          String(step % 10),
+        );
+
+        return (
+          <span
+            className={`${styles.digitWindow} ${
+              isLeadingHidden ? styles.digitWindowHidden : ""
+            }`}
+            key={`${index}-${value}`}
+          >
+            <span
+              className={`${styles.digitTrack} ${
+                isResetting ? styles.digitTrackResetting : ""
+              }`}
+              style={{
+                transform: `translateY(-${targetStep}em)`,
+                transitionDuration:
+                  displayValue >= value - 1 ? "320ms" : undefined,
+              }}
+            >
+              {sequence.map((number, step) => (
+                <span className={styles.digit} key={`${number}-${step}`}>
+                  {number}
+                </span>
+              ))}
+            </span>
+          </span>
+        );
+      })}
+    </span>
+  );
+}
+
+function Step({ rank, title, copy }) {
+  return (
+    <div className={styles.step}>
+      <div className={styles.rank}>{rank}</div>
+      <h3>{title}</h3>
+      <p>{copy}</p>
+    </div>
+  );
+}
+
+function Divider() {
+  return <hr className={styles.divider} />;
 }
 
 export default Home;

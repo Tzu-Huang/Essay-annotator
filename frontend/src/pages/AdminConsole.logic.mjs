@@ -6,6 +6,7 @@ export const PROJECT_ADMIN_EMAILS = [
   "zackeryliu98@gmail.com",
   "zackery032895@gmail.com",
   "tzuhuangliu@gmail.com",
+  "amanda.tsai11@gmail.com",
 ];
 
 export function formatNumber(value) {

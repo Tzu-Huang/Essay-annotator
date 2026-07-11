@@ -46,7 +46,6 @@
         padding: 0;
         background: linear-gradient(180deg, #f8fafd 0%, #eef4fb 45%, #e7f0fa 100%);
         color: var(--ink);
-        overflow-x: hidden;
       }
       body {
         font-family: "Changa", "Segoe UI", sans-serif;
@@ -177,6 +176,12 @@
       .intro-screen {
         position: sticky;
         top: var(--navbar-h);
+        /* overflow-x:hidden lived on html/body before this section became
+           sticky — on this browser engine, overflow-x on an html/body
+           ancestor silently breaks position:sticky on descendants, so it's
+           scoped down to here instead (the only place with elements —
+           the ambient blobs below — that overflow horizontally) */
+        overflow-x: hidden;
         /* now that the masthead is actually fixed, --navbar-h is real space
            reserved above this section — sizing off it keeps hero + compare
            panel together inside the remaining viewport instead of spilling

@@ -6,7 +6,6 @@ import os
 from service.build_results import build_results
 from embedding.search_similar import cosine_search, classify_query_input
 from embedding.make_embedding import get_query_embedding
-from service.generate_topic import get_topic
 
 
 def get_client():
@@ -65,10 +64,6 @@ def run_search(req, app_state):
 
     for result in results:
         essay = app_state.essays.get(result["parent_id"], {})
-        result["generated_title"] = get_topic(
-            topic=essay.get("topic", ""),
-            content=essay.get("content", ""),
-            client=client,
-        )
+        result["generated_title"] = essay.get("generated_title")
 
     return {"results": results}

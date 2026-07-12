@@ -46,6 +46,12 @@
         padding: 0;
         background: linear-gradient(180deg, #f8fafd 0%, #eef4fb 45%, #e7f0fa 100%);
         color: var(--ink);
+        scrollbar-width: none;
+        -ms-overflow-style: none;
+      }
+      html::-webkit-scrollbar,
+      body::-webkit-scrollbar {
+        display: none;
       }
       body {
         font-family: "Changa", "Segoe UI", sans-serif;
@@ -164,28 +170,16 @@
         box-shadow: 0 10px 15px rgba(17, 24, 39, 0.16);
       }
 
-      /* SCROLLY WRAPPER — gives the sticky intro-screen extra scroll distance
-         to pin against while the compare-window reveal scrubs open */
+      /* INTRO WRAPPER */
       .intro-scroll {
         position: relative;
-        height: calc(100vh - var(--navbar-h) + 90vh);
       }
 
       /* INTRO SCREEN — hero + peek panel together sized to the viewport, so the
-         "first section" fills exactly one screen (minus the navbar) on load */
+         first section fills the opening screen without pinning scroll */
       .intro-screen {
-        position: sticky;
-        top: var(--navbar-h);
-        /* overflow-x:hidden lived on html/body before this section became
-           sticky — on this browser engine, overflow-x on an html/body
-           ancestor silently breaks position:sticky on descendants, so it's
-           scoped down to here instead (the only place with elements —
-           the ambient blobs below — that overflow horizontally) */
+        /* Scoped to the intro because the ambient blobs overflow horizontally. */
         overflow-x: hidden;
-        /* now that the masthead is actually fixed, --navbar-h is real space
-           reserved above this section — sizing off it keeps hero + compare
-           panel together inside the remaining viewport instead of spilling
-           past the fold */
         min-height: calc(100vh - var(--navbar-h));
         display: flex;
         flex-direction: column;
@@ -469,7 +463,7 @@
         background: var(--parchment-2);
         border: 1px solid var(--line);
         border-radius: 16px;
-        box-shadow: 0 44px 90px rgba(15, 23, 42, 0.13);
+        box-shadow: 0 18px 42px rgba(15, 23, 42, 0.06);
         /* no overflow:hidden here — the floating match chip sits above this box
            and must not be clipped by it; children below handle their own clipping */
       }
@@ -614,6 +608,9 @@
       section {
         padding: 70px 0;
       }
+      #how section {
+        padding-top: 48px;
+      }
       .section-head {
         text-align: center;
         max-width: 620px;
@@ -631,6 +628,15 @@
         font-size: clamp(28px, 3.6vw, 40px);
         font-weight: 600;
         margin: 0 0 14px;
+      }
+      .section-head h2.single-line-title {
+        white-space: nowrap;
+        font-size: clamp(24px, 3.1vw, 40px);
+      }
+      @media (max-width: 720px) {
+        .section-head h2.single-line-title {
+          font-size: clamp(21px, 7vw, 34px);
+        }
       }
       .section-head p {
         font-size: 15.5px;
@@ -730,8 +736,8 @@
       }
       .cert-body {
         display: grid;
-        grid-template-columns: 1fr auto 1fr;
-        gap: 30px;
+        grid-template-columns: minmax(0, 1fr) 150px minmax(0, 1fr);
+        gap: 24px;
         align-items: start;
       }
       @media (max-width: 820px) {
@@ -754,8 +760,12 @@
       }
       .cert-col p {
         font-size: 14.5px;
-        margin: 0 0 12px;
+        line-height: 1.68;
+        margin: 0 0 13px;
         color: #31394a;
+      }
+      .cert-col.admitted-col p {
+        line-height: 1.88;
       }
       .cert-col .hl {
         background: var(--highlight);
@@ -766,12 +776,64 @@
         color: var(--muted);
       }
       .cert-divider {
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        min-height: 230px;
+        padding: 18px 0;
+      }
+      .cert-divider::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        left: 50%;
         width: 1px;
         background: var(--line);
       }
+      .relation-button {
+        position: relative;
+        z-index: 1;
+        font-family: "Futura", "Century Gothic", sans-serif;
+        font-weight: 600;
+        letter-spacing: 0;
+        text-align: center;
+        text-transform: none;
+        display: block;
+        width: 100%;
+        padding: 10px 12px;
+        border: none;
+        border-radius: 10px;
+        background: #f4eeea;
+        color: #e86b2c;
+        font-size: 13px;
+        line-height: 1.25;
+        box-shadow: 0 10px 22px rgba(32, 28, 22, 0.05);
+      }
       @media (max-width: 820px) {
         .cert-divider {
-          display: none;
+          width: 100%;
+          height: auto;
+          min-height: auto;
+          flex-direction: row;
+          justify-content: center;
+          padding: 12px 0;
+          background: transparent;
+        }
+        .cert-divider::before {
+          content: "";
+          position: absolute;
+          top: 50%;
+          right: 0;
+          left: 0;
+          height: 1px;
+          background: var(--line);
+        }
+        .relation-button {
+          width: auto;
         }
       }
       .cert-note {
@@ -791,9 +853,147 @@
         font-size: 13.5px;
         color: #4b5566;
       }
-      .cert-note a {
-        color: var(--forest);
-        border-bottom: 1px solid var(--forest);
+      .rewrite-demo {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+        gap: 18px;
+        align-items: stretch;
+        margin-top: 22px;
+        text-align: left;
+      }
+      .rewrite-before,
+      .rewrite-after {
+        position: relative;
+        min-height: 122px;
+        padding: 18px;
+        border: 1px solid var(--line);
+        border-radius: 10px;
+        background: #f8f9fb;
+        overflow: hidden;
+      }
+      .rewrite-after {
+        border-color: rgba(15, 118, 110, 0.35);
+        background: #eef7f1;
+      }
+      .rewrite-before small,
+      .rewrite-after small,
+      .rewrite-flow span {
+        font-family: "Futura", "Century Gothic", sans-serif;
+        font-size: 10px;
+        font-weight: 700;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+      }
+      .rewrite-before small { color: var(--muted); }
+      .rewrite-after small { color: var(--forest); }
+      .rewrite-before p,
+      .rewrite-after p {
+        margin: 10px 0 0;
+        color: #31394a;
+        font-size: 14px;
+        line-height: 1.55;
+      }
+      .rewrite-before p {
+        animation: softenDraft 5.8s ease-in-out infinite;
+      }
+      .rewrite-after p {
+        animation: revealRewrite 5.8s ease-in-out infinite;
+      }
+      .rewrite-flow {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        gap: 8px;
+        width: 128px;
+      }
+      .rewrite-flow span {
+        display: block;
+        padding: 7px 10px;
+        border: 1px solid rgba(79, 124, 255, 0.25);
+        border-radius: 999px;
+        background: #edf3ff;
+        color: var(--cp-blue-text);
+        text-align: center;
+        line-height: 1.2;
+        opacity: 0.35;
+        transform: translateX(-8px);
+        animation: cueStep 5.8s ease-in-out infinite;
+      }
+      .rewrite-flow span:nth-child(2) { animation-delay: 0.45s; }
+      .rewrite-flow span:nth-child(3) { animation-delay: 0.9s; }
+      .analysis-button {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        margin-top: 20px;
+        padding: 11px 20px;
+        border: 1px solid rgba(108, 75, 176, 0.42);
+        border-radius: 999px;
+        background: #ffffff;
+        color: var(--cp-purple-text);
+        font-family: "Futura", "Century Gothic", sans-serif;
+        font-size: 10.5px;
+        font-weight: 700;
+        letter-spacing: 0.08em;
+        line-height: 1;
+        text-transform: uppercase;
+        box-shadow: 0 10px 20px rgba(108, 75, 176, 0.12);
+        transition: transform 0.16s ease, box-shadow 0.16s ease;
+      }
+      .analysis-button:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 14px 26px rgba(108, 75, 176, 0.18);
+      }
+      @keyframes softenDraft {
+        0%, 22% {
+          opacity: 1;
+          text-decoration-color: transparent;
+        }
+        38%, 100% {
+          opacity: 0.45;
+          text-decoration: line-through;
+          text-decoration-color: rgba(194, 86, 79, 0.55);
+        }
+      }
+      @keyframes revealRewrite {
+        0%, 48% {
+          opacity: 0.35;
+          transform: translateY(6px);
+        }
+        64%, 100% {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+      @keyframes cueStep {
+        0%, 18%, 100% {
+          opacity: 0.35;
+          transform: translateX(-8px);
+        }
+        34%, 68% {
+          opacity: 1;
+          transform: translateX(0);
+        }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        .rewrite-before p,
+        .rewrite-after p,
+        .rewrite-flow span {
+          animation: none !important;
+        }
+      }
+      @media (max-width: 720px) {
+        .rewrite-demo {
+          grid-template-columns: 1fr;
+        }
+        .rewrite-flow {
+          width: 100%;
+          flex-direction: row;
+          flex-wrap: wrap;
+        }
+        .rewrite-flow span {
+          flex: 1 1 120px;
+        }
       }
 
       /* LIBRARY */
@@ -865,8 +1065,42 @@
         font-size: 10.5px;
         letter-spacing: 0.06em;
         color: var(--brass);
+        position: relative;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        width: fit-content;
         margin-top: auto;
         padding-top: 6px;
+        padding-bottom: 3px;
+      }
+      .card .go::before {
+        content: "";
+        position: absolute;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        height: 1px;
+        background: currentColor;
+        transform: scaleX(0);
+        transform-origin: left;
+        transition: transform 0.18s ease;
+      }
+      .card .go::after {
+        content: "->";
+        display: inline-block;
+        transform: translateX(-2px);
+        opacity: 0;
+        transition: transform 0.18s ease, opacity 0.18s ease;
+      }
+      .card:hover .go::before,
+      .card .go:hover::before {
+        transform: scaleX(1);
+      }
+      .card:hover .go::after,
+      .card .go:hover::after {
+        transform: translateX(2px);
+        opacity: 1;
       }
 
       /* WHY DIFFERENT */
@@ -1015,9 +1249,9 @@
         <div class="wrap">
           <h1>Real essays.<br />Real <span class="accent">improvement.</span></h1>
           <p class="dek">
-            Upload your draft, find similar successful essays, and see exactly
-            what makes them work — reviewed against the standard of essays already
-            admitted.
+            Most essay tools show you standout examples. We show you relevant
+            ones. Find accepted essays similar to your draft and learn from
+            improvements that actually apply to your writing.
           </p>
           <div class="hero-actions">
             <a href="#" class="btn-brass">Start writing</a>
@@ -1025,7 +1259,7 @@
           </div>
           <div class="credential-row">
             <div class="credential"><b>200+</b><span>Accepted essays</span></div>
-            <div class="credential"><b>6</b><span>Top universities</span></div>
+            <div class="credential"><b>15</b><span>Different topics</span></div>
             <div class="credential"><b>Free</b><span>To get started</span></div>
           </div>
         </div>
@@ -1128,7 +1362,7 @@
       <div class="wrap">
         <div class="section-head">
           <p class="eyebrow">Comparative Review</p>
-          <h2>See what makes strong essays work</h2>
+          <h2 class="single-line-title">See what makes strong essays work</h2>
           <p>Your draft, reviewed side by side with a real accepted essay.</p>
         </div>
         <div class="certificate">
@@ -1136,7 +1370,7 @@
             <p class="eyebrow">Comparative Reading — Prompt Matched</p>
           </div>
           <div class="cert-body">
-            <div class="cert-col">
+            <div class="cert-col admitted-col">
               <h4>Candidate draft</h4>
               <h3>Your essay</h3>
               <p>
@@ -1151,10 +1385,12 @@
               </p>
               <p>I hope to continue this journey in college and beyond.</p>
             </div>
-            <div class="cert-divider"></div>
+            <div class="cert-divider">
+              <span class="relation-button">See how they are related</span>
+            </div>
             <div class="cert-col">
               <h4>Admitted essay</h4>
-              <h3>essay_0167</h3>
+              <h3>A First Day at the Hospital</h3>
               <p>
                 Stepping into the local hospital sophomore summer, I embraced
                 the role of student volunteer, eager to assist patients.
@@ -1170,9 +1406,31 @@
             <div class="cert-note">
               <b>Stronger opening image</b>
               <span
-                >essay_0167 turns a general idea into a vivid, sensory image
-                that pulls readers in. <a href="#">See full analysis →</a></span
+                >A First Day at the Hospital turns a general idea into a vivid, sensory image
+                that pulls readers in.</span
               >
+              <div class="rewrite-demo" aria-label="Opening image rewrite demonstration">
+                <div class="rewrite-before">
+                  <small>Draft line</small>
+                  <p>
+                    The experience opened my eyes to how small acts of
+                    kindness can have a big impact.
+                  </p>
+                </div>
+                <div class="rewrite-flow" aria-hidden="true">
+                  <span>setting</span>
+                  <span>sensory detail</span>
+                  <span>specific movement</span>
+                </div>
+                <div class="rewrite-after">
+                  <small>Stronger opening</small>
+                  <p>
+                    The sterile scent of alcohol greeted me as I stepped into
+                    the hospital hallway.
+                  </p>
+                </div>
+              </div>
+              <a href="#" class="analysis-button">See full analysis</a>
             </div>
           </div>
         </div>
@@ -1196,7 +1454,7 @@
               A research experience in nanotechnology reveals the writer's deep
               fascination with science and lifelong ambition for discovery.
             </p>
-            <span class="go">Read more →</span>
+            <span class="go">Read more</span>
           </a>
           <a href="#" class="card">
             <span class="school">Stanford University</span>
@@ -1205,7 +1463,7 @@
               A summer science program transforms the writer's view of learning
               into curiosity and discovery.
             </p>
-            <span class="go">Read more →</span>
+            <span class="go">Read more</span>
           </a>
           <a href="#" class="card">
             <span class="school">Columbia University</span>
@@ -1214,7 +1472,7 @@
               A hospital performance inspires the writer to use music to support
               a child with a rare disease.
             </p>
-            <span class="go">Read more →</span>
+            <span class="go">Read more</span>
           </a>
           <a href="#" class="card">
             <span class="school">University of Pennsylvania</span>
@@ -1223,7 +1481,7 @@
               From public health service to medical research, meaningful change
               often begins with small solutions.
             </p>
-            <span class="go">Read more →</span>
+            <span class="go">Read more</span>
           </a>
           <a href="#" class="card">
             <span class="school">Johns Hopkins</span>
@@ -1232,7 +1490,7 @@
               A journey through self-expression and belonging helps the writer
               discover authenticity and community coexist.
             </p>
-            <span class="go">Read more →</span>
+            <span class="go">Read more</span>
           </a>
           <a href="#" class="card">
             <span class="school">Ivy League</span>
@@ -1241,7 +1499,7 @@
               Scuba diving becomes a refuge of peace for a writer navigating
               cultural identity between two worlds.
             </p>
-            <span class="go">Read more →</span>
+            <span class="go">Read more</span>
           </a>
         </div>
       </div>
@@ -1305,7 +1563,7 @@
         </p>
         <div class="cta-stats">
           <div class="stat"><b>200+</b><span>Accepted essays</span></div>
-          <div class="stat"><b>6</b><span>Top universities</span></div>
+          <div class="stat"><b>15</b><span>Different topics</span></div>
           <div class="stat"><b>Free</b><span>To get started</span></div>
         </div>
         <a href="#" class="btn-brass">Start writing</a>

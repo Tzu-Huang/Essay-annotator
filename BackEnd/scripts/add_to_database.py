@@ -8,8 +8,10 @@ It saves runtime while handling id order issues and uncategorized new input data
 """
 
 import json
+import os
 import re
 import shutil
+import sys
 from itertools import count
 from pathlib import Path
 
@@ -17,6 +19,13 @@ from pathlib import Path
 # Config
 # =========================
 script_dir = Path(__file__).parent
+ROOT = script_dir.resolve().parent
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
+
+from openai import OpenAI
+from service.generate_topic import get_topic
+
 ONLINE_INPUT_DIR = script_dir / "../drive_data/essays_jsonl/online_essays"
 COLLECTED_JSONL = script_dir / "../drive_data/essays_jsonl/collected_essays.jsonl"
 NEW_INPUT_DIR = script_dir / "../drive_data/organized_data/new_input"
@@ -271,6 +280,28 @@ def get_next_id():
         return (int)(last_id.split("_")[1]) + 1
 
 
+def get_client() -> OpenAI:
+    return OpenAI(api_key=os.environ["OPENAI_API_KEY"])
+
+
+def add_generated_titles(essays: list[dict], client) -> None:
+    """
+    Generate a short LLM title for each essay and store it under 'generated_title'.
+    Mutates each essay dict in place. A failure on one essay is logged and skipped;
+    it does not stop processing of the rest.
+    """
+    for essay in essays:
+        try:
+            essay["generated_title"] = get_topic(
+                topic=essay.get("topic", ""),
+                content=essay.get("content", ""),
+                client=client,
+            )
+        except Exception as e:
+            print(f"  [warn] Failed to generate title for {essay.get('id')}: {e}")
+            essay["generated_title"] = None
+
+
 # =========================
 # Main
 # =========================
@@ -292,6 +323,8 @@ def update_database():
             print("No essays found, please check.")
             return
 
+        add_generated_titles(all_essays, get_client())
+
         DATABASE_PATH.parent.mkdir(parents=True, exist_ok=True)
         with open(DATABASE_PATH, "w", encoding="utf-8") as f:
             for essay in all_essays:
@@ -308,6 +341,8 @@ def update_database():
         if not new_essays:
             print("  No new essays found in new_input/. Nothing appended.")
             return
+
+        add_generated_titles(new_essays, get_client())
 
         with open(DATABASE_PATH, "a", encoding="utf-8") as f:
             for essay in new_essays:

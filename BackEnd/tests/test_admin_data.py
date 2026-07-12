@@ -25,7 +25,7 @@ from app.admin import (
     update_essay,
 )
 from database.create import AdminAuditLog, Base, Essay, EssayEmbedding, OpenAIUsageEvent
-from database.essays import audit_log, import_essays_from_jsonl, load_essays_from_db, query_essays, summarize_usage, utcnow
+from database.essays import audit_log, essay_to_dict, import_essays_from_jsonl, load_essays_from_db, query_essays, summarize_usage, utcnow
 
 
 class AdminDataTests(unittest.TestCase):
@@ -68,6 +68,67 @@ class AdminDataTests(unittest.TestCase):
         self.assertEqual(result.skipped_duplicates, 1)
         self.assertEqual(result.invalid, 2)
         self.assertIn("essay_0001", load_essays_from_db(self.db))
+
+    def test_import_essays_merges_generated_title_into_metadata_json(self):
+        path = self.write_jsonl(
+            [
+                {
+                    "id": "essay_0001",
+                    "topic": "Prompt",
+                    "content": "Essay body",
+                    "type": "Personal Statement",
+                    "generated_title": "A Great Title",
+                },
+            ]
+        )
+
+        import_essays_from_jsonl(self.db, path)
+        self.db.commit()
+
+        essay = self.db.query(Essay).filter_by(id="essay_0001").first()
+        self.assertEqual(essay.metadata_json, {"generated_title": "A Great Title"})
+
+    def test_import_essays_preserves_existing_metadata_when_merging_generated_title(self):
+        path = self.write_jsonl(
+            [
+                {
+                    "id": "essay_0001",
+                    "topic": "Prompt",
+                    "content": "Essay body",
+                    "metadata": {"custom": "value"},
+                    "generated_title": "A Great Title",
+                },
+            ]
+        )
+
+        import_essays_from_jsonl(self.db, path)
+        self.db.commit()
+
+        essay = self.db.query(Essay).filter_by(id="essay_0001").first()
+        self.assertEqual(
+            essay.metadata_json,
+            {"custom": "value", "generated_title": "A Great Title"},
+        )
+
+    def test_essay_to_dict_flattens_generated_title_from_metadata_json(self):
+        essay = Essay(
+            id="essay_0099",
+            topic="Prompt",
+            content="Body",
+            metadata_json={"generated_title": "Existing Title", "other": "value"},
+        )
+
+        result = essay_to_dict(essay)
+
+        self.assertEqual(result["generated_title"], "Existing Title")
+        self.assertEqual(result["metadata"], {"generated_title": "Existing Title", "other": "value"})
+
+    def test_essay_to_dict_generated_title_is_none_without_metadata(self):
+        essay = Essay(id="essay_0100", topic="Prompt", content="Body", metadata_json=None)
+
+        result = essay_to_dict(essay)
+
+        self.assertIsNone(result["generated_title"])
 
     def test_admin_allowlist_and_write_role(self):
         os.environ["ADMIN_EMAILS"] = "owner@example.com,viewer@example.com"

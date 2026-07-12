@@ -1,8 +1,5 @@
 import os
 import time
-from service.generate_topic import get_topic
-from service.generate_topic import MODEL as TOPIC_MODEL
-from openai import OpenAI
 from app.helpers import load_essays
 from service.search_service import run_search
 from app.state import AppData
@@ -92,8 +89,9 @@ app.add_middleware(CORSMiddleware,
     allow_origins=["http://44.201.62.0:8000",
         "http://127.0.0.1:3000",
         "http://localhost:5173",   # Vite 常見
-        "http://127.0.0.1:5173",         
-                   
+        "http://127.0.0.1:5173",
+        "http://localhost:5174",
+        "http://127.0.0.1:5174",
     ],  # your frontend URL
     
     allow_methods=["*"],
@@ -219,22 +217,7 @@ def get_essay(
     content = essay.get("content", "")
     result["word_count"] = len(content.split()) if content else 0
 
-    client = OpenAI(api_key=os.environ["OPENAI_API_KEY"])
-    db = SessionLocal()
-    try:
-        result["generated_title"] = get_topic(
-            topic=essay.get("topic", ""),
-            content=content,
-            client=client,
-        )
-        record_openai_usage(db, feature="generated_title", model=TOPIC_MODEL, status="success")
-        db.commit()
-    except Exception:
-        record_openai_usage(db, feature="generated_title", model=TOPIC_MODEL, status="failed")
-        db.commit()
-        raise
-    finally:
-        db.close()
+    result["generated_title"] = essay.get("generated_title")
 
     return result
 # ===========================

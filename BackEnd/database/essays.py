@@ -41,6 +41,7 @@ def essay_to_dict(essay: Essay, include_content: bool = True) -> dict:
         "public": essay.public,
         "source_file": essay.source_file,
         "metadata": essay.metadata_json,
+        "generated_title": (essay.metadata_json or {}).get("generated_title"),
         "embedding_status": essay.embedding_status,
         "created_at": essay.created_at.isoformat() if essay.created_at else None,
         "updated_at": essay.updated_at.isoformat() if essay.updated_at else None,
@@ -143,6 +144,13 @@ def import_essays_from_jsonl(db: Session, path: Path) -> ImportResult:
             except (json.JSONDecodeError, ValueError):
                 result.invalid += 1
                 continue
+
+            generated_title = raw.get("generated_title")
+            if generated_title:
+                payload["metadata_json"] = {
+                    **(payload["metadata_json"] or {}),
+                    "generated_title": generated_title,
+                }
 
             signature = (
                 payload["topic"].lower(),

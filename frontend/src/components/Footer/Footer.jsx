@@ -1,14 +1,14 @@
 import "./Footer.css";
 import { FaGithub } from "react-icons/fa";
-import logo from "../../logo/logo.png";
+import logo from "../../assets/logo.png";
 
 export default function Footer() {
   return (
     <footer className="footer">
       <div className="footer-top">
         <div className="footer-brand">
-          <img src={logo} alt="Storyteller logo" className="footer-logo" />
-          <span className="footer-title">storyteller</span>
+          <img src={logo} alt="Essay Annotator logo" className="footer-logo" />
+          <span className="footer-title">Essay Annotator</span>
         </div>
 
         <nav className="footer-nav" aria-label="Footer navigation">
@@ -22,7 +22,7 @@ export default function Footer() {
       <div className="footer-line" />
 
       <div className="footer-bottom">
-        <p>©2026 Storyteller</p>
+        <p>©2026 Essay Annotator</p>
 
         <div className="footer-links">
           <a href="https://github.com" aria-label="GitHub" className="github-icon">

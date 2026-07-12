@@ -4,7 +4,7 @@
     linear-gradient(180deg, #202630 0%, #1c222b 100%);
   color: #f6f7f8;
   padding: 42px 76px 32px;
-  font-family: "Montserrat", "Helvetica Neue", Arial, sans-serif;
+  font-family: "Montserrat", "Helvetica Neue", "Arial", sans-serif;
 }
 
 .footer-top,
@@ -30,10 +30,12 @@
 
 .footer-title {
   color: #f7f8f9;
-  font-size: 23px;
+  font-size: 15px;
+  margin-left: -17px;
+  margin-bottom: -10px;
   font-weight: 400;
   line-height: 1;
-  letter-spacing: 0;
+  letter-spacing: 0.5px;
 }
 
 .footer-nav,
@@ -56,7 +58,7 @@
   font-size: 16px;
   font-weight: 400;
   line-height: 1;
-  letter-spacing: 0;
+  letter-spacing: 0.25px;
   text-decoration: none;
   transition:
     color 160ms ease,
@@ -79,6 +81,7 @@
   color: rgba(235, 238, 242, 0.84);
   font-size: 14px;
   font-weight: 400;
+  letter-spacing: 0.1px;
   line-height: 1;
 }
 

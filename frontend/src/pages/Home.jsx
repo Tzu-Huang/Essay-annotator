@@ -58,6 +58,16 @@ function Home({ onOpenSignIn }) {
   const [essayCount, setEssayCount] = useState(FALLBACK_ESSAY_COUNT);
 
   useEffect(() => {
+    document.documentElement.classList.add("homepage-scrollbar-hidden");
+    document.body.classList.add("homepage-scrollbar-hidden");
+
+    return () => {
+      document.documentElement.classList.remove("homepage-scrollbar-hidden");
+      document.body.classList.remove("homepage-scrollbar-hidden");
+    };
+  }, []);
+
+  useEffect(() => {
     if (!API_BASE) return undefined;
 
     const controller = new AbortController();
@@ -111,9 +121,9 @@ function Home({ onOpenSignIn }) {
               </h1>
 
               <p className={styles.dek}>
-                Upload your draft, find similar successful essays, and see
-                exactly what makes them work, reviewed against the standard of
-                essays already admitted.
+                Most essay tools show you standout examples. We show you
+                relevant ones. Find accepted essays similar to your draft and
+                learn from improvements that actually apply to your writing.
               </p>
 
               <div className={styles.heroActions}>
@@ -138,8 +148,10 @@ function Home({ onOpenSignIn }) {
                   <span>Accepted essays</span>
                 </div>
                 <div className={styles.credential}>
-                  <b>6</b>
-                  <span>Top universities</span>
+                  <b>
+                    <CountUpNumber value={15} easing="linear" />
+                  </b>
+                  <span>Different topics</span>
                 </div>
                 <div className={styles.credential}>
                   <b>Free</b>
@@ -209,7 +221,10 @@ function Home({ onOpenSignIn }) {
         </div>
       </div>
 
-      <section id="how-it-works" className={styles.section}>
+      <section
+        id="how-it-works"
+        className={`${styles.section} ${styles.howSection}`}
+      >
         <div className={styles.wrap}>
           <SectionHead
             eyebrow="Procedure"
@@ -244,6 +259,7 @@ function Home({ onOpenSignIn }) {
           <SectionHead
             eyebrow="Comparative Review"
             title="See what makes strong essays work"
+            titleClassName={styles.singleLineTitle}
             copy="Your draft, reviewed side by side with a real accepted essay."
           />
 
@@ -253,7 +269,7 @@ function Home({ onOpenSignIn }) {
             </div>
 
             <div className={styles.certBody}>
-              <div className={styles.certCol}>
+              <div className={`${styles.certCol} ${styles.admittedCol}`}>
                 <h4>Candidate draft</h4>
                 <h3>Your essay</h3>
                 <p>Ever since my first day volunteering at the community clinic,</p>
@@ -267,11 +283,15 @@ function Home({ onOpenSignIn }) {
                 <p>I hope to continue this journey in college and beyond.</p>
               </div>
 
-              <div className={styles.certDivider} />
+              <div className={styles.certDivider}>
+                <span className={styles.relationButton}>
+                  See how they are related
+                </span>
+              </div>
 
               <div className={styles.certCol}>
                 <h4>Admitted essay</h4>
-                <h3>essay_0167</h3>
+                <h3>A First Day at the Hospital</h3>
                 <p>
                   Stepping into the local hospital sophomore summer, I embraced
                   the role of student volunteer, eager to assist patients.{" "}
@@ -288,10 +308,33 @@ function Home({ onOpenSignIn }) {
               <div className={styles.certNote}>
                 <b>Stronger opening image</b>
                 <span>
-                  essay_0167 turns a general idea into a vivid, sensory image
-                  that pulls readers in.{" "}
-                  <Link to="/editor">See full analysis</Link>
+                  A First Day at the Hospital turns a general idea into a vivid, sensory image
+                  that pulls readers in.
                 </span>
+                <div className={styles.rewriteDemo} aria-label="Opening image rewrite demonstration">
+                  <div className={styles.rewriteBefore}>
+                    <small>Draft line</small>
+                    <p>
+                      The experience opened my eyes to how small acts of
+                      kindness can have a big impact.
+                    </p>
+                  </div>
+                  <div className={styles.rewriteFlow} aria-hidden="true">
+                    <span>setting</span>
+                    <span>sensory detail</span>
+                    <span>specific movement</span>
+                  </div>
+                  <div className={styles.rewriteAfter}>
+                    <small>Stronger opening</small>
+                    <p>
+                      The sterile scent of alcohol greeted me as I stepped into
+                      the hospital hallway.
+                    </p>
+                  </div>
+                </div>
+                <Link to="/editor" className={styles.analysisButton}>
+                  See full analysis
+                </Link>
               </div>
             </div>
           </div>
@@ -394,8 +437,10 @@ function Home({ onOpenSignIn }) {
               <span>Accepted essays</span>
             </div>
             <div className={styles.stat}>
-              <b>6</b>
-              <span>Top universities</span>
+              <b>
+                <CountUpNumber value={15} easing="linear" />
+              </b>
+              <span>Different topics</span>
             </div>
             <div className={styles.stat}>
               <b>Free</b>
@@ -416,17 +461,23 @@ function Home({ onOpenSignIn }) {
   );
 }
 
-function SectionHead({ eyebrow, title, copy }) {
+function SectionHead({ eyebrow, title, copy, titleClassName }) {
   return (
     <div className={styles.sectionHead}>
       <p>{eyebrow}</p>
-      <h2>{title}</h2>
+      <h2 className={titleClassName}>{title}</h2>
       <span>{copy}</span>
     </div>
   );
 }
 
-function CountUpNumber({ value, duration = 5500, pause = 2400, resetPause = 520 }) {
+function CountUpNumber({
+  value,
+  duration = 5500,
+  pause = 2400,
+  resetPause = 520,
+  easing = "default",
+}) {
   const [displayValue, setDisplayValue] = useState(0);
   const [isResetting, setIsResetting] = useState(true);
   const elementRef = useRef(null);
@@ -477,17 +528,13 @@ function CountUpNumber({ value, duration = 5500, pause = 2400, resetPause = 520 
             if (!startedAt) startedAt = timestamp;
 
             const progress = Math.min((timestamp - startedAt) / duration, 1);
-            const tailStart = 0.68;
-            const tailValue = Math.max(0, value - 9);
             let nextValue;
 
-            if (progress < tailStart) {
-              const phase = progress / tailStart;
-              nextValue = Math.floor(tailValue * phase ** 2.8);
+            if (easing === "linear") {
+              nextValue = Math.floor(value * progress);
             } else {
-              const phase = (progress - tailStart) / (1 - tailStart);
-              const easedTail = 1 - (1 - phase) ** 1.1;
-              nextValue = Math.floor(tailValue + (value - tailValue) * easedTail);
+              const cosineProgress = 0.5 * (1 - Math.cos(Math.PI * progress));
+              nextValue = Math.floor(value * cosineProgress);
             }
 
             nextValue = Math.min(value, nextValue);
@@ -541,7 +588,7 @@ function CountUpNumber({ value, duration = 5500, pause = 2400, resetPause = 520 
       observer.disconnect();
       clearTimers();
     };
-  }, [duration, pause, resetPause, value]);
+  }, [duration, easing, pause, resetPause, value]);
 
   const targetDigits = String(value).split("");
   const lastIndex = targetDigits.length - 1;

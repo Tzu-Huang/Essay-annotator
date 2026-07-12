@@ -1,6 +1,9 @@
 @import url("https://fonts.googleapis.com/css2?family=Changa:wght@600;700;800&display=swap");
 
 .navbarShell {
+  position: sticky;
+  top: 0;
+  z-index: 100;
   width: 100%;
   box-sizing: border-box;
   background: rgba(255, 255, 255, 0.94);

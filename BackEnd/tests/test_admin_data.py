@@ -4,6 +4,7 @@ import tempfile
 import unittest
 from pathlib import Path
 
+from fastapi import HTTPException
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
@@ -315,6 +316,16 @@ class AdminDataTests(unittest.TestCase):
 
         with self.assertRaises(Exception):
             restore_essay("does-not-exist", db=self.db, actor=actor)
+
+    def test_update_blocks_soft_deleted_essay(self):
+        actor = AdminActor(email="owner@example.com", can_write=True)
+        created = create_essay(EssayCreate(topic="T", content="C", type="PS", school="S"), db=self.db, actor=actor)
+        essay_id = created["essay"]["id"]
+        soft_delete_essay(essay_id, db=self.db, actor=actor)
+
+        with self.assertRaises(HTTPException) as ctx:
+            update_essay(essay_id, EssayUpdate(topic="New"), db=self.db, actor=actor)
+        self.assertEqual(ctx.exception.status_code, 409)
 
 
 if __name__ == "__main__":

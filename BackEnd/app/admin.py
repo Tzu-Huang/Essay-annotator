@@ -242,6 +242,8 @@ def update_essay(
     essay = db.query(Essay).filter(Essay.id == essay_id).first()
     if not essay:
         raise HTTPException(status_code=404, detail="Essay not found")
+    if essay.deleted_at is not None:
+        raise HTTPException(status_code=409, detail="Cannot edit a soft-deleted essay; restore it first")
     before = essay_to_dict(essay, include_content=True)
     values = _model_data(payload, exclude_unset=True)
     if "metadata" in values:

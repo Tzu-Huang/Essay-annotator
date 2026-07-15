@@ -108,14 +108,15 @@ def make_essay_signature(topic: str, content: str, source_file: str | None = Non
     )
 
 # load the essay signatures in the database.jsonl (topic + content + source)
-def load_existing_signatures():
+def load_existing_signatures(database_path: Path = None):
+    database_path = database_path if database_path is not None else DATABASE_PATH
     signatures = set()
 
-    if not DATABASE_PATH.exists():
+    if not database_path.exists():
         print(f"  database.jsonl has not been created")
         return signatures
 
-    with open(DATABASE_PATH, "r", encoding="utf-8") as f:
+    with open(database_path, "r", encoding="utf-8") as f:
         for line in f:
             line = line.strip()
             if not line:
@@ -138,19 +139,21 @@ def load_existing_signatures():
 # =========================
 # Handle new input + move files
 # =========================
-def load_new_input_essays(id_counter: count, existing_signatures=None) -> list[dict]:
+def load_new_input_essays(id_counter: count, existing_signatures=None, new_input_dir: Path = None) -> list[dict]:
     """
-    Read all .txt files from NEW_INPUT_DIR and the type of the essay is detected by filename.
+    Read all .txt files from new_input_dir (defaults to NEW_INPUT_DIR) and the
+    type of the essay is detected by filename.
     """
     essays = []
     existing_signatures = existing_signatures or set()
+    new_input_dir = new_input_dir if new_input_dir is not None else NEW_INPUT_DIR
 
-    if not NEW_INPUT_DIR.exists():
-        print(f"  [skip] new_input/ not found: {NEW_INPUT_DIR}")
+    if not new_input_dir.exists():
+        print(f"  [skip] new_input/ not found: {new_input_dir}")
         return essays
 
     moved_count = 0
-    for file_path in sorted(NEW_INPUT_DIR.glob("*.txt")):
+    for file_path in sorted(new_input_dir.glob("*.txt")):
 
         with file_path.open(encoding="utf-8-sig") as f:
             text = f.read()
@@ -262,22 +265,26 @@ def get_essay_type(path):
     else: 
         return "Supplemental", file_name.strip()
 
-def get_next_id():
+def get_next_id(database_path: Path = None):
     """
     Read the last line of database.jsonl and return the next available ID number.
-    Returns -1 if the database doesn't exist or is empty.
+    Returns -1 if the database doesn't exist. Returns 1 if it exists but has no
+    valid last line (e.g. empty file), matching the "build from scratch" start id.
     """
-    if not DATABASE_PATH.exists():
+    database_path = database_path if database_path is not None else DATABASE_PATH
+    if not database_path.exists():
         return -1
-    
+
     last_line = None
-    with open(DATABASE_PATH, "r", encoding = "utf-8") as f:
+    with open(database_path, "r", encoding = "utf-8") as f:
         for line in f:
             last_line = line
-    
+
     if last_line:
         last_id = json.loads(last_line)["id"]
         return (int)(last_id.split("_")[1]) + 1
+
+    return 1
 
 
 def get_client() -> OpenAI:
@@ -306,17 +313,27 @@ def add_generated_titles(essays: list[dict], client) -> None:
 # Main
 # =========================
 def update_database():
+    # Deferred import: service.ingest_service imports from this module, so
+    # importing it at module load time would create a circular import.
+    from service.ingest_service import scan_and_title_new_essays
+
     if_database = (not DATABASE_PATH.exists()) or DATABASE_PATH.stat().st_size == 0
-    existing_signatures = load_existing_signatures()
+    existing_signatures = load_existing_signatures(DATABASE_PATH)
 
     # if database.jsonl does not exist or nothing inside, add everything together
     if (if_database):
         print("\n===Building database.jsonl===\n")
         counter = count(1)
 
+        # NOTE: this branch shares a single counter across three sources
+        # (online, collected, new_input) so IDs stay sequential without gaps,
+        # and titles are generated once for the combined list below. That
+        # doesn't map onto scan_and_title_new_essays's self-contained
+        # counter/titling, so this branch intentionally keeps the inline
+        # load_new_input_essays call rather than calling scan_and_title_new_essays.
         online_essays = load_online_essays(counter)
         collected_essays = load_collected_essays(counter)
-        new_essays = load_new_input_essays(counter, existing_signatures)
+        new_essays = load_new_input_essays(counter, existing_signatures, NEW_INPUT_DIR)
         all_essays = online_essays + collected_essays + new_essays
 
         if not all_essays:
@@ -329,20 +346,17 @@ def update_database():
         with open(DATABASE_PATH, "w", encoding="utf-8") as f:
             for essay in all_essays:
                 f.write(json.dumps(essay, ensure_ascii=False) + '\n')
-            
+
         print(f"Done! Created database.jsonl file with {len(all_essays)} essays")
-    
+
     # if database.jsonl does exist, just append the new ones inside
     else:
-        # get next id and append
-        counter = count(get_next_id())
-        new_essays = load_new_input_essays(counter, existing_signatures)
+        # scan new_input/, dedupe, and generate titles via the shared ingest core
+        new_essays = scan_and_title_new_essays(NEW_INPUT_DIR, DATABASE_PATH, get_client())
 
         if not new_essays:
             print("  No new essays found in new_input/. Nothing appended.")
             return
-
-        add_generated_titles(new_essays, get_client())
 
         with open(DATABASE_PATH, "a", encoding="utf-8") as f:
             for essay in new_essays:

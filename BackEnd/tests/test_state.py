@@ -22,6 +22,13 @@ class AppDataMutationTests(unittest.TestCase):
         self.assertEqual(self.data.parent, ["e2"])
         self.assertEqual(self.data.topic_V.shape[0], 1)
 
+    def test_remove_all_essay_vectors_preserves_embedding_dim(self):
+        self.data.remove_essay_vectors("e1")
+        self.data.remove_essay_vectors("e2")
+        self.assertEqual(self.data.parent, [])
+        self.assertEqual(self.data.topic_V.shape, (0, 2))
+        self.assertEqual(self.data.content_V.shape, (0, 2))
+
     def test_replace_essay_vectors(self):
         new_row = {
             "id": "e1_00", "parent": "e1", "preview": "new preview", "topic_text": "new topic",

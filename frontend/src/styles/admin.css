@@ -411,6 +411,11 @@
   padding: 0;
 }
 
+.admin-sort-header-static {
+  font-weight: 600;
+  padding: 0;
+}
+
 .spin {
   animation: admin-spin 1s linear infinite;
 }

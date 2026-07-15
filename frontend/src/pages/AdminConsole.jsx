@@ -510,10 +510,14 @@ function Essays(props) {
               <tr>
                 {ESSAY_COLUMNS.map(([field, label]) => (
                   <th key={field}>
-                    <button type="button" className="admin-sort-header" onClick={() => toggleEssaySort(field)}>
-                      {label}
-                      {essaySort.field === field && (essaySort.dir === "asc" ? " ▲" : " ▼")}
-                    </button>
+                    {field === "public" ? (
+                      <span className="admin-sort-header-static">{label}</span>
+                    ) : (
+                      <button type="button" className="admin-sort-header" onClick={() => toggleEssaySort(field)}>
+                        {label}
+                        {essaySort.field === field && (essaySort.dir === "asc" ? " ▲" : " ▼")}
+                      </button>
+                    )}
                   </th>
                 ))}
               </tr>

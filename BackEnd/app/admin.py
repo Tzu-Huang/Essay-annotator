@@ -282,6 +282,23 @@ def soft_delete_essay(essay_id: str, db: Session = Depends(get_db), actor: Admin
     return {"essay": after}
 
 
+@router.post("/essays/{essay_id}/restore")
+def restore_essay(essay_id: str, db: Session = Depends(get_db), actor: AdminActor = Depends(require_admin_write)):
+    essay = db.query(Essay).filter(Essay.id == essay_id).first()
+    if not essay:
+        raise HTTPException(status_code=404, detail="Essay not found")
+    if essay.deleted_at is None:
+        raise HTTPException(status_code=409, detail="Essay is not deleted")
+    before = essay_to_dict(essay, include_content=True)
+    essay.deleted_at = None
+    essay.updated_at = utcnow()
+    db.flush()
+    after = essay_to_dict(essay, include_content=True)
+    audit_log(db, actor.email, "restore", "essay", essay.id, before, after)
+    db.commit()
+    return {"essay": after}
+
+
 @router.post("/essays/{essay_id}/regenerate-embedding")
 def trigger_embedding_regeneration(
     essay_id: str,

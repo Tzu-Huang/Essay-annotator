@@ -20,6 +20,7 @@ from app.admin import (
     list_essays,
     require_admin,
     require_admin_write,
+    restore_essay,
     soft_delete_essay,
     trigger_embedding_regeneration,
     update_essay,
@@ -299,6 +300,21 @@ class AdminDataTests(unittest.TestCase):
 
         desc = list_essays(page=1, page_size=25, sort="school", sort_dir="desc", db=self.db, actor=actor)
         self.assertEqual([e["school"] for e in desc["items"]], ["Zeta U", "Alpha U"])
+
+    def test_restore_essay(self):
+        actor = AdminActor(email="owner@example.com", can_write=True)
+        created = create_essay(EssayCreate(topic="T", content="C", type="PS", school="S"), db=self.db, actor=actor)
+        essay_id = created["essay"]["id"]
+        soft_delete_essay(essay_id, db=self.db, actor=actor)
+
+        restored = restore_essay(essay_id, db=self.db, actor=actor)
+        self.assertIsNone(restored["essay"]["deleted_at"])
+
+        log = self.db.query(AdminAuditLog).filter_by(action="restore", entity_id=essay_id).first()
+        self.assertIsNotNone(log)
+
+        with self.assertRaises(Exception):
+            restore_essay("does-not-exist", db=self.db, actor=actor)
 
 
 if __name__ == "__main__":

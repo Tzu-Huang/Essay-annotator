@@ -12,8 +12,17 @@ body {
   );
 
   font-family: -apple-system, BlinkMacSystemFont, sans-serif;
-<<<<<<< HEAD
-=======
+}
+
+html.homepage-scrollbar-hidden,
+body.homepage-scrollbar-hidden {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+html.homepage-scrollbar-hidden::-webkit-scrollbar,
+body.homepage-scrollbar-hidden::-webkit-scrollbar {
+  display: none;
 }
 
 @keyframes pageEnter {
@@ -25,5 +34,4 @@ body {
     opacity: 1;
     transform: translateY(0);
   }
->>>>>>> feature/Footer
 }

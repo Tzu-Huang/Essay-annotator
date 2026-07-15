@@ -1,31 +1,24 @@
-import time
-import json
 import os
-from service.generate_topic import get_topic
-from openai import OpenAI
+import time
 from app.helpers import load_essays
 from service.search_service import run_search
 from app.state import AppData
 from compare_results.analysis import compare
 from dotenv import load_dotenv
 from embedding.search_similar import load_db_embeddings
-from fastapi import FastAPI, HTTPException, Query, Request
-from fastapi.middleware.cors import CORSMiddleware
-from pathlib import Path
-from pydantic import BaseModel
-from typing import Optional
-
-from database.create import get_db, User, create_tables
-from fastapi import Depends
+from database.create import get_db, User, create_tables, SessionLocal
+from database.essays import load_essays_from_db
+from app.admin import require_admin_write, router as admin_router
+from app.usage import record_openai_usage
 from sqlalchemy.orm import Session
 from datetime import datetime, timezone
 from fastapi import FastAPI, HTTPException, Query, Request, Depends
 from fastapi.middleware.cors import CORSMiddleware
-from datetime import datetime, timezone
 from pathlib import Path
 from pydantic import BaseModel
 from typing import Optional
 from compare_results.analysis import (
+    MODEL as COMPARE_MODEL,
     MIN_COMPARE_WORDS,
     prepare_compare_context,
     finalize_compare_result,
@@ -49,13 +42,23 @@ async def lifespan(app: FastAPI):
     )
     
     try:
-        essays = load_essays(DB_JSONL)
+        create_tables()
+        db = SessionLocal()
+        try:
+            essays = load_essays_from_db(db)
+        finally:
+            db.close()
+
+        if not essays:
+            essays = load_essays(DB_JSONL)
 
         ids, parent, previews, topic_texts, topic_V, content_V = load_db_embeddings(EMBED_JSONL)
         types = [essays[pid]["type"] if pid in essays else "unknown" for pid in parent]
         schools = [essays[pid].get("school", "Unknown") if pid in essays else "none" for pid in parent]
         
         data.essays = essays
+        data.essay_count = len(essays)
+        data.data_path = "postgres" if essays else str(DB_JSONL)
         data.ids = ids
         data.parent = parent
         data.previews = previews
@@ -65,10 +68,6 @@ async def lifespan(app: FastAPI):
         data.topic_V = topic_V
         data.content_V = content_V
         data.ready = True
-<<<<<<< HEAD
-
-=======
->>>>>>> feature/Footer
         print(f"loaded {data.essay_count} essays")
 
     except Exception as e:
@@ -83,14 +82,16 @@ async def lifespan(app: FastAPI):
     print("shut down")
     
 app = FastAPI(lifespan=lifespan)
+app.include_router(admin_router)
 
 # Allow frontend to make requests
 app.add_middleware(CORSMiddleware,
     allow_origins=["http://44.201.62.0:8000",
         "http://127.0.0.1:3000",
         "http://localhost:5173",   # Vite 常見
-        "http://127.0.0.1:5173",         
-                   
+        "http://127.0.0.1:5173",
+        "http://localhost:5174",
+        "http://127.0.0.1:5174",
     ],  # your frontend URL
     
     allow_methods=["*"],
@@ -121,6 +122,20 @@ def health():
         "startup_error": data.startup_error,
     }
 
+@app.post("/admin/reload-data")
+def reload_runtime_data(db: Session = Depends(get_db), _actor=Depends(require_admin_write)):
+    """
+    Reload in-memory essay records from PostgreSQL after migration or admin edits.
+    """
+    data = app.state.data
+    essays = load_essays_from_db(db)
+    data.essays = essays
+    data.essay_count = len(essays)
+    data.data_path = "postgres"
+    data.ready = bool(essays)
+    data.startup_error = None if essays else "No essays found in PostgreSQL"
+    return {"status": "reloaded", "essay_count": len(essays)}
+
 @app.get("/ready")
 def ready():
     """
@@ -138,12 +153,6 @@ def ready():
 
     return {"status": "ready", "essay_count": data.essay_count}
 
-<<<<<<< HEAD
-DEFAULT_FIELDS = ["id", "topic", "type", "school", "public"]
-ALLOWED_FIELDS = set(DEFAULT_FIELDS + ["content", "source_file", "metadata"])
-
-# TODO: frontend is taking parent id
-=======
 
 # Handling saving user info into our database
 @app.post("/api/users")
@@ -175,7 +184,6 @@ def save_user(email: str, name: str, db: Session = Depends(get_db)):
 DEFAULT_FIELDS = ["id", "topic", "type", "school", "public"]
 ALLOWED_FIELDS = set(DEFAULT_FIELDS + ["content", "source_file", "metadata"])
 
->>>>>>> feature/Footer
 @app.get("/essays/{essay_id}")
 def get_essay(
     essay_id: str,
@@ -204,26 +212,14 @@ def get_essay(
     for k in selected:
         result[k] = essay.get(k)
 
-<<<<<<< HEAD
-    # originally this get "id" will get the chunked id ? 
-    result["id"] = essay.get("id", essay_id)
-    return result
-
-=======
     result["id"] = essay.get("id", essay_id)
 
     content = essay.get("content", "")
     result["word_count"] = len(content.split()) if content else 0
 
-    client = OpenAI(api_key=os.environ["OPENAI_API_KEY"])
-    result["generated_title"] = get_topic(
-        topic=essay.get("topic", ""),
-        content=content,
-        client=client,
-    )
+    result["generated_title"] = essay.get("generated_title")
 
     return result
->>>>>>> feature/Footer
 # ===========================
 # Search endpoint
 # ===========================
@@ -243,20 +239,28 @@ def search(req: Search, request: Request):
 
     try: 
         results = run_search(req, request.app.state.data)
+        db = SessionLocal()
+        try:
+            record_openai_usage(db, feature="search", model="text-embedding-3-small", status="success")
+            db.commit()
+        finally:
+            db.close()
 
         print(results)
         return results
 
     except Exception as e:
+        db = SessionLocal()
+        try:
+            record_openai_usage(db, feature="search", model="text-embedding-3-small", status="failed")
+            db.commit()
+        finally:
+            db.close()
         print("[Error] /search API did not run successfully")
         raise HTTPException(
             status_code=500,
             detail=str(e)
         )
-<<<<<<< HEAD
-
-=======
->>>>>>> feature/Footer
 # ===========================
 # Compare endpoint
 # ===========================
@@ -268,43 +272,20 @@ class CompareRequest(BaseModel):
 def compare_api(essay_id: str, req: CompareRequest):
     # Load essays from app.state
     data = app.state.data
-<<<<<<< HEAD
-    
-=======
 
->>>>>>> feature/Footer
     # Error handling
     if not hasattr(data, "essays"):
         raise HTTPException(status_code=500, detail="Server essays data not initialized")
 
     essay = data.essays.get(essay_id)
-<<<<<<< HEAD
-    print(essay)
-    if not essay:
-        raise HTTPException(status_code=404, detail="Essay not found")
-    
-=======
 
     if not essay:
         raise HTTPException(status_code=404, detail="Essay not found")
 
->>>>>>> feature/Footer
     if not req.user_input.strip():
         raise HTTPException(status_code=400, detail="user_input cannot be empty")
 
     essay_text = essay.get("content", "")
-<<<<<<< HEAD
-    try:
-        # Call the actual function that do the actual comparison
-        result = compare(user_essay=req.user_input, sample_essay=essay_text)
-        # result.append({
-        #     "similarity":
-        # })
-        return result
-    except Exception as e:
-        print(e)
-        raise HTTPException(status_code=500, detail=f"Compare failed: {str(e)}")
-=======
 
     # Prepare context before calling LLM
     context = prepare_compare_context(
@@ -327,6 +308,12 @@ def compare_api(essay_id: str, req: CompareRequest):
             user_essay=req.user_input,
             sample_essay=essay_text
         )
+        db = SessionLocal()
+        try:
+            record_openai_usage(db, feature="compare", model=COMPARE_MODEL, status="success")
+            db.commit()
+        finally:
+            db.close()
 
         # Clean and normalize result for frontend
         result = finalize_compare_result(
@@ -338,6 +325,11 @@ def compare_api(essay_id: str, req: CompareRequest):
         return result
 
     except Exception as e:
+        db = SessionLocal()
+        try:
+            record_openai_usage(db, feature="compare", model=COMPARE_MODEL, status="failed")
+            db.commit()
+        finally:
+            db.close()
         print(e)
         raise HTTPException(status_code=500, detail=f"Compare failed: {str(e)}")
->>>>>>> feature/Footer

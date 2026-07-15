@@ -1,0 +1,110 @@
+.page {
+  min-height: calc(100vh - 180px);
+  display: grid;
+  place-items: center;
+  padding: 96px 24px;
+  background:
+    linear-gradient(rgba(17, 24, 39, 0.035) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(17, 24, 39, 0.035) 1px, transparent 1px),
+    linear-gradient(180deg, #f7fbff 0%, #eef4fb 100%);
+  background-size: 30px 30px, 30px 30px, auto;
+}
+
+.content {
+  width: min(100%, 680px);
+  padding: 64px 48px;
+  text-align: center;
+  background: rgba(255, 253, 248, 0.94);
+  border: 1px solid rgba(221, 212, 198, 0.95);
+  border-radius: 8px;
+  box-shadow: 0 24px 45px rgba(43, 35, 25, 0.11);
+}
+
+.badge {
+  width: max-content;
+  margin: 0 auto 22px;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 16px;
+  color: #10192d;
+  background: #f3de83;
+  border: 1px solid rgba(17, 24, 39, 0.12);
+  border-radius: 999px;
+  font-weight: 800;
+}
+
+.content h1 {
+  margin: 0;
+  color: #111827;
+  font-size: clamp(42px, 7vw, 72px);
+  line-height: 1.05;
+}
+
+.content p {
+  max-width: 460px;
+  margin: 20px auto 0;
+  color: #2f3a4d;
+  font-size: 18px;
+  line-height: 1.7;
+}
+
+.actions {
+  margin-top: 34px;
+  display: flex;
+  justify-content: center;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+.primaryAction,
+.secondaryAction {
+  min-height: 48px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 0 20px;
+  border-radius: 6px;
+  font-weight: 800;
+  text-decoration: none;
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.primaryAction {
+  color: #ffffff;
+  background: #10192d;
+  box-shadow: 0 12px 22px rgba(19, 35, 61, 0.18);
+}
+
+.secondaryAction {
+  color: #10192d;
+  background: #ffffff;
+  border: 1px solid rgba(17, 24, 39, 0.14);
+}
+
+.primaryAction:hover,
+.secondaryAction:hover {
+  transform: translateY(-2px);
+}
+
+.primaryAction:hover {
+  box-shadow: 0 18px 28px rgba(19, 35, 61, 0.22);
+}
+
+@media (max-width: 640px) {
+  .page {
+    padding: 56px 16px;
+  }
+
+  .content {
+    padding: 44px 22px;
+  }
+
+  .actions {
+    align-items: stretch;
+    flex-direction: column;
+  }
+}

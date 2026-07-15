@@ -1,1050 +1,651 @@
-<<<<<<< HEAD
-import { Link } from "react-router-dom";
-import {
-  FileText,
-  FileCheck,
-  Search,
-  TrendingUp,
-} from "lucide-react";
-
-import styles from "../styles/home.module.css";
-
-function Home() {
-  const curatedEssays = [
-    {
-      id: "essay_0039",
-      school: "Harvard University",
-      topic:
-        "Describe a topic, idea, or concept you find so engaging that it makes you lose all track of time. Why does it captivate you?",
-      title: "Nanotech Research Passion",
-      description:
-        "A research experience in nanotechnology reveals the writer’s deep fascination with science and lifelong ambition for discovery.",
-      logo: "/logos/harvard.svg",
-    },
-    {
-      id: "essay_0042",
-      school: "Stanford University",
-      topic:
-        "The Stanford community is deeply curious and driven to learn in and out of the classroom. Reflect on an idea or experience that makes you genuinely excited about learning.",
-      title: "What Real Learning Means",
-      description:
-        "A summer science program transforms the writer’s view of learning from memorization into curiosity, collaboration, and discovery.",
-      logo: "/logos/stanford.png",
-    },
-    {
-      id: "essay_0185",
-      school: "Columbia University",
-      topic:
-        "Share an essay on any topic of your choice. It can be one you've already written, one that responds to a different prompt, or one of your own design.",
-      title: "Music for Healing",
-      description:
-        "A hospital performance inspires the writer to use music to support a child with a rare disease.",
-      logo: "/logos/columbia.jpg",
-    },
-    {
-      id: "essay_0043",
-      school: "University of Pennsylvania",
-      topic:
-        "Discuss an accomplishment, event, or realization that sparked a period of personal growth and a new understanding of yourself or others.",
-      title: "Small Changes, Big Impact",
-      description:
-        "From public health service to medical research, the writer learns that meaningful change often begins with small, practical solutions.",
-      logo: "/logos/upenn.svg",
-    },
-    {
-      id: "essay_0026",
-      school: "Johns Hopkins",
-      topic:
-        "Reflect on a time when you questioned or challenged a belief or idea. What prompted your thinking? What was the outcome?",
-      title: "Standing Out and Fitting In",
-      description:
-        "A journey through self-expression, insecurity, and belonging helps the writer discover that authenticity and community can coexist.",
-      logo: "/logos/jhu.webp",
-    },
-    {
-      id: "essay_0025",
-      school: "Johns Hopkins",
-      topic:
-        "The lessons we take from obstacles we encounter can be fundamental to later success. Recount a time when you faced a challenge, setback, or failure.",
-      title: "Learning Through Frustration",
-      description:
-        "Struggles in art and data science teach the writer that patience and perseverance can turn frustration into growth.",
-      logo: "/logos/jhu.webp",
-    },
-    {
-      id: "essay_0029",
-      school: "Johns Hopkins",
-      topic:
-        "Discuss an accomplishment, event, or realization that sparked a period of personal growth and a new understanding of yourself or others.",
-      title: "Building Community Through Music",
-      description:
-        "Through carefully curated playlists, the writer uses music to unite teammates, classmates, and younger students across different communities.",
-      logo: "/logos/jhu.webp",
-    },
-    {
-      id: "essay_0004",
-      school: "Ivy League",
-      topic:
-        "Reflect on a time when you questioned or challenged a belief or idea. What prompted your thinking? What was the outcome?",
-      title: "Justice, Courage, and Compassion",
-      description:
-        "A school discipline hearing reshapes the writer’s view of justice as a balance between accountability and empathy.",
-      logo: "/logos/ivy.png",
-    },
-    {
-      id: "essay_0009",
-      school: "Ivy League",
-      topic:
-        "Some students have a background, identity, interest, or talent that is so meaningful they believe their application would be incomplete without it.",
-      title: "Finding Identity Underwater",
-      description:
-        "Scuba diving becomes a refuge of peace and equality for a writer navigating cultural identity and life between two worlds.",
-      logo: "/logos/ivy.png",
-    },
-    {
-      id: "essay_0005",
-      school: "Ivy League",
-      topic:
-        "Some students have a background, identity, interest, or talent that is so meaningful they believe their application would be incomplete without it.",
-      title: "The Hot Sauce Sommelier",
-      description:
-        "A love of spice becomes a vivid lens for exploring curiosity, culture, adventure, and personal identity.",
-      logo: "/logos/ivy.png",
-    },
-  ];
-
-  const scrollingEssays = [...curatedEssays, ...curatedEssays];
-
-  return (
-    <div className={styles.home}>
-      <section className={styles.hero}>
-        <div className={styles.heroDecor} />
-
-          <h1>
-            Get Into Top Colleges By Learning From 
-            <br />
-            <span>200+ Real Accepted Essays</span>
-          </h1>
-
-=======
-import { useState, useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import {
-  FileCheck,
-  Search,
-  TrendingUp,
-  Upload,
-  ScanSearch,
-  Sparkles,
-} from "lucide-react";
-import gsap from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
 
-import styles from "../styles/home.module.css";
 import { useAuth } from "../hooks/useAuth";
+import styles from "../styles/home.module.css";
 
-gsap.registerPlugin(ScrollTrigger);
+const FALLBACK_ESSAY_COUNT = 219;
+const API_BASE = import.meta.env.VITE_API_URL;
 
-const CURATED_ESSAYS = [
+const ESSAYS = [
   {
     id: "essay_0039",
     school: "Harvard University",
-    topic:
-      "Describe a topic, idea, or concept you find so engaging that it makes you lose all track of time. Why does it captivate you?",
     title: "Nanotech Research Passion",
     description:
       "A research experience in nanotechnology reveals the writer's deep fascination with science and lifelong ambition for discovery.",
-    logo: "/logos/harvard.svg",
   },
   {
     id: "essay_0042",
     school: "Stanford University",
-    topic:
-      "The Stanford community is deeply curious and driven to learn in and out of the classroom. Reflect on an idea or experience that makes you genuinely excited about learning.",
     title: "What Real Learning Means",
     description:
-      "A summer science program transforms the writer's view of learning from memorization into curiosity, collaboration, and discovery.",
-    logo: "/logos/stanford.png",
+      "A summer science program transforms the writer's view of learning into curiosity and discovery.",
   },
   {
     id: "essay_0185",
     school: "Columbia University",
-    topic:
-      "Share an essay on any topic of your choice. It can be one you've already written, one that responds to a different prompt, or one of your own design.",
     title: "Music for Healing",
     description:
       "A hospital performance inspires the writer to use music to support a child with a rare disease.",
-    logo: "/logos/columbia.jpg",
   },
   {
     id: "essay_0043",
     school: "University of Pennsylvania",
-    topic:
-      "Discuss an accomplishment, event, or realization that sparked a period of personal growth and a new understanding of yourself or others.",
     title: "Small Changes, Big Impact",
     description:
-      "From public health service to medical research, the writer learns that meaningful change often begins with small, practical solutions.",
-    logo: "/logos/upenn.svg",
+      "From public health service to medical research, meaningful change often begins with small solutions.",
   },
   {
     id: "essay_0026",
     school: "Johns Hopkins",
-    topic:
-      "Reflect on a time when you questioned or challenged a belief or idea. What prompted your thinking? What was the outcome?",
     title: "Standing Out and Fitting In",
     description:
-      "A journey through self-expression, insecurity, and belonging helps the writer discover that authenticity and community can coexist.",
-    logo: "/logos/jhu.webp",
-  },
-  {
-    id: "essay_0025",
-    school: "Johns Hopkins",
-    topic:
-      "The lessons we take from obstacles we encounter can be fundamental to later success. Recount a time when you faced a challenge, setback, or failure.",
-    title: "Learning Through Frustration",
-    description:
-      "Struggles in art and data science teach the writer that patience and perseverance can turn frustration into growth.",
-    logo: "/logos/jhu.webp",
-  },
-  {
-    id: "essay_0029",
-    school: "Johns Hopkins",
-    topic:
-      "Discuss an accomplishment, event, or realization that sparked a period of personal growth and a new understanding of yourself or others.",
-    title: "Building Community Through Music",
-    description:
-      "Through carefully curated playlists, the writer uses music to unite teammates, classmates, and younger students across different communities.",
-    logo: "/logos/jhu.webp",
-  },
-  {
-    id: "essay_0004",
-    school: "Ivy League",
-    topic:
-      "Reflect on a time when you questioned or challenged a belief or idea. What prompted your thinking? What was the outcome?",
-    title: "Justice, Courage, and Compassion",
-    description:
-      "A school discipline hearing reshapes the writer's view of justice as a balance between accountability and empathy.",
-    logo: "/logos/ivy.png",
+      "A journey through self-expression and belonging helps the writer discover authenticity and community coexist.",
   },
   {
     id: "essay_0009",
     school: "Ivy League",
-    topic:
-      "Some students have a background, identity, interest, or talent that is so meaningful they believe their application would be incomplete without it.",
     title: "Finding Identity Underwater",
     description:
-      "Scuba diving becomes a refuge of peace and equality for a writer navigating cultural identity and life between two worlds.",
-    logo: "/logos/ivy.png",
-  },
-  {
-    id: "essay_0005",
-    school: "Ivy League",
-    topic:
-      "Some students have a background, identity, interest, or talent that is so meaningful they believe their application would be incomplete without it.",
-    title: "The Hot Sauce Sommelier",
-    description:
-      "A love of spice becomes a vivid lens for exploring curiosity, culture, adventure, and personal identity.",
-    logo: "/logos/ivy.png",
+      "Scuba diving becomes a refuge of peace for a writer navigating cultural identity between two worlds.",
   },
 ];
-
-const CARDS_PER_VIEW = 5;
-const REPEAT_COUNT = 80;
-
-const WORDS = ["Improvement.", "Stories.", "Confidence."];
-
-function useTypewriter(words) {
-  const [display, setDisplay] = useState("");
-  useEffect(() => {
-    let wi = 0,
-      ci = 0,
-      deleting = false,
-      t;
-    const tick = () => {
-      const word = words[wi];
-      if (!deleting) {
-        setDisplay(word.slice(0, ++ci));
-        if (ci === word.length) {
-          deleting = true;
-          t = setTimeout(tick, 1800);
-          return;
-        }
-      } else {
-        setDisplay(word.slice(0, --ci));
-        if (ci === 0) {
-          deleting = false;
-          wi = (wi + 1) % words.length;
-        }
-      }
-      t = setTimeout(tick, deleting ? 55 : 90);
-    };
-    t = setTimeout(tick, 600);
-    return () => clearTimeout(t);
-  }, [words]);
-  return display;
-}
 
 function Home({ onOpenSignIn }) {
   const navigate = useNavigate();
   const { user } = useAuth();
+  const [essayCount, setEssayCount] = useState(FALLBACK_ESSAY_COUNT);
+
+  useEffect(() => {
+    document.documentElement.classList.add("homepage-scrollbar-hidden");
+    document.body.classList.add("homepage-scrollbar-hidden");
+
+    return () => {
+      document.documentElement.classList.remove("homepage-scrollbar-hidden");
+      document.body.classList.remove("homepage-scrollbar-hidden");
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!API_BASE) return undefined;
+
+    const controller = new AbortController();
+
+    async function fetchEssayCount() {
+      try {
+        const response = await fetch(`${API_BASE}/ready`, {
+          signal: controller.signal,
+        });
+
+        if (!response.ok) return;
+
+        const data = await response.json();
+        if (Number.isFinite(data.essay_count) && data.essay_count > 0) {
+          setEssayCount(data.essay_count);
+        }
+      } catch (error) {
+        if (error.name !== "AbortError") {
+          console.warn("Unable to load essay count; using fallback.", error);
+        }
+      }
+    }
+
+    fetchEssayCount();
+
+    return () => controller.abort();
+  }, []);
 
   const handleStartWriting = () => {
     if (user) {
       navigate("/editor");
       return;
     }
+
     onOpenSignIn();
   };
 
-  const loopedEssays = Array.from(
-    { length: REPEAT_COUNT },
-    () => CURATED_ESSAYS,
-  ).flat();
-
-  const startIndex = CURATED_ESSAYS.length * 20;
-  const maxEssayIndex = loopedEssays.length - CARDS_PER_VIEW;
-
-  const [essayIndex, setEssayIndex] = useState(startIndex);
-
-  const handlePrevEssay = () => setEssayIndex((prev) => Math.max(prev - 1, 0));
-  const handleNextEssay = () =>
-    setEssayIndex((prev) => Math.min(prev + 1, maxEssayIndex));
-
-  const typed = useTypewriter(WORDS);
-
-  const heroContentRef = useRef(null);
-  const heroPaperRef = useRef(null);
-  const stickyGreenRef = useRef(null);
-  const matchCardRef = useRef(null);
-  const stickyPurpleRef = useRef(null);
-  const howItWorksRef = useRef(null);
-  const stepsRef = useRef([]);
-  const compareSectionRef = useRef(null);
-  const featuredRef = useRef(null);
-  const differenceSectionRef = useRef(null);
-  const ctaSectionRef = useRef(null);
-
-  // Enable scroll snapping only on this page
-  useEffect(() => {
-    document.documentElement.style.scrollSnapType = "y proximity";
-    return () => {
-      document.documentElement.style.scrollSnapType = "";
-    };
-  }, []);
-
-  useEffect(() => {
-    const ctx = gsap.context(() => {
-      // Hero content — fades up on load
-      gsap.from(heroContentRef.current, {
-        opacity: 0,
-        y: 32,
-        duration: 0.9,
-        ease: "power3.out",
-        delay: 0.1,
-      });
-
-      // Hero visual elements — staggered, each keeps its own rotation
-      gsap.from(heroPaperRef.current, {
-        opacity: 0,
-        y: 40,
-        duration: 0.85,
-        ease: "power3.out",
-        delay: 0.3,
-      });
-      gsap.from(stickyGreenRef.current, {
-        opacity: 0,
-        x: 24,
-        y: -16,
-        duration: 0.7,
-        ease: "power2.out",
-        delay: 0.55,
-      });
-      gsap.from(matchCardRef.current, {
-        opacity: 0,
-        x: -28,
-        y: 20,
-        duration: 0.75,
-        ease: "power2.out",
-        delay: 0.7,
-      });
-      gsap.from(stickyPurpleRef.current, {
-        opacity: 0,
-        x: 20,
-        y: 16,
-        duration: 0.7,
-        ease: "power2.out",
-        delay: 0.85,
-      });
-
-      // How it works section — reverses when scrolling back up
-      gsap.from(howItWorksRef.current, {
-        opacity: 0,
-        y: 40,
-        duration: 0.8,
-        ease: "power2.out",
-        scrollTrigger: {
-          trigger: howItWorksRef.current,
-          start: "top 82%",
-          toggleActions: "play reverse play reverse",
-        },
-      });
-
-      // Step cards staggered — each reverses individually
-      gsap.from(stepsRef.current.filter(Boolean), {
-        opacity: 0,
-        y: 36,
-        duration: 0.65,
-        ease: "power2.out",
-        stagger: 0.12,
-        scrollTrigger: {
-          trigger: howItWorksRef.current,
-          start: "top 75%",
-          toggleActions: "play reverse play reverse",
-        },
-      });
-
-      // Compare section
-      gsap.from(compareSectionRef.current, {
-        opacity: 0,
-        y: 36,
-        duration: 0.8,
-        ease: "power2.out",
-        scrollTrigger: {
-          trigger: compareSectionRef.current,
-          start: "top 82%",
-          toggleActions: "play reverse play reverse",
-        },
-      });
-
-      // Featured essays section
-      gsap.from(featuredRef.current, {
-        opacity: 0,
-        y: 28,
-        duration: 0.75,
-        ease: "power2.out",
-        scrollTrigger: {
-          trigger: featuredRef.current,
-          start: "top 84%",
-          toggleActions: "play reverse play reverse",
-        },
-      });
-
-      // Difference section
-      gsap.from(differenceSectionRef.current, {
-        opacity: 0,
-        y: 36,
-        duration: 0.8,
-        ease: "power2.out",
-        scrollTrigger: {
-          trigger: differenceSectionRef.current,
-          start: "top 82%",
-          toggleActions: "play reverse play reverse",
-        },
-      });
-
-      // CTA
-      gsap.from(ctaSectionRef.current, {
-        opacity: 0,
-        y: 28,
-        duration: 0.75,
-        ease: "power2.out",
-        scrollTrigger: {
-          trigger: ctaSectionRef.current,
-          start: "top 86%",
-          toggleActions: "play reverse play reverse",
-        },
-      });
-    });
-
-    return () => ctx.revert();
-  }, []);
-
   return (
-    <div className={styles.home}>
-      {/* HERO */}
-      <section className={styles.hero}>
-        <div className={styles.heroContent} ref={heroContentRef}>
-          <h1 className={styles.heroTitle}>
-            <span className={styles.titleLine1}>REAL Essays</span>
-            <span className={styles.titleLine2}>
-              REAL <span className={styles.typedWord}>{typed}</span>
-              <span className={styles.cursor} aria-hidden="true" />
-            </span>
-          </h1>
+    <main className={styles.home}>
+      <div className={styles.introScroll}>
+        <div className={styles.introScreen}>
+          <span className={`${styles.ambientBlob} ${styles.blobOne}`} />
+          <span className={`${styles.ambientBlob} ${styles.blobTwo}`} />
 
-          <p className={styles.heroDescription}>
-            Upload your draft, find similar successful essays, and see what
-            makes them work.
-          </p>
+          <section className={styles.hero}>
+            <div className={styles.wrap}>
+              <h1>
+                Real essays.
+                <br />
+                Real <span className={styles.accent}>improvement.</span>
+              </h1>
 
-          <div className={styles.heroActions}>
-            <button
-              type="button"
-              className={styles.primaryBtn}
-              onClick={handleStartWriting}
-            >
-              Start Writing
-            </button>
-
-            <a href="#how-it-works" className={styles.secondaryLink}>
-              See how it works →
-            </a>
-          </div>
-        </div>
-
-        <div className={styles.heroVisual}>
-          <div className={styles.stickyNoteGreen} ref={stickyGreenRef}>
-            Learn from essays that actually got in.
-          </div>
-
-          <div className={styles.heroPaper} ref={heroPaperRef}>
-            <div className={styles.paperColumn}>
-              <p className={styles.paperMiniTitle}>Your Essay</p>
-              <h3 className={styles.paperMainTitle}>music</h3>
-
-              <div className={styles.pillRow}>
-                <span>0 words</span>
-                <span>User Draft</span>
-              </div>
-
-              <div className={styles.fakeLineShort}></div>
-              <div className={styles.fakeLine}></div>
-              <div className={styles.fakeLine}></div>
-              <div className={styles.fakeLineMedium}></div>
-            </div>
-
-            <div className={styles.paperColumn}>
-              <p className={styles.paperMiniTitle}>Similar Accepted Essays</p>
-              <h3 className={styles.paperMainTitle}>essay_0155</h3>
-
-              <div className={styles.pillRow}>
-                <span>University of California</span>
-                <span>Reference essay</span>
-              </div>
-
-              <p className={styles.paperText}>
-                Born in New York, I have lived abroad most of my life: Shanghai
-                for 8 years and Taiwan making up most of the rest.
+              <p className={styles.dek}>
+                Most essay tools show you standout examples. We show you
+                relevant ones. Find accepted essays similar to your draft and
+                learn from improvements that actually apply to your writing.
               </p>
 
-              <div className={styles.fakeLine}></div>
-              <div className={styles.fakeLine}></div>
-              <div className={styles.fakeLineMedium}></div>
-            </div>
-          </div>
-
-          <div className={styles.matchCard} ref={matchCardRef}>
-            <div className={styles.matchHeader}>
-              <strong>Top Matches</strong>
-              <span className={styles.matchCount}>3</span>
-            </div>
-
-            <div className={styles.matchItem}>
-              <span className={styles.matchIndex}>1</span>
-              <p>What would you say is your greatest talent...</p>
-              <b className={styles.matchPercent}>49% similar</b>
-            </div>
-
-            <div className={styles.matchItem}>
-              <span className={styles.matchIndex}>2</span>
-              <p>In addition to my major, my academic interests include...</p>
-              <b className={styles.matchPercent}>46% similar</b>
-            </div>
-
-            <div className={styles.matchItem}>
-              <span className={styles.matchIndex}>3</span>
-              <p>Some students have a background, identity, interest...</p>
-              <b className={styles.matchPercent}>44% similar</b>
-            </div>
-          </div>
-
-          <div className={styles.stickyNotePurple} ref={stickyPurpleRef}>
-            See what makes <br /> successful essays <br /> stand out.
-          </div>
-        </div>
-      </section>
-
-      {/* HOW IT WORKS */}
-      <section
-        id="how-it-works"
-        className={styles.howItWorks}
-        ref={howItWorksRef}
-      >
-        <div className={styles.sectionLabel}>HOW IT WORKS</div>
-
-        <div className={styles.stepsGrid}>
-          <div className={styles.step} ref={(el) => (stepsRef.current[0] = el)}>
-            <div className={styles.stepHead}>
-              <span className={styles.stepNumber}>1</span>
-              <h3>Upload your draft</h3>
-            </div>
-
-            <p>
-              Paste your essay and let Essay Annotator understand your story.
-            </p>
-
-            <div className={styles.stepCard}>
-              <strong>Your Draft</strong>
-              <span>Personal Statement — Draft 1</span>
-              <div className={styles.stepCardLines}>
-                <i></i>
-                <i></i>
-                <i></i>
-              </div>
-              <div className={styles.stepIcon}>
-                <Upload size={28} />
-              </div>
-            </div>
-          </div>
-
-          <div className={styles.stepArrow}>→</div>
-
-          <div className={styles.step} ref={(el) => (stepsRef.current[1] = el)}>
-            <div className={styles.stepHead}>
-              <span className={styles.stepNumber}>2</span>
-              <h3>Find similar accepted essays</h3>
-            </div>
-
-            <p>Essay Annotator finds real essays from students like you.</p>
-
-            <div className={styles.stepCard}>
-              <strong>Top Matches</strong>
-
-              <div className={styles.matchRow}>
-                <span>1</span>
-                <div></div>
-                <b>86% match</b>
+              <div className={styles.heroActions}>
+                <button
+                  type="button"
+                  className={styles.primaryButton}
+                  onClick={handleStartWriting}
+                >
+                  Start writing
+                </button>
+                <a href="#how-it-works" className={styles.outlineButton}>
+                  See how it works
+                </a>
               </div>
 
-              <div className={styles.matchRow}>
-                <span>2</span>
-                <div></div>
-                <b>82% match</b>
-              </div>
-
-              <div className={styles.matchRow}>
-                <span>3</span>
-                <div></div>
-                <b>79% match</b>
+              <div className={styles.credentialRow}>
+                <div className={styles.credential}>
+                  <b>
+                    <CountUpNumber value={essayCount} />
+                    <span className={styles.countPlus}>+</span>
+                  </b>
+                  <span>Accepted essays</span>
+                </div>
+                <div className={styles.credential}>
+                  <b>
+                    <CountUpNumber value={15} easing="linear" />
+                  </b>
+                  <span>Different topics</span>
+                </div>
+                <div className={styles.credential}>
+                  <b>Free</b>
+                  <span>To get started</span>
+                </div>
               </div>
             </div>
-          </div>
+          </section>
 
-          <div className={styles.stepArrow}>→</div>
-
-          <div className={styles.step} ref={(el) => (stepsRef.current[2] = el)}>
-            <div className={styles.stepHead}>
-              <span className={styles.stepNumber}>3</span>
-              <h3>Learn what works</h3>
-            </div>
-
-            <p>
-              See how successful essays answer the same questions — and why they
-              stand out.
-            </p>
-
-            <div className={styles.stepCard}>
-              <strong>Essay Insights</strong>
-              <span>
-                See structure, tone, and details that make accepted essays
-                stronger.
+          <div className={styles.peekWrap}>
+            <div className={styles.peekPanel}>
+              <span className={styles.peekMatch}>88% match | Live preview</span>
+              <span className={styles.peekStat}>
+                <b>200+</b> essays analyzed
               </span>
 
-              <div className={styles.analysisLines}>
-                <i></i>
-                <i></i>
-                <i></i>
-                <i></i>
+              <div className={styles.peekTopbar}>
+                <span className={`${styles.peekDot} ${styles.red}`} />
+                <span className={`${styles.peekDot} ${styles.yellow}`} />
+                <span className={`${styles.peekDot} ${styles.green}`} />
+                <span className={styles.peekUrl}>essayannotator.com/compare</span>
               </div>
 
-              <div className={styles.scanIcon}>
-                <ScanSearch size={28} />
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* COMPARE */}
-      <section className={styles.compareSection} ref={compareSectionRef}>
-        <div className={styles.compareIntro}>
-          <h2 className={styles.sectionTitle}>
-            See What Makes <br />
-            Strong Essays Work
-          </h2>
-
-          <p>
-            Compare your draft with real accepted essays and discover what makes
-            stronger writing stand out.
-          </p>
-        </div>
-
-        <div className={styles.analysisDemo}>
-          <div className={styles.analysisPaper}>
-            <div className={styles.analysisColumn}>
-              <p className={styles.analysisLabel}>YOUR ESSAY</p>
-              <h3>User Draft</h3>
-
-              <div
-                className={`${styles.analysisDivider} ${styles.leftDivider}`}
-              ></div>
-              <p className={styles.analysisText}>
-                Ever since my first day volunteering at the community clinic,
-              </p>
-
-              <p className={styles.analysisText}>
-                I knew I wanted to make a difference in people&apos;s lives.
-              </p>
-
-              <p className={styles.analysisText}>
-                <span className={styles.hoverHighlight}>
-                  The experience opened my eyes to how small acts of kindness
-                  can have a big impact.
-                </span>
-              </p>
-
-              <p className={styles.analysisTextMuted}>
-                I hope to continue this journey in college and beyond.
-              </p>
-
-              <div className={styles.demoSoftLines}>
-                <span></span>
-                <span></span>
-              </div>
-            </div>
-
-            <div className={styles.analysisMiddle}>
-              <div className={styles.suggestionPopup}>
-                <p>EXPRESSION</p>
-                <strong>Stronger opening image</strong>
-                <span>
-                  The database essay is stronger because it turns a general idea
-                  into a vivid, sensory image that pulls readers in.
-                </span>
-                <button type="button">See full analysis →</button>
-              </div>
-            </div>
-
-            <div className={styles.analysisColumn}>
-              <p className={styles.analysisLabel}>DATABASE ESSAY</p>
-              <h3>essay_0167</h3>
-
-              <div
-                className={`${styles.analysisDivider} ${styles.rightDivider}`}
-              ></div>
-
-              <p className={styles.analysisText}>
-                Stepping into the local hospital sophomore year summer, I
-                embraced the role of student volunteer, eager to assist
-                patients.{" "}
-                <span className={styles.hoverHighlight}>
-                  The sterile scent of alcohol greeted me and the vast,
-                  maze-like hospital left me disoriented,
-                </span>{" "}
-                so I struggled to find the desired locations in the labyrinthine
-                hallways.
-              </p>
-
-              <p className={styles.analysisTextMuted}>...</p>
-
-              <div className={styles.demoSoftLines}>
-                <span></span>
-                <span></span>
-                <span></span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* ESSAY LIBRARY - CAROUSEL STYLE */}
-      <section className={styles.featuredScroll} ref={featuredRef}>
-        <div className={styles.libraryContent}>
-          <h2 className={styles.sectionTitleCenter}>
-            EXPLORE REAL ACCEPTED ESSAYS
-          </h2>
-
-          <p className={styles.featuredSubtitle}>
-            Explore real essays from top schools and click any card to read
-            more.
-          </p>
-
-          <div className={styles.scrollWrapper}>
-            <button
-              type="button"
-              className={`${styles.carouselBtn} ${styles.carouselBtnLeft}`}
-              onClick={handlePrevEssay}
-              aria-label="Previous essays"
-            >
-              ‹
-            </button>
-
-            <div className={styles.carouselViewport}>
-              <div
-                className={styles.scrollTrack}
-                style={{
-                  transform: `translateX(calc(${essayIndex} * -1 * (var(--essay-card-width) + var(--essay-card-gap))))`,
-                }}
-              >
-                {loopedEssays.map((essay, index) => (
-                  <Link
-                    to={`/essay/${essay.id}`}
-                    className={styles.scrollCard}
-                    key={`${essay.id}-${index}`}
-                  >
-                    <div className={styles.pin}></div>
-
-                    <div className={styles.cardHeader}>
-                      <img
-                        src={essay.logo}
-                        alt={`${essay.school} logo`}
-                        className={styles.schoolLogo}
-                      />
-
-                      <h4>{essay.school}</h4>
-                    </div>
-
-                    <p>{essay.title}</p>
-
-                    <span>{essay.description}</span>
-
-                    <div className={styles.scrollLink}>Read more →</div>
-                  </Link>
-                ))}
-              </div>
-            </div>
-
-            <button
-              type="button"
-              className={`${styles.carouselBtn} ${styles.carouselBtnRight}`}
-              onClick={handleNextEssay}
-              aria-label="Next essays"
-            >
-              ›
-            </button>
-          </div>
-        </div>
-      </section>
-
-      {/* WHY DIFFERENT */}
-      <section className={styles.differenceSection} ref={differenceSectionRef}>
-        <div className={styles.differenceTitle}>
-          <h2 className={styles.sectionTitleSmall}>
-            Why Essay Annotator <br />
-            Is Different
-          </h2>
-        </div>
-
-        <div className={styles.differenceCompareWrap}>
-          <div className={styles.differenceCardBad}>
-            <div className={styles.iconBadgeMuted}>
-              <Sparkles size={26} />
-            </div>
-
-            <h3>Generic AI Advice</h3>
-
-            <ul>
-              <li>Vague, one-size-fits-all tips</li>
-              <li>Not based on real admissions outcomes</li>
-              <li>Doesn&apos;t show proven examples</li>
-              <li>Hard to know what actually works</li>
-            </ul>
-          </div>
-
-          <div className={styles.vsCircleSmall}>VS.</div>
-
-          <div className={styles.differenceCardGood}>
-            <div className={styles.iconBadgeGreen}>
-              <FileCheck size={26} />
-            </div>
-
-            <h3>Learning From Real Accepted Essays</h3>
-
-            <ul>
-              <li>Based on essays that got students in</li>
-              <li>See real responses to real prompts</li>
-              <li>Discover what makes essays effective</li>
-              <li>Learn and strengthen your unique voice</li>
-            </ul>
-          </div>
-        </div>
-      </section>
-
-      {/* CTA */}
-      <section className={styles.ctaSection} ref={ctaSectionRef}>
-        <div className={styles.bottomPaperDecorLeft}></div>
-
-        <h2 className={styles.ctaTitle}>Ready to improve your essay?</h2>
-
->>>>>>> feature/Footer
-        <p>
-          Access a curated database of 200+ real essays accepted into Harvard,
-          MIT, Stanford, and other top universities.
-        </p>
-
-<<<<<<< HEAD
-        <Link to="/login" className={styles.startWritingLink}>
-          <button className={styles.primaryBtn}>
-            <span>Start Writing</span>
-          </button>
-        </Link>
-
-        <div className={styles.heroBadges}>
-          <div>
-            <Search size={18} />
-            <span>Find Matches</span>
-          </div>
-          <div>
-            <FileCheck size={18} />
-            <span>Real Student Submissions</span>
-          </div>
-          <div>
-            <TrendingUp size={18} />
-            <span>Compare & Improve</span>
-          </div>
-        </div>
-      </section>
-
-      <section className={styles.featuredScroll}>
-        <h2>Featured Accepted Essays</h2>
-        <p className={styles.featuredSubtitle}>
-          Explore real essays from top schools and click any card to read more.
-        </p>
-
-        <div className={styles.scrollWrapper}>
-          <div className={styles.scrollTrack}>
-            {scrollingEssays.map((essay, index) => (
-              <Link
-                to={`/essay/${essay.id}`}
-                className={styles.scrollCard}
-                key={`${essay.id}-${index}`}
-              >
-                <div className={styles.cardHeader}>
-                  <img
-                    src={essay.logo}
-                    alt={`${essay.school} logo`}
-                    className={styles.schoolLogo}
-                  />
-                  <h4>{essay.school}</h4>
+              <div className={styles.peekBody}>
+                <div className={`${styles.peekPane} ${styles.mine}`}>
+                  <p className={styles.peekPaneHead}>Your Essay</p>
+                  <p className={styles.peekText}>
+                    Ever since my first day volunteering at the community
+                    clinic, I knew I wanted to make a difference in people's
+                    lives. <span className={styles.peekBadge}>1</span>{" "}
+                    <span className={`${styles.peekHighlight} ${styles.orange}`}>
+                      The experience opened my eyes
+                    </span>{" "}
+                    to how small acts of kindness can have a big impact.{" "}
+                    <span className={`${styles.peekBadge} ${styles.alt}`}>2</span>
+                    <span className={styles.peekCursor} />
+                  </p>
                 </div>
 
-                <p>{essay.title}</p>
-                <span>{essay.description}</span>
-                <div className={styles.scrollLink}>Read more →</div>
+                <div className={`${styles.peekPane} ${styles.theirs}`}>
+                  <p className={styles.peekPaneHead}>Sample Essay</p>
+                  <p className={styles.peekText}>
+                    Stepping into the local hospital sophomore summer, I
+                    embraced the role of student volunteer, eager to assist
+                    patients. <span className={styles.peekBadge}>1</span>{" "}
+                    <span className={`${styles.peekHighlight} ${styles.greenText}`}>
+                      The sterile scent of alcohol greeted me
+                    </span>{" "}
+                    and the vast, maze-like hospital left me disoriented.{" "}
+                    <span className={`${styles.peekBadge} ${styles.alt}`}>2</span>
+                  </p>
+                </div>
+              </div>
+
+              <div className={styles.peekComments}>
+                <div className={styles.peekComment}>
+                  <span className={`${styles.peekCommentDot} ${styles.orange}`} />
+                  Specific, sensory detail stands out immediately
+                </div>
+                <div className={styles.peekComment}>
+                  <span className={`${styles.peekCommentDot} ${styles.greenText}`} />
+                  Matches the opening style of top-ranked essays
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <section
+        id="how-it-works"
+        className={`${styles.section} ${styles.howSection}`}
+      >
+        <div className={styles.wrap}>
+          <SectionHead
+            eyebrow="Procedure"
+            title="How the review is conducted"
+            copy="Three stages, modeled on how an admissions reader actually evaluates a personal statement."
+          />
+
+          <div className={styles.steps}>
+            <Step
+              rank="I"
+              title="Paste your draft"
+              copy="Essay Annotator maps your voice, structure, and story from the first line, any draft, any stage."
+            />
+            <Step
+              rank="II"
+              title="Find similar accepted essays"
+              copy="We surface accepted essays that mirror your topic, tone, and structure, not just keywords."
+            />
+            <Step
+              rank="III"
+              title="Learn what works"
+              copy="See the exact patterns that make accepted essays land, highlighted directly on your writing."
+            />
+          </div>
+        </div>
+      </section>
+
+      <Divider />
+
+      <section className={styles.section}>
+        <div className={styles.wrap}>
+          <SectionHead
+            eyebrow="Comparative Review"
+            title="See what makes strong essays work"
+            titleClassName={styles.singleLineTitle}
+            copy="Your draft, reviewed side by side with a real accepted essay."
+          />
+
+          <div className={styles.certificate}>
+            <div className={styles.certHead}>
+              <p>Comparative Reading | Prompt Matched</p>
+            </div>
+
+            <div className={styles.certBody}>
+              <div className={`${styles.certCol} ${styles.admittedCol}`}>
+                <h4>Candidate draft</h4>
+                <h3>Your essay</h3>
+                <p>Ever since my first day volunteering at the community clinic,</p>
+                <p>I knew I wanted to make a difference in people's lives.</p>
+                <p>
+                  <span className={styles.certHighlight}>
+                    The experience opened my eyes to how small acts of kindness
+                    can have a big impact.
+                  </span>
+                </p>
+                <p>I hope to continue this journey in college and beyond.</p>
+              </div>
+
+              <div className={styles.certDivider}>
+                <span className={styles.relationButton}>
+                  See how they are related
+                </span>
+              </div>
+
+              <div className={styles.certCol}>
+                <h4>Admitted essay</h4>
+                <h3>A First Day at the Hospital</h3>
+                <p>
+                  Stepping into the local hospital sophomore summer, I embraced
+                  the role of student volunteer, eager to assist patients.{" "}
+                  <span className={styles.certHighlight}>
+                    The sterile scent of alcohol greeted me and the vast,
+                    maze-like hospital left me disoriented,
+                  </span>{" "}
+                  so I struggled to find the desired locations in the
+                  labyrinthine hallways.
+                </p>
+                <p className={styles.ellipsis}>...</p>
+              </div>
+
+              <div className={styles.certNote}>
+                <b>Stronger opening image</b>
+                <span>
+                  A First Day at the Hospital turns a general idea into a vivid, sensory image
+                  that pulls readers in.
+                </span>
+                <div className={styles.rewriteDemo} aria-label="Opening image rewrite demonstration">
+                  <div className={styles.rewriteBefore}>
+                    <small>Draft line</small>
+                    <p>
+                      The experience opened my eyes to how small acts of
+                      kindness can have a big impact.
+                    </p>
+                  </div>
+                  <div className={styles.rewriteFlow} aria-hidden="true">
+                    <span>setting</span>
+                    <span>sensory detail</span>
+                    <span>specific movement</span>
+                  </div>
+                  <div className={styles.rewriteAfter}>
+                    <small>Stronger opening</small>
+                    <p>
+                      The sterile scent of alcohol greeted me as I stepped into
+                      the hospital hallway.
+                    </p>
+                  </div>
+                </div>
+                <Link to="/editor" className={styles.analysisButton}>
+                  See full analysis
+                </Link>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <Divider />
+
+      <section id="library" className={styles.section}>
+        <div className={styles.wrap}>
+          <SectionHead
+            eyebrow="The Archive"
+            title="Explore real accepted essays"
+            copy="Essays from students admitted to top universities."
+          />
+
+          <div className={styles.libraryGrid}>
+            {ESSAYS.map((essay) => (
+              <Link to={`/essay/${essay.id}`} className={styles.card} key={essay.id}>
+                <span className={styles.school}>{essay.school}</span>
+                <h3>{essay.title}</h3>
+                <p>{essay.description}</p>
+                <span className={styles.go}>Read more</span>
               </Link>
             ))}
           </div>
         </div>
       </section>
 
-      <section className={styles.exampleSection}>
-        <div className={`${styles.exampleBox} ${styles.exampleBoxPurple}`}>
-          <div className={styles.boxTop}>
-            <div className={`${styles.boxIconWrap} ${styles.boxIconPurple}`}>
-              <FileText className={styles.boxTopIcon} />
-            </div>
-            <div>
-              <h3>Your Essay</h3>
-              <p className={styles.boxSubtitle}>Preview and enhance your essay</p>
-            </div>
-          </div>
+      <Divider />
 
-          <div className={`${styles.placeholder} ${styles.large}`}>
-            <div className={styles.mockEssay}>
-              <div className={styles.mockEssayLineWide} />
-              <div className={styles.mockEssayBody}>
-                <div className={styles.mockEssayThumbPurple} />
-                <div className={styles.mockEssayText}>
-                  <div className={styles.mockEssayLine} />
-                  <div className={styles.mockEssayLine} />
-                  <div className={styles.mockEssayLine} />
-                  <div className={styles.mockEssayLineShort} />
-                </div>
-              </div>
+      <section className={styles.section}>
+        <div className={styles.wrap}>
+          <SectionHead
+            eyebrow="Committee Notes"
+            title="Why this review is different"
+            copy="Generic AI advice versus feedback grounded in real admitted outcomes."
+          />
+
+          <div className={styles.compareGrid}>
+            <div className={styles.compareCol}>
+              <span className={styles.compareLabel}>The Old Way</span>
+              <h3>Generic AI Advice</h3>
+              <ul>
+                <li>
+                  <span className={styles.bad}>x</span> Vague, one-size-fits-all tips
+                </li>
+                <li>
+                  <span className={styles.bad}>x</span> Not based on real admissions outcomes
+                </li>
+                <li>
+                  <span className={styles.bad}>x</span> Doesn't show proven examples
+                </li>
+                <li>
+                  <span className={styles.bad}>x</span> Hard to know what actually works
+                </li>
+              </ul>
             </div>
-          </div>
-        </div>
 
-        <div className={`${styles.exampleBox} ${styles.exampleBoxBlue}`}>
-          <div className={styles.boxTop}>
-            <div className={`${styles.boxIconWrap} ${styles.boxIconBlue}`}>
-              <FileCheck className={styles.boxTopIcon} />
-            </div>
-            <div>
-              <h3>Similar Accepted Essays</h3>
-              <p className={styles.boxSubtitle}>
-                Find and compare similar successful essays
-              </p>
-            </div>
-          </div>
-
-          <div className={`${styles.placeholder} ${styles.large}`}>
-            <div className={styles.mockEssay}>
-              <div className={styles.mockEssayBody}>
-                <div className={styles.mockEssayThumbBlue} />
-                <div className={styles.mockEssayText}>
-                  <div className={styles.mockEssayLine} />
-                  <div className={styles.mockEssayLine} />
-                  <div className={styles.mockEssayLineShort} />
-                </div>
-              </div>
-
-              <div className={styles.mockCardDivider} />
-
-              <div className={styles.mockEssayBody}>
-                <div className={styles.mockEssayThumbBlue} />
-                <div className={styles.mockEssayText}>
-                  <div className={styles.mockEssayLine} />
-                  <div className={styles.mockEssayLine} />
-                  <div className={styles.mockEssayLineShort} />
-                </div>
-              </div>
+            <div className={`${styles.compareCol} ${styles.good}`}>
+              <span className={styles.compareLabel}>The Essay Annotator Way</span>
+              <h3>Learn From Real Accepted Essays</h3>
+              <ul>
+                <li>
+                  <span className={styles.check}>✓</span> Based on essays that got students in
+                </li>
+                <li>
+                  <span className={styles.check}>✓</span> See real responses to real prompts
+                </li>
+                <li>
+                  <span className={styles.check}>✓</span> Discover what makes essays effective
+                </li>
+                <li>
+                  <span className={styles.check}>✓</span> Strengthen your own unique voice
+                </li>
+              </ul>
             </div>
           </div>
         </div>
       </section>
 
-      <section className={styles.comparison}>
-        <h2>Boost Your Admissions Chances Today</h2>
-        <p>Learn from real essays that actually got into top schools.</p>
+      <section className={styles.cta}>
+        <div className={styles.wrap}>
+          <h2>
+            Ready to improve
+            <br />
+            your essay?
+          </h2>
+          <p>
+            Access a curated database of 200+ real essays accepted into Harvard,
+            MIT, Stanford, and other top universities.
+          </p>
 
-        <div className={styles.compareBox}>
-          <div className={styles.bad}>
-            <h3>✗ Generic Advice</h3>
-            <p>AI gives broad, non-specific feedback</p>
-            <ul>
-              <li>✗ Vague suggestions</li>
-              <li>✗ No real examples</li>
-              <li>✗ Hard to apply</li>
-            </ul>
+          <div className={styles.ctaStats}>
+            <div className={styles.stat}>
+              <b>
+                <CountUpNumber value={essayCount} />
+                <span className={styles.countPlus}>+</span>
+              </b>
+              <span>Accepted essays</span>
+            </div>
+            <div className={styles.stat}>
+              <b>
+                <CountUpNumber value={15} easing="linear" />
+              </b>
+              <span>Different topics</span>
+            </div>
+            <div className={styles.stat}>
+              <b>Free</b>
+              <span>To get started</span>
+            </div>
           </div>
 
-          <div className={styles.good}>
-            <h3>✓ Real Examples</h3>
-            <p>See essays that actually got accepted</p>
-            <ul>
-              <li>✓ 10,000+ essays indexed</li>
-              <li>✓ Real successful structures</li>
-              <li>✓ Clear improvement path</li>
-            </ul>
-          </div>
+          <button
+            type="button"
+            className={styles.primaryButton}
+            onClick={handleStartWriting}
+          >
+            Start writing
+          </button>
         </div>
-=======
-        <button
-          type="button"
-          className={styles.primaryBtn}
-          onClick={handleStartWriting}
-        >
-          <span>Start Writing</span>
-        </button>
->>>>>>> feature/Footer
       </section>
+    </main>
+  );
+}
+
+function SectionHead({ eyebrow, title, copy, titleClassName }) {
+  return (
+    <div className={styles.sectionHead}>
+      <p>{eyebrow}</p>
+      <h2 className={titleClassName}>{title}</h2>
+      <span>{copy}</span>
     </div>
   );
 }
 
-<<<<<<< HEAD
+function CountUpNumber({
+  value,
+  duration = 5500,
+  pause = 2400,
+  resetPause = 520,
+  easing = "default",
+}) {
+  const [displayValue, setDisplayValue] = useState(0);
+  const [isResetting, setIsResetting] = useState(true);
+  const elementRef = useRef(null);
+  const frameRef = useRef(null);
+  const timeoutsRef = useRef([]);
+  const lastDisplayRef = useRef(0);
+
+  useEffect(() => {
+    const element = elementRef.current;
+    if (!element) return undefined;
+
+    const prefersReducedMotion = window.matchMedia(
+      "(prefers-reduced-motion: reduce)",
+    ).matches;
+
+    if (prefersReducedMotion) {
+      setIsResetting(false);
+      setDisplayValue(value);
+      return undefined;
+    }
+
+    let isVisible = false;
+    let isCancelled = false;
+
+    const clearTimers = () => {
+      if (frameRef.current) {
+        cancelAnimationFrame(frameRef.current);
+        frameRef.current = null;
+      }
+
+      timeoutsRef.current.forEach((timeoutId) => clearTimeout(timeoutId));
+      timeoutsRef.current = [];
+    };
+
+    const runAnimation = () => {
+      setIsResetting(true);
+      lastDisplayRef.current = 0;
+      setDisplayValue(0);
+
+      timeoutsRef.current.push(
+        setTimeout(() => {
+          if (isCancelled || !isVisible) return;
+          setIsResetting(false);
+          let startedAt;
+
+          const animate = (timestamp) => {
+            if (isCancelled || !isVisible) return;
+            if (!startedAt) startedAt = timestamp;
+
+            const progress = Math.min((timestamp - startedAt) / duration, 1);
+            let nextValue;
+
+            if (easing === "linear") {
+              nextValue = Math.floor(value * progress);
+            } else {
+              const cosineProgress = 0.5 * (1 - Math.cos(Math.PI * progress));
+              nextValue = Math.floor(value * cosineProgress);
+            }
+
+            nextValue = Math.min(value, nextValue);
+            if (nextValue !== lastDisplayRef.current || progress === 1) {
+              lastDisplayRef.current = nextValue;
+              setDisplayValue(progress === 1 ? value : nextValue);
+            }
+
+            if (progress < 1) {
+              frameRef.current = requestAnimationFrame(animate);
+            }
+          };
+
+          frameRef.current = requestAnimationFrame(animate);
+        }, resetPause),
+      );
+
+      timeoutsRef.current.push(
+        setTimeout(() => {
+          if (isCancelled || !isVisible) return;
+          runAnimation();
+        }, resetPause + duration + pause),
+      );
+    };
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const entry = entries[0];
+
+        if (entry?.isIntersecting) {
+          if (isVisible) return;
+          isVisible = true;
+          clearTimers();
+          runAnimation();
+          return;
+        }
+
+        isVisible = false;
+        clearTimers();
+        setIsResetting(true);
+        lastDisplayRef.current = 0;
+        setDisplayValue(0);
+      },
+      { threshold: 0.55 },
+    );
+
+    observer.observe(element);
+
+    return () => {
+      isCancelled = true;
+      observer.disconnect();
+      clearTimers();
+    };
+  }, [duration, easing, pause, resetPause, value]);
+
+  const targetDigits = String(value).split("");
+  const lastIndex = targetDigits.length - 1;
+
+  return (
+    <span ref={elementRef} className={styles.countNumber}>
+      {targetDigits.map((_, index) => {
+        const distanceFromRight = lastIndex - index;
+        const placeValue = 10 ** distanceFromRight;
+        const targetStep = Math.floor(displayValue / placeValue);
+        const isLeadingHidden = displayValue < placeValue && distanceFromRight > 0;
+        const sequence = Array.from({ length: targetStep + 1 }, (_, step) =>
+          String(step % 10),
+        );
+
+        return (
+          <span
+            className={`${styles.digitWindow} ${
+              isLeadingHidden ? styles.digitWindowHidden : ""
+            }`}
+            key={`${index}-${value}`}
+          >
+            <span
+              className={`${styles.digitTrack} ${
+                isResetting ? styles.digitTrackResetting : ""
+              }`}
+              style={{
+                transform: `translateY(-${targetStep}em)`,
+                transitionDuration:
+                  displayValue >= value - 1 ? "320ms" : undefined,
+              }}
+            >
+              {sequence.map((number, step) => (
+                <span className={styles.digit} key={`${number}-${step}`}>
+                  {number}
+                </span>
+              ))}
+            </span>
+          </span>
+        );
+      })}
+    </span>
+  );
+}
+
+function Step({ rank, title, copy }) {
+  return (
+    <div className={styles.step}>
+      <div className={styles.rank}>{rank}</div>
+      <h3>{title}</h3>
+      <p>{copy}</p>
+    </div>
+  );
+}
+
+function Divider() {
+  return <hr className={styles.divider} />;
+}
+
 export default Home;
-=======
-export default Home;
->>>>>>> feature/Footer

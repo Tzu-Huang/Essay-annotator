@@ -33,196 +33,18 @@
   background: var(--bg);
   color: var(--text);
   font-family: "Inter", sans-serif;
-<<<<<<< HEAD
-  padding-bottom: 320px;
-}
-
-/* =========================
-   Topbar
-   ========================= */
-
-.compareTopbar {
-  position: sticky;
-  top: 0;
-  z-index: 100;
-  height: 72px;
-  background: rgba(255, 255, 255, 0.92);
-  backdrop-filter: blur(8px);
-  border-bottom: 1px solid var(--border);
-  display: grid;
-  grid-template-columns: 1fr auto 1fr;
-  align-items: center;
-  padding: 0 24px;
-}
-
-.topbarLeft {
-  display: flex;
-  align-items: center;
-}
-
-.brandBlock {
-  display: flex;
-  align-items: baseline;
-  gap: 6px;
-}
-
-.brandLogo {
-  height: 40px;
-  width: auto;
-  display: block;
-  object-fit: contain;
-}
-
-.brandSub {
-  color: var(--muted);
-  font-weight: 500;
-}
-
-.topbarCenter {
-  display: flex;
-  justify-content: center;
-}
-
-.pillGroup {
-  display: flex;
-  gap: 10px;
-  align-items: center;
-}
-
-.topPill {
-  padding: 8px 14px;
-  border-radius: 999px;
-  font-size: 14px;
-  font-weight: 600;
-  border: 1px solid var(--border);
-  background: #fff;
-  color: var(--muted);
-}
-
-.pillTotal {
-  background: var(--greenBg);
-  color: var(--green);
-  border-color: #cfe7d7;
-}
-
-.pillExpression {
-  background: var(--orangeBg);
-  color: var(--orange);
-}
-
-.pillReflection {
-  background: var(--blueBg);
-  color: var(--blue);
-}
-
-.pillEnding {
-  background: var(--purpleBg);
-  color: var(--purple);
-}
-
-.topbarRight {
-  display: flex;
-  justify-content: flex-end;
-  gap: 10px;
-}
-
-/* =========================
-   Buttons
-   ========================= */
-
-.ghostButton,
-.primaryButton,
-.panelIconButton {
-  border-radius: 12px;
-  font-size: 14px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: 0.18s ease;
-}
-
-.ghostButton {
-  border: 1px solid var(--border);
-  background: #fff;
-  color: #5b5852;
-  padding: 10px 14px;
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.ghostButton:hover {
-  background: #faf9f7;
-}
-
-.primaryButton {
-  border: none;
-  background: #3d8b57;
-  color: #fff;
-  padding: 10px 18px;
-  box-shadow: 0 8px 22px rgba(61, 139, 87, 0.18);
-  display: inline-flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.primaryButton:hover {
-  transform: translateY(-1px);
-}
-
-.primaryButton:disabled {
-  cursor: not-allowed;
-  opacity: 0.85;
-}
-
-.primaryButtonLoading {
-  background: #34784b;
-}
-
-.statusDot {
-  width: 10px;
-  height: 10px;
-  border-radius: 999px;
-  flex-shrink: 0;
-}
-
-.statusOn {
-  background: #4caf50;
-}
-
-.statusOff {
-  background: #d64545;
-}
-
-.buttonSpinner {
-  width: 16px;
-  height: 16px;
-  border: 2px solid rgba(255, 255, 255, 0.35);
-  border-top-color: #ffffff;
-  border-radius: 999px;
-  animation: compareSpin 0.75s linear infinite;
-  flex-shrink: 0;
-}
-
-/* =========================
-   Loading + error
-   ========================= */
-=======
   padding-bottom: 150px;
 }
 
 /* =========================
 Loading Error
 ========================= */
->>>>>>> feature/Footer
 
 .loadingOverlay {
   position: fixed;
   inset: 0;
   background: rgba(246, 245, 243, 0.62);
-<<<<<<< HEAD
-=======
   -webkit-backdrop-filter: blur(4px);
->>>>>>> feature/Footer
   backdrop-filter: blur(4px);
   z-index: 200;
   display: flex;
@@ -295,13 +117,8 @@ Loading Error
 }
 
 /* =========================
-<<<<<<< HEAD
-   Main layout
-   ========================= */
-=======
    Main Layout
 ========================= */
->>>>>>> feature/Footer
 
 .compareMain {
   max-width: 1600px;
@@ -312,53 +129,15 @@ Loading Error
 .compareSplitLayout {
   display: grid;
   align-items: stretch;
-<<<<<<< HEAD
-  border: 1px solid var(--border);
-  border-radius: 20px;
-  overflow: hidden;
-=======
   min-height: calc(100vh - 140px);
   border: 1px solid var(--border);
   border-radius: 20px;
   overflow: visible;
->>>>>>> feature/Footer
   background: var(--surface);
   box-shadow: var(--shadow);
   position: relative;
 }
 
-<<<<<<< HEAD
-.userPanel,
-.databasePanel {
-  min-width: 0;
-  background: var(--surface);
-}
-
-/* =========================
-   Left panel
-   ========================= */
-
-.userPanel {
-  display: flex;
-  flex-direction: column;
-}
-
-.userPanelHeader {
-  padding: 26px 28px 18px;
-  position: relative;
-}
-
-.userPanelHeader::after {
-  content: "";
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  height: 1px;
-  background: var(--border);
-}
-
-=======
 /* =========================
    Main 4 Sections Layout
 
@@ -412,15 +191,10 @@ Loading Error
 }
 
 /* 3. User content + footer area */
->>>>>>> feature/Footer
 .userPanelGrid {
   display: grid;
   grid-template-columns: minmax(0, 1fr) 220px;
   gap: 18px;
-<<<<<<< HEAD
-  align-items: start;
-  padding: 26px 28px 0;
-=======
   min-height: 0;
   padding: 26px 28px 0;
   background: #fffffb;
@@ -441,16 +215,10 @@ Loading Error
 
 .readingLayout .userHoverRail {
   display: none;
->>>>>>> feature/Footer
 }
 
 .userEssayMain {
   min-width: 0;
-<<<<<<< HEAD
-}
-
-.userEssayBody {
-=======
   min-height: 0;
   display: flex;
   flex-direction: column;
@@ -463,7 +231,6 @@ Loading Error
   padding-bottom: 30px;
   /*font-family: Inter, system-ui, sans-serif;*/
   letter-spacing: -0.05em;
->>>>>>> feature/Footer
   font-family: "Source Serif 4", Georgia, serif;
   font-size: 18px;
   line-height: 1.95;
@@ -472,8 +239,6 @@ Loading Error
   color: #2f2b28;
 }
 
-<<<<<<< HEAD
-=======
 /* 4. Database content + footer area */
 .essayCardBody {
   flex: 1;
@@ -499,53 +264,21 @@ Loading Error
   margin-top: auto;
 }
 
->>>>>>> feature/Footer
 .userHoverRail {
   position: relative;
   min-height: 100%;
 }
 
 /* =========================
-<<<<<<< HEAD
-   Shared cards
-   ========================= */
-
-.essayCard {
-  min-height: 720px;
-  display: flex;
-  flex-direction: column;
-  background: var(--surface);
-}
-
-.essayCardHeader {
-  padding: 26px 28px 18px;
-  position: relative;
-}
-
-.essayCardHeader::after {
-  content: "";
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  height: 1px;
-  background: var(--border);
-}
-=======
    Essay Header Text
 ========================= */
->>>>>>> feature/Footer
 
 .essayCardLabel {
   font-size: 12px;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.08em;
-<<<<<<< HEAD
-  color: var(--muted2);
-=======
   color: #6c6a6a;
->>>>>>> feature/Footer
   margin-bottom: 8px;
 }
 
@@ -556,40 +289,14 @@ Loading Error
   letter-spacing: -0.02em;
 }
 
-<<<<<<< HEAD
-.essayCardBody {
-  flex: 1;
-  padding: 26px 30px 30px;
-  font-family: "Source Serif 4", Georgia, serif;
-  font-size: 18px;
-  line-height: 1.95;
-  font-weight: 400;
-  letter-spacing: -0.01em;
-  color: #2f2b28;
-}
-
-.essayCardFooter {
-  padding: 14px 28px;
-  border-top: 1px solid var(--border);
-  font-size: 14px;
-  color: var(--muted);
-}
-
-=======
->>>>>>> feature/Footer
 .metaSep {
   margin: 0 8px;
   color: #b6b0a8;
 }
 
 /* =========================
-<<<<<<< HEAD
-   Chips
-   ========================= */
-=======
    Metadata Chips
 ========================= */
->>>>>>> feature/Footer
 
 .metaChipRow {
   display: flex;
@@ -608,31 +315,6 @@ Loading Error
   align-items: center;
 }
 
-<<<<<<< HEAD
-.chipSchool {
-  background: #f3f0c9;
-  color: #7a7a2f;
-}
-
-.chipType {
-  background: #f3f0c9;
-  color: #7a7a2f;
-}
-
-.chipRef {
-  background: #e8f3ea;
-  color: #2f7a4f;
-}
-
-.chipNeutral {
-  background: #f5f3ef;
-  color: #6f6a63;
-}
-
-/* =========================
-   Divider
-   ========================= */
-=======
 .chipSchool,
 .chipType {
   background: #f5f4f4;
@@ -658,7 +340,6 @@ Loading Error
 /* =========================
    Resize Divider
 ========================= */
->>>>>>> feature/Footer
 
 .resizeDivider {
   position: relative;
@@ -667,10 +348,7 @@ Loading Error
   display: flex;
   align-items: center;
   justify-content: center;
-<<<<<<< HEAD
-=======
   -webkit-user-select: none;
->>>>>>> feature/Footer
   user-select: none;
 }
 
@@ -694,10 +372,7 @@ Loading Error
   gap: 4px;
   color: #5f5a53;
   font-size: 14px;
-<<<<<<< HEAD
-=======
   -webkit-user-select: none;
->>>>>>> feature/Footer
   user-select: none;
   transition: all 0.15s ease;
 }
@@ -730,13 +405,8 @@ Loading Error
 }
 
 /* =========================
-<<<<<<< HEAD
-   Paragraph interaction
-   ========================= */
-=======
    Paragraph + Annotation
 ========================= */
->>>>>>> feature/Footer
 
 .essayParagraph {
   margin: 0 0 26px 0;
@@ -748,8 +418,6 @@ Loading Error
   gap: 10px;
 }
 
-<<<<<<< HEAD
-=======
 .annotationGroup {
   display: inline-flex;
   flex-direction: column;
@@ -757,7 +425,6 @@ Loading Error
   flex-shrink: 0;
 }
 
->>>>>>> feature/Footer
 .annotationBadge {
   border: none;
   width: 26px;
@@ -770,14 +437,6 @@ Loading Error
   cursor: pointer;
 }
 
-<<<<<<< HEAD
-.essayHighlight {
-  display: inline;
-  padding: 2px 4px;
-  border-radius: 7px;
-  cursor: pointer;
-  transition: background 0.15s ease, filter 0.15s ease, box-shadow 0.15s ease;
-=======
 .essaySentenceBlock {
   display: inline;
 }
@@ -787,7 +446,6 @@ Loading Error
   padding: 2px 4px;
   cursor: pointer;
   box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.04);
->>>>>>> feature/Footer
 }
 
 .isHovered {
@@ -804,13 +462,6 @@ Loading Error
   transition: 0.15s ease;
 }
 
-<<<<<<< HEAD
-.isLinked {
-  box-shadow: inset 0 0 0 1.5px rgba(0, 0, 0, 0.05);
-}
-
-=======
->>>>>>> feature/Footer
 .variantExpression {
   background: var(--orangeBg);
   color: #9c5a16;
@@ -832,13 +483,8 @@ Loading Error
 }
 
 /* =========================
-<<<<<<< HEAD
-   Hover note card
-   ========================= */
-=======
    Hover Note Card
 ========================= */
->>>>>>> feature/Footer
 
 .hoverNoteRail {
   position: absolute;
@@ -846,14 +492,10 @@ Loading Error
   width: 210px;
   opacity: 0;
   transform: translateY(-4px);
-<<<<<<< HEAD
-  transition: opacity 0.14s ease, transform 0.14s ease, top 0.14s ease;
-=======
   transition:
     opacity 0.14s ease,
     transform 0.14s ease,
     top 0.14s ease;
->>>>>>> feature/Footer
   pointer-events: none;
 }
 
@@ -878,8 +520,6 @@ Loading Error
   background: #e86b2c;
 }
 
-<<<<<<< HEAD
-=======
 .hoverNoteAccent.variantExpression {
   background: #ef8f2f;
 }
@@ -896,7 +536,6 @@ Loading Error
   background: #8a63d2;
 }
 
->>>>>>> feature/Footer
 .hoverNoteBody {
   padding: 14px 14px 12px;
 }
@@ -943,53 +582,9 @@ Loading Error
   filter: brightness(0.98);
 }
 
-<<<<<<< HEAD
-.essaySentenceBlock {
-  display: inline;
-}
-
-.inlineSentenceHighlight {
-  border-radius: 6px;
-  padding: 2px 4px;
-  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.04);
-}
-.annotationGroup {
-  display: inline-flex;
-  flex-direction: column;
-  gap: 6px;
-  flex-shrink: 0;
-}
-
-.inlineSentenceHighlight {
-  border-radius: 6px;
-  padding: 2px 4px;
-  cursor: pointer;
-  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.04);
-}
-.hoverNoteAccent.variantExpression {
-  background: #ef8f2f;
-}
-
-.hoverNoteAccent.variantReflection {
-  background: #4a7ddc;
-}
-
-.hoverNoteAccent.variantEnding {
-  background: #4e9a6e;
-}
-
-.hoverNoteAccent.variantStructure {
-  background: #8a63d2;
-}
-
-/* =========================
-   Bottom detail panel
-   ========================= */
-=======
 /* =========================
    Bottom Detail Panel
 ========================= */
->>>>>>> feature/Footer
 
 .bottomPanel {
   position: fixed;
@@ -997,10 +592,7 @@ Loading Error
   right: 18px;
   bottom: 18px;
   background: rgba(255, 255, 255, 0.96);
-<<<<<<< HEAD
-=======
   -webkit-backdrop-filter: blur(10px);
->>>>>>> feature/Footer
   backdrop-filter: blur(10px);
   border: 1px solid var(--border);
   border-radius: 24px;
@@ -1010,10 +602,7 @@ Loading Error
 }
 
 .bottomPanelOpen {
-<<<<<<< HEAD
-=======
   display: block;
->>>>>>> feature/Footer
 }
 
 .bottomPanelHandle {
@@ -1080,14 +669,11 @@ Loading Error
   border: 1px solid var(--border);
   background: #fff;
   color: #666159;
-<<<<<<< HEAD
-=======
   border-radius: 12px;
   font-size: 14px;
   font-weight: 600;
   cursor: pointer;
   transition: 0.18s ease;
->>>>>>> feature/Footer
 }
 
 .panelIconButton:hover {
@@ -1102,19 +688,13 @@ Loading Error
 }
 
 .panelBlock {
-<<<<<<< HEAD
-  padding: 0 22px;
-=======
   padding: 18px 22px;
->>>>>>> feature/Footer
 }
 
 .panelBlock + .panelBlock {
   border-left: 1px solid var(--border);
 }
 
-<<<<<<< HEAD
-=======
 .panelUser {
   background: linear-gradient(
     180deg,
@@ -1139,7 +719,6 @@ Loading Error
   );
 }
 
->>>>>>> feature/Footer
 .panelBlockLabel {
   font-size: 12px;
   text-transform: uppercase;
@@ -1150,12 +729,8 @@ Loading Error
 }
 
 .panelQuoteBox {
-<<<<<<< HEAD
-  background: #edf2fb;
-=======
   background: var(--shadow);
   /*background: #edf2fb;*/
->>>>>>> feature/Footer
   border-radius: 12px;
   padding: 16px 18px;
   font-size: 15px;
@@ -1201,11 +776,7 @@ Loading Error
 
 /* =========================
    Responsive
-<<<<<<< HEAD
-   ========================= */
-=======
 ========================= */
->>>>>>> feature/Footer
 
 @media (max-width: 1280px) {
   .userPanelGrid {
@@ -1218,22 +789,6 @@ Loading Error
 }
 
 @media (max-width: 1200px) {
-<<<<<<< HEAD
-  .compareTopbar {
-    grid-template-columns: 1fr;
-    height: auto;
-    gap: 12px;
-    padding: 16px;
-  }
-
-  .topbarLeft,
-  .topbarCenter,
-  .topbarRight {
-    justify-content: center;
-  }
-
-=======
->>>>>>> feature/Footer
   .bottomPanelGrid {
     grid-template-columns: 1fr;
     gap: 18px;
@@ -1242,39 +797,21 @@ Loading Error
   .panelBlock + .panelBlock {
     border-left: none;
     border-top: 1px solid var(--border);
-<<<<<<< HEAD
-    padding-top: 18px;
-=======
->>>>>>> feature/Footer
   }
 }
 
 @media (max-width: 720px) {
-<<<<<<< HEAD
-  .pillGroup {
-    flex-wrap: wrap;
-    justify-content: center;
-  }
-
-  .topbarRight {
-    flex-wrap: wrap;
-=======
   .compareSplitLayout {
     grid-template-columns: 1fr !important;
   }
 
   .resizeDivider {
     display: none;
->>>>>>> feature/Footer
   }
 
   .essayCardBody,
   .userEssayBody {
     font-size: 18px;
-<<<<<<< HEAD
-    padding: 18px 20px 20px;
-=======
->>>>>>> feature/Footer
   }
 
   .essayCardHeader,
@@ -1299,8 +836,4 @@ Loading Error
     flex-direction: column;
     align-items: flex-start;
   }
-<<<<<<< HEAD
 }
-=======
-}
->>>>>>> feature/Footer

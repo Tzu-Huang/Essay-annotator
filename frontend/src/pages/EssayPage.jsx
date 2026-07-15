@@ -1,10 +1,4 @@
 import { useParams, useNavigate } from "react-router-dom";
-<<<<<<< HEAD
-import { useEffect, useState } from "react";
-import { Copy, Download, Share2 } from "lucide-react";
-import styles from "../styles/EssayPage.module.css";
-
-=======
 import { useEffect, useState, useRef } from "react";
 import styles from "../styles/EssayPage.module.css";
 
@@ -14,22 +8,11 @@ const PLACEHOLDER_IMAGES = [
   "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?q=80&w=1200&auto=format&fit=crop",
 ];
 
->>>>>>> feature/Footer
 function EssayPage() {
   const { id } = useParams();
   const navigate = useNavigate();
   const [essay, setEssay] = useState(null);
   const [error, setError] = useState("");
-<<<<<<< HEAD
-
-  useEffect(() => {
-    const fetchEssay = async () => {
-      try {
-        setError("");
-
-        const response = await fetch(
-          `http://44.201.62.0:8000/essays/${id}?include_content=true`
-=======
   const [relatedEssays, setRelatedEssays] = useState([]);
   const cardRef = useRef(null);
 
@@ -70,7 +53,6 @@ function EssayPage() {
         // generate_title=true triggers OpenAI title generation for the main essay <h1>
         const response = await fetch(
           `${import.meta.env.VITE_API_URL}/essays/${id}?include_content=true`,
->>>>>>> feature/Footer
         );
 
         if (!response.ok) {
@@ -79,8 +61,6 @@ function EssayPage() {
 
         const data = await response.json();
         setEssay(data);
-<<<<<<< HEAD
-=======
 
         // Find related essays
         const searchResponse = await fetch(`${import.meta.env.VITE_API_URL}/search`, {
@@ -107,7 +87,6 @@ function EssayPage() {
           setRelatedEssays(filtered);
         }
         // find related essays ===
->>>>>>> feature/Footer
       } catch (err) {
         console.error("ERROR:", err);
         setError("Failed to load essay.");
@@ -120,39 +99,15 @@ function EssayPage() {
   const handleCompare = () => {
     navigate(`/compare/${id}`);
   };
-<<<<<<< HEAD
-=======
   const heroImage =
     essay?.hero_image ||
     "https://images.unsplash.com/photo-1455390582262-044cdead277a?q=80&w=1600&auto=format&fit=crop";
->>>>>>> feature/Footer
 
   if (error) {
     return <p className={styles.loading}>{error}</p>;
   }
 
   return (
-<<<<<<< HEAD
-    <div className={styles.essayPage}>
-      {essay ? (
-        <>
-          {/* NAV */}
-          <div className={styles.essayNav}>
-            <div className={styles.logo}>
-              Essay <span>AI</span>
-            </div>
-
-            <div className={styles.navLinks}>
-              <span>Home</span>
-              <span>My Essays</span>
-              <span>Examples</span>
-              <span>About Us</span>
-            </div>
-          </div>
-
-          {/* HERO */}
-          <div className={styles.essayHero}>
-=======
     <main className={styles.essayPage}>
       {essay ? (
         <>
@@ -163,136 +118,14 @@ function EssayPage() {
                 90deg,
                 rgba(248, 248, 253, 0.86) 0%,
                 rgba(248, 248, 253, 0.82) 42%,
-                rgba(248, 248, 253, 0.25) 100%
+                rgba(248, 248, 253, 0.48) 100%
               ), url(${heroImage})`,
             }}
           >
->>>>>>> feature/Footer
             <button className={styles.backBtn} onClick={() => navigate(-1)}>
               ← Back to Results
             </button>
 
-<<<<<<< HEAD
-            <h1 title={essay.topic}>{essay.topic}</h1>
-
-            <div className={styles.metaRow}>
-              {essay.essay_type && (
-                <span className={`${styles.badge} ${styles.type}`}>
-                  {essay.essay_type}
-                </span>
-              )}
-
-              {essay.word_count && (
-                <span className={`${styles.badge} ${styles.words}`}>
-                  {essay.word_count} words
-                </span>
-              )}
-            </div>
-          </div>
-
-          {/* MAIN */}
-          <div className={styles.essayLayout}>
-            {/* LEFT SIDEBAR */}
-            <div className={styles.sidebar}>
-              <div className={`${styles.card} ${styles.infoCard}`}>
-                <h3>Essay Info</h3>
-
-                <div className={styles.infoRow}>
-                  <div className={styles.infoIcon}>▣</div>
-                  <div>
-                    <span>Word Count</span>
-                    <b>{essay.word_count || essay.words || "-"}</b>
-                  </div>
-                </div>
-
-                <div className={styles.infoRow}>
-                  <div className={styles.infoIcon}>Aa</div>
-                  <div>
-                    <span>Type</span>
-                    <b>{essay.essay_type || essay.type || "-"}</b>
-                  </div>
-                </div>
-
-                <div className={styles.infoRow}>
-                  <div className={styles.infoIcon}>⌂</div>
-                  <div>
-                    <span>School</span>
-                    <b>{essay.school || "-"}</b>
-                  </div>
-                </div>
-              </div>
-
-              <div className={`${styles.card} ${styles.noteCard}`}>
-                <h3>Reading Guide</h3>
-                <p>
-                  This essay example is provided for learning structure, tone,
-                  and storytelling techniques.
-                </p>
-              </div>
-            </div>
-
-            {/* RIGHT CONTENT */}
-            <div className={styles.contentCard}>
-              <div className={styles.essayText}>
-                {essay.content.split("\n\n").map((para, i) => (
-                  <p key={i}>{para}</p>
-                ))}
-              </div>
-
-              <div className={styles.actionBar}>
-                <button className={styles.primaryBtn} onClick={handleCompare}>
-                  ⚡ Compare with My Essay
-                </button>
-
-                <div className={styles.secondaryBtns}>
-                  <button>
-                    <Copy size={16} />
-                    Copy
-                  </button>
-
-                  <button>
-                    <Download size={16} />
-                    Download
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div className={styles.featureStrip}>
-            <div className={styles.featureItem}>
-              🛡
-              <div>
-                <b>AI-Powered</b>
-                <p>Smart comparison support</p>
-              </div>
-            </div>
-
-            <div className={styles.featureItem}>
-              ✦
-              <div>
-                <b>High Quality</b>
-                <p>Curated essay examples</p>
-              </div>
-            </div>
-
-            <div className={styles.featureItem}>
-              📖
-              <div>
-                <b>Learning Focused</b>
-                <p>Improve through examples</p>
-              </div>
-            </div>
-
-            <div className={styles.featureItem}>
-              🔒
-              <div>
-                <b>Your Privacy</b>
-                <p>Your essay stays secure</p>
-              </div>
-            </div>
-          </div>
-=======
             <h1 className={styles.title}>
               {essay.generated_title || essay.title || "Untitled Essay"}
             </h1>
@@ -379,16 +212,11 @@ function EssayPage() {
               </div>
             </section>
           )}
->>>>>>> feature/Footer
         </>
       ) : (
         <p className={styles.loading}>Loading...</p>
       )}
-<<<<<<< HEAD
-    </div>
-=======
     </main>
->>>>>>> feature/Footer
   );
 }
 

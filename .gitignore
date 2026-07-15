@@ -45,6 +45,9 @@ openspec/
 template/
 .claude
 node_modules
+design-mockups/
+docs/
+CLAUDE.md
 
 # ---------------------------------------------------------
 # VS Code settings (optional)

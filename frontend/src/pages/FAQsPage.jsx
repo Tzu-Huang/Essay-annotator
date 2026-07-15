@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { ChevronDown, Mail, Search } from "lucide-react";
 import styles from "../styles/faqs.module.css";
 
 const faqSections = [
@@ -20,6 +21,16 @@ const faqSections = [
         answer:
           "It does not rewrite your essay for you. Instead, it shows what strong essays do well so you can improve your own structure, specificity, reflection, and storytelling.",
       },
+      {
+        question: "Do I need an account to try the platform?",
+        answer:
+          "Some pages can be explored without signing in, but features that process drafts or save context may require authentication during testing.",
+      },
+      {
+        question: "Who is Essay Annotator built for?",
+        answer:
+          "It is built for students who want to study strong college application essays and use those examples to revise their own writing more thoughtfully.",
+      },
     ],
   },
   {
@@ -39,6 +50,21 @@ const faqSections = [
         question: "What kinds of essays are included?",
         answer:
           "The database is focused on college application essays, including personal statements and school-specific supplemental essays.",
+      },
+      {
+        question: "Can I search with a rough idea instead of exact keywords?",
+        answer:
+          "Yes. Semantic search is designed for rough ideas, themes, and draft fragments, so you do not need to know the exact wording used in the essay database.",
+      },
+      {
+        question: "What should I do after finding a similar essay?",
+        answer:
+          "Read for structure, specificity, and reflection. The goal is to identify useful writing moves, not to copy the essay's content or voice.",
+      },
+      {
+        question: "Why do some search results feel only loosely related?",
+        answer:
+          "The system ranks essays by meaning rather than exact phrasing. A result may share a theme, narrative pattern, or emotional arc even when the surface topic is different.",
       },
     ],
   },
@@ -60,42 +86,57 @@ const faqSections = [
         answer:
           "The system depends on the essay database, embeddings, and AI-generated comparison logic. It is meant to guide revision, not replace human judgment.",
       },
+      {
+        question: "Can feedback replace a teacher, counselor, or editor?",
+        answer:
+          "No. Essay Annotator can help you notice patterns and revision opportunities, but human feedback is still important for judgment, context, and personal fit.",
+      },
+      {
+        question: "Will the platform tell me exactly what to write?",
+        answer:
+          "No. Feedback is framed around revision direction and writing quality. You are responsible for the ideas, examples, and final wording in your essay.",
+      },
     ],
   },
 ];
 
 export default function FAQPage() {
-  const [openSection, setOpenSection] = useState(0);
-  const [openQuestion, setOpenQuestion] = useState(0);
+  const [openQuestions, setOpenQuestions] = useState(
+    () => new Set([`${faqSections[0].title}-${faqSections[0].questions[0].question}`]),
+  );
+  const [query, setQuery] = useState("");
 
-  const handleSectionClick = (index) => {
-    setOpenSection(openSection === index ? null : index);
-    setOpenQuestion(0);
-  };
+  const normalizedQuery = query.trim().toLowerCase();
+  const visibleSections = faqSections
+    .map((section) => ({
+      ...section,
+      questions: section.questions.filter((item) => {
+        if (!normalizedQuery) return true;
+        return `${section.title} ${item.question} ${item.answer}`
+          .toLowerCase()
+          .includes(normalizedQuery);
+      }),
+    }))
+    .filter((section) => section.questions.length > 0);
 
   return (
     <div className={styles.page}>
       <section className={styles.hero}>
-        <div>
+        <div className={styles.heroInner}>
+          <p className={styles.eyebrow}>Help Center</p>
           <h1>Essay Annotator Help Center</h1>
-          <p>Ask us anything. We’re here to help.</p>
+          <p>
+            Find clear answers about searching examples, comparing drafts, and
+            using feedback responsibly.
+          </p>
 
           <div className={styles.search}>
-            <input placeholder="Search for help..." />
-            <button>Search</button>
-          </div>
-        </div>
-
-        <div className={styles.illustration}>
-          <div className={styles.imageCard}>
-            <div className={styles.paper}>
-              <span></span>
-              <span></span>
-              <span></span>
-            </div>
-            <div className={styles.highlight}></div>
-            <div className={styles.avatar}></div>
-            <div className={styles.chatBubble}>?</div>
+            <Search aria-hidden="true" size={20} />
+            <input
+              value={query}
+              onChange={(event) => setQuery(event.target.value)}
+              placeholder="Search questions, topics, or privacy"
+            />
           </div>
         </div>
       </section>
@@ -108,103 +149,92 @@ export default function FAQPage() {
           </p>
 
           <div className={styles.card}>
-            {faqSections.map((section, sectionIndex) => (
+            {visibleSections.map((section) => (
               <div key={section.title} className={styles.section}>
-                <button
-                  className={styles.sectionHeader}
-                  onClick={() => handleSectionClick(sectionIndex)}
-                >
-<<<<<<< HEAD
-                  <span className={styles.sectionTitle}>
-                    {section.title}
-                  </span>
-=======
+                <div className={styles.sectionHeader}>
                   <span className={styles.sectionTitle}>{section.title}</span>
->>>>>>> feature/Footer
-
-                  <span className={styles.toggleIcon}>
-                    {openSection === sectionIndex ? "−" : "+"}
+                  <span className={styles.sectionCount}>
+                    {section.questions.length} articles
                   </span>
-                </button>
+                </div>
 
-                <div
-                  className={`${styles.questionsPanel} ${
-                    openSection === sectionIndex ? styles.open : ""
-                  }`}
-                >
-                  {section.questions.map((item, questionIndex) => (
-                    <div key={item.question} className={styles.questionBlock}>
-                      <button
-                        className={`${styles.question} ${
-                          openQuestion === questionIndex &&
-                          openSection === sectionIndex
-                            ? styles.featured
-                            : ""
-                        }`}
-                        onClick={() =>
-                          setOpenQuestion(
-<<<<<<< HEAD
-                            openQuestion === questionIndex ? null : questionIndex
-=======
-                            openQuestion === questionIndex
-                              ? null
-                              : questionIndex,
->>>>>>> feature/Footer
-                          )
-                        }
-                      >
-                        <span>{item.question}</span>
-<<<<<<< HEAD
-                        <span>{openQuestion === questionIndex ? "−" : "+"}</span>
-=======
-                        <span>
-                          {openQuestion === questionIndex ? "−" : "+"}
-                        </span>
->>>>>>> feature/Footer
-                      </button>
+                <div className={`${styles.questionsPanel} ${styles.open}`}>
+                  {section.questions.map((item) => {
+                    const questionId = `${section.title}-${item.question}`;
+                    const isOpen = openQuestions.has(questionId);
 
-                      <div
-                        className={`${styles.answer} ${
-                          openQuestion === questionIndex &&
-                          openSection === sectionIndex
-                            ? styles.answerOpen
-                            : ""
-                        }`}
-                      >
-                        <p>{item.answer}</p>
+                    return (
+                      <div key={item.question} className={styles.questionBlock}>
+                        <button
+                          className={`${styles.question} ${
+                            isOpen ? styles.featured : ""
+                          }`}
+                          onClick={() =>
+                            setOpenQuestions((currentOpenQuestions) => {
+                              const nextOpenQuestions = new Set(
+                                currentOpenQuestions,
+                              );
+
+                              if (nextOpenQuestions.has(questionId)) {
+                                nextOpenQuestions.delete(questionId);
+                              } else {
+                                nextOpenQuestions.add(questionId);
+                              }
+
+                              return nextOpenQuestions;
+                            })
+                          }
+                          aria-expanded={isOpen}
+                        >
+                          <span>{item.question}</span>
+                          <span>
+                            <ChevronDown aria-hidden="true" size={18} />
+                          </span>
+                        </button>
+
+                        <div
+                          className={`${styles.answer} ${
+                            isOpen ? styles.answerOpen : ""
+                          }`}
+                        >
+                          <p>{item.answer}</p>
+                        </div>
                       </div>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
               </div>
             ))}
+
+            {visibleSections.length === 0 && (
+              <div className={styles.emptyState}>
+                <h3>No matching questions</h3>
+                <p>Try a broader search term or contact us for help.</p>
+              </div>
+            )}
           </div>
         </div>
 
         <div className={styles.sidebar}>
-          <h3>Categories</h3>
-
-          {faqSections.map((section, index) => (
-            <button
-              key={section.title}
-              className={openSection === index ? styles.activeCategory : ""}
-              onClick={() => handleSectionClick(index)}
-            >
-              {section.title}
-            </button>
-          ))}
-
           <div className={styles.contactBox}>
-            <h4>Still need questions?</h4>
-            <p>We respond within 24 hours</p>
+            <Mail aria-hidden="true" size={22} />
+            <h3>Still need help?</h3>
+            <p>
+              Send us the issue you ran into and include the page where it
+              happened.
+            </p>
             <button>Contact Us</button>
+          </div>
+
+          <div className={styles.noteBox}>
+            <h3>Before you submit</h3>
+            <p>
+              Avoid including private information in drafts during testing.
+              Essay Annotator is designed for guidance, not ghostwriting.
+            </p>
           </div>
         </div>
       </div>
     </div>
   );
-<<<<<<< HEAD
 }
-=======
-}
->>>>>>> feature/Footer

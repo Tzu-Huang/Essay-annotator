@@ -30,7 +30,7 @@ def main(path: str | None = None):
 
     print(
         "Imported essays: "
-        f"seen={result.seen}, created={result.created}, "
+        f"seen={result.seen}, created={result.created}, updated={result.updated}, "
         f"skipped_duplicates={result.skipped_duplicates}, invalid={result.invalid}"
     )
 

@@ -19,6 +19,7 @@ EMBEDDING_RELEVANT_FIELDS = {"topic", "content", "type", "school"}
 class ImportResult:
     seen: int = 0
     created: int = 0
+    updated: int = 0
     skipped_duplicates: int = 0
     invalid: int = 0
 
@@ -122,14 +123,15 @@ def validate_essay_payload(payload: dict) -> dict:
 
 def import_essays_from_jsonl(db: Session, path: Path) -> ImportResult:
     result = ImportResult()
-    existing_ids = {row[0] for row in db.query(Essay.id).all()}
-    signatures = {
+    existing_essays = db.query(Essay).all()
+    essays_by_id = {essay.id: essay for essay in existing_essays}
+    essays_by_signature = {
         (
-            (row[0] or "").strip().lower(),
-            (row[1] or "").strip().lower(),
-            (row[2] or "").strip().lower(),
-        )
-        for row in db.query(Essay.topic, Essay.content, Essay.source_file).all()
+            (essay.topic or "").strip().lower(),
+            (essay.content or "").strip().lower(),
+            (essay.source_file or "").strip().lower(),
+        ): essay
+        for essay in existing_essays
     }
 
     with path.open("r", encoding="utf-8-sig") as f:
@@ -157,8 +159,17 @@ def import_essays_from_jsonl(db: Session, path: Path) -> ImportResult:
                 payload["content"].lower(),
                 (payload["source_file"] or "").lower(),
             )
-            if payload["id"] in existing_ids or signature in signatures:
-                result.skipped_duplicates += 1
+            duplicate = essays_by_id.get(payload["id"]) or essays_by_signature.get(signature)
+            if duplicate:
+                existing_metadata = duplicate.metadata_json or {}
+                if generated_title and existing_metadata.get("generated_title") != generated_title:
+                    duplicate.metadata_json = {
+                        **existing_metadata,
+                        "generated_title": generated_title,
+                    }
+                    result.updated += 1
+                else:
+                    result.skipped_duplicates += 1
                 continue
 
             essay = Essay(
@@ -173,8 +184,8 @@ def import_essays_from_jsonl(db: Session, path: Path) -> ImportResult:
                 embedding_status="stale",
             )
             db.add(essay)
-            existing_ids.add(essay.id)
-            signatures.add(signature)
+            essays_by_id[essay.id] = essay
+            essays_by_signature[signature] = essay
             result.created += 1
 
     return result

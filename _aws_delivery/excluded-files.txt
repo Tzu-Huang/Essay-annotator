@@ -1,0 +1,17 @@
+# Local-only / reproducible / non-runtime exclusions
+.git/
+.venv/
+node_modules/
+Frontend/node_modules/
+**/__pycache__/
+**/*.pyc
+**/*.log
+.codex/
+.agents/
+openspec/
+template/
+admin-console-proposal-feedback.md
+_aws_delivery/
+
+# Kept outside the repository and never packaged
+C:\aws\Fb021451.pem

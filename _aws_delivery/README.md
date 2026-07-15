@@ -1,0 +1,47 @@
+# Essay Annotator AWS delivery (2026-07-15)
+
+Target host: `ubuntu@44.201.62.0`
+
+Target directory: `/home/ubuntu/Essay-annotator`
+
+Backend service: `essay-api.service`
+
+## Delivery files
+
+- `essay-annotator-app-20260715.tar.gz`
+  - Application source and configuration files.
+  - Includes the ignored, pre-built `Frontend/dist` directory.
+  - Does not contain Git metadata, dependencies, caches, runtime data, or secrets.
+- `essay-annotator-data-20260715.tar.gz`
+  - Contains the complete ignored `BackEnd/drive_data` tree, including the runtime database and embeddings.
+- `essay-annotator-secrets-20260715.tar.gz`
+  - Contains `BackEnd/.env`, `Frontend/.env`, `BackEnd/client_secret.json`, and `BackEnd/token.json`.
+  - Treat this archive as confidential. Do not commit it or send it through an untrusted channel.
+- `SHA256SUMS.txt`
+  - SHA-256 hashes for verifying all three archives after transfer.
+- `excluded-files.txt`
+  - Local-only or reproducible content intentionally omitted.
+
+## Intentionally excluded
+
+- `.git`: the AWS checkout already has its own Git metadata and GitHub remote.
+- `.venv`: the local environment is Windows-specific; AWS already has a Linux virtual environment.
+- `node_modules` and `Frontend/node_modules`: reproducible from lock files and platform-dependent.
+- Python caches, test caches, logs, editor metadata, `.codex`, `.agents`, and OpenSpec working files.
+- Root `template` design prototypes and the local proposal-feedback note; these are not runtime inputs.
+- `C:\aws\Fb021451.pem`: SSH private keys are never deployment payloads.
+
+## Suggested transfer
+
+Run from `C:\aws` in PowerShell:
+
+```powershell
+scp -i .\Fb021451.pem `
+  "C:\Personal_repo\ProjectVault\10-active\essay-annotator\repo\_aws_delivery\essay-annotator-app-20260715.tar.gz" `
+  "C:\Personal_repo\ProjectVault\10-active\essay-annotator\repo\_aws_delivery\essay-annotator-data-20260715.tar.gz" `
+  "C:\Personal_repo\ProjectVault\10-active\essay-annotator\repo\_aws_delivery\essay-annotator-secrets-20260715.tar.gz" `
+  "C:\Personal_repo\ProjectVault\10-active\essay-annotator\repo\_aws_delivery\SHA256SUMS.txt" `
+  ubuntu@44.201.62.0:/home/ubuntu/incoming-essay-annotator/
+```
+
+Do not extract directly over production without first backing up the remote ignored data and checking the remote-only Git commits. The remote checkout and the local checkout both currently have commits ahead of `origin/frontend-base`, so their histories must be reconciled before a production update.

@@ -110,6 +110,67 @@ class AdminDataTests(unittest.TestCase):
             {"custom": "value", "generated_title": "A Great Title"},
         )
 
+    def test_import_essays_backfills_generated_title_on_existing_essay(self):
+        self.db.add(
+            Essay(
+                id="essay_0001",
+                topic="Prompt",
+                content="Essay body",
+                source_file="online",
+                metadata_json={"custom": "value"},
+            )
+        )
+        self.db.commit()
+        path = self.write_jsonl(
+            [
+                {
+                    "id": "essay_0001",
+                    "topic": "Prompt",
+                    "content": "Essay body",
+                    "source_file": "online",
+                    "generated_title": "A Great Title",
+                },
+            ]
+        )
+
+        result = import_essays_from_jsonl(self.db, path)
+        self.db.commit()
+
+        essay = self.db.query(Essay).filter_by(id="essay_0001").one()
+        self.assertEqual(result.created, 0)
+        self.assertEqual(result.updated, 1)
+        self.assertEqual(result.skipped_duplicates, 0)
+        self.assertEqual(
+            essay.metadata_json,
+            {"custom": "value", "generated_title": "A Great Title"},
+        )
+
+    def test_import_essays_does_not_reupdate_matching_generated_title(self):
+        self.db.add(
+            Essay(
+                id="essay_0001",
+                topic="Prompt",
+                content="Essay body",
+                metadata_json={"generated_title": "A Great Title"},
+            )
+        )
+        self.db.commit()
+        path = self.write_jsonl(
+            [
+                {
+                    "id": "essay_0001",
+                    "topic": "Prompt",
+                    "content": "Essay body",
+                    "generated_title": "A Great Title",
+                },
+            ]
+        )
+
+        result = import_essays_from_jsonl(self.db, path)
+
+        self.assertEqual(result.updated, 0)
+        self.assertEqual(result.skipped_duplicates, 1)
+
     def test_essay_to_dict_flattens_generated_title_from_metadata_json(self):
         essay = Essay(
             id="essay_0099",

@@ -20,14 +20,17 @@ from database.essays import (
     audit_log,
     content_hash,
     essay_to_dict,
+    import_essays_from_jsonl,
     next_essay_id,
     query_essays,
     summarize_usage,
     utcnow,
     validate_essay_payload,
 )
+from scripts.add_to_database import DATABASE_PATH as DATABASE_JSONL_PATH, NEW_INPUT_DIR as NEW_INPUT_DIR_PATH
 from service.embed_store import remove_parent_ids, replace_parent_id
 from service.embedding_service import embed_essay
+from service.ingest_service import scan_and_title_new_essays
 
 
 load_dotenv(dotenv_path=Path(__file__).resolve().parent.parent / ".env")
@@ -441,6 +444,93 @@ def trigger_embedding_regeneration(
     audit_log(db, actor.email, "regenerate_embedding", "essay", essay.id, before, after)
     db.commit()
     return {"essay": after, "embedding_job": {"status": essay.embedding_status}}
+
+
+_import_lock_held = False
+
+
+def append_to_database_jsonl(essays: list[dict]) -> None:
+    DATABASE_JSONL_PATH.parent.mkdir(parents=True, exist_ok=True)
+    with open(DATABASE_JSONL_PATH, "a", encoding="utf-8") as f:
+        for essay in essays:
+            f.write(json.dumps(essay, ensure_ascii=False) + "\n")
+
+
+@router.post("/import-new-essays")
+def import_new_essays(db: Session = Depends(get_db), actor: AdminActor = Depends(require_admin_write)):
+    global _import_lock_held
+    if _import_lock_held:
+        raise HTTPException(status_code=409, detail="An import is already running")
+    _import_lock_held = True
+    try:
+        client = get_embedding_client()
+        new_essays = scan_and_title_new_essays(NEW_INPUT_DIR_PATH, DATABASE_JSONL_PATH, client)
+        if not new_essays:
+            return {"created": 0, "skipped_duplicates": 0, "invalid": 0, "embedded": 0}
+
+        for essay in new_essays:
+            essay.setdefault("public", False)  # imported essays default to non-public
+        append_to_database_jsonl(new_essays)
+
+        import_result = import_essays_from_jsonl(db, DATABASE_JSONL_PATH)
+
+        stale = db.query(Essay).filter(Essay.embedding_status == "stale", Essay.deleted_at.is_(None)).all()
+        embedded_count = 0
+        app_data: AppData = _current_app_data()
+        embed_path = _embed_jsonl_path()
+        for essay in stale:
+            essay_dict = {
+                "id": essay.id,
+                "topic": essay.topic,
+                "content": essay.content,
+                "type": essay.type,
+                "school": essay.school,
+                "public": essay.public,
+                "source_file": essay.source_file,
+            }
+            try:
+                records = embed_essay(essay_dict, client)
+            except Exception:
+                continue  # leave embedding_status == "stale"; visible failure, not silently marked current
+            replace_parent_id(embed_path, essay.id, records)
+            rows = [
+                {
+                    "id": r["id"],
+                    "parent": r["parent_id"],
+                    "preview": r["content"][:220],
+                    "topic_text": r["topic"],
+                    "type": r["type"],
+                    "school": r["school"],
+                    "topic_V": r["topic_embedding"],
+                    "content_V": r["content_embedding"],
+                }
+                for r in records
+            ]
+            app_data.replace_essay_vectors(essay.id, rows)
+            db.add(
+                EssayEmbedding(
+                    essay_id=essay.id,
+                    model=os.getenv("OPENAI_EMBEDDING_MODEL", "text-embedding-3-small"),
+                    topic_embedding=records[0]["topic_embedding"] if records else None,
+                    content_embedding=[r["content_embedding"] for r in records],
+                    content_hash=content_hash(essay.topic, essay.content),
+                )
+            )
+            essay.embedding_status = "current"
+            embedded_count += 1
+        db.flush()
+
+        result = {
+            "created": import_result.created,
+            "skipped_duplicates": import_result.skipped_duplicates,
+            "invalid": import_result.invalid,
+            "embedded": embedded_count,
+        }
+        audit_log(db, actor.email, "import_essays", "essay", None, None, result)
+        db.commit()
+        return result
+    finally:
+        _import_lock_held = False
 
 
 @router.get("/audit")

@@ -20,6 +20,7 @@ from app.admin import (
     create_essay,
     essay_detail,
     hard_delete_essay,
+    import_new_essays,
     list_essays,
     require_admin,
     require_admin_write,
@@ -431,6 +432,125 @@ class AdminDataTests(unittest.TestCase):
         log = self.db.query(AdminAuditLog).filter_by(action="hard_delete", entity_id=essay_id).first()
         self.assertIsNotNone(log)
         self.assertIn("content", log.before_json)  # full snapshot retained per approved design
+
+    # -- import-new-essays -------------------------------------------------
+    #
+    # SAFETY: every test below patches all three real paths this endpoint can
+    # touch -- app.admin.scan_and_title_new_essays (so BackEnd/drive_data/
+    # organized_data/new_input/ is never scanned/moved), app.admin.
+    # DATABASE_JSONL_PATH (so BackEnd/drive_data/finalized_data_jsonl/
+    # database.jsonl is never read or appended to), and app.admin.
+    # _embed_jsonl_path (so BackEnd/drive_data/embed_output/embed.jsonl,
+    # which the running dev server loads into memory at startup, is never
+    # written to). Scratch files come from self.write_jsonl(), matching the
+    # pattern already used by the regenerate-embedding/hard-delete tests above.
+
+    def test_import_new_essays_rejects_concurrent_run(self):
+        actor = AdminActor(email="owner@example.com", can_write=True)
+        import app.admin as admin_module
+
+        admin_module._import_lock_held = True
+        try:
+            with self.assertRaises(HTTPException) as ctx:
+                import_new_essays(db=self.db, actor=actor)
+            self.assertEqual(ctx.exception.status_code, 409)
+        finally:
+            admin_module._import_lock_held = False
+
+    def test_import_new_essays_happy_path(self):
+        actor = AdminActor(email="owner@example.com", can_write=True)
+        fake_essay = {
+            "id": "essay_9001", "topic": "T", "content": "C", "type": "PS",
+            "school": "S", "public": False, "source_file": "manual", "generated_title": "T",
+        }
+        fake_client = MagicMock()
+        fake_response = MagicMock()
+        fake_response.data = [MagicMock(embedding=[0.1, 0.2])]
+        fake_client.embeddings.create.return_value = fake_response
+
+        # Scratch stand-ins for database.jsonl and embed.jsonl -- never the
+        # real repo files. Both start empty; append_to_database_jsonl (not
+        # mocked) writes the scanned essay into the scratch database path,
+        # and import_essays_from_jsonl then reads it back from that same
+        # scratch path, never touching the real one.
+        scratch_database_path = self.write_jsonl([])
+        scratch_embed_path = self.write_jsonl([])
+
+        with patch("app.admin.scan_and_title_new_essays", return_value=[fake_essay]), \
+             patch("app.admin.get_embedding_client", return_value=fake_client), \
+             patch("app.admin.DATABASE_JSONL_PATH", scratch_database_path), \
+             patch("app.admin._embed_jsonl_path", return_value=scratch_embed_path):
+            result = import_new_essays(db=self.db, actor=actor)
+
+        self.assertEqual(result["created"], 1)
+        self.assertGreaterEqual(result["embedded"], 1)
+        essay = self.db.query(Essay).filter_by(id="essay_9001").first()
+        self.assertIsNotNone(essay)
+        self.assertFalse(essay.public)  # imports default to public=False
+        self.assertEqual(essay.embedding_status, "current")
+
+    def test_import_new_essays_partial_embedding_failure_leaves_that_essay_stale(self):
+        actor = AdminActor(email="owner@example.com", can_write=True)
+        fake_essay_ok = {
+            "id": "essay_9101", "topic": "T1", "content": "C1", "type": "PS",
+            "school": "S", "public": False, "source_file": "manual",
+        }
+        fake_essay_fail = {
+            "id": "essay_9102", "topic": "T2", "content": "C2", "type": "PS",
+            "school": "S", "public": False, "source_file": "manual",
+        }
+
+        def fake_embed_essay(essay_dict, client):
+            if essay_dict["id"] == "essay_9102":
+                raise RuntimeError("rate limited")
+            return [
+                {
+                    "parent_id": essay_dict["id"],
+                    "id": f"{essay_dict['id']}_00",
+                    "topic": essay_dict["topic"],
+                    "content": essay_dict["content"],
+                    "type": essay_dict["type"],
+                    "school": essay_dict["school"],
+                    "topic_embedding": [0.1, 0.2],
+                    "content_embedding": [0.3, 0.4],
+                }
+            ]
+
+        scratch_database_path = self.write_jsonl([])
+        scratch_embed_path = self.write_jsonl([])
+
+        with patch("app.admin.scan_and_title_new_essays", return_value=[fake_essay_ok, fake_essay_fail]), \
+             patch("app.admin.get_embedding_client", return_value=MagicMock()), \
+             patch("app.admin.embed_essay", side_effect=fake_embed_essay), \
+             patch("app.admin.DATABASE_JSONL_PATH", scratch_database_path), \
+             patch("app.admin._embed_jsonl_path", return_value=scratch_embed_path):
+            result = import_new_essays(db=self.db, actor=actor)
+
+        self.assertEqual(result["created"], 2)
+        self.assertEqual(result["embedded"], 1)
+
+        ok_essay = self.db.query(Essay).filter_by(id="essay_9101").first()
+        failed_essay = self.db.query(Essay).filter_by(id="essay_9102").first()
+        self.assertEqual(ok_essay.embedding_status, "current")
+        self.assertEqual(failed_essay.embedding_status, "stale")
+
+    def test_import_new_essays_releases_lock_on_failure(self):
+        actor = AdminActor(email="owner@example.com", can_write=True)
+        import app.admin as admin_module
+
+        with patch("app.admin.scan_and_title_new_essays", side_effect=RuntimeError("scan blew up")), \
+             patch("app.admin.get_embedding_client", return_value=MagicMock()):
+            with self.assertRaises(RuntimeError):
+                import_new_essays(db=self.db, actor=actor)
+
+        self.assertFalse(admin_module._import_lock_held)
+
+        # A subsequent call must not be rejected by a lock left stuck by the
+        # failure above.
+        with patch("app.admin.scan_and_title_new_essays", return_value=[]), \
+             patch("app.admin.get_embedding_client", return_value=MagicMock()):
+            result = import_new_essays(db=self.db, actor=actor)
+        self.assertEqual(result, {"created": 0, "skipped_duplicates": 0, "invalid": 0, "embedded": 0})
 
 
 if __name__ == "__main__":

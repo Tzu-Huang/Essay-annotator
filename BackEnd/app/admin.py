@@ -9,10 +9,12 @@ from typing import Optional
 
 from dotenv import load_dotenv
 from fastapi import APIRouter, Depends, Header, HTTPException, Query
+from openai import OpenAI
 from pydantic import BaseModel
 from sqlalchemy import func
 from sqlalchemy.orm import Session
 
+from app.state import AppData
 from database.create import AdminAuditLog, Essay, EssayEmbedding, OpenAIUsageEvent, User, get_db
 from database.essays import (
     audit_log,
@@ -24,11 +26,47 @@ from database.essays import (
     utcnow,
     validate_essay_payload,
 )
+from service.embed_store import replace_parent_id
+from service.embedding_service import embed_essay
 
 
 load_dotenv(dotenv_path=Path(__file__).resolve().parent.parent / ".env")
 
 router = APIRouter(prefix="/admin", tags=["admin"])
+
+def get_embedding_client() -> OpenAI:
+    return OpenAI(api_key=os.environ["OPENAI_API_KEY"])
+
+
+def _embed_jsonl_path() -> Path:
+    # Reuse app.main's EMBED_JSONL constant rather than recomputing the path
+    # string here; deferred import for the same circular-import reason as
+    # _current_app_data() below.
+    from app.main import EMBED_JSONL
+
+    return EMBED_JSONL
+
+
+def _current_app_data() -> AppData:
+    # admin.py must not import app.main at module load time: main.py imports
+    # this module (`from app.admin import ... router as admin_router`), so a
+    # top-level `from app.main import app` here would be a circular import.
+    # Deferring the import into this function call avoids that, since by the
+    # time this runs, app.admin has already finished loading. There's also no
+    # existing `Depends(get_app_data)`-style dependency in main.py to mirror,
+    # and unit tests call endpoint functions directly (bypassing FastAPI's DI
+    # container and any `Request` injection), so a plain helper that reaches
+    # into the running app singleton is the pattern that works both in
+    # production (uvicorn has run the lifespan, so app.state.data is a real
+    # AppData) and in tests (lifespan never runs, so we lazily create an
+    # empty AppData the first time this is called).
+    from app.main import app as _fastapi_app
+
+    data = getattr(_fastapi_app.state, "data", None)
+    if data is None:
+        data = AppData()
+        _fastapi_app.state.data = data
+    return data
 
 
 def _split_env(name: str) -> set[str]:
@@ -310,21 +348,75 @@ def trigger_embedding_regeneration(
     essay = db.query(Essay).filter(Essay.id == essay_id, Essay.deleted_at.is_(None)).first()
     if not essay:
         raise HTTPException(status_code=404, detail="Essay not found")
+
+    current_hash = content_hash(essay.topic, essay.content)
+    existing_row = (
+        db.query(EssayEmbedding)
+        .filter_by(essay_id=essay.id)
+        .order_by(EssayEmbedding.generated_at.desc())
+        .first()
+    )
+    if essay.embedding_status == "current" and existing_row and existing_row.content_hash == current_hash:
+        # Short-circuit: no OpenAI call when the embedding is already current
+        # for this exact content, so repeated clicks don't burn spend.
+        return {
+            "essay": essay_to_dict(essay, include_content=True),
+            "embedding_job": {"status": "current", "skipped": True},
+        }
+
     before = essay_to_dict(essay, include_content=True)
-    essay.embedding_status = "queued"
-    embedding = EssayEmbedding(
+    essay_dict = {
+        "id": essay.id,
+        "topic": essay.topic,
+        "content": essay.content,
+        "type": essay.type,
+        "school": essay.school,
+        "public": essay.public,
+        "source_file": essay.source_file,
+    }
+
+    client = get_embedding_client()
+    try:
+        records = embed_essay(essay_dict, client)
+    except Exception as exc:
+        raise HTTPException(status_code=502, detail=f"Embedding generation failed: {exc}")
+
+    replace_parent_id(_embed_jsonl_path(), essay.id, records)
+    rows = [
+        {
+            "id": r["id"],
+            "parent": r["parent_id"],
+            "preview": r["content"][:220],
+            "topic_text": r["topic"],
+            "type": r["type"],
+            "school": r["school"],
+            "topic_V": r["topic_embedding"],
+            "content_V": r["content_embedding"],
+        }
+        for r in records
+    ]
+    app_data = _current_app_data()
+    app_data.replace_essay_vectors(essay.id, rows)
+
+    # Re-check content_hash *after* the OpenAI call: an edit landing mid-flight
+    # must not be marked "current" over content that's now stale.
+    db.refresh(essay)
+    post_hash = content_hash(essay.topic, essay.content)
+    embedding_row = EssayEmbedding(
         essay_id=essay.id,
         model=os.getenv("OPENAI_EMBEDDING_MODEL", "text-embedding-3-small"),
-        topic_embedding=None,
-        content_embedding=None,
-        content_hash=content_hash(essay.topic, essay.content),
+        topic_embedding=records[0]["topic_embedding"] if records else None,
+        content_embedding=[r["content_embedding"] for r in records],
+        content_hash=post_hash,
     )
-    db.add(embedding)
+    db.add(embedding_row)
+    essay.embedding_status = "current" if post_hash == current_hash else "stale"
+    essay.updated_at = utcnow()
     db.flush()
     after = essay_to_dict(essay, include_content=True)
-    audit_log(db, actor.email, "queue_embedding_regeneration", "essay", essay.id, before, after)
+    audit_log(db, actor.email, "regenerate_embedding", "essay", essay.id, before, after)
     db.commit()
-    return {"essay": after, "embedding_job": {"status": "queued", "content_hash": embedding.content_hash}}
+    return {"essay": after, "embedding_job": {"status": essay.embedding_status}}
 
 
 @router.get("/audit")

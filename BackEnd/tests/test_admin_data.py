@@ -3,6 +3,7 @@ import os
 import tempfile
 import unittest
 from pathlib import Path
+from unittest.mock import MagicMock, patch
 
 from fastapi import HTTPException
 from sqlalchemy import create_engine
@@ -27,7 +28,16 @@ from app.admin import (
     update_essay,
 )
 from database.create import AdminAuditLog, Base, Essay, EssayEmbedding, OpenAIUsageEvent
-from database.essays import audit_log, essay_to_dict, import_essays_from_jsonl, load_essays_from_db, query_essays, summarize_usage, utcnow
+from database.essays import (
+    audit_log,
+    content_hash,
+    essay_to_dict,
+    import_essays_from_jsonl,
+    load_essays_from_db,
+    query_essays,
+    summarize_usage,
+    utcnow,
+)
 
 
 class AdminDataTests(unittest.TestCase):
@@ -250,8 +260,16 @@ class AdminDataTests(unittest.TestCase):
         self.assertEqual(updated["essay"]["content"], "Updated essay body")
         self.assertEqual(updated["essay"]["embedding_status"], "stale")
 
-        queued = trigger_embedding_regeneration(essay_id, db=self.db, actor=actor)
-        self.assertEqual(queued["essay"]["embedding_status"], "queued")
+        fake_client = MagicMock()
+        fake_response = MagicMock()
+        fake_response.data = [MagicMock(embedding=[0.1, 0.2])]
+        fake_client.embeddings.create.return_value = fake_response
+        scratch_embed_path = self.write_jsonl([])
+        with patch("app.admin.get_embedding_client", return_value=fake_client), patch(
+            "app.admin._embed_jsonl_path", return_value=scratch_embed_path
+        ):
+            regenerated = trigger_embedding_regeneration(essay_id, db=self.db, actor=actor)
+        self.assertEqual(regenerated["essay"]["embedding_status"], "current")
         self.assertEqual(self.db.query(EssayEmbedding).count(), 1)
 
         deleted = soft_delete_essay(essay_id, db=self.db, actor=actor)
@@ -326,6 +344,61 @@ class AdminDataTests(unittest.TestCase):
         with self.assertRaises(HTTPException) as ctx:
             update_essay(essay_id, EssayUpdate(topic="New"), db=self.db, actor=actor)
         self.assertEqual(ctx.exception.status_code, 409)
+
+    def test_regenerate_embedding_live_marks_current(self):
+        actor = AdminActor(email="owner@example.com", can_write=True)
+        created = create_essay(EssayCreate(topic="T", content="C", type="PS", school="S"), db=self.db, actor=actor)
+        essay_id = created["essay"]["id"]
+
+        fake_client = MagicMock()
+        fake_response = MagicMock()
+        fake_response.data = [MagicMock(embedding=[0.1, 0.2])]
+        fake_client.embeddings.create.return_value = fake_response
+
+        # Route embed.jsonl writes to a scratch file instead of the real
+        # drive_data/embed_output/embed.jsonl — that file backs the running
+        # dev server's in-memory search index and must not be mutated by tests.
+        scratch_embed_path = self.write_jsonl([])
+        with patch("app.admin.get_embedding_client", return_value=fake_client), patch(
+            "app.admin._embed_jsonl_path", return_value=scratch_embed_path
+        ):
+            result = trigger_embedding_regeneration(essay_id, db=self.db, actor=actor)
+
+        self.assertEqual(result["essay"]["embedding_status"], "current")
+        row = self.db.query(EssayEmbedding).filter_by(essay_id=essay_id).first()
+        self.assertIsNotNone(row.generated_at)
+
+    def test_regenerate_embedding_short_circuits_when_already_current(self):
+        actor = AdminActor(email="owner@example.com", can_write=True)
+        created = create_essay(EssayCreate(topic="T", content="C", type="PS", school="S"), db=self.db, actor=actor)
+        essay_id = created["essay"]["id"]
+        essay = self.db.query(Essay).filter_by(id=essay_id).first()
+        essay.embedding_status = "current"
+        self.db.add(EssayEmbedding(essay_id=essay_id, model="text-embedding-3-small", content_hash=content_hash(essay.topic, essay.content)))
+        self.db.commit()
+
+        fake_client = MagicMock()
+        with patch("app.admin.get_embedding_client", return_value=fake_client):
+            trigger_embedding_regeneration(essay_id, db=self.db, actor=actor)
+
+        fake_client.embeddings.create.assert_not_called()
+
+    def test_regenerate_embedding_failure_leaves_status_untouched(self):
+        actor = AdminActor(email="owner@example.com", can_write=True)
+        created = create_essay(EssayCreate(topic="T", content="C", type="PS", school="S"), db=self.db, actor=actor)
+        essay_id = created["essay"]["id"]
+
+        fake_client = MagicMock()
+        fake_client.embeddings.create.side_effect = RuntimeError("rate limited")
+
+        with patch("app.admin.get_embedding_client", return_value=fake_client):
+            with self.assertRaises(HTTPException) as ctx:
+                trigger_embedding_regeneration(essay_id, db=self.db, actor=actor)
+        self.assertEqual(ctx.exception.status_code, 502)
+
+        essay = self.db.query(Essay).filter_by(id=essay_id).first()
+        self.assertEqual(essay.embedding_status, "stale")  # unchanged from create_essay default
+        self.assertIsNone(self.db.query(AdminAuditLog).filter_by(action="regenerate_embedding").first())
 
 
 if __name__ == "__main__":

@@ -276,7 +276,7 @@ def update_embeddings():
     # service.embedding_service imports chunk_text/normalize/embedding/build_output_record
     # from this module at its own import time, so this module can't import
     # embedding_service back until both modules have finished loading.
-    from service.embedding_service import embed_essay
+    from service.embedding_service import embed_essay_chunks
 
     # LOADING
     try:
@@ -320,21 +320,22 @@ def update_embeddings():
                 total_skipped += len(expected_chunk_ids)
                 continue
 
-            # Chunk + embed + normalize + build chunk records for this essay.
+            # Only embed the chunks not already in seen_ids -- never pay for
+            # an OpenAI API call on a chunk id that's already embedded.
+            unseen_indices = [
+                i for i, cid in enumerate(expected_chunk_ids) if cid not in seen_ids
+            ]
+            total_skipped += len(expected_chunk_ids) - len(unseen_indices)
+
             try:
-                essay_records = embed_essay(record, client)
+                essay_records = embed_essay_chunks(record, client, chunk_indices=unseen_indices)
             except Exception as e:
                 print(e)
                 continue
 
-            # go through each chunk record, skipping ones already embedded
+            # go through each chunk record; all of these are freshly embedded
+            # and not-yet-seen, since unseen_indices already filtered them.
             for rec in essay_records:
-                # skip seen chunk_id
-                if rec["id"] in seen_ids:
-                    total_skipped += 1
-                    continue
-
-                # Convert a complete record to a line and store in embed.jsonl
                 out.write(json.dumps(rec, ensure_ascii=False) + "\n")
                 seen_ids.add(rec["id"])
                 total_written += 1

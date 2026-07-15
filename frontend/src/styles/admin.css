@@ -378,6 +378,52 @@
   background: #eff6ff;
 }
 
+.admin-essay-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.admin-essay-table th,
+.admin-essay-table td {
+  padding: 8px 10px;
+  text-align: left;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.admin-essay-table tbody tr {
+  cursor: pointer;
+}
+
+.admin-essay-table tbody tr:hover {
+  background: #f8fafc;
+}
+
+.admin-essay-table tbody tr.active {
+  background: #eff6ff;
+}
+
+.admin-sort-header {
+  border: none;
+  background: none;
+  cursor: pointer;
+  font-weight: 600;
+  padding: 0;
+}
+
+.spin {
+  animation: admin-spin 1s linear infinite;
+}
+
+@keyframes admin-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
 .admin-table button {
   display: grid;
   gap: 4px;

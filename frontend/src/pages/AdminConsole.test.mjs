@@ -4,6 +4,7 @@ import assert from "node:assert/strict";
 import {
   extractOfficialCostBuckets,
   isAdminEmailAllowed,
+  isConfirmIdMatch,
   PROJECT_ADMIN_EMAILS,
   usageDashboard,
 } from "./AdminConsole.logic.mjs";
@@ -103,5 +104,18 @@ test("admin console includes essay mutation workflows", () => {
     "method: \"DELETE\"",
   ]) {
     assert.match(source, new RegExp(endpoint.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")));
+  }
+});
+
+test("isConfirmIdMatch requires an exact match", () => {
+  assert.equal(isConfirmIdMatch("essay_0042", "essay_0042"), true);
+  assert.equal(isConfirmIdMatch("essay_004", "essay_0042"), false);
+  assert.equal(isConfirmIdMatch("", "essay_0042"), false);
+  assert.equal(isConfirmIdMatch(" essay_0042 ", "essay_0042"), false);
+});
+
+test("admin console exposes new essay management actions", () => {
+  for (const needle of ["restore", "hard-delete", "regenerate-embedding", "import-new-essays", "sort_dir"]) {
+    assert.match(source, new RegExp(needle));
   }
 });

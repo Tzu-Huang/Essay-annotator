@@ -22,6 +22,7 @@ import {
   formatCurrency,
   formatNumber,
   isAdminEmailAllowed,
+  isConfirmIdMatch,
   PROJECT_ADMIN_EMAILS,
   usageDashboard,
 } from "./AdminConsole.logic.mjs";
@@ -65,8 +66,11 @@ export default function AdminConsole() {
   const [overview, setOverview] = useState(null);
   const [essays, setEssays] = useState({ items: [], total: 0, page: 1, page_size: 50 });
   const [filters, setFilters] = useState({ search: "", school: "", embedding_status: "", include_deleted: false });
+  const [essaySort, setEssaySort] = useState({ field: "updated_at", dir: "desc" });
   const [selectedEssay, setSelectedEssay] = useState(null);
   const [editor, setEditor] = useState(emptyEssay());
+  const [hardDeleteConfirmId, setHardDeleteConfirmId] = useState("");
+  const [importRunning, setImportRunning] = useState(false);
   const [usage, setUsage] = useState(null);
   const [logs, setLogs] = useState({ items: [], error: "", configured: false });
   const [audit, setAudit] = useState([]);
@@ -107,12 +111,22 @@ export default function AdminConsole() {
     const params = new URLSearchParams({
       page: String(page),
       page_size: String(essays.page_size || 50),
+      sort: essaySort.field,
+      sort_dir: essaySort.dir,
     });
     Object.entries(filters).forEach(([key, value]) => {
       if (value !== "" && value !== false) params.set(key, String(value));
     });
     const data = await api(`/admin/essays?${params.toString()}`);
     setEssays(data);
+  }
+
+  function toggleEssaySort(field) {
+    setEssaySort((current) =>
+      current.field === field
+        ? { field, dir: current.dir === "asc" ? "desc" : "asc" }
+        : { field, dir: "asc" }
+    );
   }
 
   async function loadEssayDetail(id) {
@@ -178,13 +192,47 @@ export default function AdminConsole() {
     setMessage("Essay soft deleted");
   }
 
-  async function queueEmbedding() {
+  async function restoreEssay() {
+    if (!selectedEssay?.essay?.id) return;
+    const data = await api(`/admin/essays/${selectedEssay.essay.id}/restore`, { method: "POST" });
+    setSelectedEssay({ essay: data.essay, audit: selectedEssay.audit || [] });
+    await loadEssays(essays.page || 1);
+    setMessage("Essay restored");
+  }
+
+  async function hardDeleteEssay() {
+    if (!selectedEssay?.essay?.id) return;
+    await api(`/admin/essays/${selectedEssay.essay.id}/hard-delete`, { method: "POST" });
+    setSelectedEssay(null);
+    setHardDeleteConfirmId("");
+    await loadEssays(essays.page || 1);
+    setMessage("Essay permanently deleted");
+  }
+
+  async function regenerateEmbedding() {
     if (!selectedEssay?.essay?.id) return;
     const data = await api(`/admin/essays/${selectedEssay.essay.id}/regenerate-embedding`, { method: "POST" });
     setSelectedEssay({ essay: data.essay, audit: selectedEssay.audit || [] });
     await loadEssays(essays.page || 1);
-    await loadOverview();
-    setMessage("Embedding regeneration queued");
+    setMessage(
+      data.embedding_job?.status === "current"
+        ? "Embedding regenerated"
+        : "Embedding regeneration failed to reach current status"
+    );
+  }
+
+  async function importNewEssays() {
+    setImportRunning(true);
+    try {
+      const result = await api("/admin/import-new-essays", { method: "POST" });
+      setMessage(
+        `Imported ${result.created} new essays, ${result.skipped_duplicates} duplicates skipped, ${result.invalid} invalid — ${result.embedded} embedded and searchable.`
+      );
+      await loadEssays(essays.page || 1);
+      await loadOverview();
+    } finally {
+      setImportRunning(false);
+    }
   }
 
   useEffect(() => {
@@ -226,7 +274,9 @@ export default function AdminConsole() {
           if (!cancelled) setOverview(data);
         }
         if (tab === "essays") {
-          const data = await api(`/admin/essays?page=1&page_size=${essays.page_size || 50}`);
+          const data = await api(
+            `/admin/essays?page=1&page_size=${essays.page_size || 50}&sort=${essaySort.field}&sort_dir=${essaySort.dir}`
+          );
           if (!cancelled) setEssays(data);
         }
         if (tab === "usage") {
@@ -250,7 +300,7 @@ export default function AdminConsole() {
     return () => {
       cancelled = true;
     };
-  }, [adminState.profile, api, essays.page_size, tab]);
+  }, [adminState.profile, api, essays.page_size, essaySort, tab]);
 
   if (adminState.loading) {
     return <main className="admin-shell admin-loading">Loading admin access...</main>;
@@ -315,16 +365,25 @@ export default function AdminConsole() {
             filters={filters}
             setFilters={setFilters}
             loadEssays={loadEssays}
+            essaySort={essaySort}
+            toggleEssaySort={toggleEssaySort}
             selectedEssay={selectedEssay}
             loadEssayDetail={loadEssayDetail}
             editor={editor}
             setEditor={setEditor}
             saveEssay={saveEssay}
             deleteEssay={deleteEssay}
-            queueEmbedding={queueEmbedding}
+            restoreEssay={restoreEssay}
+            hardDeleteEssay={hardDeleteEssay}
+            regenerateEmbedding={regenerateEmbedding}
+            hardDeleteConfirmId={hardDeleteConfirmId}
+            setHardDeleteConfirmId={setHardDeleteConfirmId}
+            importNewEssays={importNewEssays}
+            importRunning={importRunning}
             newEssay={() => {
               setSelectedEssay(null);
               setEditor(emptyEssay());
+              setHardDeleteConfirmId("");
             }}
           />
         )}
@@ -361,21 +420,41 @@ function Overview({ overview }) {
   );
 }
 
+const ESSAY_COLUMNS = [
+  ["id", "ID"],
+  ["topic", "Topic"],
+  ["school", "School"],
+  ["type", "Type"],
+  ["public", "Public"],
+  ["updated_at", "Updated at"],
+  ["embedding_status", "Embedding status"],
+];
+
 function Essays(props) {
   const {
     essays,
     filters,
     setFilters,
     loadEssays,
+    essaySort,
+    toggleEssaySort,
     selectedEssay,
     loadEssayDetail,
     editor,
     setEditor,
     saveEssay,
     deleteEssay,
-    queueEmbedding,
+    restoreEssay,
+    hardDeleteEssay,
+    regenerateEmbedding,
+    hardDeleteConfirmId,
+    setHardDeleteConfirmId,
+    importNewEssays,
+    importRunning,
     newEssay,
   } = props;
+
+  const isDeleted = Boolean(selectedEssay?.essay?.deleted_at);
 
   return (
     <section className="admin-essay-layout">
@@ -385,7 +464,12 @@ function Essays(props) {
             <h2>Essays</h2>
             <span>{formatNumber(essays.total)} records</span>
           </div>
-          <button onClick={newEssay}>New</button>
+          <div className="admin-actions">
+            <button onClick={importNewEssays} disabled={importRunning}>
+              <RefreshCw size={16} className={importRunning ? "spin" : ""} /> Import new essays
+            </button>
+            <button onClick={newEssay}>New</button>
+          </div>
         </div>
         <div className="admin-filters">
           <label className="admin-search-field">
@@ -421,18 +505,42 @@ function Essays(props) {
           <button onClick={() => loadEssays(1)}>Apply</button>
         </div>
         <div className="admin-id-list">
-          {essays.items.map((essay) => (
-            <button
-              key={essay.id}
-              className={selectedEssay?.essay?.id === essay.id ? "active" : ""}
-              onClick={() => loadEssayDetail(essay.id)}
-              title={essay.topic || essay.id}
-            >
-              <strong>{essay.id}</strong>
-              <StatusBadge value={essay.embedding_status || "unknown"} />
-              {essay.public && <span className="admin-tiny-pill">Public</span>}
-            </button>
-          ))}
+          <table className="admin-essay-table">
+            <thead>
+              <tr>
+                {ESSAY_COLUMNS.map(([field, label]) => (
+                  <th key={field}>
+                    <button type="button" className="admin-sort-header" onClick={() => toggleEssaySort(field)}>
+                      {label}
+                      {essaySort.field === field && (essaySort.dir === "asc" ? " ▲" : " ▼")}
+                    </button>
+                  </th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {essays.items.map((essay) => (
+                <tr
+                  key={essay.id}
+                  className={selectedEssay?.essay?.id === essay.id ? "active" : ""}
+                  onClick={() => loadEssayDetail(essay.id)}
+                  title={essay.topic || essay.id}
+                >
+                  <td>
+                    <strong>{essay.id}</strong>
+                  </td>
+                  <td>{essay.topic || "none"}</td>
+                  <td>{essay.school || "none"}</td>
+                  <td>{essay.type || "none"}</td>
+                  <td>{essay.public ? <span className="admin-tiny-pill">Public</span> : "No"}</td>
+                  <td>{formatDate(essay.updated_at)}</td>
+                  <td>
+                    <StatusBadge value={essay.embedding_status || "unknown"} />
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
       </div>
 
@@ -443,19 +551,39 @@ function Essays(props) {
             <span>{selectedEssay?.essay?.topic || "Create or select an essay"}</span>
           </div>
           <div className="admin-actions">
-            {selectedEssay?.essay?.id && <button onClick={queueEmbedding}>Queue Embedding</button>}
-            {selectedEssay?.essay?.id && (
-              <button className="danger" onClick={deleteEssay} title="Soft delete" aria-label="Soft delete">
-                <Trash2 size={16} />
-              </button>
+            {isDeleted ? (
+              <>
+                <button onClick={restoreEssay}>Restore</button>
+                <input
+                  value={hardDeleteConfirmId}
+                  onChange={(e) => setHardDeleteConfirmId(e.target.value)}
+                  placeholder="Type essay ID to confirm"
+                />
+                <button
+                  className="danger"
+                  disabled={!isConfirmIdMatch(hardDeleteConfirmId, selectedEssay.essay.id)}
+                  onClick={hardDeleteEssay}
+                >
+                  Hard Delete
+                </button>
+              </>
+            ) : (
+              <>
+                <button onClick={saveEssay}>
+                  <Save size={16} /> Save
+                </button>
+                {selectedEssay?.essay?.id && (
+                  <button className="danger" onClick={deleteEssay} title="Soft delete" aria-label="Soft delete">
+                    <Trash2 size={16} /> Soft Delete
+                  </button>
+                )}
+                {selectedEssay?.essay?.id && <button onClick={regenerateEmbedding}>Regenerate Embedding</button>}
+              </>
             )}
-            <button onClick={saveEssay}>
-              <Save size={16} /> Save
-            </button>
           </div>
         </div>
         {selectedEssay?.essay && <EssayReadPanel essay={selectedEssay.essay} audit={selectedEssay.audit || []} />}
-        <EssayEditor editor={editor} setEditor={setEditor} />
+        {!isDeleted && <EssayEditor editor={editor} setEditor={setEditor} />}
       </div>
     </section>
   );

@@ -2,6 +2,10 @@ export function isAdminEmailAllowed(email, configuredEmails) {
   return configuredEmails.length === 0 || configuredEmails.includes("*") || (email && configuredEmails.includes(email));
 }
 
+export function isConfirmIdMatch(inputValue, essayId) {
+  return typeof inputValue === "string" && inputValue === essayId;
+}
+
 export const PROJECT_ADMIN_EMAILS = [
   "zackeryliu98@gmail.com",
   "zackery032895@gmail.com",

@@ -195,6 +195,16 @@ def export_essays_to_jsonl(db: Session, path: Path, include_deleted: bool = Fals
     return count
 
 
+_SORTABLE_FIELDS = {
+    "id": Essay.id,
+    "topic": Essay.topic,
+    "school": Essay.school,
+    "type": Essay.type,
+    "updated_at": Essay.updated_at,
+    "embedding_status": Essay.embedding_status,
+}
+
+
 def query_essays(
     db: Session,
     *,
@@ -204,6 +214,8 @@ def query_essays(
     public: bool | None = None,
     embedding_status: str | None = None,
     include_deleted: bool = False,
+    sort: str | None = None,
+    sort_dir: str = "asc",
 ):
     query = db.query(Essay)
     if not include_deleted:
@@ -226,6 +238,10 @@ def query_essays(
         query = query.filter(Essay.public == public)
     if embedding_status:
         query = query.filter(Essay.embedding_status == embedding_status)
+    if sort:
+        column = _SORTABLE_FIELDS.get(sort)
+        if column is not None:
+            query = query.order_by(column.desc() if sort_dir == "desc" else column.asc())
     return query
 
 

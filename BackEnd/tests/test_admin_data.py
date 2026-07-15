@@ -289,6 +289,17 @@ class AdminDataTests(unittest.TestCase):
         self.assertEqual(_infer_severity("warn something"), "warn")
         self.assertEqual(_infer_severity("startup ok"), "info")
 
+    def test_list_essays_server_side_sort(self):
+        actor = AdminActor(email="owner@example.com", can_write=True)
+        create_essay(EssayCreate(topic="Zebra", content="B", type="PS", school="Alpha U"), db=self.db, actor=actor)
+        create_essay(EssayCreate(topic="Apple", content="A", type="PS", school="Zeta U"), db=self.db, actor=actor)
+
+        asc = list_essays(page=1, page_size=25, sort="topic", sort_dir="asc", db=self.db, actor=actor)
+        self.assertEqual([e["topic"] for e in asc["items"]], ["Apple", "Zebra"])
+
+        desc = list_essays(page=1, page_size=25, sort="school", sort_dir="desc", db=self.db, actor=actor)
+        self.assertEqual([e["school"] for e in desc["items"]], ["Zeta U", "Alpha U"])
+
 
 if __name__ == "__main__":
     unittest.main()

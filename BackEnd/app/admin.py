@@ -139,6 +139,8 @@ def list_essays(
     public: Optional[bool] = None,
     embedding_status: Optional[str] = None,
     include_deleted: bool = False,
+    sort: Optional[str] = Query(default=None, pattern="^(id|topic|school|type|updated_at|embedding_status)$"),
+    sort_dir: str = Query(default="asc", pattern="^(asc|desc)$"),
     db: Session = Depends(get_db),
     actor: AdminActor = Depends(require_admin),
 ):
@@ -150,14 +152,19 @@ def list_essays(
         public=public,
         embedding_status=embedding_status,
         include_deleted=include_deleted,
+        sort=sort,
+        sort_dir=sort_dir,
     )
     total = query.count()
-    rows = (
-        query.order_by(Essay.updated_at.desc(), Essay.id.asc())
-        .offset((page - 1) * page_size)
-        .limit(page_size)
-        .all()
-    )
+    if sort:
+        rows = query.offset((page - 1) * page_size).limit(page_size).all()
+    else:
+        rows = (
+            query.order_by(Essay.updated_at.desc(), Essay.id.asc())
+            .offset((page - 1) * page_size)
+            .limit(page_size)
+            .all()
+        )
     return {
         "items": [essay_to_dict(row, include_content=False) for row in rows],
         "page": page,

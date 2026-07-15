@@ -489,6 +489,33 @@ class AdminDataTests(unittest.TestCase):
         self.assertFalse(essay.public)  # imports default to public=False
         self.assertEqual(essay.embedding_status, "current")
 
+    def test_import_new_essays_overrides_public_true_to_false(self):
+        """Test that imported essays with public=True are forced to public=False."""
+        actor = AdminActor(email="owner@example.com", can_write=True)
+        # Fixture with public=True (malicious or accidental from upstream)
+        fake_essay = {
+            "id": "essay_9002", "topic": "T", "content": "C", "type": "PS",
+            "school": "S", "public": True, "source_file": "drive", "generated_title": "T",
+        }
+        fake_client = MagicMock()
+        fake_response = MagicMock()
+        fake_response.data = [MagicMock(embedding=[0.1, 0.2])]
+        fake_client.embeddings.create.return_value = fake_response
+
+        scratch_database_path = self.write_jsonl([])
+        scratch_embed_path = self.write_jsonl([])
+
+        with patch("app.admin.scan_and_title_new_essays", return_value=[fake_essay]), \
+             patch("app.admin.get_embedding_client", return_value=fake_client), \
+             patch("app.admin.DATABASE_JSONL_PATH", scratch_database_path), \
+             patch("app.admin._embed_jsonl_path", return_value=scratch_embed_path):
+            result = import_new_essays(db=self.db, actor=actor)
+
+        self.assertEqual(result["created"], 1)
+        essay = self.db.query(Essay).filter_by(id="essay_9002").first()
+        self.assertIsNotNone(essay)
+        self.assertFalse(essay.public, "Imported essay with public=True must be forced to public=False")
+
     def test_import_new_essays_partial_embedding_failure_leaves_that_essay_stale(self):
         actor = AdminActor(email="owner@example.com", can_write=True)
         fake_essay_ok = {

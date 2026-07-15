@@ -469,7 +469,7 @@ def import_new_essays(db: Session = Depends(get_db), actor: AdminActor = Depends
             return {"created": 0, "skipped_duplicates": 0, "invalid": 0, "embedded": 0}
 
         for essay in new_essays:
-            essay.setdefault("public", False)  # imported essays default to non-public
+            essay["public"] = False  # imported essays unconditionally forced to non-public
         append_to_database_jsonl(new_essays)
 
         import_result = import_essays_from_jsonl(db, DATABASE_JSONL_PATH)

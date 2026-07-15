@@ -19,6 +19,7 @@ from app.admin import (
     cloudwatch_logs,
     create_essay,
     essay_detail,
+    hard_delete_essay,
     list_essays,
     require_admin,
     require_admin_write,
@@ -399,6 +400,37 @@ class AdminDataTests(unittest.TestCase):
         essay = self.db.query(Essay).filter_by(id=essay_id).first()
         self.assertEqual(essay.embedding_status, "stale")  # unchanged from create_essay default
         self.assertIsNone(self.db.query(AdminAuditLog).filter_by(action="regenerate_embedding").first())
+
+
+    def test_hard_delete_requires_prior_soft_delete(self):
+        actor = AdminActor(email="owner@example.com", can_write=True)
+        created = create_essay(EssayCreate(topic="T", content="C", type="PS", school="S"), db=self.db, actor=actor)
+        essay_id = created["essay"]["id"]
+        with self.assertRaises(HTTPException) as ctx:
+            hard_delete_essay(essay_id, db=self.db, actor=actor)
+        self.assertEqual(ctx.exception.status_code, 409)
+
+    def test_hard_delete_removes_essay_and_embeddings(self):
+        actor = AdminActor(email="owner@example.com", can_write=True)
+        created = create_essay(EssayCreate(topic="T", content="C", type="PS", school="S"), db=self.db, actor=actor)
+        essay_id = created["essay"]["id"]
+        self.db.add(EssayEmbedding(essay_id=essay_id, model="text-embedding-3-small", content_hash="h"))
+        self.db.commit()
+        soft_delete_essay(essay_id, db=self.db, actor=actor)
+
+        # Route embed.jsonl writes to a scratch file instead of the real
+        # drive_data/embed_output/embed.jsonl — that file backs the running
+        # dev server's in-memory search index and must not be mutated by tests.
+        scratch_embed_path = self.write_jsonl([])
+        with patch("app.admin._embed_jsonl_path", return_value=scratch_embed_path):
+            result = hard_delete_essay(essay_id, db=self.db, actor=actor)
+
+        self.assertTrue(result["deleted"])
+        self.assertIsNone(self.db.query(Essay).filter_by(id=essay_id).first())
+        self.assertEqual(self.db.query(EssayEmbedding).filter_by(essay_id=essay_id).count(), 0)
+        log = self.db.query(AdminAuditLog).filter_by(action="hard_delete", entity_id=essay_id).first()
+        self.assertIsNotNone(log)
+        self.assertIn("content", log.before_json)  # full snapshot retained per approved design
 
 
 if __name__ == "__main__":

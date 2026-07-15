@@ -26,7 +26,7 @@ from database.essays import (
     utcnow,
     validate_essay_payload,
 )
-from service.embed_store import replace_parent_id
+from service.embed_store import remove_parent_ids, replace_parent_id
 from service.embedding_service import embed_essay
 
 
@@ -337,6 +337,30 @@ def restore_essay(essay_id: str, db: Session = Depends(get_db), actor: AdminActo
     audit_log(db, actor.email, "restore", "essay", essay.id, before, after)
     db.commit()
     return {"essay": after}
+
+
+@router.post("/essays/{essay_id}/hard-delete")
+def hard_delete_essay(essay_id: str, db: Session = Depends(get_db), actor: AdminActor = Depends(require_admin_write)):
+    essay = db.query(Essay).filter(Essay.id == essay_id).first()
+    if not essay:
+        raise HTTPException(status_code=404, detail="Essay not found")
+    if essay.deleted_at is None:
+        raise HTTPException(status_code=409, detail="Essay must be soft-deleted before it can be hard-deleted")
+
+    before = essay_to_dict(essay, include_content=True)
+
+    # EssayEmbedding.essay_id is a foreign key to Essay.id — delete embeddings first.
+    db.query(EssayEmbedding).filter(EssayEmbedding.essay_id == essay.id).delete()
+    db.delete(essay)
+    db.flush()
+
+    remove_parent_ids(_embed_jsonl_path(), {essay_id})
+    app_data: AppData = _current_app_data()
+    app_data.remove_essay_vectors(essay_id)
+
+    audit_log(db, actor.email, "hard_delete", "essay", essay_id, before, None)
+    db.commit()
+    return {"deleted": True, "essay_id": essay_id}
 
 
 @router.post("/essays/{essay_id}/regenerate-embedding")

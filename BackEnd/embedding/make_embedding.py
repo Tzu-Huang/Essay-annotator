@@ -13,7 +13,7 @@ records (with embeddings) back to a JSONL output file.
 import os
 import json
 import numpy as np
-import tiktoken 
+import tiktoken
 from openai import OpenAI
 from dotenv import load_dotenv
 
@@ -272,6 +272,11 @@ def get_query_embedding(query: str, client):
 # =========================
 
 def update_embeddings():
+    # Imported here (rather than at module top) to avoid a circular import:
+    # service.embedding_service imports chunk_text/normalize/embedding/build_output_record
+    # from this module at its own import time, so this module can't import
+    # embedding_service back until both modules have finished loading.
+    from service.embedding_service import embed_essay
 
     # LOADING
     try:
@@ -282,10 +287,6 @@ def update_embeddings():
     except:
         print("Unexpected issue happened during the loading process")
         return
-
-    batch_records = []   # list[dict]
-    batch_topics = []    # list[str]
-    batch_contents = []  # list[str]
 
     total_written = 0
     total_seen = 0
@@ -304,92 +305,41 @@ def update_embeddings():
             record = extract_text_fields(obj)
             if record is None:
                 continue
-            
+
             rid = record.get("id")
             if not rid:
                 continue
-            
-            # splitting into chunks
-            chunks = chunk_text(record["content"])
 
-            # go through each chunk
-            for i, chunk in enumerate(chunks):
-                chunk_record = record.copy()
+            # Figure out this essay's expected chunk ids up front so a fully
+            # already-embedded essay can be skipped without calling the
+            # embeddings API at all (mirrors the old per-chunk skip check).
+            expected_chunk_ids = [
+                f"{rid}_{i:02d}" for i in range(len(chunk_text(record["content"])))
+            ]
+            if expected_chunk_ids and all(cid in seen_ids for cid in expected_chunk_ids):
+                total_skipped += len(expected_chunk_ids)
+                continue
 
-                # keep record of its parent id
-                chunk_record["parent_id"] = record["id"]
+            # Chunk + embed + normalize + build chunk records for this essay.
+            try:
+                essay_records = embed_essay(record, client)
+            except Exception as e:
+                print(e)
+                continue
 
-                # new unique id for the chunked ones
-                chunk_id = f"{record['id']}_{i:02d}"
-
+            # go through each chunk record, skipping ones already embedded
+            for rec in essay_records:
                 # skip seen chunk_id
-                if chunk_id in seen_ids:
+                if rec["id"] in seen_ids:
                     total_skipped += 1
                     continue
 
-                chunk_record["id"] = chunk_id
-                
-                # replace content with chunk
-                chunk_record["content"] = chunk
-
-                batch_records.append(chunk_record)
-                batch_topics.append(chunk_record["topic"])
-                batch_contents.append(chunk)
-
-            # When batch is full, do embedding and output
-            if (len(batch_records) >= Batch_size):
-                print("records >= Batch size! Embedding now")
-                try:
-                    topic_vecs = embedding(client, batch_topics)
-                    content_vecs = embedding(client, batch_contents)
-                except Exception as e:
-                    print(e)
-                    print("Batch Size: ", len(batch_records))
-
-                    # Clear batch to avoid crash
-                    batch_records.clear()
-                    batch_topics.clear()
-                    batch_contents.clear()
-                    continue
-
-                for rec, tvec, cvec in zip(batch_records, topic_vecs, content_vecs):
-                    # rec: record, tvec: topic_vector, cvec: content_vec
-                    rec["topic_embedding"] = normalize(tvec)
-                    rec["content_embedding"] = normalize(cvec)
-
-                    # Convert a complete record to a line and store in embed.jsonl
-                    out.write(json.dumps(build_output_record(rec), ensure_ascii=False) + "\n")
-                    seen_ids.add(rec["id"])
-
-                total_written += len(batch_records)
-                print(f"Written {total_written} records.. ")
-
-                # Clear batch
-                batch_records.clear()
-                batch_topics.clear()
-                batch_contents.clear()
-
-        # This is for the case when there are no enough batch_recrods that is >= 64
-        if batch_records:
-            topic_vecs = embedding(client, batch_topics)
-            content_vecs = embedding(client, batch_contents)
-
-            for rec, tvec, cvec in zip(batch_records, topic_vecs, content_vecs):
-                # rec: record, tvec: topic_vector, cvec: content_vec
-                rec["topic_embedding"] = normalize(tvec)
-                rec["content_embedding"] = normalize(cvec)
-
                 # Convert a complete record to a line and store in embed.jsonl
-                out.write(json.dumps(build_output_record(rec), ensure_ascii=False) + "\n")
+                out.write(json.dumps(rec, ensure_ascii=False) + "\n")
                 seen_ids.add(rec["id"])
+                total_written += 1
 
-            total_written += len(batch_records)
             print(f"Written {total_written} records.. ")
-
-            # Clear batch
-            batch_records.clear()
-            batch_topics.clear()
-            batch_contents.clear()
 
     print("\n DONE! ")
     print(f"Total seen lines: {total_seen}")

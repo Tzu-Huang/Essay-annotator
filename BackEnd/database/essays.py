@@ -1,6 +1,6 @@
 import hashlib
 import json
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Iterable
@@ -21,6 +21,7 @@ class ImportResult:
     created: int = 0
     skipped_duplicates: int = 0
     invalid: int = 0
+    created_ids: list[str] = field(default_factory=list)
 
 
 def utcnow():
@@ -176,6 +177,7 @@ def import_essays_from_jsonl(db: Session, path: Path) -> ImportResult:
             existing_ids.add(essay.id)
             signatures.add(signature)
             result.created += 1
+            result.created_ids.append(essay.id)
 
     return result
 

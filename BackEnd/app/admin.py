@@ -1,5 +1,6 @@
 import json
 import os
+import threading
 import urllib.error
 import urllib.parse
 import urllib.request
@@ -28,7 +29,7 @@ from database.essays import (
     validate_essay_payload,
 )
 from scripts.add_to_database import DATABASE_PATH as DATABASE_JSONL_PATH, NEW_INPUT_DIR as NEW_INPUT_DIR_PATH
-from service.embed_store import remove_parent_ids, replace_parent_id
+from service.embed_store import append_records, remove_parent_ids, replace_parent_id
 from service.embedding_service import embed_essay
 from service.ingest_service import scan_and_title_new_essays
 
@@ -446,7 +447,7 @@ def trigger_embedding_regeneration(
     return {"essay": after, "embedding_job": {"status": essay.embedding_status}}
 
 
-_import_lock_held = False
+_import_lock = threading.Lock()
 
 
 def append_to_database_jsonl(essays: list[dict]) -> None:
@@ -458,10 +459,8 @@ def append_to_database_jsonl(essays: list[dict]) -> None:
 
 @router.post("/import-new-essays")
 def import_new_essays(db: Session = Depends(get_db), actor: AdminActor = Depends(require_admin_write)):
-    global _import_lock_held
-    if _import_lock_held:
+    if not _import_lock.acquire(blocking=False):
         raise HTTPException(status_code=409, detail="An import is already running")
-    _import_lock_held = True
     try:
         client = get_embedding_client()
         new_essays = scan_and_title_new_essays(NEW_INPUT_DIR_PATH, DATABASE_JSONL_PATH, client)
@@ -474,11 +473,28 @@ def import_new_essays(db: Session = Depends(get_db), actor: AdminActor = Depends
 
         import_result = import_essays_from_jsonl(db, DATABASE_JSONL_PATH)
 
-        stale = db.query(Essay).filter(Essay.embedding_status == "stale", Essay.deleted_at.is_(None)).all()
+        # Only embed essays this call actually just created -- not the whole
+        # DB-wide stale backlog (which may include essays made stale by an
+        # unrelated PATCH long before this import ran). A freshly imported
+        # essay should always be embedding_status == "stale", but the filter
+        # below double-checks that invariant rather than assuming it.
+        newly_imported = (
+            db.query(Essay)
+            .filter(
+                Essay.id.in_(import_result.created_ids),
+                Essay.embedding_status == "stale",
+                Essay.deleted_at.is_(None),
+            )
+            .all()
+            if import_result.created_ids
+            else []
+        )
         embedded_count = 0
         app_data: AppData = _current_app_data()
         embed_path = _embed_jsonl_path()
-        for essay in stale:
+        all_records: list[dict] = []
+        all_rows: list[dict] = []
+        for essay in newly_imported:
             essay_dict = {
                 "id": essay.id,
                 "topic": essay.topic,
@@ -492,8 +508,8 @@ def import_new_essays(db: Session = Depends(get_db), actor: AdminActor = Depends
                 records = embed_essay(essay_dict, client)
             except Exception:
                 continue  # leave embedding_status == "stale"; visible failure, not silently marked current
-            replace_parent_id(embed_path, essay.id, records)
-            rows = [
+            all_records.extend(records)
+            all_rows.extend(
                 {
                     "id": r["id"],
                     "parent": r["parent_id"],
@@ -505,8 +521,7 @@ def import_new_essays(db: Session = Depends(get_db), actor: AdminActor = Depends
                     "content_V": r["content_embedding"],
                 }
                 for r in records
-            ]
-            app_data.replace_essay_vectors(essay.id, rows)
+            )
             db.add(
                 EssayEmbedding(
                     essay_id=essay.id,
@@ -518,6 +533,15 @@ def import_new_essays(db: Session = Depends(get_db), actor: AdminActor = Depends
             )
             essay.embedding_status = "current"
             embedded_count += 1
+
+        # These are freshly-imported essays that have never had embeddings
+        # before, so there's nothing to "replace" -- a single append is
+        # correct and avoids an unnecessary full read-modify-write of
+        # embed.jsonl (and of AppData's rows) per essay.
+        if all_records:
+            append_records(embed_path, all_records)
+        if all_rows:
+            app_data.add_essay_vectors(all_rows)
         db.flush()
 
         result = {
@@ -530,7 +554,7 @@ def import_new_essays(db: Session = Depends(get_db), actor: AdminActor = Depends
         db.commit()
         return result
     finally:
-        _import_lock_held = False
+        _import_lock.release()
 
 
 @router.get("/audit")

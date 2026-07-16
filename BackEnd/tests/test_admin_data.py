@@ -449,13 +449,16 @@ class AdminDataTests(unittest.TestCase):
         actor = AdminActor(email="owner@example.com", can_write=True)
         import app.admin as admin_module
 
-        admin_module._import_lock_held = True
+        # Simulate a concurrent request already holding the real
+        # threading.Lock, so this call must be rejected non-blockingly with
+        # a 409 instead of blocking until the lock frees up.
+        admin_module._import_lock.acquire()
         try:
             with self.assertRaises(HTTPException) as ctx:
                 import_new_essays(db=self.db, actor=actor)
             self.assertEqual(ctx.exception.status_code, 409)
         finally:
-            admin_module._import_lock_held = False
+            admin_module._import_lock.release()
 
     def test_import_new_essays_happy_path(self):
         actor = AdminActor(email="owner@example.com", can_write=True)
@@ -488,6 +491,56 @@ class AdminDataTests(unittest.TestCase):
         self.assertIsNotNone(essay)
         self.assertFalse(essay.public)  # imports default to public=False
         self.assertEqual(essay.embedding_status, "current")
+
+    def test_import_new_essays_does_not_embed_unrelated_stale_essays(self):
+        """An essay that was made stale by an earlier, unrelated PATCH must
+        not be swept up and re-embedded by a later import call -- only
+        essays this call actually just created should be embedded."""
+        actor = AdminActor(email="owner@example.com", can_write=True)
+
+        preexisting = Essay(
+            id="essay_8001",
+            topic="Preexisting",
+            content="Unrelated stale essay edited before this import ran",
+            type="PS",
+            school="S",
+            public=False,
+            source_file="manual",
+            embedding_status="stale",
+        )
+        self.db.add(preexisting)
+        self.db.commit()
+
+        fake_essay = {
+            "id": "essay_9003", "topic": "T", "content": "C", "type": "PS",
+            "school": "S", "public": False, "source_file": "manual", "generated_title": "T",
+        }
+        fake_client = MagicMock()
+        fake_response = MagicMock()
+        fake_response.data = [MagicMock(embedding=[0.1, 0.2])]
+        fake_client.embeddings.create.return_value = fake_response
+
+        scratch_database_path = self.write_jsonl([])
+        scratch_embed_path = self.write_jsonl([])
+
+        with patch("app.admin.scan_and_title_new_essays", return_value=[fake_essay]), \
+             patch("app.admin.get_embedding_client", return_value=fake_client), \
+             patch("app.admin.DATABASE_JSONL_PATH", scratch_database_path), \
+             patch("app.admin._embed_jsonl_path", return_value=scratch_embed_path):
+            result = import_new_essays(db=self.db, actor=actor)
+
+        self.assertEqual(result["created"], 1)
+        self.assertEqual(result["embedded"], 1, "only the newly-imported essay should be embedded")
+
+        imported = self.db.query(Essay).filter_by(id="essay_9003").first()
+        self.assertEqual(imported.embedding_status, "current")
+
+        still_stale = self.db.query(Essay).filter_by(id="essay_8001").first()
+        self.assertEqual(
+            still_stale.embedding_status,
+            "stale",
+            "unrelated pre-existing stale essay must be left untouched by this import",
+        )
 
     def test_import_new_essays_overrides_public_true_to_false(self):
         """Test that imported essays with public=True are forced to public=False."""
@@ -570,7 +623,7 @@ class AdminDataTests(unittest.TestCase):
             with self.assertRaises(RuntimeError):
                 import_new_essays(db=self.db, actor=actor)
 
-        self.assertFalse(admin_module._import_lock_held)
+        self.assertFalse(admin_module._import_lock.locked())
 
         # A subsequent call must not be rejected by a lock left stuck by the
         # failure above.

@@ -23,6 +23,7 @@ from app.admin import (
     hard_delete_essay,
     import_new_essays,
     list_essays,
+    regenerate_stale_embeddings,
     require_admin,
     require_admin_write,
     restore_essay,
@@ -485,6 +486,59 @@ class AdminDataTests(unittest.TestCase):
         essay = self.db.query(Essay).filter_by(id=essay_id).first()
         self.assertEqual(essay.embedding_status, "stale")  # unchanged from create_essay default
         self.assertIsNone(self.db.query(AdminAuditLog).filter_by(action="regenerate_embedding").first())
+
+    @patch("app.admin.get_embedding_client")
+    @patch("app.admin.embed_essay")
+    @patch("app.admin.replace_parent_id")
+    @patch("app.admin._current_app_data")
+    def test_regenerate_stale_embeddings_processes_only_stale_non_deleted_essays(
+        self, mock_app_data, mock_replace_parent_id, mock_embed_essay, mock_client
+    ):
+        stale = Essay(id="essay_0001", topic="T1", content="C1", embedding_status="stale")
+        current = Essay(id="essay_0002", topic="T2", content="C2", embedding_status="current")
+        deleted_stale = Essay(
+            id="essay_0003", topic="T3", content="C3", embedding_status="stale",
+            deleted_at=utcnow(),
+        )
+        self.db.add_all([stale, current, deleted_stale])
+        self.db.commit()
+
+        mock_embed_essay.return_value = [
+            {
+                "id": "essay_0001-0", "parent_id": "essay_0001", "content": "C1",
+                "topic": "T1", "type": None, "school": None,
+                "topic_embedding": [0.1], "content_embedding": [0.1],
+            }
+        ]
+        mock_app_data.return_value = MagicMock()
+
+        actor = AdminActor(email="owner@example.com", can_write=True)
+        result = regenerate_stale_embeddings(db=self.db, actor=actor)
+
+        self.assertEqual(result["attempted"], 1)
+        self.assertEqual(result["succeeded"], 1)
+        self.assertEqual(result["failed"], 0)
+        mock_embed_essay.assert_called_once()
+        self.db.refresh(stale)
+        self.assertEqual(stale.embedding_status, "current")
+
+        audit_row = (
+            self.db.query(AdminAuditLog)
+            .filter_by(action="regenerate_stale_embeddings")
+            .first()
+        )
+        self.assertIsNotNone(audit_row)
+        self.assertEqual(audit_row.after_json["succeeded"], 1)
+
+    def test_regenerate_stale_embeddings_returns_zeroes_when_nothing_is_stale(self):
+        essay = Essay(id="essay_0001", topic="T1", content="C1", embedding_status="current")
+        self.db.add(essay)
+        self.db.commit()
+
+        actor = AdminActor(email="owner@example.com", can_write=True)
+        result = regenerate_stale_embeddings(db=self.db, actor=actor)
+
+        self.assertEqual(result, {"attempted": 0, "succeeded": 0, "failed": 0})
 
     def test_hard_delete_requires_prior_soft_delete(self):
         actor = AdminActor(email="owner@example.com", can_write=True)

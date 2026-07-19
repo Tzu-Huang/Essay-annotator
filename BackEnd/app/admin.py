@@ -448,6 +448,84 @@ def trigger_embedding_regeneration(
     return {"essay": after, "embedding_job": {"status": essay.embedding_status}}
 
 
+@router.post("/essays/regenerate-stale-embeddings")
+def regenerate_stale_embeddings(
+    db: Session = Depends(get_db),
+    actor: AdminActor = Depends(require_admin_write),
+):
+    if not _import_lock.acquire(blocking=False):
+        raise HTTPException(status_code=409, detail="An import or regeneration run is already in progress")
+    try:
+        stale_essays = (
+            db.query(Essay)
+            .filter(Essay.embedding_status != "current", Essay.deleted_at.is_(None))
+            .all()
+        )
+        if not stale_essays:
+            return {"attempted": 0, "succeeded": 0, "failed": 0}
+
+        client = get_embedding_client()
+        app_data: AppData = _current_app_data()
+        embed_path = _embed_jsonl_path()
+        succeeded = 0
+        failed = 0
+        for essay in stale_essays:
+            current_hash = content_hash(essay.topic, essay.content)
+            essay_dict = {
+                "id": essay.id,
+                "topic": essay.topic,
+                "content": essay.content,
+                "type": essay.type,
+                "school": essay.school,
+                "public": essay.public,
+                "source_file": essay.source_file,
+            }
+            try:
+                records = embed_essay(essay_dict, client)
+            except Exception:
+                failed += 1
+                continue  # leave embedding_status == "stale"; visible in the result, not silently dropped
+
+            replace_parent_id(embed_path, essay.id, records)
+            rows = [
+                {
+                    "id": r["id"],
+                    "parent": r["parent_id"],
+                    "preview": r["content"][:220],
+                    "topic_text": r["topic"],
+                    "type": r["type"],
+                    "school": r["school"],
+                    "topic_V": r["topic_embedding"],
+                    "content_V": r["content_embedding"],
+                }
+                for r in records
+            ]
+            app_data.replace_essay_vectors(essay.id, rows)
+
+            db.refresh(essay)
+            post_hash = content_hash(essay.topic, essay.content)
+            db.add(
+                EssayEmbedding(
+                    essay_id=essay.id,
+                    model=os.getenv("OPENAI_EMBEDDING_MODEL", "text-embedding-3-small"),
+                    topic_embedding=records[0]["topic_embedding"] if records else None,
+                    content_embedding=[r["content_embedding"] for r in records],
+                    content_hash=post_hash,
+                )
+            )
+            essay.embedding_status = "current" if post_hash == current_hash else "stale"
+            essay.updated_at = utcnow()
+            succeeded += 1
+
+        db.flush()
+        result = {"attempted": len(stale_essays), "succeeded": succeeded, "failed": failed}
+        audit_log(db, actor.email, "regenerate_stale_embeddings", "essay", None, None, result)
+        db.commit()
+        return result
+    finally:
+        _import_lock.release()
+
+
 _import_lock = threading.Lock()
 
 

@@ -2,6 +2,7 @@ import json
 import os
 import tempfile
 import unittest
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from unittest.mock import MagicMock, patch
 
@@ -34,6 +35,7 @@ from database.essays import (
     audit_log,
     backfill_current_embedding_status,
     content_hash,
+    daily_request_counts,
     essay_to_dict,
     import_essays_from_jsonl,
     load_essays_from_db,
@@ -350,6 +352,36 @@ class AdminDataTests(unittest.TestCase):
         self.assertEqual(compare["output_tokens"], 27)
         self.assertEqual(search["status"], "failed")
 
+    def test_daily_request_counts_buckets_by_day_and_feature(self):
+        base = datetime(2026, 7, 15, tzinfo=timezone.utc)
+        self.db.add_all(
+            [
+                OpenAIUsageEvent(feature="search", created_at=base.replace(hour=1)),
+                OpenAIUsageEvent(feature="search", created_at=base.replace(hour=14)),
+                OpenAIUsageEvent(feature="compare", created_at=base + timedelta(days=1)),
+            ]
+        )
+        self.db.commit()
+
+        result = daily_request_counts(self.db, base - timedelta(days=1), base + timedelta(days=2))
+
+        self.assertEqual(
+            result,
+            [
+                {"date": "2026-07-15", "requests": 2, "by_feature": {"search": 2}},
+                {"date": "2026-07-16", "requests": 1, "by_feature": {"compare": 1}},
+            ],
+        )
+
+    def test_daily_request_counts_respects_range_filter(self):
+        base = datetime(2026, 7, 15, tzinfo=timezone.utc)
+        self.db.add(OpenAIUsageEvent(feature="search", created_at=base))
+        self.db.commit()
+
+        result = daily_request_counts(self.db, base + timedelta(days=1), base + timedelta(days=2))
+
+        self.assertEqual(result, [])
+
     def test_cloudwatch_missing_config_and_severity_mapping(self):
         os.environ.pop("AWS_REGION", None)
         os.environ.pop("AWS_CLOUDWATCH_LOG_GROUP", None)
@@ -453,7 +485,6 @@ class AdminDataTests(unittest.TestCase):
         essay = self.db.query(Essay).filter_by(id=essay_id).first()
         self.assertEqual(essay.embedding_status, "stale")  # unchanged from create_essay default
         self.assertIsNone(self.db.query(AdminAuditLog).filter_by(action="regenerate_embedding").first())
-
 
     def test_hard_delete_requires_prior_soft_delete(self):
         actor = AdminActor(email="owner@example.com", can_write=True)

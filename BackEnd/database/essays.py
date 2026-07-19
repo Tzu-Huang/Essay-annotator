@@ -305,3 +305,33 @@ def summarize_usage(db: Session, start: datetime | None = None, end: datetime | 
         }
         for row in rows
     ]
+
+
+def daily_request_counts(db: Session, start: datetime | None = None, end: datetime | None = None) -> list[dict]:
+    """Day-bucketed request counts for the Overview dashboard's "Daily
+    requests" chart, plus a per-feature breakdown (near-free, since
+    OpenAIUsageEvent already carries `feature`) for a possible future
+    stacked-chart follow-up -- see OverviewDashboard.jsx in Task 7, which
+    only reads `date`/`requests` for now. Buckets in Python (not SQL) to
+    stay agnostic between the SQLite dev DB and Postgres prod DB -- see
+    summarize_usage() above for the equivalent cumulative (non-bucketed)
+    query."""
+    query = db.query(OpenAIUsageEvent.created_at, OpenAIUsageEvent.feature)
+    if start:
+        query = query.filter(OpenAIUsageEvent.created_at >= start)
+    if end:
+        query = query.filter(OpenAIUsageEvent.created_at <= end)
+    counts: dict[str, int] = {}
+    by_feature: dict[str, dict[str, int]] = {}
+    for created_at, feature in query.all():
+        if not created_at:
+            continue
+        day = created_at.date().isoformat()
+        counts[day] = counts.get(day, 0) + 1
+        feature_key = feature or "unknown"
+        day_features = by_feature.setdefault(day, {})
+        day_features[feature_key] = day_features.get(feature_key, 0) + 1
+    return [
+        {"date": day, "requests": count, "by_feature": by_feature.get(day, {})}
+        for day, count in sorted(counts.items())
+    ]

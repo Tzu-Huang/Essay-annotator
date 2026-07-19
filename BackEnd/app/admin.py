@@ -20,6 +20,7 @@ from database.create import AdminAuditLog, Essay, EssayEmbedding, OpenAIUsageEve
 from database.essays import (
     audit_log,
     content_hash,
+    daily_request_counts,
     essay_to_dict,
     import_essays_from_jsonl,
     next_essay_id,
@@ -600,9 +601,11 @@ def openai_usage(
     start_dt = _parse_timestamp(start) or (utcnow() - timedelta(days=30))
     end_dt = _parse_timestamp(end) or utcnow()
     local_summary = summarize_usage(db, start_dt, end_dt)
+    local_daily = daily_request_counts(db, start_dt, end_dt)
     official = _fetch_openai_costs(start_dt, end_dt)
     return {
         "local": local_summary,
+        "local_daily": local_daily,
         "official": official,
         "range": {"start": start_dt.isoformat(), "end": end_dt.isoformat()},
     }

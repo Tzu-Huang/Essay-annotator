@@ -32,6 +32,7 @@ from app.admin import (
 from database.create import AdminAuditLog, Base, Essay, EssayEmbedding, OpenAIUsageEvent
 from database.essays import (
     audit_log,
+    backfill_current_embedding_status,
     content_hash,
     essay_to_dict,
     import_essays_from_jsonl,
@@ -235,6 +236,57 @@ class AdminDataTests(unittest.TestCase):
         self.assertEqual(query_essays(self.db, include_deleted=True).count(), 2)
         self.assertEqual(query_essays(self.db, school="Stanford").one().id, "essay_0001")
         self.assertEqual(query_essays(self.db, embedding_status="current", include_deleted=True).one().id, "essay_0002")
+
+    def test_backfill_current_embedding_status_marks_essays_with_embeddings(self):
+        stale_with_embedding = Essay(
+            id="essay_0001", topic="T1", content="C1", embedding_status="stale"
+        )
+        stale_without_embedding = Essay(
+            id="essay_0002", topic="T2", content="C2", embedding_status="stale"
+        )
+        already_current = Essay(
+            id="essay_0003", topic="T3", content="C3", embedding_status="current"
+        )
+        self.db.add_all([stale_with_embedding, stale_without_embedding, already_current])
+        self.db.add(
+            EssayEmbedding(
+                essay_id="essay_0001",
+                model="text-embedding-3-small",
+                content_embedding=[[0.1, 0.2]],
+                content_hash="hash1",
+            )
+        )
+        self.db.commit()
+
+        updated = backfill_current_embedding_status(self.db)
+        self.db.commit()
+
+        self.assertEqual(updated, 1)
+        self.db.refresh(stale_with_embedding)
+        self.db.refresh(stale_without_embedding)
+        self.assertEqual(stale_with_embedding.embedding_status, "current")
+        self.assertEqual(stale_without_embedding.embedding_status, "stale")
+
+    def test_backfill_current_embedding_status_is_idempotent(self):
+        essay = Essay(id="essay_0001", topic="T1", content="C1", embedding_status="stale")
+        self.db.add(essay)
+        self.db.add(
+            EssayEmbedding(
+                essay_id="essay_0001",
+                model="text-embedding-3-small",
+                content_embedding=[[0.1]],
+                content_hash="hash1",
+            )
+        )
+        self.db.commit()
+
+        first_run = backfill_current_embedding_status(self.db)
+        self.db.commit()
+        second_run = backfill_current_embedding_status(self.db)
+        self.db.commit()
+
+        self.assertEqual(first_run, 1)
+        self.assertEqual(second_run, 0)
 
     def test_admin_essay_crud_and_embedding_queue(self):
         actor = AdminActor(email="owner@example.com", can_write=True)

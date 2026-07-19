@@ -247,6 +247,22 @@ def query_essays(
     return query
 
 
+def backfill_current_embedding_status(db: Session) -> int:
+    """One-time backfill for essays embedded before embedding_status tracking
+    existed (e.g. via the standalone embedding/make_embedding.py script,
+    which never set the flag). Any essay with a real EssayEmbedding row is
+    treated as current -- see docs/superpowers/specs/2026-07-17-admin-console-redesign-design.md
+    section 1 for the full root-cause writeup. Caller must db.commit()."""
+    embedded_ids = {row[0] for row in db.query(EssayEmbedding.essay_id).distinct().all()}
+    if not embedded_ids:
+        return 0
+    return (
+        db.query(Essay)
+        .filter(Essay.id.in_(embedded_ids), Essay.embedding_status != "current")
+        .update({Essay.embedding_status: "current"}, synchronize_session=False)
+    )
+
+
 def usage_event_to_dict(event: OpenAIUsageEvent) -> dict:
     return {
         "id": event.id,

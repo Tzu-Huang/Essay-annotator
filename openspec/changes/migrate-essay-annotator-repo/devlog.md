@@ -63,6 +63,24 @@ safety checks from the standalone target root.
   remediation of the pre-existing secret archive in older Git history.
 - Next action: `/dev-review`.
 
+### Round 2 (2026-07-20)
+
+- Tested head: `2f674aa1d82784fba595f8adb931fa64813f622e`
+- Status: `pass`
+- Checks:
+  - `pass` — `.venv\Scripts\python.exe -m unittest discover -s BackEnd\tests -v`: 18 tests passed.
+  - `pass` — backend startup smoke: `/health` returned HTTP 200 and loaded 219 essays.
+  - `pass` — `npm run lint` from `frontend`: no lint errors.
+  - `pass` — `npm test` from `frontend`: 12 tests passed.
+  - `pass` — `npm run build` from `frontend`: Vite transformed 1,826 modules.
+  - `pass` — frontend startup smoke: Vite served the entry page over HTTP 200.
+  - `pass` — `openspec validate migrate-essay-annotator-repo` and OpenSpec status: valid and 21/21 tasks complete.
+  - `pass` — repository checks: clean worktree, expected origin, `origin/main` ancestor of `frontend-base`, and `frontend-base` ancestor of the tested head.
+  - `pass` — archive safety checks: the deployment secrets archive is ignored, untracked, and absent from active-ref history; local migration backup and legacy archive remain available.
+  - `skip` — live AWS transfer requires the external host and SSH key and is not a required local migration acceptance check.
+- Unresolved failures: `none`; provider-side credential rotation remains an explicitly accepted residual risk under `REV-001` rather than a technical resolution.
+- Next action: `/dev-review`.
+
 ## Follow-ups
 
 - Run closure review after this verification round. Do not run `/dev-done` until

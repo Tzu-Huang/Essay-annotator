@@ -13,10 +13,10 @@
 
 ## 3. Local state preservation
 
-- [ ] 3.1 Preserve the pending local frontend change as a reviewed patch or local commit without pushing it.
-- [ ] 3.2 Copy required `.env`, credentials, datasets, embeddings, generated files, dependencies, and deployment artifacts to the target or documented local backup.
-- [ ] 3.3 Confirm copied secrets and sensitive data remain ignored and are not staged or included in OpenSpec, Cortex, or Linear documentation.
-- [ ] 3.4 Compare the post-copy manifest with the source and record any intentional exceptions.
+- [x] 3.1 Preserve the pending local frontend change as a reviewed patch or local commit without pushing it.
+- [x] 3.2 Copy required `.env`, credentials, datasets, embeddings, generated files, dependencies, and deployment artifacts to the target or documented local backup.
+- [x] 3.3 Confirm copied secrets and sensitive data remain ignored and are not staged or included in OpenSpec, Cortex, or Linear documentation.
+- [x] 3.4 Compare the post-copy manifest with the source and record any intentional exceptions.
 
 ## 4. Path and runtime compatibility
 

@@ -142,16 +142,16 @@ function Home({ onOpenSignIn }) {
               <div className={styles.credentialRow}>
                 <div className={styles.credential}>
                   <b>
+                    <CountUpNumber value={15} easing="linear" />
+                  </b>
+                  <span>Different topics</span>
+                </div>
+                <div className={styles.credential}>
+                  <b>
                     <CountUpNumber value={essayCount} />
                     <span className={styles.countPlus}>+</span>
                   </b>
                   <span>Accepted essays</span>
-                </div>
-                <div className={styles.credential}>
-                  <b>
-                    <CountUpNumber value={15} easing="linear" />
-                  </b>
-                  <span>Different topics</span>
                 </div>
                 <div className={styles.credential}>
                   <b>Free</b>

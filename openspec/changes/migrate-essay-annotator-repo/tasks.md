@@ -1,9 +1,9 @@
 ## 1. Source and target inventory
 
-- [ ] 1.1 Record source and target commit IDs, branches, remotes, and working-tree status.
-- [ ] 1.2 Inventory tracked changes, untracked files, ignored files, runtime configuration, generated data, dependencies, and deployment artifacts without printing secret contents.
-- [ ] 1.3 Create a local preservation manifest with relative paths, categories, sizes, and hashes where practical.
-- [ ] 1.4 Create a recoverable local backup of all required ProjectVault-only files before changing the target.
+- [x] 1.1 Record source and target commit IDs, branches, remotes, and working-tree status.
+- [x] 1.2 Inventory tracked changes, untracked files, ignored files, runtime configuration, generated data, dependencies, and deployment artifacts without printing secret contents.
+- [x] 1.3 Create a local preservation manifest with relative paths, categories, sizes, and hashes where practical.
+- [x] 1.4 Create a recoverable local backup of all required ProjectVault-only files before changing the target.
 
 ## 2. Repository and branch setup
 

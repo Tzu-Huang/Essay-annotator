@@ -33,6 +33,6 @@
 
 ## 6. Legacy cleanup gate
 
-- [ ] 6.1 Record validation evidence and confirm the target is usable as the rollback replacement.
-- [ ] 6.2 Obtain explicit cleanup confirmation after validation passes.
-- [ ] 6.3 Archive or remove the legacy ProjectVault `repo/` only as a separate final operation.
+- [x] 6.1 Record validation evidence and confirm the target is usable as the rollback replacement.
+- [x] 6.2 Obtain explicit cleanup confirmation after validation passes.
+- [x] 6.3 Archive or remove the legacy ProjectVault `repo/` only as a separate final operation.

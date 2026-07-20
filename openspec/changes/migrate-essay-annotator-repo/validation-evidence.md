@@ -23,6 +23,24 @@ Recorded: 2026-07-20
 - Frontend production build: passed (`vite`, 1,826 modules transformed).
 - Frontend startup smoke: passed with HTTP 200 from the Vite entry page.
 
+## REV-001 security remediation
+
+- On 2026-07-20, the Git history reachable from `main`, `frontend-base`, and
+  `feature/ZAC-66_migrate-essay-annotator-repo` was rewritten to remove
+  `_aws_delivery/essay-annotator-secrets-20260715.tar.gz` from every commit.
+- The remote `main` and `frontend-base` refs were updated together with an
+  atomic force-with-lease operation. Both remote refs now resolve to
+  `4e167f42592a70afde0c483219b9eebb06b0d8dc`.
+- Post-remediation checks found no path history for the archive on active refs,
+  and the former archive blob is no longer present in the local object
+  database after removal of temporary recovery refs, reflog expiration, and
+  garbage collection.
+- A filename/key-name-only audit identified credentials requiring rotation:
+  an OpenAI API key, a PostgreSQL connection credential, a Google OAuth client
+  secret, and Google OAuth access/refresh tokens. No credential values were
+  printed or recorded. Provider-side rotation remains required before
+  `REV-001` can be considered resolved.
+
 ## Cleanup decision
 
 The legacy source is archived, not deleted, at

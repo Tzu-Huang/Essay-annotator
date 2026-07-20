@@ -20,6 +20,7 @@ import AdminSidebar from "./admin/AdminSidebar.jsx";
 import EssaysTab from "./admin/EssaysTab.jsx";
 import EssayEditorPage from "./admin/EssayEditorPage.jsx";
 import UnsavedChangesModal from "./admin/UnsavedChangesModal.jsx";
+import { AuditLogList } from "./admin/AuditLogList.jsx";
 import { readSidebarCollapsed, writeSidebarCollapsed } from "./AdminConsole.logic.mjs";
 import {
   formatCurrency,
@@ -605,15 +606,7 @@ function Audit({ audit }) {
   return (
     <section className="admin-panel">
       <PanelHeader title="Audit" aside={`${formatNumber(audit.length)} recent entries`} />
-      <div className="admin-table">
-        {audit.map((row) => (
-          <button key={row.id}>
-            <span>{formatDate(row.created_at)}</span>
-            <strong>{row.action}</strong>
-            <em>{row.actor_email} | {row.entity_type}:{row.entity_id}</em>
-          </button>
-        ))}
-      </div>
+      <AuditLogList audit={audit} />
     </section>
   );
 }

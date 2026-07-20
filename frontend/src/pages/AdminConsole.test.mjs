@@ -225,3 +225,11 @@ test("sidebar is collapsible via a toggle button and persists via localStorage",
   assert.match(source, /readSidebarCollapsed/);
   assert.match(source, /writeSidebarCollapsed/);
 });
+
+const auditLogSource = readFileSync(new URL("./admin/AuditLogList.jsx", import.meta.url), "utf8");
+
+test("audit log renders as an expandable typewriter-style list with action tags", () => {
+  assert.match(auditLogSource, /admin-audit-log/);
+  assert.match(auditLogSource, /admin-audit-tag/);
+  assert.match(auditLogSource, /export function AuditLogList/);
+});

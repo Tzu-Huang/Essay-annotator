@@ -26,6 +26,8 @@ import {
   PROJECT_ADMIN_EMAILS,
   usageDashboard,
 } from "./AdminConsole.logic.mjs";
+import { formatDate } from "./AdminConsole.logic.mjs";
+import { EmptyState, MetaItem, MetricCard, PanelHeader, StatusBadge } from "./admin/AdminPrimitives.jsx";
 import "../styles/admin.css";
 
 const API_BASE = import.meta.env.VITE_API_URL || "http://44.201.62.0:8000";
@@ -755,18 +757,6 @@ function Audit({ audit }) {
   );
 }
 
-function MetricCard({ label, value, icon: Icon }) {
-  return (
-    <div className="admin-stat">
-      <div>
-        <span>{label}</span>
-        <strong>{value}</strong>
-      </div>
-      <Icon size={18} />
-    </div>
-  );
-}
-
 function IntegrationCard({ name, detail }) {
   const configured = Boolean(detail?.configured);
   return (
@@ -778,51 +768,4 @@ function IntegrationCard({ name, detail }) {
       </div>
     </div>
   );
-}
-
-function PanelHeader({ title, aside }) {
-  return (
-    <div className="admin-panel-header">
-      <h2>{title}</h2>
-      {aside && <span>{aside}</span>}
-    </div>
-  );
-}
-
-function StatusBadge({ value }) {
-  const normalized = String(value || "unknown").toLowerCase();
-  return <span className={`admin-status admin-status-${normalized}`}>{value}</span>;
-}
-
-function MetaItem({ label, value }) {
-  return (
-    <div className="admin-meta-item">
-      <span>{label}</span>
-      <strong>{value || "none"}</strong>
-    </div>
-  );
-}
-
-function EmptyState({ icon: Icon, title, detail }) {
-  return (
-    <div className="admin-empty">
-      <Icon size={22} />
-      <strong>{title}</strong>
-      <span>{detail}</span>
-    </div>
-  );
-}
-
-function formatDate(value) {
-  if (!value) return "none";
-  try {
-    return new Intl.DateTimeFormat("en-US", {
-      month: "short",
-      day: "2-digit",
-      hour: "2-digit",
-      minute: "2-digit",
-    }).format(new Date(value));
-  } catch {
-    return value;
-  }
 }

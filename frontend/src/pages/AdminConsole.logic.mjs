@@ -100,3 +100,75 @@ export function usageDashboard(usage) {
     officialConfigured: Boolean(usage?.official?.configured),
   };
 }
+
+export function formatDate(value) {
+  if (!value) return "none";
+  try {
+    return new Intl.DateTimeFormat("en-US", {
+      month: "short",
+      day: "2-digit",
+      hour: "2-digit",
+      minute: "2-digit",
+    }).format(new Date(value));
+  } catch {
+    return value;
+  }
+}
+
+export function initialFromName(name) {
+  const trimmed = (name || "").trim();
+  return trimmed ? trimmed[0].toUpperCase() : "?";
+}
+
+export function embeddingCoveragePercent(counts) {
+  const total = Number(counts?.essays || 0);
+  const stale = Number(counts?.stale_embeddings || 0);
+  if (total <= 0) return 100;
+  const current = Math.max(total - stale, 0);
+  return Math.round((current / total) * 100);
+}
+
+export function buildDailyRequestSeries(localDaily = []) {
+  return localDaily
+    .filter((row) => row && row.date)
+    .map((row) => ({ date: row.date, requests: Number(row.requests || 0) }))
+    .sort((a, b) => (a.date < b.date ? -1 : a.date > b.date ? 1 : 0));
+}
+
+const SIDEBAR_STORAGE_KEY = "admin_sidebar_collapsed";
+
+export function readSidebarCollapsed(storage) {
+  if (!storage) return false;
+  return storage.getItem(SIDEBAR_STORAGE_KEY) === "true";
+}
+
+export function writeSidebarCollapsed(storage, collapsed) {
+  if (!storage) return;
+  storage.setItem(SIDEBAR_STORAGE_KEY, collapsed ? "true" : "false");
+}
+
+export function isContentDirty(original, draft) {
+  return (original || "") !== (draft || "");
+}
+
+const EDITOR_DIRTY_FIELDS = ["topic", "type", "school", "source_file", "public", "content"];
+
+export function isEditorDirty(saved, current) {
+  if (!saved || !current) return Boolean(saved) !== Boolean(current);
+  for (const field of EDITOR_DIRTY_FIELDS) {
+    if ((saved[field] || "") !== (current[field] || "")) return true;
+  }
+  return JSON.stringify(saved.metadata || {}) !== JSON.stringify(current.metadata || {});
+}
+
+export function parseMetadataDraft(draft) {
+  try {
+    const parsed = JSON.parse(draft && draft.trim() ? draft : "{}");
+    if (parsed === null || typeof parsed !== "object" || Array.isArray(parsed)) {
+      return { ok: false, error: "Metadata must be a JSON object" };
+    }
+    return { ok: true, value: parsed };
+  } catch {
+    return { ok: false, error: "Invalid JSON" };
+  }
+}

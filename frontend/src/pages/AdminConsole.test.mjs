@@ -2,11 +2,20 @@ import { readFileSync } from "node:fs";
 import test from "node:test";
 import assert from "node:assert/strict";
 import {
+  buildDailyRequestSeries,
+  embeddingCoveragePercent,
   extractOfficialCostBuckets,
+  formatDate,
+  initialFromName,
   isAdminEmailAllowed,
   isConfirmIdMatch,
+  isContentDirty,
+  isEditorDirty,
+  parseMetadataDraft,
   PROJECT_ADMIN_EMAILS,
+  readSidebarCollapsed,
   usageDashboard,
+  writeSidebarCollapsed,
 } from "./AdminConsole.logic.mjs";
 
 const source = readFileSync(new URL("./AdminConsole.jsx", import.meta.url), "utf8");
@@ -118,4 +127,73 @@ test("admin console exposes new essay management actions", () => {
   for (const needle of ["restore", "hard-delete", "regenerate-embedding", "import-new-essays", "sort_dir"]) {
     assert.match(source, new RegExp(needle));
   }
+});
+
+test("formatDate renders a short month/day/time string", () => {
+  assert.equal(formatDate(null), "none");
+  assert.match(formatDate("2026-07-17T12:04:00Z"), /Jul 17/);
+});
+
+test("initialFromName returns an uppercase first letter or a fallback", () => {
+  assert.equal(initialFromName("Amanda Tsai"), "A");
+  assert.equal(initialFromName("  bob"), "B");
+  assert.equal(initialFromName(""), "?");
+  assert.equal(initialFromName(undefined), "?");
+});
+
+test("embeddingCoveragePercent computes rounded current-vs-total percentage", () => {
+  assert.equal(embeddingCoveragePercent({ essays: 200, stale_embeddings: 0 }), 100);
+  assert.equal(embeddingCoveragePercent({ essays: 200, stale_embeddings: 50 }), 75);
+  assert.equal(embeddingCoveragePercent({ essays: 0, stale_embeddings: 0 }), 100);
+});
+
+test("buildDailyRequestSeries sorts ascending and coerces request counts", () => {
+  const series = buildDailyRequestSeries([
+    { date: "2026-07-16", requests: "3" },
+    { date: "2026-07-14", requests: 1 },
+    { date: null, requests: 5 },
+  ]);
+  assert.deepEqual(series, [
+    { date: "2026-07-14", requests: 1 },
+    { date: "2026-07-16", requests: 3 },
+  ]);
+});
+
+test("sidebar-collapsed storage helpers round-trip through a Storage-like object", () => {
+  const store = new Map();
+  const fakeStorage = {
+    getItem: (key) => (store.has(key) ? store.get(key) : null),
+    setItem: (key, value) => store.set(key, value),
+  };
+  assert.equal(readSidebarCollapsed(fakeStorage), false);
+  writeSidebarCollapsed(fakeStorage, true);
+  assert.equal(readSidebarCollapsed(fakeStorage), true);
+  assert.equal(readSidebarCollapsed(undefined), false);
+});
+
+test("isContentDirty compares original vs draft content", () => {
+  assert.equal(isContentDirty("hello", "hello"), false);
+  assert.equal(isContentDirty("hello", "hello!"), true);
+  assert.equal(isContentDirty(null, ""), false);
+});
+
+test("parseMetadataDraft accepts JSON objects and rejects everything else", () => {
+  assert.deepEqual(parseMetadataDraft('{"a": 1}'), { ok: true, value: { a: 1 } });
+  assert.deepEqual(parseMetadataDraft(""), { ok: true, value: {} });
+  assert.equal(parseMetadataDraft("not json").ok, false);
+  assert.equal(parseMetadataDraft("[1,2,3]").ok, false);
+  assert.equal(parseMetadataDraft("null").ok, false);
+});
+
+test("isEditorDirty compares every editable field, not just content", () => {
+  const saved = {
+    topic: "T", type: "Personal Statement", school: "MIT", source_file: "online",
+    public: true, content: "body", metadata: { generated_title: "T" },
+  };
+  assert.equal(isEditorDirty(saved, { ...saved }), false);
+  assert.equal(isEditorDirty(saved, { ...saved, topic: "Changed" }), true);
+  assert.equal(isEditorDirty(saved, { ...saved, public: false }), true);
+  assert.equal(isEditorDirty(saved, { ...saved, metadata: { generated_title: "Changed" } }), true);
+  assert.equal(isEditorDirty(saved, { ...saved, metadata: { generated_title: "T" } }), false);
+  assert.equal(isEditorDirty(null, saved), true);
 });

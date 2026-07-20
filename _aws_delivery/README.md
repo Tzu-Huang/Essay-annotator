@@ -14,11 +14,8 @@ Backend service: `essay-api.service`
   - Does not contain Git metadata, dependencies, caches, runtime data, or secrets.
 - `essay-annotator-data-20260715.tar.gz`
   - Contains the complete ignored `BackEnd/drive_data` tree, including the runtime database and embeddings.
-- `essay-annotator-secrets-20260715.tar.gz`
-  - Contains `BackEnd/.env`, `frontend/.env`, `BackEnd/client_secret.json`, and `BackEnd/token.json`.
-  - Treat this archive as confidential. Do not commit it or send it through an untrusted channel.
 - `SHA256SUMS.txt`
-  - SHA-256 hashes for verifying all three archives after transfer.
+  - SHA-256 hashes for verifying the application and data archives after transfer.
 - `excluded-files.txt`
   - Local-only or reproducible content intentionally omitted.
 
@@ -29,6 +26,7 @@ Backend service: `essay-api.service`
 - `node_modules` and `frontend/node_modules`: reproducible from lock files and platform-dependent.
 - Python caches, test caches, logs, editor metadata, `.codex`, `.agents`, and OpenSpec working files.
 - Root `template` design prototypes and the local proposal-feedback note; these are not runtime inputs.
+- Runtime secrets and credential archives are supplied from an approved secure secret store and are never repository payloads.
 - `C:\aws\Fb021451.pem`: SSH private keys are never deployment payloads.
 
 ## Suggested transfer
@@ -39,7 +37,6 @@ Run from `C:\Personal_repo\Projects\essay-annotator` in PowerShell:
 scp -i .\Fb021451.pem `
   ".\_aws_delivery\essay-annotator-app-20260715.tar.gz" `
   ".\_aws_delivery\essay-annotator-data-20260715.tar.gz" `
-  ".\_aws_delivery\essay-annotator-secrets-20260715.tar.gz" `
   ".\_aws_delivery\SHA256SUMS.txt" `
   ubuntu@44.201.62.0:/home/ubuntu/incoming-essay-annotator/
 ```

@@ -58,3 +58,6 @@ CLAUDE.md
 # Logs
 # ---------------------------------------------------------
 *.log
+
+# Deployment secrets archives stay outside Git.
+_aws_delivery/*secrets*.tar.gz

@@ -41,6 +41,18 @@ Recorded: 2026-07-20
   printed or recorded. Provider-side rotation remains required before
   `REV-001` can be considered resolved.
 
+### REV-001 risk acceptance
+
+- On 2026-07-20, the user explicitly chose not to perform provider-side
+  credential rotation as part of this migration and accepted the residual
+  exposure risk.
+- This decision does not establish that the credentials are safe, expired, or
+  technically remediated. `REV-001` must not be described as `resolved` solely
+  because of this acceptance; the next closure review may disposition it as
+  `accepted-risk`.
+- The migration backup remains local-only and must not be committed, uploaded,
+  or used as evidence that credential exposure has been remediated.
+
 ## Cleanup decision
 
 The legacy source is archived, not deleted, at

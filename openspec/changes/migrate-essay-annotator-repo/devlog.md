@@ -68,6 +68,11 @@ safety checks from the standalone target root.
 - Run closure review after this verification round. Do not run `/dev-done` until
   the closure review covers the current tested head and the remaining security
   risk has an approved disposition.
+- On 2026-07-20, the user explicitly accepted the residual provider-side
+  credential exposure risk in `REV-001` and chose not to rotate the identified
+  credentials as part of this migration. This is a risk disposition, not a
+  technical resolution; a new closure review must decide whether to mark the
+  finding `accepted-risk`.
 
 ## Code Review
 

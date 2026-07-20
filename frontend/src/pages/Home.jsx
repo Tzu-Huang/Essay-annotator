@@ -471,6 +471,12 @@ function SectionHead({ eyebrow, title, copy, titleClassName }) {
   );
 }
 
+function getPrefersReducedMotion() {
+  return typeof window !== "undefined"
+    && typeof window.matchMedia === "function"
+    && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+}
+
 function CountUpNumber({
   value,
   duration = 5500,
@@ -480,6 +486,9 @@ function CountUpNumber({
 }) {
   const [displayValue, setDisplayValue] = useState(0);
   const [isResetting, setIsResetting] = useState(true);
+  const prefersReducedMotion = getPrefersReducedMotion();
+  const renderedDisplayValue = prefersReducedMotion ? value : displayValue;
+  const renderedIsResetting = prefersReducedMotion ? false : isResetting;
   const elementRef = useRef(null);
   const frameRef = useRef(null);
   const timeoutsRef = useRef([]);
@@ -489,13 +498,7 @@ function CountUpNumber({
     const element = elementRef.current;
     if (!element) return undefined;
 
-    const prefersReducedMotion = window.matchMedia(
-      "(prefers-reduced-motion: reduce)",
-    ).matches;
-
     if (prefersReducedMotion) {
-      setIsResetting(false);
-      setDisplayValue(value);
       return undefined;
     }
 
@@ -588,7 +591,7 @@ function CountUpNumber({
       observer.disconnect();
       clearTimers();
     };
-  }, [duration, easing, pause, resetPause, value]);
+  }, [duration, easing, pause, prefersReducedMotion, resetPause, value]);
 
   const targetDigits = String(value).split("");
   const lastIndex = targetDigits.length - 1;
@@ -598,8 +601,8 @@ function CountUpNumber({
       {targetDigits.map((_, index) => {
         const distanceFromRight = lastIndex - index;
         const placeValue = 10 ** distanceFromRight;
-        const targetStep = Math.floor(displayValue / placeValue);
-        const isLeadingHidden = displayValue < placeValue && distanceFromRight > 0;
+        const targetStep = Math.floor(renderedDisplayValue / placeValue);
+        const isLeadingHidden = renderedDisplayValue < placeValue && distanceFromRight > 0;
         const sequence = Array.from({ length: targetStep + 1 }, (_, step) =>
           String(step % 10),
         );
@@ -613,12 +616,12 @@ function CountUpNumber({
           >
             <span
               className={`${styles.digitTrack} ${
-                isResetting ? styles.digitTrackResetting : ""
+                renderedIsResetting ? styles.digitTrackResetting : ""
               }`}
               style={{
                 transform: `translateY(-${targetStep}em)`,
                 transitionDuration:
-                  displayValue >= value - 1 ? "320ms" : undefined,
+                  renderedDisplayValue >= value - 1 ? "320ms" : undefined,
               }}
             >
               {sequence.map((number, step) => (

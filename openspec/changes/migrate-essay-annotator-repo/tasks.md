@@ -27,9 +27,9 @@
 ## 5. Validation and release workflow
 
 - [x] 5.1 Run backend tests and startup smoke checks from the target root.
-- [ ] 5.2 Run frontend tests, build checks, and startup smoke checks from the target root.
-- [ ] 5.3 Verify the feature-to-`frontend-base` workflow and the validated promotion path to `main`.
-- [ ] 5.4 Confirm no unintended secrets or local-only files are staged and no GitHub mutation occurred.
+- [x] 5.2 Run frontend tests, build checks, and startup smoke checks from the target root.
+- [x] 5.3 Verify the feature-to-`frontend-base` workflow and the validated promotion path to `main`.
+- [x] 5.4 Confirm no unintended secrets or local-only files are staged and no GitHub mutation occurred.
 
 ## 6. Legacy cleanup gate
 

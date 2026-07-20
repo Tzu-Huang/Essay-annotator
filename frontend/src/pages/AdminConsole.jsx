@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { createElement, useCallback, useEffect, useMemo, useState } from "react";
 import {
   Activity,
   AlertCircle,
@@ -282,9 +282,9 @@ export default function AdminConsole() {
           </div>
         </div>
         <nav className="admin-nav" aria-label="Admin sections">
-          {NAV_ITEMS.map(([id, label, Icon]) => (
+          {NAV_ITEMS.map(([id, label, iconComponent]) => (
             <button key={id} className={tab === id ? "active" : ""} onClick={() => setTab(id)}>
-              <Icon size={17} />
+              {createElement(iconComponent, { size: 17 })}
               <span>{label}</span>
             </button>
           ))}
@@ -346,8 +346,8 @@ function Overview({ overview }) {
   ];
   return (
     <section className="admin-grid">
-      {cards.map(([label, value, Icon]) => (
-        <MetricCard key={label} label={label} value={formatNumber(value)} icon={Icon} />
+      {cards.map(([label, value, iconComponent]) => (
+        <MetricCard key={label} label={label} value={formatNumber(value)} icon={iconComponent} />
       ))}
       <div className="admin-panel wide">
         <PanelHeader title="Integrations" />
@@ -623,14 +623,14 @@ function Audit({ audit }) {
   );
 }
 
-function MetricCard({ label, value, icon: Icon }) {
+function MetricCard({ label, value, icon: iconComponent }) {
   return (
     <div className="admin-stat">
       <div>
         <span>{label}</span>
         <strong>{value}</strong>
       </div>
-      <Icon size={18} />
+      {createElement(iconComponent, { size: 18 })}
     </div>
   );
 }
@@ -671,10 +671,10 @@ function MetaItem({ label, value }) {
   );
 }
 
-function EmptyState({ icon: Icon, title, detail }) {
+function EmptyState({ icon: iconComponent, title, detail }) {
   return (
     <div className="admin-empty">
-      <Icon size={22} />
+      {createElement(iconComponent, { size: 22 })}
       <strong>{title}</strong>
       <span>{detail}</span>
     </div>

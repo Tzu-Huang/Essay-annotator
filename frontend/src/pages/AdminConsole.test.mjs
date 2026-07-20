@@ -55,12 +55,31 @@ test("admin console explains when the AWS admin API is not deployed", () => {
   assert.match(source, /Admin API is not deployed on the AWS backend yet/);
 });
 
-test("admin console renders ID-first essay list and read panel", () => {
-  assert.match(source, /admin-id-list/);
-  assert.match(source, /EssayReadPanel/);
-  assert.match(source, /essay\.id/);
-  assert.match(source, /Metadata/);
-  assert.match(source, /Recent audit/);
+const essaysTabSource = readFileSync(new URL("./admin/EssaysTab.jsx", import.meta.url), "utf8");
+const essayEditorSource = readFileSync(new URL("./admin/EssayEditorPage.jsx", import.meta.url), "utf8");
+
+test("essays tab renders a table with pagination and an inline peek row", () => {
+  assert.match(essaysTabSource, /admin-essay-table/);
+  assert.match(essaysTabSource, /admin-essay-pager/);
+  assert.match(essaysTabSource, /admin-peek-row/);
+});
+
+test("essay editor page supports content edit-toggle and metadata JSON editing", () => {
+  assert.match(essayEditorSource, /parseMetadataDraft/);
+  assert.match(essayEditorSource, /isContentDirty/);
+  assert.match(essayEditorSource, /onMetadataErrorChange/);
+  assert.match(essayEditorSource, /saveDisabled/);
+  assert.match(essayEditorSource, /Regenerate Embedding/);
+  assert.match(essayEditorSource, /Soft Delete/);
+});
+
+test("admin console tracks unsaved edits across every editor field, not just content", () => {
+  assert.match(source, /isEditorDirty/);
+  assert.match(source, /savedEditorSnapshot/);
+});
+
+test("admin console essays list uses a page size of 15", () => {
+  assert.match(source, /page_size:\s*15/);
 });
 
 test("usage dashboard parses official daily cost buckets", () => {
@@ -100,7 +119,7 @@ test("admin console includes CloudWatch setup state", () => {
 
 test("admin console has responsive dashboard layout rules", () => {
   assert.match(styles, /admin-sidebar/);
-  assert.match(styles, /admin-essay-layout/);
+  assert.match(styles, /admin-essay-table/);
   assert.match(styles, /@media \(max-width: 1120px\)/);
   assert.match(styles, /@media \(max-width: 720px\)/);
 });
@@ -124,8 +143,9 @@ test("isConfirmIdMatch requires an exact match", () => {
 });
 
 test("admin console exposes new essay management actions", () => {
+  const combined = source + essaysTabSource + essayEditorSource;
   for (const needle of ["restore", "hard-delete", "regenerate-embedding", "import-new-essays", "sort_dir"]) {
-    assert.match(source, new RegExp(needle));
+    assert.match(combined, new RegExp(needle));
   }
 });
 

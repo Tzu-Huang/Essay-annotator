@@ -4,19 +4,18 @@ import {
   AlertCircle,
   BarChart3,
   BookOpen,
-  CheckCircle2,
   ClipboardList,
   Cloud,
   Database,
   RefreshCw,
   Shield,
   Terminal,
-  Trash2,
   Wallet,
 } from "lucide-react";
 import { useAuth } from "../hooks/useAuth";
 import { useGoogleSignIn } from "../hooks/useGoogleSignIn";
 import AdminSidebar from "./admin/AdminSidebar.jsx";
+import OverviewDashboard from "./admin/OverviewDashboard.jsx";
 import EssaysTab from "./admin/EssaysTab.jsx";
 import EssayEditorPage from "./admin/EssayEditorPage.jsx";
 import UnsavedChangesModal from "./admin/UnsavedChangesModal.jsx";
@@ -78,6 +77,7 @@ export default function AdminConsole() {
   const [editor, setEditor] = useState(emptyEssay());
   const [hardDeleteConfirmId, setHardDeleteConfirmId] = useState("");
   const [importRunning, setImportRunning] = useState(false);
+  const [regeneratingStale, setRegeneratingStale] = useState(false);
   const [usage, setUsage] = useState(null);
   const [logs, setLogs] = useState({ items: [], error: "", configured: false });
   const [audit, setAudit] = useState([]);
@@ -131,7 +131,12 @@ export default function AdminConsole() {
   }, [headers]);
 
   async function loadOverview() {
-    setOverview(await api("/admin/overview"));
+    const [overviewData, usageData] = await Promise.all([
+      api("/admin/overview"),
+      api("/admin/openai/usage"),
+    ]);
+    setOverview(overviewData);
+    setUsage(usageData);
   }
 
   async function loadEssays(page = 1) {
@@ -305,6 +310,21 @@ export default function AdminConsole() {
     }
   }
 
+  async function regenerateAllStale() {
+    setRegeneratingStale(true);
+    try {
+      const result = await api("/admin/essays/regenerate-stale-embeddings", { method: "POST" });
+      setMessage(
+        result.attempted === 0
+          ? "No stale essays to regenerate."
+          : `Regenerated ${result.succeeded} of ${result.attempted} stale essay(s)${result.failed ? ` (${result.failed} failed)` : ""}.`
+      );
+      await loadOverview();
+    } finally {
+      setRegeneratingStale(false);
+    }
+  }
+
   useEffect(() => {
     let cancelled = false;
 
@@ -340,8 +360,16 @@ export default function AdminConsole() {
     async function loadTab() {
       try {
         if (tab === "overview") {
-          const data = await api("/admin/overview");
-          if (!cancelled) setOverview(data);
+          const [overviewData, usageData, auditData] = await Promise.all([
+            api("/admin/overview"),
+            api("/admin/openai/usage"),
+            api("/admin/audit?limit=50"),
+          ]);
+          if (!cancelled) {
+            setOverview(overviewData);
+            setUsage(usageData);
+            setAudit(auditData.items || []);
+          }
         }
         if (tab === "essays") {
           const data = await api(
@@ -415,7 +443,19 @@ export default function AdminConsole() {
         </header>
 
         {message && <div className="admin-message">{message}</div>}
-        {tab === "overview" && <Overview overview={overview} />}
+        {tab === "overview" && (
+          <OverviewDashboard
+            overview={overview}
+            usage={usage}
+            audit={audit}
+            user={adminState.profile ? user : null}
+            onOpenLog={() => switchTab("audit")}
+            onImport={importNewEssays}
+            importRunning={importRunning}
+            onRegenerateStale={regenerateAllStale}
+            regeneratingStale={regeneratingStale}
+          />
+        )}
         {tab === "essays" && essayView === "list" && (
           <EssaysTab
             essays={essays}
@@ -478,31 +518,6 @@ export default function AdminConsole() {
         {tab === "audit" && <Audit audit={audit} />}
       </section>
     </main>
-  );
-}
-
-function Overview({ overview }) {
-  if (!overview) return null;
-  const cards = [
-    ["Essays", overview.counts.essays, BookOpen],
-    ["Deleted", overview.counts.deleted_essays, Trash2],
-    ["Users", overview.counts.users, Shield],
-    ["Stale embeddings", overview.counts.stale_embeddings, Database],
-  ];
-  return (
-    <section className="admin-grid">
-      {cards.map(([label, value, Icon]) => (
-        <MetricCard key={label} label={label} value={formatNumber(value)} icon={Icon} />
-      ))}
-      <div className="admin-panel wide">
-        <PanelHeader title="Integrations" />
-        <div className="admin-integration-grid">
-          {Object.entries(overview.integrations || {}).map(([name, detail]) => (
-            <IntegrationCard key={name} name={name} detail={detail} />
-          ))}
-        </div>
-      </div>
-    </section>
   );
 }
 
@@ -608,18 +623,5 @@ function Audit({ audit }) {
       <PanelHeader title="Audit" aside={`${formatNumber(audit.length)} recent entries`} />
       <AuditLogList audit={audit} />
     </section>
-  );
-}
-
-function IntegrationCard({ name, detail }) {
-  const configured = Boolean(detail?.configured);
-  return (
-    <div className="admin-integration-card">
-      {configured ? <CheckCircle2 size={16} /> : <AlertCircle size={16} />}
-      <div>
-        <strong>{name.replaceAll("_", " ")}</strong>
-        <span>{configured ? "Configured" : "Needs setup"}</span>
-      </div>
-    </div>
   );
 }

@@ -233,3 +233,20 @@ test("audit log renders as an expandable typewriter-style list with action tags"
   assert.match(auditLogSource, /admin-audit-tag/);
   assert.match(auditLogSource, /export function AuditLogList/);
 });
+
+const overviewSource = readFileSync(new URL("./admin/OverviewDashboard.jsx", import.meta.url), "utf8");
+
+test("overview dashboard renders a greeting, charts, activity feed, and quick actions", () => {
+  assert.match(overviewSource, /initialFromName/);
+  assert.match(overviewSource, /AreaChart|LineChart/);
+  assert.match(overviewSource, /BarChart/);
+  assert.match(overviewSource, /AuditLogList/);
+  assert.match(overviewSource, /Open log/);
+  assert.match(overviewSource, /Import essays/);
+  assert.match(overviewSource, /Regenerate stale/);
+});
+
+test("admin console can regenerate all stale essays via the bulk backend endpoint", () => {
+  assert.match(source, /regenerateAllStale/);
+  assert.match(source, /regenerate-stale-embeddings/);
+});

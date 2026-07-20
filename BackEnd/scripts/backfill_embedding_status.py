@@ -1,8 +1,10 @@
-"""One-time backfill: mark embedding_status="current" for every essay that
-already has an EssayEmbedding row, since the flag defaults to "stale" and was
-never retroactively set for essays embedded before this status-tracking
-system existed (see docs/superpowers/specs/2026-07-17-admin-console-redesign-design.md,
-section 1). Safe to re-run; the second run always updates 0 rows.
+"""One-time backfill: mark embedding_status="current" for every essay present
+in embed.jsonl, since the flag defaults to "stale" and was never retroactively
+set for essays embedded before this status-tracking system existed -- notably
+essays embedded via the standalone embedding/make_embedding.py script, which
+only ever wrote to embed.jsonl and never touched the EssayEmbedding table (see
+docs/superpowers/specs/2026-07-17-admin-console-redesign-design.md, section 1).
+Safe to re-run; a run with no new embed.jsonl entries updates 0 rows.
 
 Usage (from BackEnd/, with .venv activated):
     python scripts/backfill_embedding_status.py
@@ -18,11 +20,13 @@ if str(ROOT) not in sys.path:
 from database.create import SessionLocal
 from database.essays import backfill_current_embedding_status
 
+EMBED_JSONL = ROOT / "drive_data/embed_output/embed.jsonl"
+
 
 def main() -> None:
     db = SessionLocal()
     try:
-        updated = backfill_current_embedding_status(db)
+        updated = backfill_current_embedding_status(db, EMBED_JSONL)
         db.commit()
         print(f"Marked {updated} essay(s) embedding_status=current")
     finally:

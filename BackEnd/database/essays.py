@@ -8,7 +8,7 @@ from typing import Iterable
 from sqlalchemy import func, or_
 from sqlalchemy.orm import Session
 
-from database.create import AdminAuditLog, Essay, EssayEmbedding, OpenAIUsageEvent
+from database.create import AdminAuditLog, Essay, OpenAIUsageEvent
 
 
 EDITABLE_ESSAY_FIELDS = {"topic", "content", "type", "school", "public", "source_file", "metadata_json"}
@@ -247,13 +247,30 @@ def query_essays(
     return query
 
 
-def backfill_current_embedding_status(db: Session) -> int:
+def backfill_current_embedding_status(db: Session, embed_jsonl_path: Path) -> int:
     """One-time backfill for essays embedded before embedding_status tracking
-    existed (e.g. via the standalone embedding/make_embedding.py script,
-    which never set the flag). Any essay with a real EssayEmbedding row is
-    treated as current -- see docs/superpowers/specs/2026-07-17-admin-console-redesign-design.md
-    section 1 for the full root-cause writeup. Caller must db.commit()."""
-    embedded_ids = {row[0] for row in db.query(EssayEmbedding.essay_id).distinct().all()}
+    existed. Keyed off presence in embed.jsonl -- the file the in-memory search
+    index and every embedding endpoint read/write -- rather than the
+    EssayEmbedding table, because essays embedded via the standalone
+    embedding/make_embedding.py script only ever wrote to embed.jsonl and never
+    inserted an EssayEmbedding row; keying off that table left this backfill a
+    no-op for exactly the essays it was meant to fix. See
+    docs/superpowers/specs/2026-07-17-admin-console-redesign-design.md section 1
+    for the full root-cause writeup. Caller must db.commit()."""
+    embedded_ids: set[str] = set()
+    if embed_jsonl_path.exists():
+        with embed_jsonl_path.open("r", encoding="utf-8-sig") as f:
+            for line in f:
+                line = line.strip()
+                if not line:
+                    continue
+                try:
+                    record = json.loads(line)
+                except json.JSONDecodeError:
+                    continue
+                parent_id = record.get("parent_id")
+                if parent_id:
+                    embedded_ids.add(parent_id)
     if not embedded_ids:
         return 0
     return (

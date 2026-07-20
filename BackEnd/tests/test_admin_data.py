@@ -240,37 +240,29 @@ class AdminDataTests(unittest.TestCase):
         self.assertEqual(query_essays(self.db, school="Stanford").one().id, "essay_0001")
         self.assertEqual(query_essays(self.db, embedding_status="current", include_deleted=True).one().id, "essay_0002")
 
-    def test_backfill_current_embedding_status_marks_essays_with_embeddings(self):
-        stale_with_embedding = Essay(
-            id="essay_0001", topic="T1", content="C1", embedding_status="stale"
-        )
-        stale_without_embedding = Essay(
-            id="essay_0002", topic="T2", content="C2", embedding_status="stale"
-        )
-        already_current = Essay(
-            id="essay_0003", topic="T3", content="C3", embedding_status="current"
-        )
-        self.db.add_all([stale_with_embedding, stale_without_embedding, already_current])
-        self.db.add(
-            EssayEmbedding(
-                essay_id="essay_0001",
-                model="text-embedding-3-small",
-                content_embedding=[[0.1, 0.2]],
-                content_hash="hash1",
-            )
-        )
+    def test_backfill_current_embedding_status_marks_essays_present_in_embed_jsonl(self):
+        present_in_index = Essay(id="essay_0001", topic="T1", content="C1", embedding_status="stale")
+        not_in_index = Essay(id="essay_0002", topic="T2", content="C2", embedding_status="stale")
+        already_current = Essay(id="essay_0003", topic="T3", content="C3", embedding_status="current")
+        self.db.add_all([present_in_index, not_in_index, already_current])
         self.db.commit()
+        embed_path = self.write_jsonl([{"parent_id": "essay_0001", "id": "essay_0001_00"}])
 
-        updated = backfill_current_embedding_status(self.db)
+        updated = backfill_current_embedding_status(self.db, embed_path)
         self.db.commit()
 
         self.assertEqual(updated, 1)
-        self.db.refresh(stale_with_embedding)
-        self.db.refresh(stale_without_embedding)
-        self.assertEqual(stale_with_embedding.embedding_status, "current")
-        self.assertEqual(stale_without_embedding.embedding_status, "stale")
+        self.db.refresh(present_in_index)
+        self.db.refresh(not_in_index)
+        self.assertEqual(present_in_index.embedding_status, "current")
+        self.assertEqual(not_in_index.embedding_status, "stale")
 
-    def test_backfill_current_embedding_status_is_idempotent(self):
+    def test_backfill_current_embedding_status_keys_off_embed_jsonl_not_essay_embedding_table(self):
+        # Regression test for the production gap this backfill was rewritten to fix:
+        # essays embedded via the legacy embedding/make_embedding.py script have no
+        # EssayEmbedding row at all, only an embed.jsonl entry -- so an essay with an
+        # EssayEmbedding row but absent from embed.jsonl must NOT be marked current,
+        # proving the source of truth really changed.
         essay = Essay(id="essay_0001", topic="T1", content="C1", embedding_status="stale")
         self.db.add(essay)
         self.db.add(
@@ -282,14 +274,36 @@ class AdminDataTests(unittest.TestCase):
             )
         )
         self.db.commit()
+        embed_path = self.write_jsonl([])
 
-        first_run = backfill_current_embedding_status(self.db)
+        updated = backfill_current_embedding_status(self.db, embed_path)
+
+        self.assertEqual(updated, 0)
+        self.db.refresh(essay)
+        self.assertEqual(essay.embedding_status, "stale")
+
+    def test_backfill_current_embedding_status_is_idempotent(self):
+        essay = Essay(id="essay_0001", topic="T1", content="C1", embedding_status="stale")
+        self.db.add(essay)
         self.db.commit()
-        second_run = backfill_current_embedding_status(self.db)
+        embed_path = self.write_jsonl([{"parent_id": "essay_0001", "id": "essay_0001_00"}])
+
+        first_run = backfill_current_embedding_status(self.db, embed_path)
+        self.db.commit()
+        second_run = backfill_current_embedding_status(self.db, embed_path)
         self.db.commit()
 
         self.assertEqual(first_run, 1)
         self.assertEqual(second_run, 0)
+
+    def test_backfill_current_embedding_status_handles_missing_embed_file(self):
+        essay = Essay(id="essay_0001", topic="T1", content="C1", embedding_status="stale")
+        self.db.add(essay)
+        self.db.commit()
+
+        updated = backfill_current_embedding_status(self.db, Path("/nonexistent/embed.jsonl"))
+
+        self.assertEqual(updated, 0)
 
     def test_admin_essay_crud_and_embedding_queue(self):
         actor = AdminActor(email="owner@example.com", can_write=True)

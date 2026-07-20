@@ -7,9 +7,9 @@
 
 ## 2. Repository and branch setup
 
-- [ ] 2.1 Verify the target clone points to the Essay-Annotator GitHub remote and is based on `frontend-base`.
-- [ ] 2.2 Keep `feature/ZAC-66_migrate-essay-annotator-repo` local and verify that no push is configured or attempted during migration.
-- [ ] 2.3 Preserve the target's full Git history and avoid importing ProjectVault outer-repository history.
+- [x] 2.1 Verify the target clone points to the Essay-Annotator GitHub remote and is based on `frontend-base`.
+- [x] 2.2 Keep `feature/ZAC-66_migrate-essay-annotator-repo` local and verify that no push is configured or attempted during migration.
+- [x] 2.3 Preserve the target's full Git history and avoid importing ProjectVault outer-repository history.
 
 ## 3. Local state preservation
 

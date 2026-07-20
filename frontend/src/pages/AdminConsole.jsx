@@ -18,6 +18,8 @@ import {
 } from "lucide-react";
 import { useAuth } from "../hooks/useAuth";
 import { useGoogleSignIn } from "../hooks/useGoogleSignIn";
+import AdminSidebar from "./admin/AdminSidebar.jsx";
+import { readSidebarCollapsed, writeSidebarCollapsed } from "./AdminConsole.logic.mjs";
 import {
   formatCurrency,
   formatNumber,
@@ -77,6 +79,18 @@ export default function AdminConsole() {
   const [logs, setLogs] = useState({ items: [], error: "", configured: false });
   const [audit, setAudit] = useState([]);
   const [message, setMessage] = useState("");
+
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(() =>
+    readSidebarCollapsed(typeof window !== "undefined" ? window.localStorage : undefined)
+  );
+
+  function toggleSidebarCollapsed() {
+    setSidebarCollapsed((prev) => {
+      const next = !prev;
+      writeSidebarCollapsed(typeof window !== "undefined" ? window.localStorage : undefined, next);
+      return next;
+    });
+  }
 
   const email = user?.email?.toLowerCase();
   const configuredEmails = adminEmails();
@@ -324,28 +338,15 @@ export default function AdminConsole() {
   }
 
   return (
-    <main className="admin-shell">
-      <aside className="admin-sidebar">
-        <div className="admin-brand">
-          <div className="admin-brand-mark">EA</div>
-          <div>
-            <strong>Essay Ops</strong>
-            <span>Developer console</span>
-          </div>
-        </div>
-        <nav className="admin-nav" aria-label="Admin sections">
-          {NAV_ITEMS.map(([id, label, Icon]) => (
-            <button key={id} className={tab === id ? "active" : ""} onClick={() => setTab(id)}>
-              <Icon size={17} />
-              <span>{label}</span>
-            </button>
-          ))}
-        </nav>
-        <div className="admin-sidebar-footer">
-          <span>API</span>
-          <strong>{API_BASE.replace(/^https?:\/\//, "")}</strong>
-        </div>
-      </aside>
+    <main className={`admin-shell${sidebarCollapsed ? " sidebar-collapsed" : ""}`}>
+      <AdminSidebar
+        navItems={NAV_ITEMS}
+        activeTab={tab}
+        onSelectTab={setTab}
+        collapsed={sidebarCollapsed}
+        onToggleCollapsed={toggleSidebarCollapsed}
+        apiBase={API_BASE}
+      />
 
       <section className="admin-main">
         <header className="admin-topbar">

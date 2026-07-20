@@ -197,3 +197,11 @@ test("isEditorDirty compares every editable field, not just content", () => {
   assert.equal(isEditorDirty(saved, { ...saved, metadata: { generated_title: "T" } }), false);
   assert.equal(isEditorDirty(null, saved), true);
 });
+
+const sidebarSource = readFileSync(new URL("./admin/AdminSidebar.jsx", import.meta.url), "utf8");
+
+test("sidebar is collapsible via a toggle button and persists via localStorage", () => {
+  assert.match(sidebarSource, /onToggleCollapsed/);
+  assert.match(source, /readSidebarCollapsed/);
+  assert.match(source, /writeSidebarCollapsed/);
+});

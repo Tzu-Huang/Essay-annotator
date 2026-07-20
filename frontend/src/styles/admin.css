@@ -1,3 +1,5 @@
+@import url("https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap");
+
 .admin-shell {
   min-height: 100vh;
   display: grid;
@@ -106,6 +108,48 @@
   border-radius: 8px;
   background: #0b1220;
   overflow-wrap: anywhere;
+}
+
+.admin-shell.sidebar-collapsed {
+  grid-template-columns: 64px minmax(0, 1fr);
+}
+
+.admin-sidebar.collapsed {
+  padding: 18px 10px;
+  align-items: center;
+}
+
+.admin-sidebar.collapsed .admin-nav button {
+  justify-content: center;
+  padding: 10px;
+}
+
+.admin-sidebar-toggle {
+  margin-left: auto;
+  background: rgba(255, 255, 255, 0.08);
+  border: none;
+  color: #f8fafc;
+  width: 30px;
+  height: 30px;
+  border-radius: 6px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.admin-sidebar-toggle:hover {
+  background: rgba(255, 255, 255, 0.16);
+}
+
+.admin-sidebar.collapsed .admin-brand {
+  flex-direction: column;
+  gap: 10px;
+}
+
+.admin-sidebar.collapsed .admin-sidebar-toggle {
+  margin-left: 0;
 }
 
 .admin-main {

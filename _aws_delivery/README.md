@@ -10,12 +10,12 @@ Backend service: `essay-api.service`
 
 - `essay-annotator-app-20260715.tar.gz`
   - Application source and configuration files.
-  - Includes the ignored, pre-built `Frontend/dist` directory.
+  - Includes the ignored, pre-built `frontend/dist` directory.
   - Does not contain Git metadata, dependencies, caches, runtime data, or secrets.
 - `essay-annotator-data-20260715.tar.gz`
   - Contains the complete ignored `BackEnd/drive_data` tree, including the runtime database and embeddings.
 - `essay-annotator-secrets-20260715.tar.gz`
-  - Contains `BackEnd/.env`, `Frontend/.env`, `BackEnd/client_secret.json`, and `BackEnd/token.json`.
+  - Contains `BackEnd/.env`, `frontend/.env`, `BackEnd/client_secret.json`, and `BackEnd/token.json`.
   - Treat this archive as confidential. Do not commit it or send it through an untrusted channel.
 - `SHA256SUMS.txt`
   - SHA-256 hashes for verifying all three archives after transfer.
@@ -26,21 +26,21 @@ Backend service: `essay-api.service`
 
 - `.git`: the AWS checkout already has its own Git metadata and GitHub remote.
 - `.venv`: the local environment is Windows-specific; AWS already has a Linux virtual environment.
-- `node_modules` and `Frontend/node_modules`: reproducible from lock files and platform-dependent.
+- `node_modules` and `frontend/node_modules`: reproducible from lock files and platform-dependent.
 - Python caches, test caches, logs, editor metadata, `.codex`, `.agents`, and OpenSpec working files.
 - Root `template` design prototypes and the local proposal-feedback note; these are not runtime inputs.
 - `C:\aws\Fb021451.pem`: SSH private keys are never deployment payloads.
 
 ## Suggested transfer
 
-Run from `C:\aws` in PowerShell:
+Run from `C:\Personal_repo\Projects\essay-annotator` in PowerShell:
 
 ```powershell
 scp -i .\Fb021451.pem `
-  "C:\Personal_repo\ProjectVault\10-active\essay-annotator\repo\_aws_delivery\essay-annotator-app-20260715.tar.gz" `
-  "C:\Personal_repo\ProjectVault\10-active\essay-annotator\repo\_aws_delivery\essay-annotator-data-20260715.tar.gz" `
-  "C:\Personal_repo\ProjectVault\10-active\essay-annotator\repo\_aws_delivery\essay-annotator-secrets-20260715.tar.gz" `
-  "C:\Personal_repo\ProjectVault\10-active\essay-annotator\repo\_aws_delivery\SHA256SUMS.txt" `
+  ".\_aws_delivery\essay-annotator-app-20260715.tar.gz" `
+  ".\_aws_delivery\essay-annotator-data-20260715.tar.gz" `
+  ".\_aws_delivery\essay-annotator-secrets-20260715.tar.gz" `
+  ".\_aws_delivery\SHA256SUMS.txt" `
   ubuntu@44.201.62.0:/home/ubuntu/incoming-essay-annotator/
 ```
 

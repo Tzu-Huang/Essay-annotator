@@ -12,6 +12,8 @@ records (with embeddings) back to a JSONL output file.
 
 import os
 import json
+from pathlib import Path
+
 import numpy as np
 import tiktoken 
 from openai import OpenAI
@@ -20,11 +22,12 @@ from dotenv import load_dotenv
 # =========================
 # Config
 # =========================
-load_dotenv()
+BACKEND_DIR = Path(__file__).resolve().parents[1]
+load_dotenv(BACKEND_DIR / ".env")
 
 # Input JSONL file (finalized schema)
-Input_file = 'BackEnd/drive_data/finalized_data_jsonl/database.jsonl'
-Output_file = 'BackEnd/drive_data/embed_output/embed.jsonl'
+Input_file = BACKEND_DIR / "drive_data" / "finalized_data_jsonl" / "database.jsonl"
+Output_file = BACKEND_DIR / "drive_data" / "embed_output" / "embed.jsonl"
 
 Batch_size = 64 # This is the size that you want to embed and store at once
 

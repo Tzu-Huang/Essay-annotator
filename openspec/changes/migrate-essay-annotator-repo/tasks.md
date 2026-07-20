@@ -20,8 +20,8 @@
 
 ## 4. Path and runtime compatibility
 
-- [ ] 4.1 Search code, scripts, Makefiles, frontend configuration, and deployment material for `repo/`, ProjectVault absolute paths, and case-sensitive path assumptions.
-- [ ] 4.2 Correct migration-specific path references while preserving application behavior.
+- [x] 4.1 Search code, scripts, Makefiles, frontend configuration, and deployment material for `repo/`, ProjectVault absolute paths, and case-sensitive path assumptions.
+- [x] 4.2 Correct migration-specific path references while preserving application behavior.
 - [ ] 4.3 Recreate or verify backend and frontend dependencies from the new project root.
 
 ## 5. Validation and release workflow

@@ -34,7 +34,7 @@ Backend service: `essay-api.service`
 Run from `C:\Personal_repo\Projects\essay-annotator` in PowerShell:
 
 ```powershell
-scp -i .\Fb021451.pem `
+scp -i "C:\aws\Fb021451.pem" `
   ".\_aws_delivery\essay-annotator-app-20260715.tar.gz" `
   ".\_aws_delivery\essay-annotator-data-20260715.tar.gz" `
   ".\_aws_delivery\SHA256SUMS.txt" `

@@ -10,7 +10,8 @@ Recorded: 2026-07-20
 - Remote: `https://github.com/Tzu-Huang/Essay-annotator.git`
 - Validation branch: `feature/ZAC-66_migrate-essay-annotator-repo`
 - Baseline: `frontend-base`; `origin/main` is an ancestor of `frontend-base`, and `frontend-base` is an ancestor of the validation branch.
-- Source and target preservation manifests were compared with zero recorded differences; the backup contains the source and target manifests and SHA256 records.
+- For the required runtime/data preservation set, source and target manifests had zero file-size or SHA256 differences; the backup contains the source and target manifests and SHA256 records.
+- The source manifest has 12 intentional source-only workflow paths that were not copied into the standalone target: `.codex\skills\openspec-apply-change\SKILL.md`, `.codex\skills\openspec-archive-change\SKILL.md`, `.codex\skills\openspec-explore\SKILL.md`, `.codex\skills\openspec-propose\SKILL.md`, `openspec\changes\add-developer-admin-console\.openspec.yaml`, `openspec\changes\add-developer-admin-console\design.md`, `openspec\changes\add-developer-admin-console\proposal.md`, `openspec\changes\add-developer-admin-console\specs\admin-essay-management\spec.md`, `openspec\changes\add-developer-admin-console\specs\aws-log-observability\spec.md`, `openspec\changes\add-developer-admin-console\specs\developer-admin-access\spec.md`, `openspec\changes\add-developer-admin-console\specs\openai-usage-observability\spec.md`, and `openspec\changes\add-developer-admin-console\tasks.md`.
 - The target working tree is clean before cleanup. Local-only `.env`, dependency, and build-output paths remain ignored and unstaged.
 - No GitHub push or branch mutation was performed during migration.
 

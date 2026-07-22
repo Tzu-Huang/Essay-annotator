@@ -601,6 +601,7 @@ export default function AdminConsole() {
         )}
         {tab === "essays" && essayView === "editor" && (
           <EssayEditorPage
+            key={editor.source_file}
             essay={selectedEssay?.essay || null}
             audit={selectedEssay?.audit || []}
             editor={editor}

@@ -73,6 +73,8 @@ test("essay editor page supports content edit-toggle and a details edit-gate", (
   assert.match(essayEditorSource, /ESSAY_TYPES/);
   assert.match(essayEditorSource, /Regenerate Embedding/);
   assert.match(essayEditorSource, /Soft Delete/);
+  assert.match(essayEditorSource, /draftInfo/);
+  assert.match(essayEditorSource, /extractionWarning/);
 });
 
 test("upload essays page has a file picker, per-file type/school fields, and a batch-complete state", () => {

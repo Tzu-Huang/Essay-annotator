@@ -19,6 +19,8 @@ export default function EssayEditorPage({
   setHardDeleteConfirmId,
   onContentEditingChange,
   onContentDraftChange,
+  draftInfo,
+  extractionWarning,
 }) {
   const isNew = !essay?.id;
 
@@ -108,6 +110,19 @@ export default function EssayEditorPage({
           ← Back to essays
         </button>
       </div>
+
+      {draftInfo && (
+        <div className="admin-draft-banner">
+          <span>
+            <strong>
+              Draft {draftInfo.current} of {draftInfo.total}
+            </strong>
+          </span>
+          <button type="button" onClick={draftInfo.onSkip}>
+            Skip
+          </button>
+        </div>
+      )}
 
       <div className="admin-panel admin-editor-header">
         <div className="admin-editor-header-top">
@@ -216,6 +231,7 @@ export default function EssayEditorPage({
                 </p>
               )}
 
+              {extractionWarning && <p className="admin-warning">{extractionWarning}</p>}
               <div className="admin-form-grid">
                 <label className="admin-form-grid-full">
                   <span className="admin-field-label">Topic</span>

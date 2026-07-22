@@ -160,6 +160,20 @@ test("admin console exposes new essay management actions", () => {
   }
 });
 
+test("admin console wires the upload-drafts flow: endpoint, draft queue, and view state", () => {
+  for (const needle of [
+    "upload-drafts",
+    "uploadDrafts",
+    "uploadDraftIndex",
+    "draftToEditorPayload",
+    "advanceDraftQueue",
+    "saveUploadDraft",
+    "essayView === \"upload\"",
+  ]) {
+    assert.match(source, new RegExp(needle.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")));
+  }
+});
+
 test("formatDate renders a short month/day/time string in 24-hour format", () => {
   assert.equal(formatDate(null), "none");
   assert.match(formatDate("2026-07-17T12:04:00Z"), /Jul 17/);

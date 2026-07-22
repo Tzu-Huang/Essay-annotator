@@ -18,10 +18,13 @@ import AdminSidebar from "./admin/AdminSidebar.jsx";
 import OverviewDashboard from "./admin/OverviewDashboard.jsx";
 import EssaysTab from "./admin/EssaysTab.jsx";
 import EssayEditorPage from "./admin/EssayEditorPage.jsx";
+import UploadEssaysPage from "./admin/UploadEssaysPage.jsx";
 import UnsavedChangesModal from "./admin/UnsavedChangesModal.jsx";
 import { AuditLogList } from "./admin/AuditLogList.jsx";
 import { readSidebarCollapsed, writeSidebarCollapsed } from "./AdminConsole.logic.mjs";
 import {
+  advanceDraftQueue,
+  draftToEditorPayload,
   formatCurrency,
   formatNumber,
   isAdminEmailAllowed,
@@ -102,6 +105,12 @@ export default function AdminConsole() {
   const [savedEditorSnapshot, setSavedEditorSnapshot] = useState(null);
   const [pendingNav, setPendingNav] = useState(null);
   const [savingBeforeNav, setSavingBeforeNav] = useState(false);
+  const [uploadDrafts, setUploadDrafts] = useState([]);
+  const [uploadDraftIndex, setUploadDraftIndex] = useState(0);
+  const [uploadFailed, setUploadFailed] = useState([]);
+  const [uploading, setUploading] = useState(false);
+  const [uploadCreatedCount, setUploadCreatedCount] = useState(0);
+  const [uploadBatchComplete, setUploadBatchComplete] = useState(false);
 
   const [sidebarCollapsed, setSidebarCollapsed] = useState(() =>
     readSidebarCollapsed(typeof window !== "undefined" ? window.localStorage : undefined)
@@ -218,6 +227,8 @@ export default function AdminConsole() {
     setEssayView("list");
     setContentEditing(false);
     setContentDraft("");
+    setUploadDrafts([]);
+    setUploadDraftIndex(0);
   }
 
   function switchTab(id) {
@@ -257,6 +268,80 @@ export default function AdminConsole() {
     await loadEssays(essays.page || 1);
     await loadOverview();
     showMessage("Essay saved");
+  }
+
+  function loadDraftIntoEditor(draft) {
+    setSelectedEssay(null);
+    const payload = draftToEditorPayload(draft);
+    setEditor(payload);
+    setSavedEditorSnapshot(payload);
+    setHardDeleteConfirmId("");
+  }
+
+  async function uploadEssayDrafts(files, fileMeta) {
+    if (!files.length) return;
+    setUploading(true);
+    try {
+      const formData = new FormData();
+      files.forEach((file) => formData.append("files", file));
+      formData.append("file_meta", JSON.stringify(fileMeta));
+      const response = await fetch(`${API_BASE}/admin/essays/upload-drafts`, {
+        method: "POST",
+        headers: { "X-Admin-Email": email || "" },
+        body: formData,
+      });
+      const data = await response.json().catch(() => ({}));
+      if (!response.ok) throw new Error(data.detail || "Upload failed");
+
+      setUploadFailed(data.failed || []);
+      setUploadCreatedCount(0);
+      setUploadBatchComplete(false);
+
+      if (data.drafts?.length) {
+        setUploadDrafts(data.drafts);
+        setUploadDraftIndex(0);
+        loadDraftIntoEditor(data.drafts[0]);
+        setEssayView("editor");
+      } else if (data.failed?.length) {
+        showMessage(`No files could be processed (${data.failed.length} failed).`, "error");
+      } else {
+        showMessage("No files selected.", "error");
+      }
+    } catch (error) {
+      showMessage(error.message, "error");
+    } finally {
+      setUploading(false);
+    }
+  }
+
+  function advanceOrFinishDraftQueue() {
+    const result = advanceDraftQueue(uploadDraftIndex, uploadDrafts.length);
+    if (result.done) {
+      setUploadDrafts([]);
+      setUploadDraftIndex(0);
+      setUploadBatchComplete(true);
+      setEssayView("upload");
+    } else {
+      setUploadDraftIndex(result.nextIndex);
+      loadDraftIntoEditor(uploadDrafts[result.nextIndex]);
+    }
+  }
+
+  async function saveUploadDraft() {
+    await saveEssay();
+    setUploadCreatedCount((count) => count + 1);
+    advanceOrFinishDraftQueue();
+  }
+
+  function skipUploadDraft() {
+    advanceOrFinishDraftQueue();
+  }
+
+  function startNewUpload() {
+    setUploadFailed([]);
+    setUploadCreatedCount(0);
+    setUploadBatchComplete(false);
+    setEssayView("upload");
   }
 
   async function deleteEssay() {
@@ -492,6 +577,7 @@ export default function AdminConsole() {
             regeneratingEmbeddingId={regeneratingEmbeddingId}
             importNewEssays={importNewEssays}
             importRunning={importRunning}
+            onOpenUpload={startNewUpload}
             newEssay={() => {
               setSelectedEssay(null);
               const blank = emptyEssay();
@@ -502,6 +588,17 @@ export default function AdminConsole() {
             }}
           />
         )}
+        {tab === "essays" && essayView === "upload" && (
+          <UploadEssaysPage
+            onBack={() => requestNavigation(closeEditor)}
+            onSubmit={uploadEssayDrafts}
+            uploading={uploading}
+            failed={uploadFailed}
+            createdCount={uploadCreatedCount}
+            batchComplete={uploadBatchComplete}
+            onStartNew={startNewUpload}
+          />
+        )}
         {tab === "essays" && essayView === "editor" && (
           <EssayEditorPage
             essay={selectedEssay?.essay || null}
@@ -509,7 +606,13 @@ export default function AdminConsole() {
             editor={editor}
             setEditor={setEditor}
             onBack={() => requestNavigation(closeEditor)}
-            onSave={saveEssay}
+            onSave={uploadDrafts.length > 0 ? saveUploadDraft : saveEssay}
+            draftInfo={
+              uploadDrafts.length > 0
+                ? { current: uploadDraftIndex + 1, total: uploadDrafts.length, onSkip: skipUploadDraft }
+                : null
+            }
+            extractionWarning={uploadDrafts.length > 0 ? uploadDrafts[uploadDraftIndex]?.extraction_warning : null}
             onSoftDelete={deleteEssay}
             onRestore={restoreEssay}
             onHardDelete={hardDeleteEssay}

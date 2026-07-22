@@ -9,3 +9,5 @@ tiktoken
 pydantic
 boto3
 requests
+python-docx
+pypdf

@@ -308,7 +308,7 @@ test("overview dashboard renders a greeting, charts, activity feed, and quick ac
   assert.match(overviewSource, /BarChart/);
   assert.match(overviewSource, /AuditLogList/);
   assert.match(overviewSource, /Open log/);
-  assert.match(overviewSource, /Import essays/);
+  assert.match(overviewSource, /Upload essays/);
   assert.match(overviewSource, /Regenerate stale/);
 });
 

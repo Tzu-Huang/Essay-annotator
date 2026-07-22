@@ -20,7 +20,6 @@ export default function OverviewDashboard({
   user,
   onOpenLog,
   onImport,
-  importRunning,
   onRegenerateStale,
   regeneratingStale,
 }) {
@@ -122,11 +121,11 @@ export default function OverviewDashboard({
       </div>
 
       <div className="admin-quick-actions">
-        <button type="button" className="admin-quick-action" onClick={onImport} disabled={importRunning}>
+        <button type="button" className="admin-quick-action" onClick={onImport}>
           <span className="admin-quick-action-icon">+</span>
           <span>
-            <span className="admin-quick-action-title">Import essays</span>
-            <span className="admin-quick-action-sub">Pull new essays and embed them</span>
+            <span className="admin-quick-action-title">Upload essays</span>
+            <span className="admin-quick-action-sub">Add new essays from files</span>
           </span>
         </button>
         <button

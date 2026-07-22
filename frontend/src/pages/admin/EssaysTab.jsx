@@ -29,7 +29,6 @@ export default function EssaysTab({
   onOpenUpload,
   importNewEssays,
   importRunning,
-  newEssay,
 }) {
   const totalPages = Math.max(1, Math.ceil((essays.total || 0) / (essays.page_size || 15)));
   const currentPage = essays.page || 1;
@@ -48,7 +47,6 @@ export default function EssaysTab({
           <button onClick={onOpenUpload} className="primary">
             Upload essays
           </button>
-          <button onClick={newEssay}>New</button>
         </div>
       </div>
 

@@ -341,6 +341,7 @@ export default function AdminConsole() {
     setUploadFailed([]);
     setUploadCreatedCount(0);
     setUploadBatchComplete(false);
+    setTab("essays");
     setEssayView("upload");
   }
 
@@ -554,8 +555,7 @@ export default function AdminConsole() {
             audit={audit}
             user={adminState.profile ? user : null}
             onOpenLog={() => switchTab("audit")}
-            onImport={importNewEssays}
-            importRunning={importRunning}
+            onImport={startNewUpload}
             onRegenerateStale={regenerateAllStale}
             regeneratingStale={regeneratingStale}
           />
@@ -578,14 +578,6 @@ export default function AdminConsole() {
             importNewEssays={importNewEssays}
             importRunning={importRunning}
             onOpenUpload={startNewUpload}
-            newEssay={() => {
-              setSelectedEssay(null);
-              const blank = emptyEssay();
-              setEditor(blank);
-              setSavedEditorSnapshot(blank);
-              setHardDeleteConfirmId("");
-              setEssayView("editor");
-            }}
           />
         )}
         {tab === "essays" && essayView === "upload" && (

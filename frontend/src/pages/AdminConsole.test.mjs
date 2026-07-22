@@ -58,6 +58,7 @@ test("admin console explains when the AWS admin API is not deployed", () => {
 
 const essaysTabSource = readFileSync(new URL("./admin/EssaysTab.jsx", import.meta.url), "utf8");
 const essayEditorSource = readFileSync(new URL("./admin/EssayEditorPage.jsx", import.meta.url), "utf8");
+const uploadEssaysPageSource = readFileSync(new URL("./admin/UploadEssaysPage.jsx", import.meta.url), "utf8");
 
 test("essays tab renders a table with pagination and an inline peek row", () => {
   assert.match(essaysTabSource, /admin-essay-table/);
@@ -72,6 +73,15 @@ test("essay editor page supports content edit-toggle and a details edit-gate", (
   assert.match(essayEditorSource, /ESSAY_TYPES/);
   assert.match(essayEditorSource, /Regenerate Embedding/);
   assert.match(essayEditorSource, /Soft Delete/);
+});
+
+test("upload essays page has a file picker, per-file type/school fields, and a batch-complete state", () => {
+  assert.match(uploadEssaysPageSource, /accept=".txt,.docx,.pdf"/);
+  assert.match(uploadEssaysPageSource, /ESSAY_TYPES/);
+  assert.match(uploadEssaysPageSource, /admin-upload-card/);
+  assert.match(uploadEssaysPageSource, /batchComplete/);
+  assert.match(uploadEssaysPageSource, /Upload complete/);
+  assert.match(uploadEssaysPageSource, /couldn.t be processed/);
 });
 
 test("admin console tracks unsaved edits across every editor field, not just content", () => {

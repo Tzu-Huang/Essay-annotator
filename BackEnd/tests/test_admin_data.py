@@ -1,3 +1,5 @@
+import asyncio
+import io
 import json
 import os
 import tempfile
@@ -6,7 +8,7 @@ from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from unittest.mock import MagicMock, patch
 
-from fastapi import HTTPException
+from fastapi import HTTPException, UploadFile
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
@@ -30,6 +32,7 @@ from app.admin import (
     soft_delete_essay,
     trigger_embedding_regeneration,
     update_essay,
+    upload_essay_drafts,
 )
 from database.create import AdminAuditLog, Base, Essay, EssayEmbedding, OpenAIUsageEvent
 from database.essays import (
@@ -719,6 +722,143 @@ class AdminDataTests(unittest.TestCase):
         essay = self.db.query(Essay).filter_by(id="essay_9002").first()
         self.assertIsNotNone(essay)
         self.assertFalse(essay.public, "Imported essay with public=True must be forced to public=False")
+
+    def _upload_file(self, filename: str, content: bytes) -> UploadFile:
+        return UploadFile(io.BytesIO(content), filename=filename)
+
+    def _extraction_client(self, topic: str, content: str):
+        client = MagicMock()
+        response = MagicMock()
+        response.choices = [MagicMock(message=MagicMock(content=json.dumps({"topic": topic, "content": content})))]
+        client.chat.completions.create.return_value = response
+        return client
+
+    def test_upload_drafts_extracts_txt_file_and_writes_no_essay_rows(self):
+        actor = AdminActor(email="owner@example.com", can_write=True)
+        upload = self._upload_file("essay1.txt", b"Prompt: Describe a challenge.\n\nI once faced...")
+        client = self._extraction_client("Describe a challenge.", "I once faced...")
+
+        with patch("app.admin.get_embedding_client", return_value=client):
+            result = asyncio.run(
+                upload_essay_drafts(
+                    files=[upload],
+                    file_meta=json.dumps({"essay1.txt": {"type": "Personal Statement", "school": "Duke"}}),
+                    db=self.db,
+                    actor=actor,
+                )
+            )
+
+        self.assertEqual(len(result["drafts"]), 1)
+        draft = result["drafts"][0]
+        self.assertEqual(draft["filename"], "essay1.txt")
+        self.assertEqual(draft["topic"], "Describe a challenge.")
+        self.assertEqual(draft["content"], "I once faced...")
+        self.assertEqual(draft["type"], "Personal Statement")
+        self.assertEqual(draft["school"], "Duke")
+        self.assertFalse(draft["public"])
+        self.assertIsNone(draft["extraction_warning"])
+        self.assertEqual(result["failed"], [])
+        self.assertEqual(self.db.query(Essay).count(), 0)  # pure extraction, no DB rows created
+
+    def test_upload_drafts_missing_prompt_sets_warning_but_still_creates_draft(self):
+        actor = AdminActor(email="owner@example.com", can_write=True)
+        upload = self._upload_file("essay2.txt", b"Just essay text, no prompt anywhere.")
+        client = self._extraction_client("", "Just essay text, no prompt anywhere.")
+
+        with patch("app.admin.get_embedding_client", return_value=client):
+            result = asyncio.run(
+                upload_essay_drafts(
+                    files=[upload],
+                    file_meta=json.dumps({"essay2.txt": {"type": "", "school": ""}}),
+                    db=self.db,
+                    actor=actor,
+                )
+            )
+
+        self.assertEqual(len(result["drafts"]), 1)
+        draft = result["drafts"][0]
+        self.assertEqual(draft["topic"], "")
+        self.assertIsNotNone(draft["extraction_warning"])
+
+    def test_upload_drafts_unsupported_file_reported_in_failed_others_still_succeed(self):
+        actor = AdminActor(email="owner@example.com", can_write=True)
+        good_upload = self._upload_file("essay3.txt", b"Prompt: X\n\nBody text.")
+        bad_upload = self._upload_file("photo.png", b"not text at all")
+        client = self._extraction_client("X", "Body text.")
+
+        with patch("app.admin.get_embedding_client", return_value=client):
+            result = asyncio.run(
+                upload_essay_drafts(
+                    files=[good_upload, bad_upload],
+                    file_meta=json.dumps(
+                        {"essay3.txt": {"type": "", "school": ""}, "photo.png": {"type": "", "school": ""}}
+                    ),
+                    db=self.db,
+                    actor=actor,
+                )
+            )
+
+        self.assertEqual(len(result["drafts"]), 1)
+        self.assertEqual(result["drafts"][0]["filename"], "essay3.txt")
+        self.assertEqual(len(result["failed"]), 1)
+        self.assertEqual(result["failed"][0]["filename"], "photo.png")
+        self.assertIn("Unsupported", result["failed"][0]["error"])
+
+    def test_upload_drafts_extraction_llm_failure_reported_in_failed(self):
+        actor = AdminActor(email="owner@example.com", can_write=True)
+        upload = self._upload_file("essay4.txt", b"Some essay text here.")
+        client = MagicMock()
+        client.chat.completions.create.side_effect = RuntimeError("OpenAI is down")
+
+        with patch("app.admin.get_embedding_client", return_value=client):
+            result = asyncio.run(
+                upload_essay_drafts(
+                    files=[upload],
+                    file_meta=json.dumps({"essay4.txt": {"type": "", "school": ""}}),
+                    db=self.db,
+                    actor=actor,
+                )
+            )
+
+        self.assertEqual(result["drafts"], [])
+        self.assertEqual(len(result["failed"]), 1)
+        self.assertEqual(result["failed"][0]["filename"], "essay4.txt")
+
+    def test_upload_drafts_records_openai_usage_for_every_extraction_attempt(self):
+        actor = AdminActor(email="owner@example.com", can_write=True)
+        ok_upload = self._upload_file("ok.txt", b"Prompt: X\n\nBody.")
+        fail_upload = self._upload_file("fail.txt", b"Some text.")
+
+        ok_response = MagicMock()
+        ok_response.choices = [MagicMock(message=MagicMock(content=json.dumps({"topic": "X", "content": "Body."})))]
+
+        client = MagicMock()
+        client.chat.completions.create.side_effect = [ok_response, RuntimeError("boom")]
+
+        with patch("app.admin.get_embedding_client", return_value=client):
+            asyncio.run(
+                upload_essay_drafts(
+                    files=[ok_upload, fail_upload],
+                    file_meta=json.dumps(
+                        {"ok.txt": {"type": "", "school": ""}, "fail.txt": {"type": "", "school": ""}}
+                    ),
+                    db=self.db,
+                    actor=actor,
+                )
+            )
+
+        events = self.db.query(OpenAIUsageEvent).filter_by(feature="essay_extraction").all()
+        self.assertEqual(len(events), 2)
+        statuses = sorted(event.status for event in events)
+        self.assertEqual(statuses, ["failed", "success"])
+
+    def test_upload_drafts_rejects_invalid_file_meta_json(self):
+        actor = AdminActor(email="owner@example.com", can_write=True)
+        upload = self._upload_file("essay.txt", b"text")
+
+        with self.assertRaises(HTTPException) as ctx:
+            asyncio.run(upload_essay_drafts(files=[upload], file_meta="not json", db=self.db, actor=actor))
+        self.assertEqual(ctx.exception.status_code, 400)
 
     def test_import_new_essays_partial_embedding_failure_leaves_that_essay_stale(self):
         actor = AdminActor(email="owner@example.com", can_write=True)

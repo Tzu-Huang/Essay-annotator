@@ -9,7 +9,7 @@ from pathlib import Path
 from typing import Optional
 
 from dotenv import load_dotenv
-from fastapi import APIRouter, Depends, Header, HTTPException, Query
+from fastapi import APIRouter, Depends, File, Form, Header, HTTPException, Query, UploadFile
 from openai import OpenAI
 from pydantic import BaseModel
 from sqlalchemy import func
@@ -33,6 +33,8 @@ from database.essays import (
 from scripts.add_to_database import DATABASE_PATH as DATABASE_JSONL_PATH, NEW_INPUT_DIR as NEW_INPUT_DIR_PATH
 from service.embed_store import append_records, remove_parent_ids, replace_parent_id
 from service.embedding_service import embed_essay
+from service.extract_essay import MODEL as EXTRACTION_MODEL, extract_prompt_and_content
+from service.file_extraction import NoTextExtracted, UnsupportedFileType, extract_text
 from service.generate_topic import MODEL as TITLE_GENERATION_MODEL
 from service.ingest_service import scan_and_title_new_essays
 
@@ -658,6 +660,65 @@ def import_new_essays(db: Session = Depends(get_db), actor: AdminActor = Depends
         return result
     finally:
         _import_lock.release()
+
+
+@router.post("/essays/upload-drafts")
+async def upload_essay_drafts(
+    files: list[UploadFile] = File(...),
+    file_meta: str = Form(...),
+    db: Session = Depends(get_db),
+    actor: AdminActor = Depends(require_admin_write),
+):
+    """
+    Pure extraction: for each uploaded file, extract its raw text and ask the
+    LLM to split it into {topic, content}. Writes zero Essay rows -- drafts
+    are returned to the caller for review; the existing POST /essays create
+    endpoint is what actually persists one once reviewed.
+    """
+    try:
+        meta_map = json.loads(file_meta)
+    except json.JSONDecodeError as exc:
+        raise HTTPException(status_code=400, detail="file_meta must be valid JSON") from exc
+
+    client = get_embedding_client()
+    drafts: list[dict] = []
+    failed: list[dict] = []
+
+    for upload in files:
+        filename = upload.filename or "unknown"
+        raw_bytes = await upload.read()
+
+        try:
+            raw_text = extract_text(filename, raw_bytes)
+        except (UnsupportedFileType, NoTextExtracted) as exc:
+            failed.append({"filename": filename, "error": str(exc)})
+            continue
+
+        try:
+            extracted = extract_prompt_and_content(raw_text, client)
+        except Exception as exc:
+            record_openai_usage(db, feature="essay_extraction", model=EXTRACTION_MODEL, status="failed")
+            failed.append({"filename": filename, "error": f"Extraction failed: {exc}"})
+            continue
+        record_openai_usage(db, feature="essay_extraction", model=EXTRACTION_MODEL, status="success")
+
+        file_meta_entry = meta_map.get(filename, {}) if isinstance(meta_map, dict) else {}
+        drafts.append(
+            {
+                "filename": filename,
+                "topic": extracted["topic"],
+                "content": extracted["content"],
+                "type": file_meta_entry.get("type") or "",
+                "school": file_meta_entry.get("school") or "",
+                "public": False,
+                "extraction_warning": (
+                    None if extracted["topic"] else "No prompt detected — please fill in the Topic field manually."
+                ),
+            }
+        )
+
+    db.commit()
+    return {"drafts": drafts, "failed": failed}
 
 
 @router.get("/audit")

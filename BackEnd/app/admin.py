@@ -16,6 +16,7 @@ from sqlalchemy import func
 from sqlalchemy.orm import Session
 
 from app.state import AppData
+from app.usage import record_openai_usage
 from database.create import AdminAuditLog, Essay, EssayEmbedding, OpenAIUsageEvent, User, get_db
 from database.essays import (
     audit_log,
@@ -32,6 +33,7 @@ from database.essays import (
 from scripts.add_to_database import DATABASE_PATH as DATABASE_JSONL_PATH, NEW_INPUT_DIR as NEW_INPUT_DIR_PATH
 from service.embed_store import append_records, remove_parent_ids, replace_parent_id
 from service.embedding_service import embed_essay
+from service.generate_topic import MODEL as TITLE_GENERATION_MODEL
 from service.ingest_service import scan_and_title_new_essays
 
 
@@ -405,10 +407,14 @@ def trigger_embedding_regeneration(
     }
 
     client = get_embedding_client()
+    embedding_model = os.getenv("OPENAI_EMBEDDING_MODEL", "text-embedding-3-small")
     try:
         records = embed_essay(essay_dict, client)
     except Exception as exc:
+        record_openai_usage(db, feature="embedding_regen", model=embedding_model, status="failed")
+        db.commit()
         raise HTTPException(status_code=502, detail=f"Embedding generation failed: {exc}")
+    record_openai_usage(db, feature="embedding_regen", model=embedding_model, status="success")
 
     replace_parent_id(_embed_jsonl_path(), essay.id, records)
     rows = [
@@ -433,7 +439,7 @@ def trigger_embedding_regeneration(
     post_hash = content_hash(essay.topic, essay.content)
     embedding_row = EssayEmbedding(
         essay_id=essay.id,
-        model=os.getenv("OPENAI_EMBEDDING_MODEL", "text-embedding-3-small"),
+        model=embedding_model,
         topic_embedding=records[0]["topic_embedding"] if records else None,
         content_embedding=[r["content_embedding"] for r in records],
         content_hash=post_hash,
@@ -465,6 +471,7 @@ def regenerate_stale_embeddings(
             return {"attempted": 0, "succeeded": 0, "failed": 0}
 
         client = get_embedding_client()
+        embedding_model = os.getenv("OPENAI_EMBEDDING_MODEL", "text-embedding-3-small")
         app_data: AppData = _current_app_data()
         embed_path = _embed_jsonl_path()
         succeeded = 0
@@ -483,8 +490,10 @@ def regenerate_stale_embeddings(
             try:
                 records = embed_essay(essay_dict, client)
             except Exception:
+                record_openai_usage(db, feature="embedding_regen", model=embedding_model, status="failed")
                 failed += 1
                 continue  # leave embedding_status == "stale"; visible in the result, not silently dropped
+            record_openai_usage(db, feature="embedding_regen", model=embedding_model, status="success")
 
             replace_parent_id(embed_path, essay.id, records)
             rows = [
@@ -507,7 +516,7 @@ def regenerate_stale_embeddings(
             db.add(
                 EssayEmbedding(
                     essay_id=essay.id,
-                    model=os.getenv("OPENAI_EMBEDDING_MODEL", "text-embedding-3-small"),
+                    model=embedding_model,
                     topic_embedding=records[0]["topic_embedding"] if records else None,
                     content_embedding=[r["content_embedding"] for r in records],
                     content_hash=post_hash,
@@ -542,9 +551,22 @@ def import_new_essays(db: Session = Depends(get_db), actor: AdminActor = Depends
         raise HTTPException(status_code=409, detail="An import is already running")
     try:
         client = get_embedding_client()
+        embedding_model = os.getenv("OPENAI_EMBEDDING_MODEL", "text-embedding-3-small")
         new_essays = scan_and_title_new_essays(NEW_INPUT_DIR_PATH, DATABASE_JSONL_PATH, client)
         if not new_essays:
             return {"created": 0, "skipped_duplicates": 0, "invalid": 0, "embedded": 0}
+
+        # add_generated_titles() (called inside scan_and_title_new_essays) marks
+        # generated_title=None per-essay on an LLM failure -- mirror that here as
+        # one usage event per essay rather than reaching into scripts/add_to_database.py,
+        # which is shared with the standalone CLI import path that has no db session.
+        for essay in new_essays:
+            record_openai_usage(
+                db,
+                feature="title_generation",
+                model=TITLE_GENERATION_MODEL,
+                status="success" if essay.get("generated_title") else "failed",
+            )
 
         for essay in new_essays:
             essay["public"] = False  # imported essays unconditionally forced to non-public
@@ -586,7 +608,9 @@ def import_new_essays(db: Session = Depends(get_db), actor: AdminActor = Depends
             try:
                 records = embed_essay(essay_dict, client)
             except Exception:
+                record_openai_usage(db, feature="embedding_regen", model=embedding_model, status="failed")
                 continue  # leave embedding_status == "stale"; visible failure, not silently marked current
+            record_openai_usage(db, feature="embedding_regen", model=embedding_model, status="success")
             all_records.extend(records)
             all_rows.extend(
                 {
@@ -604,7 +628,7 @@ def import_new_essays(db: Session = Depends(get_db), actor: AdminActor = Depends
             db.add(
                 EssayEmbedding(
                     essay_id=essay.id,
-                    model=os.getenv("OPENAI_EMBEDDING_MODEL", "text-embedding-3-small"),
+                    model=embedding_model,
                     topic_embedding=records[0]["topic_embedding"] if records else None,
                     content_embedding=[r["content_embedding"] for r in records],
                     content_hash=content_hash(essay.topic, essay.content),

@@ -11,7 +11,6 @@ import {
   isConfirmIdMatch,
   isContentDirty,
   isEditorDirty,
-  parseMetadataDraft,
   PROJECT_ADMIN_EMAILS,
   readSidebarCollapsed,
   usageDashboard,
@@ -64,11 +63,11 @@ test("essays tab renders a table with pagination and an inline peek row", () => 
   assert.match(essaysTabSource, /admin-peek-row/);
 });
 
-test("essay editor page supports content edit-toggle and metadata JSON editing", () => {
-  assert.match(essayEditorSource, /parseMetadataDraft/);
+test("essay editor page supports content edit-toggle and a details edit-gate", () => {
   assert.match(essayEditorSource, /isContentDirty/);
-  assert.match(essayEditorSource, /onMetadataErrorChange/);
-  assert.match(essayEditorSource, /saveDisabled/);
+  assert.match(essayEditorSource, /detailsEditing/);
+  assert.match(essayEditorSource, /generated_title/);
+  assert.match(essayEditorSource, /ESSAY_TYPES/);
   assert.match(essayEditorSource, /Regenerate Embedding/);
   assert.match(essayEditorSource, /Soft Delete/);
 });
@@ -149,9 +148,10 @@ test("admin console exposes new essay management actions", () => {
   }
 });
 
-test("formatDate renders a short month/day/time string", () => {
+test("formatDate renders a short month/day/time string in 24-hour format", () => {
   assert.equal(formatDate(null), "none");
   assert.match(formatDate("2026-07-17T12:04:00Z"), /Jul 17/);
+  assert.doesNotMatch(formatDate("2026-07-17T12:04:00Z"), /AM|PM/i);
 });
 
 test("initialFromName returns an uppercase first letter or a fallback", () => {
@@ -195,14 +195,6 @@ test("isContentDirty compares original vs draft content", () => {
   assert.equal(isContentDirty("hello", "hello"), false);
   assert.equal(isContentDirty("hello", "hello!"), true);
   assert.equal(isContentDirty(null, ""), false);
-});
-
-test("parseMetadataDraft accepts JSON objects and rejects everything else", () => {
-  assert.deepEqual(parseMetadataDraft('{"a": 1}'), { ok: true, value: { a: 1 } });
-  assert.deepEqual(parseMetadataDraft(""), { ok: true, value: {} });
-  assert.equal(parseMetadataDraft("not json").ok, false);
-  assert.equal(parseMetadataDraft("[1,2,3]").ok, false);
-  assert.equal(parseMetadataDraft("null").ok, false);
 });
 
 test("isEditorDirty compares every editable field, not just content", () => {

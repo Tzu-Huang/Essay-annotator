@@ -154,28 +154,29 @@ function RowWithPeek({
         <td>{essay.topic || "none"}</td>
         <td>{essay.school || "none"}</td>
         <td>{essay.type || "none"}</td>
-        <td>{essay.public ? <span className="admin-tiny-pill">Public</span> : "No"}</td>
-        <td>{formatDate(essay.updated_at)}</td>
-        <td>
+        <td className="admin-center">
+          <span className={`admin-tiny-pill ${essay.public ? "public" : "private"}`}>
+            {essay.public ? "Public" : "No"}
+          </span>
+        </td>
+        <td className="admin-nowrap">{formatDate(essay.updated_at)}</td>
+        <td className="admin-center">
           <StatusBadge value={essay.embedding_status || "unknown"} />
         </td>
       </tr>
+      {isPeeked && !peekEssay && (
+        <tr className="admin-peek-row">
+          <td colSpan={columnCount}>
+            <div className="admin-peek-loading">
+              <RefreshCw size={14} className="spin" /> Loading…
+            </div>
+          </td>
+        </tr>
+      )}
       {isPeeked && peekEssay && (
         <tr className="admin-peek-row">
           <td colSpan={columnCount}>
             <div className="admin-peek-panel">
-              <div className="admin-peek-head">
-                <strong>{essay.id} — quick peek</strong>
-                <button type="button" onClick={onCollapsePeek}>
-                  ▲ Collapse
-                </button>
-              </div>
-              <div className="admin-peek-meta">
-                <PeekMetaItem label="Public" value={peekEssay.public ? "Yes" : "No"} />
-                <PeekMetaItem label="Words" value={formatNumber(peekEssay.word_count)} />
-                <PeekMetaItem label="Embedding" value={peekEssay.embedding_status || "unknown"} />
-                <PeekMetaItem label="Updated" value={formatDate(peekEssay.updated_at)} />
-              </div>
               <div className="admin-peek-content">{peekEssay.content || peekEssay.preview || "No content loaded."}</div>
               <div className="admin-peek-actions">
                 <button type="button" className="primary" onClick={onOpenEditor}>

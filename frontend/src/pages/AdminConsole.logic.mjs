@@ -13,6 +13,12 @@ export const PROJECT_ADMIN_EMAILS = [
   "amanda.tsai11@gmail.com",
 ];
 
+// Matches the canonical values already used across the existing essay
+// dataset (see get_essay_type() in BackEnd/scripts/add_to_database.py),
+// so the editor dropdown stays consistent with what's already stored
+// and searchable rather than introducing new label strings.
+export const ESSAY_TYPES = ["Personal Statement", "Supplemental", "University of California"];
+
 export function formatNumber(value) {
   return new Intl.NumberFormat("en-US").format(Number(value || 0));
 }
@@ -109,6 +115,7 @@ export function formatDate(value) {
       day: "2-digit",
       hour: "2-digit",
       minute: "2-digit",
+      hour12: false,
     }).format(new Date(value));
   } catch {
     return value;
@@ -159,16 +166,4 @@ export function isEditorDirty(saved, current) {
     if ((saved[field] || "") !== (current[field] || "")) return true;
   }
   return JSON.stringify(saved.metadata || {}) !== JSON.stringify(current.metadata || {});
-}
-
-export function parseMetadataDraft(draft) {
-  try {
-    const parsed = JSON.parse(draft && draft.trim() ? draft : "{}");
-    if (parsed === null || typeof parsed !== "object" || Array.isArray(parsed)) {
-      return { ok: false, error: "Metadata must be a JSON object" };
-    }
-    return { ok: true, value: parsed };
-  } catch {
-    return { ok: false, error: "Invalid JSON" };
-  }
 }

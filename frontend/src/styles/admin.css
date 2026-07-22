@@ -3,7 +3,7 @@
 .admin-shell {
   min-height: 100vh;
   display: grid;
-  grid-template-columns: 248px minmax(0, 1fr);
+  grid-template-columns: 208px minmax(0, 1fr);
   background: #eef2f6;
   color: #172033;
   font-family: "Manrope", "Segoe UI", sans-serif;
@@ -26,7 +26,7 @@
   height: 100vh;
   display: flex;
   flex-direction: column;
-  gap: 22px;
+  gap: 25px;
   padding: 18px;
   background: #111827;
   color: #f8fafc;
@@ -43,10 +43,22 @@
   place-items: center;
   width: 38px;
   height: 38px;
+  flex-shrink: 0;
   border-radius: 8px;
   background: #f6c453;
   color: #101828;
   font-weight: 900;
+}
+
+.admin-brand-text {
+  min-width: 0;
+}
+
+.admin-brand strong {
+  font-size: 15.5px;
+  line-height: 1.3;
+  white-space: normal;
+  overflow-wrap: break-word;
 }
 
 .admin-brand span,
@@ -84,15 +96,20 @@
 .admin-nav button {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 15px;
   width: 100%;
   border: 1px solid transparent;
   border-radius: 8px;
   background: transparent;
   color: #cbd5e1;
-  padding: 10px 11px;
+  padding: 12px 13px;
+  letter-spacing: 0.3px;
+  font-family: inherit;
+  font-size: 17px;
+  font-weight: 600;
   text-align: left;
   cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
 }
 
 .admin-nav button.active,
@@ -137,6 +154,7 @@
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
+  transition: background 0.15s ease;
 }
 
 .admin-sidebar-toggle:hover {
@@ -152,9 +170,29 @@
   margin-left: 0;
 }
 
+.admin-mobile-nav-toggle {
+  display: none;
+  margin-left: auto;
+  background: rgba(255, 255, 255, 0.08);
+  border: none;
+  color: #f8fafc;
+  width: 30px;
+  height: 30px;
+  border-radius: 6px;
+  cursor: pointer;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: background 0.15s ease;
+}
+
+.admin-mobile-nav-toggle:hover {
+  background: rgba(255, 255, 255, 0.16);
+}
+
 .admin-main {
   min-width: 0;
-  padding: 28px;
+  padding: 32px 35px;
 }
 
 .admin-topbar {
@@ -192,6 +230,7 @@
   padding: 9px 12px;
   cursor: pointer;
   white-space: nowrap;
+  transition: border-color 0.15s ease, background 0.15s ease;
 }
 
 .admin-icon-button:hover,
@@ -201,13 +240,43 @@
   border-color: #64748b;
 }
 
-.admin-message,
 .admin-warning {
   margin: 12px 0;
   padding: 10px 12px;
   border-radius: 8px;
   background: #fff7ed;
   color: #9a3412;
+}
+
+.admin-message {
+  margin: 12px 0;
+  padding: 10px 12px;
+  border-radius: 8px;
+  border: 1px solid transparent;
+  animation: admin-message-in 0.2s ease-out;
+}
+
+@keyframes admin-message-in {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.admin-message-success {
+  background: #dcfae6;
+  color: #027a48;
+  border-color: #a6f4c5;
+}
+
+.admin-message-error {
+  background: #fef3f2;
+  color: #b42318;
+  border-color: #fecdca;
 }
 
 .admin-grid {
@@ -324,6 +393,12 @@
   padding: 9px 10px;
   background: #ffffff;
   color: #1f2933;
+  transition: border-color 0.15s ease;
+}
+
+.admin-filters select:hover {
+  border-color: #94a3b8;
+  cursor: pointer;
 }
 
 .admin-search-field {
@@ -390,6 +465,8 @@
   width: 100%;
   border-collapse: collapse;
   font-size: 14.5px;
+  font-weight: 420;
+  line-height: 1.6;
   background: #ffffff;
   border: 1.5px solid #94a3b8;
   border-radius: 10px;
@@ -400,6 +477,14 @@
 .admin-essay-table td {
   padding: 10px 14px;
   text-align: left;
+}
+
+.admin-essay-table td.admin-nowrap {
+  white-space: nowrap;
+}
+
+.admin-essay-table td.admin-center {
+  text-align: center;
 }
 
 .admin-essay-table thead th {
@@ -427,13 +512,13 @@
 }
 
 .admin-essay-table tbody tr.peeked {
-  background: #dbeafe;
+  background: #e2eefe;
 }
 
 .admin-essay-table tbody tr.dimmed td {
   padding: 6px 14px;
   color: #94a3b8;
-  font-size: 12px;
+  font-size: 13px;
 }
 
 .admin-essay-table tbody tr.dimmed .admin-status,
@@ -459,6 +544,12 @@
   font-size: 14px;
   cursor: pointer;
   color: #172033;
+  transition: background 0.15s ease, border-color 0.15s ease;
+}
+
+.admin-essay-pager button:hover:not(:disabled) {
+  background: #f8fafc;
+  border-color: #64748b;
 }
 
 .admin-essay-pager button:disabled {
@@ -475,8 +566,16 @@
   border: none;
   background: none;
   cursor: pointer;
+  font-family: inherit;
+  font-size: inherit;
   font-weight: 600;
+  color: inherit;
   padding: 0;
+  transition: color 0.15s ease;
+}
+
+.admin-sort-header:hover {
+  color: #172033;
 }
 
 .admin-sort-header-static {
@@ -508,6 +607,14 @@
   font-size: 11px;
   font-weight: 800;
   text-transform: uppercase;
+}
+
+.admin-tiny-pill.public {
+  color: #027a48;
+  background: #dcfae6;
+}
+
+.admin-tiny-pill.private {
   color: #475467;
   background: #eef2f6;
 }
@@ -677,48 +784,28 @@
 
 .admin-peek-panel {
   padding: 20px;
+  animation: admin-peek-in 0.18s ease-out;
 }
 
-.admin-peek-head {
+@keyframes admin-peek-in {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.admin-peek-loading {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  margin-bottom: 14px;
-}
-
-.admin-peek-head button {
-  background: #ffffff;
-  border: 1px solid #d8dee8;
-  border-radius: 7px;
-  padding: 6px 12px;
-  font-size: 12px;
-  font-weight: 700;
-  cursor: pointer;
-}
-
-.admin-peek-meta {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 10px;
-  margin-bottom: 12px;
-}
-
-.admin-peek-meta-item {
-  background: #ffffff;
-  border: 1px solid #e2e8f0;
-  border-radius: 8px;
-  padding: 10px 12px;
-}
-
-.admin-peek-meta-item span {
-  display: block;
-  font-size: 10.5px;
-  color: #94a3b8;
-  margin-bottom: 3px;
-}
-
-.admin-peek-meta-item strong {
-  font-size: 13.5px;
+  gap: 8px;
+  padding: 20px;
+  color: #667085;
+  font-size: 13px;
+  animation: admin-peek-in 0.18s ease-out;
 }
 
 .admin-peek-content {
@@ -726,12 +813,14 @@
   background: #ffffff;
   border: 1px solid #d8dee8;
   border-radius: 8px;
-  padding: 14px;
-  font-size: 13.5px;
-  line-height: 1.7;
+  padding: 20px;
+  font-size: 15.5px;
+  font-weight: 450;
+  line-height: 1.85;
+  letter-spacing: 0.2px;
   color: #334155;
   margin-bottom: 14px;
-  max-height: 100px;
+  max-height: 250px;
   overflow: hidden;
 }
 
@@ -759,6 +848,21 @@
   border: 1px solid #d8dee8;
   background: #ffffff;
   color: #172033;
+  transition: background 0.15s ease, border-color 0.15s ease, transform 0.1s ease;
+}
+
+.admin-peek-actions button:hover:not(:disabled) {
+  background: #f8fafc;
+  border-color: #94a3b8;
+}
+
+.admin-peek-actions button:active:not(:disabled) {
+  transform: scale(0.98);
+}
+
+.admin-peek-actions button:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
 }
 
 .admin-peek-actions button.primary {
@@ -767,10 +871,56 @@
   border: none;
 }
 
+.admin-peek-actions button.primary:hover:not(:disabled) {
+  background: #1f2937;
+}
+
 .admin-editor-page {
   display: grid;
   gap: 14px;
-  max-width: 900px;
+}
+
+.admin-editor-body {
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
+  gap: 14px;
+  align-items: start;
+}
+
+.admin-editor-main,
+.admin-editor-side {
+  display: grid;
+  gap: 14px;
+}
+
+.admin-editor-side-actions {
+  margin-top: 14px;
+}
+
+.admin-editor-side-actions button {
+  width: 100%;
+}
+
+.admin-panel-sub {
+  margin: -6px 0 12px;
+  font-size: 12px;
+  color: #667085;
+}
+
+.admin-editor-side-empty {
+  border-style: dashed;
+  box-shadow: none;
+  background: #f8fafc;
+}
+
+.admin-editor-side-empty .admin-panel-sub {
+  margin: 0;
+}
+
+@media (max-width: 900px) {
+  .admin-editor-body {
+    grid-template-columns: minmax(0, 1fr);
+  }
 }
 
 .admin-back-btn {
@@ -785,6 +935,12 @@
   font-weight: 700;
   cursor: pointer;
   box-shadow: 0 4px 10px rgba(15, 23, 42, 0.04);
+  transition: border-color 0.15s ease, background 0.15s ease;
+}
+
+.admin-back-btn:hover {
+  background: #f8fafc;
+  border-color: #94a3b8;
 }
 
 .admin-editor-header-top {
@@ -797,17 +953,17 @@
 
 .admin-editor-header-top h1 {
   margin: 0;
-  font-size: 22px;
+  font-size: 25px;
+  font-weight: 800;
+  letter-spacing: -0.01em;
 }
 
 .admin-editor-desc {
-  color: #667085;
-  font-size: 13px;
-  margin: 6px 0 0;
-}
-
-.admin-editor-header > button {
-  margin-top: 10px;
+  color: #333742;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.5;
+  margin: 13px 0 0;
 }
 
 .admin-actions button:disabled {
@@ -823,12 +979,18 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px 12px;
   margin-bottom: 12px;
 }
 
 .admin-panel-head-row h3 {
   margin: 0;
   font-size: 14px;
+}
+
+.admin-panel-head-row .admin-actions {
+  flex-wrap: wrap;
 }
 
 .admin-dirty-badge {
@@ -874,14 +1036,28 @@
   margin-bottom: 14px;
 }
 
+/* Details & metadata now lives in the narrower sidebar column -- a 2-up
+   grid gets cramped there, so stack fields in a single column instead. */
+.admin-editor-side .admin-form-grid {
+  grid-template-columns: minmax(0, 1fr);
+}
+
 .admin-form-grid label {
   display: grid;
-  gap: 6px;
   color: #475467;
   font-size: 13px;
 }
 
+.admin-field-label {
+  font-weight: 900;
+  font-size: 12.5px;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  color: #344054;
+}
+
 .admin-form-grid input,
+.admin-form-grid select,
 .admin-form-grid textarea {
   width: 100%;
   box-sizing: border-box;
@@ -889,16 +1065,49 @@
   border-radius: 7px;
   padding: 9px 12px;
   font: inherit;
+  color: #172033;
+  background: #ffffff;
+}
+
+.admin-form-grid select {
+  cursor: pointer;
+  transition: border-color 0.15s ease;
+}
+
+.admin-form-grid select:hover {
+  border-color: #94a3b8;
 }
 
 .admin-form-grid-full {
   grid-column: 1 / -1;
 }
 
-.admin-metadata-textarea {
-  font-family: "SF Mono", "IBM Plex Mono", Consolas, monospace;
-  font-size: 12.5px;
+.admin-topic-textarea {
+  font: inherit;
+  font-size: 13.5px;
+  line-height: 1.6;
   min-height: 90px;
+  resize: vertical;
+}
+
+.admin-readonly-value {
+  min-height: 20px;
+  padding: 8px 0;
+  color: #172033;
+  font-size: 14px;
+}
+
+.admin-readonly-wrap {
+  margin: 0;
+  line-height: 1.5;
+  white-space: pre-wrap;
+  overflow-wrap: break-word;
+}
+
+.admin-field-hint {
+  margin: -4px 0 12px;
+  font-size: 12px;
+  color: #667085;
 }
 
 .admin-field-error {
@@ -938,14 +1147,55 @@
 
 .admin-modal-actions {
   display: flex;
-  gap: 10px;
-  justify-content: flex-end;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.admin-modal-actions-secondary {
+  display: flex;
+  gap: 8px;
+}
+
+.admin-modal-actions-secondary button {
+  flex: 1;
+}
+
+.admin-modal-actions button {
+  border: 1px solid #d8dee8;
+  border-radius: 8px;
+  padding: 10px 15px;
+  font-size: 13px;
+  font-weight: 700;
+  background: #ffffff;
+  color: #393c43;
+  cursor: pointer;
+  transition: background 0.15s ease, border-color 0.15s ease;
+}
+
+.admin-modal-actions button:hover:not(:disabled) {
+  background: #f8fafc;
+  border-color: #94a3b8;
+}
+
+.admin-modal-actions button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.admin-modal-actions button.danger {
+  color: #cb4137;
+  border-color: #fecaca;
 }
 
 .admin-modal-actions button.primary {
-  background: #111827;
+  width: 100%;
+  background: #202228;
   color: #ffffff;
   border: none;
+}
+
+.admin-modal-actions button.primary:hover:not(:disabled) {
+  background: #1f2937;
 }
 
 @media (max-width: 1120px) {
@@ -1003,6 +1253,40 @@
   .admin-topbar h1 {
     font-size: 26px;
   }
+
+  /* Below phone width, the nav (5 full-width stacked buttons, from the
+     grid-template-columns: 1fr rule above) hides by default instead of
+     always sitting above the page content -- toggled open/closed with
+     .admin-mobile-nav-toggle, expanding inline (pushing content down)
+     rather than as an overlay. */
+  .admin-sidebar-toggle {
+    display: none;
+  }
+
+  .admin-mobile-nav-toggle {
+    display: flex;
+  }
+
+  .admin-nav {
+    display: none;
+  }
+
+  .admin-sidebar.mobile-open .admin-nav {
+    display: grid;
+    margin-top: 12px;
+  }
+}
+
+.admin-audit-titlebar {
+  padding: 16px;
+  background: #0d1117;
+  border-bottom: 1px solid #30363d;
+  font-family: "SF Mono", "IBM Plex Mono", Consolas, monospace;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #9da5ae;
 }
 
 .admin-audit-log {
@@ -1011,8 +1295,19 @@
   border-radius: 8px;
   font-family: "SF Mono", "IBM Plex Mono", Consolas, monospace;
   font-size: 12.5px;
-  color: #c9d1d9;
-  overflow: hidden;
+  line-height: 1.5;
+  color: #d1d8de;
+  max-height: 560px;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+.admin-audit-row-summary-static {
+  cursor: default;
+}
+
+.admin-audit-row-summary-static:hover {
+  background: none;
 }
 
 .admin-audit-row {
@@ -1028,22 +1323,37 @@
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 10px 14px;
+  padding: 14px;
   background: none;
   border: none;
   color: inherit;
   font: inherit;
-  cursor: pointer;
   text-align: left;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.admin-audit-row-summary:hover {
+  background: rgba(255, 255, 255, 0.04);
 }
 
 .admin-audit-log.compact .admin-audit-row-summary {
   padding: 7px 12px;
-  font-size: 11.5px;
+  font-size: 12px;
+}
+
+.admin-audit-chevron {
+  flex-shrink: 0;
+  color: #8b949e;
+  transition: transform 0.15s ease;
+}
+
+.admin-audit-chevron.expanded {
+  transform: rotate(90deg);
 }
 
 .admin-audit-time {
-  color: #8b949e;
+  color: #9da5ae;
   min-width: 120px;
 }
 
@@ -1096,7 +1406,7 @@
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 10px;
-  padding: 0 14px 14px;
+  padding: 10px 14px 14px;
 }
 
 .admin-audit-diff h4 {
@@ -1109,12 +1419,15 @@
 .admin-audit-diff pre {
   background: #0d1117;
   border-radius: 6px;
-  padding: 10px;
-  max-height: 200px;
+  padding: 14px;
+  max-height: 320px;
   overflow: auto;
-  font-size: 11.5px;
-  color: #c9d1d9;
+  font-size: 12.5px;
+  line-height: 1.6;
+  color: #d1d8de;
   margin: 0;
+  white-space: pre-wrap;
+  overflow-wrap: break-word;
 }
 
 .admin-audit-empty {
@@ -1271,6 +1584,11 @@
   font-weight: 700;
   cursor: pointer;
   font-family: "SF Mono", "IBM Plex Mono", Consolas, monospace;
+  transition: background 0.15s ease;
+}
+
+.admin-open-log-btn:hover {
+  background: #2d323c;
 }
 
 .admin-integrations-panel {
@@ -1360,6 +1678,16 @@
   padding: 18px 20px;
   cursor: pointer;
   text-align: left;
+  transition: background 0.15s ease, border-color 0.15s ease;
+}
+
+.admin-quick-action:hover:not(:disabled) {
+  background: #1f2937;
+}
+
+.admin-quick-action.secondary:hover:not(:disabled) {
+  background: #f8fafc;
+  border-color: #94a3b8;
 }
 
 .admin-quick-action:disabled {

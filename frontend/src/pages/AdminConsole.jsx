@@ -82,14 +82,26 @@ export default function AdminConsole() {
   const [logs, setLogs] = useState({ items: [], error: "", configured: false });
   const [audit, setAudit] = useState([]);
   const [message, setMessage] = useState("");
+  const [messageTone, setMessageTone] = useState("success");
+
+  function showMessage(text, tone = "success") {
+    setMessage(text);
+    setMessageTone(tone);
+  }
+
+  useEffect(() => {
+    if (!message) return;
+    const timer = setTimeout(() => setMessage(""), 10000);
+    return () => clearTimeout(timer);
+  }, [message]);
   const [essayView, setEssayView] = useState("list"); // "list" | "editor"
   const [peekEssayId, setPeekEssayId] = useState(null);
   const [regeneratingEmbeddingId, setRegeneratingEmbeddingId] = useState(null);
   const [contentEditing, setContentEditing] = useState(false);
   const [contentDraft, setContentDraft] = useState("");
-  const [metadataFieldError, setMetadataFieldError] = useState("");
   const [savedEditorSnapshot, setSavedEditorSnapshot] = useState(null);
   const [pendingNav, setPendingNav] = useState(null);
+  const [savingBeforeNav, setSavingBeforeNav] = useState(false);
 
   const [sidebarCollapsed, setSidebarCollapsed] = useState(() =>
     readSidebarCollapsed(typeof window !== "undefined" ? window.localStorage : undefined)
@@ -206,7 +218,6 @@ export default function AdminConsole() {
     setEssayView("list");
     setContentEditing(false);
     setContentDraft("");
-    setMetadataFieldError("");
   }
 
   function switchTab(id) {
@@ -224,21 +235,28 @@ export default function AdminConsole() {
       if (tab === "usage") await loadUsage();
       if (tab === "logs") await loadLogs();
       if (tab === "audit") await loadAudit();
-      setMessage("Updated");
+      showMessage("Updated");
     } catch (error) {
-      setMessage(error.message);
+      showMessage(error.message, "error");
     }
   }
 
   async function saveEssay() {
+    // Fold in an in-progress content-textarea draft even if its own "Done"
+    // wasn't clicked -- the top-level Save should save what's on screen, not
+    // silently drop unfinished typing in the content editor.
+    const payload = contentEditing && isContentDirty(editor.content, contentDraft) ? { ...editor, content: contentDraft } : editor;
     const path = selectedEssay?.essay?.id ? `/admin/essays/${selectedEssay.essay.id}` : "/admin/essays";
     const method = selectedEssay?.essay?.id ? "PATCH" : "POST";
-    const data = await api(path, { method, body: JSON.stringify(editor) });
+    const data = await api(path, { method, body: JSON.stringify(payload) });
     setSelectedEssay({ essay: data.essay, audit: selectedEssay?.audit || [] });
-    setSavedEditorSnapshot(editor);
+    setSavedEditorSnapshot(payload);
+    setEditor(payload);
+    setContentDraft(payload.content || "");
+    setContentEditing(false);
     await loadEssays(essays.page || 1);
     await loadOverview();
-    setMessage("Essay saved");
+    showMessage("Essay saved");
   }
 
   async function deleteEssay() {
@@ -249,7 +267,7 @@ export default function AdminConsole() {
     setSelectedEssay({ essay: data.essay, audit: selectedEssay.audit || [] });
     await loadEssays(essays.page || 1);
     await loadOverview();
-    setMessage("Essay soft deleted");
+    showMessage("Essay soft deleted");
   }
 
   async function restoreEssay() {
@@ -257,7 +275,7 @@ export default function AdminConsole() {
     const data = await api(`/admin/essays/${selectedEssay.essay.id}/restore`, { method: "POST" });
     setSelectedEssay({ essay: data.essay, audit: selectedEssay.audit || [] });
     await loadEssays(essays.page || 1);
-    setMessage("Essay restored");
+    showMessage("Essay restored");
   }
 
   async function hardDeleteEssay() {
@@ -266,7 +284,7 @@ export default function AdminConsole() {
     setSelectedEssay(null);
     setHardDeleteConfirmId("");
     await loadEssays(essays.page || 1);
-    setMessage("Essay permanently deleted");
+    showMessage("Essay permanently deleted");
   }
 
   async function handleRowClick(essay) {
@@ -286,11 +304,12 @@ export default function AdminConsole() {
         setSelectedEssay({ essay: data.essay, audit: selectedEssay.audit || [] });
       }
       await loadEssays(essays.page || 1);
-      setMessage(
-        data.embedding_job?.status === "current"
-          ? "Embedding regenerated"
-          : "Embedding regeneration failed to reach current status"
-      );
+      await loadOverview();
+      if (data.embedding_job?.status === "current") {
+        showMessage("Embedding regenerated");
+      } else {
+        showMessage("Embedding regeneration failed to reach current status", "error");
+      }
     } finally {
       setRegeneratingEmbeddingId(null);
     }
@@ -300,7 +319,7 @@ export default function AdminConsole() {
     setImportRunning(true);
     try {
       const result = await api("/admin/import-new-essays", { method: "POST" });
-      setMessage(
+      showMessage(
         `Imported ${result.created} new essays, ${result.skipped_duplicates} duplicates skipped, ${result.invalid} invalid — ${result.embedded} embedded and searchable.`
       );
       await loadEssays(essays.page || 1);
@@ -314,10 +333,11 @@ export default function AdminConsole() {
     setRegeneratingStale(true);
     try {
       const result = await api("/admin/essays/regenerate-stale-embeddings", { method: "POST" });
-      setMessage(
+      showMessage(
         result.attempted === 0
           ? "No stale essays to regenerate."
-          : `Regenerated ${result.succeeded} of ${result.attempted} stale essay(s)${result.failed ? ` (${result.failed} failed)` : ""}.`
+          : `Regenerated ${result.succeeded} of ${result.attempted} stale essay(s)${result.failed ? ` (${result.failed} failed)` : ""}.`,
+        result.failed ? "error" : "success"
       );
       await loadOverview();
     } finally {
@@ -390,7 +410,7 @@ export default function AdminConsole() {
           if (!cancelled) setAudit(data.items || []);
         }
       } catch (error) {
-        if (!cancelled) setMessage(error.message);
+        if (!cancelled) showMessage(error.message, "error");
       }
     }
 
@@ -435,14 +455,13 @@ export default function AdminConsole() {
           <div>
             <p className="admin-kicker">Developer Operations</p>
             <h1>{NAV_ITEMS.find(([id]) => id === tab)?.[1] || "Admin Console"}</h1>
-            <span>{adminState.profile.email}</span>
           </div>
           <button className="admin-icon-button" onClick={refreshCurrent} title="Refresh" aria-label="Refresh">
             <RefreshCw size={18} />
           </button>
         </header>
 
-        {message && <div className="admin-message">{message}</div>}
+        {message && <div className={`admin-message admin-message-${messageTone}`}>{message}</div>}
         {tab === "overview" && (
           <OverviewDashboard
             overview={overview}
@@ -495,22 +514,35 @@ export default function AdminConsole() {
             onRestore={restoreEssay}
             onHardDelete={hardDeleteEssay}
             onRegenerateEmbedding={() => selectedEssay?.essay?.id && regenerateEmbeddingFor(selectedEssay.essay.id)}
+            regeneratingEmbedding={Boolean(selectedEssay?.essay?.id) && regeneratingEmbeddingId === selectedEssay.essay.id}
             hardDeleteConfirmId={hardDeleteConfirmId}
             setHardDeleteConfirmId={setHardDeleteConfirmId}
             onContentEditingChange={setContentEditing}
             onContentDraftChange={setContentDraft}
-            onMetadataErrorChange={setMetadataFieldError}
-            saveDisabled={Boolean(metadataFieldError)}
           />
         )}
         {pendingNav && (
           <UnsavedChangesModal
+            saving={savingBeforeNav}
             onLeave={() => {
               const action = pendingNav;
               setPendingNav(null);
               action();
             }}
             onStay={() => setPendingNav(null)}
+            onSave={async () => {
+              setSavingBeforeNav(true);
+              try {
+                await saveEssay();
+                const action = pendingNav;
+                setPendingNav(null);
+                action();
+              } catch (error) {
+                showMessage(error.message, "error");
+              } finally {
+                setSavingBeforeNav(false);
+              }
+            }}
           />
         )}
         {tab === "usage" && <Usage usage={usage} />}
@@ -618,10 +650,5 @@ function Logs({ logs }) {
 }
 
 function Audit({ audit }) {
-  return (
-    <section className="admin-panel">
-      <PanelHeader title="Audit" aside={`${formatNumber(audit.length)} recent entries`} />
-      <AuditLogList audit={audit} />
-    </section>
-  );
+  return <AuditLogList audit={audit} />;
 }

@@ -2,7 +2,9 @@ import { readFileSync } from "node:fs";
 import test from "node:test";
 import assert from "node:assert/strict";
 import {
+  advanceDraftQueue,
   buildDailyRequestSeries,
+  draftToEditorPayload,
   embeddingCoveragePercent,
   extractOfficialCostBuckets,
   formatDate,
@@ -208,6 +210,49 @@ test("isEditorDirty compares every editable field, not just content", () => {
   assert.equal(isEditorDirty(saved, { ...saved, metadata: { generated_title: "Changed" } }), true);
   assert.equal(isEditorDirty(saved, { ...saved, metadata: { generated_title: "T" } }), false);
   assert.equal(isEditorDirty(null, saved), true);
+});
+
+test("draftToEditorPayload maps an upload draft into the editor's expected shape", () => {
+  const draft = {
+    filename: "essay1.docx",
+    topic: "Describe a challenge.",
+    content: "I once faced...",
+    type: "Personal Statement",
+    school: "Duke",
+    public: false,
+    extraction_warning: null,
+  };
+  assert.deepEqual(draftToEditorPayload(draft), {
+    topic: "Describe a challenge.",
+    content: "I once faced...",
+    type: "Personal Statement",
+    school: "Duke",
+    public: false,
+    source_file: "essay1.docx",
+    metadata: null,
+  });
+});
+
+test("draftToEditorPayload defaults missing fields to empty strings, not undefined", () => {
+  const draft = { filename: "essay2.txt", topic: "", content: "Body only." };
+  const payload = draftToEditorPayload(draft);
+  assert.equal(payload.type, "");
+  assert.equal(payload.school, "");
+  assert.equal(payload.public, false);
+  assert.equal(payload.source_file, "essay2.txt");
+});
+
+test("advanceDraftQueue moves to the next index when more drafts remain", () => {
+  assert.deepEqual(advanceDraftQueue(0, 3), { done: false, nextIndex: 1 });
+  assert.deepEqual(advanceDraftQueue(1, 3), { done: false, nextIndex: 2 });
+});
+
+test("advanceDraftQueue reports done on the last draft", () => {
+  assert.deepEqual(advanceDraftQueue(2, 3), { done: true, nextIndex: null });
+});
+
+test("advanceDraftQueue reports done immediately for a single-draft batch", () => {
+  assert.deepEqual(advanceDraftQueue(0, 1), { done: true, nextIndex: null });
 });
 
 const sidebarSource = readFileSync(new URL("./admin/AdminSidebar.jsx", import.meta.url), "utf8");

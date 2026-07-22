@@ -167,3 +167,20 @@ export function isEditorDirty(saved, current) {
   }
   return JSON.stringify(saved.metadata || {}) !== JSON.stringify(current.metadata || {});
 }
+
+export function draftToEditorPayload(draft) {
+  return {
+    topic: draft.topic || "",
+    content: draft.content || "",
+    type: draft.type || "",
+    school: draft.school || "",
+    public: false,
+    source_file: draft.filename || "",
+    metadata: null,
+  };
+}
+
+export function advanceDraftQueue(currentIndex, totalDrafts) {
+  const nextIndex = currentIndex + 1;
+  return nextIndex < totalDrafts ? { done: false, nextIndex } : { done: true, nextIndex: null };
+}

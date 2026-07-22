@@ -160,6 +160,9 @@ test("admin console exposes new essay management actions", () => {
   for (const needle of ["restore", "hard-delete", "regenerate-embedding", "import-new-essays", "sort_dir"]) {
     assert.match(combined, new RegExp(needle));
   }
+  assert.match(essaysTabSource, /Upload essays/);
+  assert.match(essaysTabSource, /Sync from Drive folder/);
+  assert.match(essaysTabSource, /onOpenUpload/);
 });
 
 test("admin console wires the upload-drafts flow: endpoint, draft queue, and view state", () => {

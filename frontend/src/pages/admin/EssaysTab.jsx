@@ -26,6 +26,7 @@ export default function EssaysTab({
   onOpenEditor,
   onRegenerateEmbedding,
   regeneratingEmbeddingId,
+  onOpenUpload,
   importNewEssays,
   importRunning,
   newEssay,
@@ -41,8 +42,11 @@ export default function EssaysTab({
           <span>{formatNumber(essays.total)} records</span>
         </div>
         <div className="admin-actions">
-          <button onClick={importNewEssays} disabled={importRunning}>
-            <RefreshCw size={16} className={importRunning ? "spin" : ""} /> Import new essays
+          <button onClick={importNewEssays} disabled={importRunning} className="admin-secondary-link" title="Import from the Google-Drive-synced folder (existing pipeline, unchanged)">
+            <RefreshCw size={16} className={importRunning ? "spin" : ""} /> Sync from Drive folder
+          </button>
+          <button onClick={onOpenUpload} className="primary">
+            Upload essays
           </button>
           <button onClick={newEssay}>New</button>
         </div>

@@ -240,6 +240,20 @@
   border-color: #64748b;
 }
 
+.admin-secondary-link {
+  background: transparent;
+  border-color: transparent;
+  color: #667085;
+  font-weight: 500;
+}
+
+.admin-secondary-link:hover {
+  background: transparent;
+  border-color: transparent;
+  color: #172033;
+  text-decoration: underline;
+}
+
 .admin-warning {
   margin: 12px 0;
   padding: 10px 12px;

@@ -48,3 +48,16 @@ ZAC-83 repairs the broken `main` application baseline created by merge commit `1
 - Checks: `npm ci` pass; `npm run lint` pass; `npm test` pass (35/35); `npm run build` pass (Vite 7.3.6); clean Python requirements install pass; backend `unittest` pass (67/67); FastAPI import pass; bounded HTTP startup pass; tracked conflict-marker scan pass; tracked generated/runtime scan pass; tracked credential-pattern scan pass; `openspec validate repair-production-baseline --strict` pass; post-check product worktree clean and still at tested head.
 - Unresolved failures: none. Non-blocking follow-ups are seven npm high advisories requiring breaking force-fix analysis and a Vite bundle-size warning.
 - Next action: `/dev-review`
+
+## Code Review
+
+### Round 1 (2026-07-25 16:44 Asia/Taipei)
+
+- Source: `openspec/changes/repair-production-baseline/review/2026-07-25_feature-ZAC-83_repair-production-baseline_codex-review-r1.md`
+- Mode: `initial`
+- Verdict: `changes-requested`
+- Reviewed head: `d0345272ab41767cb50e360657911c611dbed66d`
+- Transitions: `REV-001 open; REV-002 open; REV-003 open`
+- Open blockers: `REV-001, REV-002, REV-003`
+- Follow-ups: seven npm high advisories; Vite bundle-size warning; temporary verification virtual environments remain outside Git
+- Next action: `/dev-fix --review "openspec/changes/repair-production-baseline/review/2026-07-25_feature-ZAC-83_repair-production-baseline_codex-review-r1.md"`

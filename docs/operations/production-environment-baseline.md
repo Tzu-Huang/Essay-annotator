@@ -4,7 +4,7 @@ Audit date: 2026-07-25 (Asia/Taipei)
 
 Linear issue: ZAC-82
 
-Status: **Host audit complete; AWS control-plane details still required**
+Status: **Complete**
 
 ## Evidence labels
 
@@ -24,7 +24,7 @@ The owner-confirmed target is `ubuntu@44.201.62.0` using the existing EC2 SSH pr
 - **Observed:** the host identifies itself as `ip-172-31-12-91`.
 - **Observed:** no process listens on TCP 80, 443, or 8000; only SSH listens externally on TCP 22.
 - **Observed:** EC2 instance metadata requests timed out, and AWS CLI is unavailable on both the audit workstation and the host.
-- **Unresolved:** instance type, region/AZ, Elastic IP association, and complete Security Group rules require AWS Console evidence.
+- **Owner-confirmed from AWS Console:** instance identity, type, region/AZ, public-IP assignment, and Security Group rules.
 
 ## Repository and deployment access
 
@@ -49,19 +49,19 @@ The production checkout is `/home/ubuntu/Essay-annotator` on clean branch `main`
 
 | Required attribute | Current result | Required evidence after access is restored |
 |---|---|---|
-| Instance ID/name | Hostname `ip-172-31-12-91`; EC2 instance ID unresolved | AWS Console/CLI instance record |
-| Instance state | Online and reachable by SSH | AWS Console state remains desirable evidence |
-| Instance type | Unresolved | EC2 instance details |
-| Region / availability zone | Unresolved | EC2 details |
+| Instance ID/name | `i-02872a5190a894a64`; hostname `ip-172-31-12-91` | Owner-confirmed from AWS Console / observed by SSH |
+| Instance state | Running and reachable by SSH | Owner-confirmed / observed |
+| Instance type | `t3.micro` | Owner-confirmed from AWS Console |
+| Region / availability zone | `us-east-1` / `us-east-1a` | Owner-confirmed from AWS Console |
 | Operating system | Ubuntu 24.04.4 LTS, kernel `6.17.0-1009-aws`, x86_64 | Observed by SSH |
 | CPU / memory | 2 vCPU, 911 MiB RAM, no swap | Observed by SSH; not sufficient to assert instance type |
 | Public IPv4 | `44.201.62.0`, reachable by SSH | Owner-confirmed / observed |
-| Elastic vs ephemeral IP | Unresolved | Elastic IP association record |
+| Elastic vs ephemeral IP | No Elastic IP; `44.201.62.0` is auto-assigned and may change after stop/start | Owner-confirmed from AWS Console |
 | Storage | One 8 GB NVMe disk; 6.8 GB ext4 root, 3.9 GB used (58%), 2.9 GB available | Observed by SSH; EBS volume identity unresolved |
-| Security Group ingress | Unresolved | Rules including protocol, port, and source category |
-| Security Group egress | Unresolved | Rules including protocol, port, and destination category |
+| Security Group ingress | `launch-wizard-4`: TCP 22, 80, 443, and 8000 from `0.0.0.0/0` | Owner-confirmed from AWS Console |
+| Security Group egress | `launch-wizard-4`: all protocols/ports to `0.0.0.0/0` | Owner-confirmed from AWS Console |
 
-Security Group evidence must describe rules without copying credentials or unrelated sensitive configuration.
+The current Security Group exposes SSH and the backend port to the public internet. Follow-up hardening should restrict TCP 22 to an authorized source IP, remove public TCP 8000 after a reverse proxy is established, and retain public 80/443 for web traffic.
 
 ## Runtime service inventory
 
@@ -117,19 +117,20 @@ The first four commands are confirmed management commands for the live unit. The
 
 ## Required read-only follow-up
 
-Before ZAC-82 can close:
+Follow-up work:
 
-1. Supply AWS Console evidence for instance ID/type, region/AZ, Elastic IP association, and complete Security Group ingress/egress.
-2. Create separate fix work for the committed conflict markers and verify the backend can reach readiness.
-3. Decide whether the verified 2026-07-15 archive is sufficient for the next deployment or create a newer data backup.
-4. Configure branch protection/automated checks in separately authorized GitHub work if desired.
+1. Create separate fix work for the committed conflict markers and verify the backend can reach readiness.
+2. Restrict SSH access and remove public TCP 8000 after a reverse proxy is established.
+3. Associate an Elastic IP before depending on this address for DNS.
+4. Decide whether the verified 2026-07-15 archive is sufficient for the next deployment or create a newer data backup.
+5. Configure branch protection/automated checks in separately authorized GitHub work if desired.
 
 ## ZAC-82 acceptance status
 
 | Acceptance criterion | Status |
 |---|---|
-| Current-state inventory attached or linked | Partial: live host complete; AWS control-plane details remain |
-| Elastic vs ephemeral IP confirmed | Blocked |
+| Current-state inventory attached or linked | Satisfied |
+| Elastic vs ephemeral IP confirmed | Satisfied: auto-assigned, not Elastic |
 | Data locations and current startup commands known | Satisfied |
 | One release strategy explicitly chosen | Satisfied by `release-and-deployment-policy.md` |
 | GitHub branch protection/check policy documented | Satisfied as policy; current GitHub enforcement remains unresolved |

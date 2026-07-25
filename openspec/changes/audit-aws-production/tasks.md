@@ -6,7 +6,7 @@
 
 ## 2. AWS and Host Inventory
 
-- [ ] 2.1 Use read-only AWS and instance evidence to record EC2 type, OS, region/AZ, storage, public IPv4, Elastic IP status, and Security Group ingress/egress.
+- [x] 2.1 Use read-only AWS and instance evidence to record EC2 type, OS, region/AZ, storage, public IPv4, Elastic IP status, and Security Group ingress/egress.
 - [x] 2.2 Use read-only host commands to inventory processes, listening ports, service units, web server or reverse proxy, installed runtimes, and startup/status commands.
 - [x] 2.3 Inspect the production repository path, branch, commit, remote, working tree, and divergence from `origin/main`; stop and flag any reconciliation requirement.
 

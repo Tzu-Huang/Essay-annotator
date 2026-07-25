@@ -12,3 +12,6 @@ requests
 python-docx
 pypdf
 python-multipart
+google-api-python-client
+google-auth
+google-auth-oauthlib

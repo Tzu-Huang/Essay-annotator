@@ -8,7 +8,8 @@ from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from unittest.mock import MagicMock, patch
 
-from fastapi import HTTPException, UploadFile
+from fastapi import Depends, FastAPI, HTTPException, UploadFile
+from fastapi.testclient import TestClient
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
@@ -60,6 +61,7 @@ class AdminDataTests(unittest.TestCase):
         self.db.close()
         os.environ.pop("ADMIN_EMAILS", None)
         os.environ.pop("ADMIN_WRITE_EMAILS", None)
+        os.environ.pop("GOOGLE_CLIENT_ID", None)
 
     def write_jsonl(self, records):
         handle = tempfile.NamedTemporaryFile("w", encoding="utf-8", suffix=".jsonl", delete=False)
@@ -154,27 +156,113 @@ class AdminDataTests(unittest.TestCase):
     def test_admin_allowlist_and_write_role(self):
         os.environ["ADMIN_EMAILS"] = "owner@example.com,viewer@example.com"
         os.environ["ADMIN_WRITE_EMAILS"] = "owner@example.com"
+        os.environ["GOOGLE_CLIENT_ID"] = "client-id"
 
-        owner = require_admin("owner@example.com")
-        viewer = require_admin("viewer@example.com")
+        with patch(
+            "app.admin._google_token_info",
+            side_effect=[
+                {"aud": "client-id", "expires_in": "300", "email_verified": "true", "email": "owner@example.com"},
+                {"aud": "client-id", "expires_in": "300", "email_verified": "true", "email": "viewer@example.com"},
+                {"aud": "client-id", "expires_in": "300", "email_verified": "true", "email": "stranger@example.com"},
+            ],
+        ):
+            owner = require_admin("Bearer owner-token")
+            viewer = require_admin("Bearer viewer-token")
 
-        self.assertTrue(owner.can_write)
-        self.assertFalse(viewer.can_write)
-        self.assertEqual(require_admin_write(owner), owner)
-        with self.assertRaises(Exception):
-            require_admin_write(viewer)
-        with self.assertRaises(Exception):
-            require_admin("stranger@example.com")
+            self.assertTrue(owner.can_write)
+            self.assertFalse(viewer.can_write)
+            self.assertEqual(require_admin_write(owner), owner)
+            with self.assertRaises(HTTPException):
+                require_admin_write(viewer)
+            with self.assertRaises(HTTPException):
+                require_admin("Bearer stranger-token")
 
     def test_admin_wildcard_allows_local_development_access(self):
         os.environ["ADMIN_EMAILS"] = "*"
         os.environ["ADMIN_WRITE_EMAILS"] = "*"
+        os.environ["GOOGLE_CLIENT_ID"] = "client-id"
 
-        actor = require_admin("anyone@example.com")
+        with patch(
+            "app.admin._google_token_info",
+            return_value={
+                "aud": "client-id",
+                "expires_in": "300",
+                "email_verified": "true",
+                "email": "anyone@example.com",
+            },
+        ):
+            actor = require_admin("Bearer valid-token")
 
         self.assertEqual(actor.email, "anyone@example.com")
         self.assertTrue(actor.can_write)
         self.assertEqual(require_admin_write(actor), actor)
+
+    def test_admin_rejects_missing_or_invalid_google_credentials(self):
+        os.environ["ADMIN_EMAILS"] = "owner@example.com"
+        os.environ["GOOGLE_CLIENT_ID"] = "client-id"
+
+        with self.assertRaises(HTTPException) as missing:
+            require_admin(None)
+        self.assertEqual(missing.exception.status_code, 401)
+
+        invalid_cases = [
+            {"aud": "wrong-client", "expires_in": "300", "email_verified": "true", "email": "owner@example.com"},
+            {"aud": "client-id", "expires_in": "0", "email_verified": "true", "email": "owner@example.com"},
+            {"aud": "client-id", "expires_in": "300", "email_verified": "false", "email": "owner@example.com"},
+            {"aud": "client-id", "expires_in": "300", "email_verified": "true", "email": ""},
+        ]
+        for token_info in invalid_cases:
+            with self.subTest(token_info=token_info), patch(
+                "app.admin._google_token_info",
+                return_value=token_info,
+            ):
+                with self.assertRaises(HTTPException) as invalid:
+                    require_admin("Bearer invalid-token")
+                self.assertEqual(invalid.exception.status_code, 401)
+
+    def test_admin_dependency_enforces_verified_read_and_write_roles_at_endpoint(self):
+        os.environ["ADMIN_EMAILS"] = "owner@example.com,viewer@example.com"
+        os.environ["ADMIN_WRITE_EMAILS"] = "owner@example.com"
+        os.environ["GOOGLE_CLIENT_ID"] = "client-id"
+        test_app = FastAPI()
+
+        @test_app.get("/admin-read")
+        def admin_read(actor: AdminActor = Depends(require_admin)):
+            return {"email": actor.email, "can_write": actor.can_write}
+
+        @test_app.post("/admin-write")
+        def admin_write(actor: AdminActor = Depends(require_admin_write)):
+            return {"email": actor.email}
+
+        client = TestClient(test_app)
+        self.assertEqual(client.get("/admin-read").status_code, 401)
+
+        token_infos = {
+            "invalid": {"aud": "wrong-client", "expires_in": "300", "email_verified": "true", "email": "owner@example.com"},
+            "stranger": {"aud": "client-id", "expires_in": "300", "email_verified": "true", "email": "stranger@example.com"},
+            "viewer": {"aud": "client-id", "expires_in": "300", "email_verified": "true", "email": "viewer@example.com"},
+            "owner": {"aud": "client-id", "expires_in": "300", "email_verified": "true", "email": "owner@example.com"},
+        }
+
+        with patch("app.admin._google_token_info", side_effect=lambda token: token_infos[token]):
+            self.assertEqual(
+                client.get("/admin-read", headers={"Authorization": "Bearer invalid"}).status_code,
+                401,
+            )
+            self.assertEqual(
+                client.get("/admin-read", headers={"Authorization": "Bearer stranger"}).status_code,
+                403,
+            )
+            viewer = client.get("/admin-read", headers={"Authorization": "Bearer viewer"})
+            self.assertEqual(viewer.status_code, 200)
+            self.assertFalse(viewer.json()["can_write"])
+            self.assertEqual(
+                client.post("/admin-write", headers={"Authorization": "Bearer viewer"}).status_code,
+                403,
+            )
+            owner = client.post("/admin-write", headers={"Authorization": "Bearer owner"})
+            self.assertEqual(owner.status_code, 200)
+            self.assertEqual(owner.json()["email"], "owner@example.com")
 
     def test_integration_status_masks_secret_values(self):
         os.environ["ADMIN_EMAILS"] = "owner@example.com"

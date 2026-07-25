@@ -53,7 +53,10 @@
 
           const profile = await response.json();
           const dbUser = await saveUser(profile);
-          loginUser({ ...profile, db_id: dbUser.id, login_count: dbUser.login_count });
+          loginUser(
+            { ...profile, db_id: dbUser.id, login_count: dbUser.login_count },
+            tokenResponse.access_token,
+          );
           const destination = REDIRECT_TO_EDITOR_PAGES.has(location.pathname)
             ? "/editor"
             : location.pathname;

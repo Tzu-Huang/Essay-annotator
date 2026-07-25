@@ -100,11 +100,49 @@ class AdminActor(BaseModel):
     can_write: bool
 
 
-def require_admin(x_admin_email: Optional[str] = Header(default=None)) -> AdminActor:
-    email = (x_admin_email or "").strip().lower()
+def _google_token_info(access_token: str) -> dict:
+    query = urllib.parse.urlencode({"access_token": access_token})
+    request = urllib.request.Request(
+        f"https://oauth2.googleapis.com/tokeninfo?{query}",
+        headers={"Accept": "application/json"},
+        method="GET",
+    )
+    try:
+        with urllib.request.urlopen(request, timeout=10) as response:
+            return json.loads(response.read().decode("utf-8"))
+    except (urllib.error.HTTPError, urllib.error.URLError, TimeoutError, json.JSONDecodeError) as exc:
+        raise HTTPException(status_code=401, detail="Invalid or expired Google credential") from exc
+
+
+def _verified_google_email(authorization: Optional[str]) -> str:
+    scheme, _, access_token = (authorization or "").strip().partition(" ")
+    if scheme.lower() != "bearer" or not access_token:
+        raise HTTPException(status_code=401, detail="Google bearer credential required")
+
+    client_id = os.getenv("GOOGLE_CLIENT_ID", "").strip()
+    if not client_id:
+        raise HTTPException(status_code=503, detail="Google authentication is not configured")
+
+    token_info = _google_token_info(access_token)
+    try:
+        expires_in = int(token_info.get("expires_in", "0"))
+    except (TypeError, ValueError):
+        expires_in = 0
+    verified_email = str(token_info.get("email_verified", token_info.get("verified_email", ""))).lower()
+    email = str(token_info.get("email", "")).strip().lower()
+    if (
+        token_info.get("aud") != client_id
+        or expires_in <= 0
+        or verified_email != "true"
+        or not email
+    ):
+        raise HTTPException(status_code=401, detail="Invalid or expired Google credential")
+    return email
+
+
+def require_admin(authorization: Optional[str] = Header(default=None)) -> AdminActor:
+    email = _verified_google_email(authorization)
     allowlist = admin_emails()
-    if not email:
-        raise HTTPException(status_code=401, detail="Admin authentication required")
     if not allowlist or ("*" not in allowlist and email not in allowlist):
         raise HTTPException(status_code=403, detail="Admin access denied")
     write_allowlist = admin_write_emails()

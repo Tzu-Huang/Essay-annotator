@@ -68,7 +68,7 @@ const NAV_ITEMS = [
 ];
 
 export default function AdminConsole() {
-  const { user } = useAuth();
+  const { user, accessToken } = useAuth();
   const googleSignIn = useGoogleSignIn();
   const [tab, setTab] = useState("overview");
   const [adminState, setAdminState] = useState({ loading: true, error: "", profile: null });
@@ -131,9 +131,9 @@ export default function AdminConsole() {
   const headers = useMemo(
     () => ({
       "Content-Type": "application/json",
-      "X-Admin-Email": email || "",
+      ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
     }),
-    [email]
+    [accessToken]
   );
 
   const api = useCallback(async (path, options = {}) => {
@@ -287,7 +287,7 @@ export default function AdminConsole() {
       formData.append("file_meta", JSON.stringify(fileMeta));
       const response = await fetch(`${API_BASE}/admin/essays/upload-drafts`, {
         method: "POST",
-        headers: { "X-Admin-Email": email || "" },
+        headers: accessToken ? { Authorization: `Bearer ${accessToken}` } : {},
         body: formData,
       });
       const data = await response.json().catch(() => ({}));

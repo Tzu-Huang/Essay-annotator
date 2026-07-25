@@ -27,14 +27,14 @@
 
 ## 5. Clean Verification
 
-- [ ] 5.1 From a clean frontend dependency state, install from the lockfile and pass lint, automated tests, and the production build
-- [ ] 5.2 From a clean Python environment, install backend dependencies and pass the complete backend test suite
-- [ ] 5.3 Pass backend application import and bounded startup/readiness checks without production credentials or persistent-data mutation
-- [ ] 5.4 Record all verification commands, results, tested source SHA, launch-v1 limitations, and rollback SHA
+- [x] 5.1 From a clean frontend dependency state, install from the lockfile and pass lint, automated tests, and the production build
+- [x] 5.2 From a clean Python environment, install backend dependencies and pass the complete backend test suite
+- [x] 5.3 Pass backend application import and bounded startup/readiness checks without production credentials or persistent-data mutation
+- [x] 5.4 Record all verification commands, results, tested source SHA, launch-v1 limitations, and rollback SHA
 
 ## 6. Release Baseline Handoff
 
 - [ ] 6.1 Complete code review and address all blocking findings against the tested candidate commit
 - [ ] 6.2 Merge the approved change through a pull request to `main` without deploying or modifying production
 - [ ] 6.3 Record the merged `main` baseline SHA and link its verification evidence for the parent launch issue
-- [ ] 6.4 Prepare the separately authorized deployment checklist with backup, readiness, and data-preserving rollback gates
+- [x] 6.4 Prepare the separately authorized deployment checklist with backup, readiness, and data-preserving rollback gates

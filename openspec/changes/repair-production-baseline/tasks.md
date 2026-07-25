@@ -1,8 +1,8 @@
 ## 1. Baseline and Scope Evidence
 
-- [ ] 1.1 Record the branch base, broken merge commit and parents, current production SHA, candidate release paths, and launch-v1 behavior inventory
-- [ ] 1.2 Classify tracked dependencies, build output, delivery archives, graph output, runtime files, and persistent production data with an explicit keep/remove/preserve disposition
-- [ ] 1.3 Record the persistent-data locations, available backup evidence, rollback SHA, and known deployment constraints without exposing secrets
+- [x] 1.1 Record the branch base, broken merge commit and parents, current production SHA, candidate release paths, and launch-v1 behavior inventory
+- [x] 1.2 Classify tracked dependencies, build output, delivery archives, graph output, runtime files, and persistent production data with an explicit keep/remove/preserve disposition
+- [x] 1.3 Record the persistent-data locations, available backup evidence, rollback SHA, and known deployment constraints without exposing secrets
 
 ## 2. Backend Merge Repair
 

@@ -78,4 +78,3 @@ The production `essay-api.service` imports this tree and currently fails on a me
 - The host currently has no reverse proxy and no listeners on ports 80, 443, or 8000 because the backend fails during startup.
 - A later deployment must record a current backup, select an exact merged `main` SHA, verify readiness, and roll code back without overwriting persistent data if readiness fails.
 - This change does not modify the EC2 checkout, service, networking, database, runtime files, or production data.
-

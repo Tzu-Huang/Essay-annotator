@@ -51,3 +51,16 @@ ZAC-82 establishes a secret-safe production environment baseline and replaces th
   - SKIP (not required for this operational-documentation change) — frontend/backend application test suites; the known pre-existing production baseline failure is assigned to ZAC-83.
 - Unresolved failures: none for ZAC-82.
 - Next action: `/dev-review`
+
+## Code Review
+
+### Round 1 (2026-07-25 16:08 Asia/Taipei)
+
+- Source: `openspec/changes/audit-aws-production/review/2026-07-25_feature-ZAC-82_audit-aws-production_codex-review-r1.md`
+- Mode: `initial`
+- Verdict: `approved`
+- Reviewed head: `9f47199a3b655de68992b5aaee8b563bc325fdfb`
+- Transitions: none
+- Open blockers: none
+- Follow-ups: existing ZAC-83 production-baseline repair and launch hardening work only
+- Next action: commit review records, then `/dev-done`

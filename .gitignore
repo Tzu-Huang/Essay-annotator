@@ -61,3 +61,4 @@ CLAUDE.md
 
 # Deployment secrets archives stay outside Git.
 _aws_delivery/*secrets*.tar.gz
+.superpowers/

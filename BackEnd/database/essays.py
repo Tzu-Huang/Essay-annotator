@@ -1,6 +1,10 @@
 import hashlib
 import json
+<<<<<<< HEAD
 from dataclasses import dataclass
+=======
+from dataclasses import dataclass, field
+>>>>>>> feature/admin
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Iterable
@@ -8,7 +12,11 @@ from typing import Iterable
 from sqlalchemy import func, or_
 from sqlalchemy.orm import Session
 
+<<<<<<< HEAD
 from database.create import AdminAuditLog, Essay, EssayEmbedding, OpenAIUsageEvent
+=======
+from database.create import AdminAuditLog, Essay, OpenAIUsageEvent
+>>>>>>> feature/admin
 
 
 EDITABLE_ESSAY_FIELDS = {"topic", "content", "type", "school", "public", "source_file", "metadata_json"}
@@ -19,9 +27,15 @@ EMBEDDING_RELEVANT_FIELDS = {"topic", "content", "type", "school"}
 class ImportResult:
     seen: int = 0
     created: int = 0
+<<<<<<< HEAD
     updated: int = 0
     skipped_duplicates: int = 0
     invalid: int = 0
+=======
+    skipped_duplicates: int = 0
+    invalid: int = 0
+    created_ids: list[str] = field(default_factory=list)
+>>>>>>> feature/admin
 
 
 def utcnow():
@@ -123,6 +137,7 @@ def validate_essay_payload(payload: dict) -> dict:
 
 def import_essays_from_jsonl(db: Session, path: Path) -> ImportResult:
     result = ImportResult()
+<<<<<<< HEAD
     existing_essays = db.query(Essay).all()
     essays_by_id = {essay.id: essay for essay in existing_essays}
     essays_by_signature = {
@@ -132,6 +147,16 @@ def import_essays_from_jsonl(db: Session, path: Path) -> ImportResult:
             (essay.source_file or "").strip().lower(),
         ): essay
         for essay in existing_essays
+=======
+    existing_ids = {row[0] for row in db.query(Essay.id).all()}
+    signatures = {
+        (
+            (row[0] or "").strip().lower(),
+            (row[1] or "").strip().lower(),
+            (row[2] or "").strip().lower(),
+        )
+        for row in db.query(Essay.topic, Essay.content, Essay.source_file).all()
+>>>>>>> feature/admin
     }
 
     with path.open("r", encoding="utf-8-sig") as f:
@@ -159,6 +184,7 @@ def import_essays_from_jsonl(db: Session, path: Path) -> ImportResult:
                 payload["content"].lower(),
                 (payload["source_file"] or "").lower(),
             )
+<<<<<<< HEAD
             duplicate = essays_by_id.get(payload["id"]) or essays_by_signature.get(signature)
             if duplicate:
                 existing_metadata = duplicate.metadata_json or {}
@@ -170,6 +196,10 @@ def import_essays_from_jsonl(db: Session, path: Path) -> ImportResult:
                     result.updated += 1
                 else:
                     result.skipped_duplicates += 1
+=======
+            if payload["id"] in existing_ids or signature in signatures:
+                result.skipped_duplicates += 1
+>>>>>>> feature/admin
                 continue
 
             essay = Essay(
@@ -184,9 +214,16 @@ def import_essays_from_jsonl(db: Session, path: Path) -> ImportResult:
                 embedding_status="stale",
             )
             db.add(essay)
+<<<<<<< HEAD
             essays_by_id[essay.id] = essay
             essays_by_signature[signature] = essay
             result.created += 1
+=======
+            existing_ids.add(essay.id)
+            signatures.add(signature)
+            result.created += 1
+            result.created_ids.append(essay.id)
+>>>>>>> feature/admin
 
     return result
 
@@ -206,6 +243,19 @@ def export_essays_to_jsonl(db: Session, path: Path, include_deleted: bool = Fals
     return count
 
 
+<<<<<<< HEAD
+=======
+_SORTABLE_FIELDS = {
+    "id": Essay.id,
+    "topic": Essay.topic,
+    "school": Essay.school,
+    "type": Essay.type,
+    "updated_at": Essay.updated_at,
+    "embedding_status": Essay.embedding_status,
+}
+
+
+>>>>>>> feature/admin
 def query_essays(
     db: Session,
     *,
@@ -215,6 +265,11 @@ def query_essays(
     public: bool | None = None,
     embedding_status: str | None = None,
     include_deleted: bool = False,
+<<<<<<< HEAD
+=======
+    sort: str | None = None,
+    sort_dir: str = "asc",
+>>>>>>> feature/admin
 ):
     query = db.query(Essay)
     if not include_deleted:
@@ -237,9 +292,52 @@ def query_essays(
         query = query.filter(Essay.public == public)
     if embedding_status:
         query = query.filter(Essay.embedding_status == embedding_status)
+<<<<<<< HEAD
     return query
 
 
+=======
+    if sort:
+        column = _SORTABLE_FIELDS.get(sort)
+        if column is not None:
+            query = query.order_by(column.desc() if sort_dir == "desc" else column.asc())
+    return query
+
+
+def backfill_current_embedding_status(db: Session, embed_jsonl_path: Path) -> int:
+    """One-time backfill for essays embedded before embedding_status tracking
+    existed. Keyed off presence in embed.jsonl -- the file the in-memory search
+    index and every embedding endpoint read/write -- rather than the
+    EssayEmbedding table, because essays embedded via the standalone
+    embedding/make_embedding.py script only ever wrote to embed.jsonl and never
+    inserted an EssayEmbedding row; keying off that table left this backfill a
+    no-op for exactly the essays it was meant to fix. See
+    docs/superpowers/specs/2026-07-17-admin-console-redesign-design.md section 1
+    for the full root-cause writeup. Caller must db.commit()."""
+    embedded_ids: set[str] = set()
+    if embed_jsonl_path.exists():
+        with embed_jsonl_path.open("r", encoding="utf-8-sig") as f:
+            for line in f:
+                line = line.strip()
+                if not line:
+                    continue
+                try:
+                    record = json.loads(line)
+                except json.JSONDecodeError:
+                    continue
+                parent_id = record.get("parent_id")
+                if parent_id:
+                    embedded_ids.add(parent_id)
+    if not embedded_ids:
+        return 0
+    return (
+        db.query(Essay)
+        .filter(Essay.id.in_(embedded_ids), Essay.embedding_status != "current")
+        .update({Essay.embedding_status: "current"}, synchronize_session=False)
+    )
+
+
+>>>>>>> feature/admin
 def usage_event_to_dict(event: OpenAIUsageEvent) -> dict:
     return {
         "id": event.id,
@@ -282,3 +380,36 @@ def summarize_usage(db: Session, start: datetime | None = None, end: datetime | 
         }
         for row in rows
     ]
+<<<<<<< HEAD
+=======
+
+
+def daily_request_counts(db: Session, start: datetime | None = None, end: datetime | None = None) -> list[dict]:
+    """Day-bucketed request counts for the Overview dashboard's "Daily
+    requests" chart, plus a per-feature breakdown (near-free, since
+    OpenAIUsageEvent already carries `feature`) for a possible future
+    stacked-chart follow-up -- see OverviewDashboard.jsx in Task 7, which
+    only reads `date`/`requests` for now. Buckets in Python (not SQL) to
+    stay agnostic between the SQLite dev DB and Postgres prod DB -- see
+    summarize_usage() above for the equivalent cumulative (non-bucketed)
+    query."""
+    query = db.query(OpenAIUsageEvent.created_at, OpenAIUsageEvent.feature)
+    if start:
+        query = query.filter(OpenAIUsageEvent.created_at >= start)
+    if end:
+        query = query.filter(OpenAIUsageEvent.created_at <= end)
+    counts: dict[str, int] = {}
+    by_feature: dict[str, dict[str, int]] = {}
+    for created_at, feature in query.all():
+        if not created_at:
+            continue
+        day = created_at.date().isoformat()
+        counts[day] = counts.get(day, 0) + 1
+        feature_key = feature or "unknown"
+        day_features = by_feature.setdefault(day, {})
+        day_features[feature_key] = day_features.get(feature_key, 0) + 1
+    return [
+        {"date": day, "requests": count, "by_feature": by_feature.get(day, {})}
+        for day, count in sorted(counts.items())
+    ]
+>>>>>>> feature/admin

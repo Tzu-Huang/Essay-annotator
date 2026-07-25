@@ -115,7 +115,11 @@ def run_sync(folder_id: str, out_dir: str | Path) -> None:
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--folder_id", required=True, help="Google Drive folder ID to sync")
+<<<<<<< HEAD
     parser.add_argument("--out", default="drive_data", help="Local output directory")
+=======
+    parser.add_argument("--out", default="backend/data", help="Local output directory")
+>>>>>>> feature/admin
     args = parser.parse_args()
     run_sync(args.folder_id, args.out)
 

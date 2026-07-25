@@ -18,13 +18,27 @@ import {
 } from "lucide-react";
 import { useAuth } from "../hooks/useAuth";
 import { useGoogleSignIn } from "../hooks/useGoogleSignIn";
+import AdminSidebar from "./admin/AdminSidebar.jsx";
+import OverviewDashboard from "./admin/OverviewDashboard.jsx";
+import EssaysTab from "./admin/EssaysTab.jsx";
+import EssayEditorPage from "./admin/EssayEditorPage.jsx";
+import UploadEssaysPage from "./admin/UploadEssaysPage.jsx";
+import UnsavedChangesModal from "./admin/UnsavedChangesModal.jsx";
+import { AuditLogList } from "./admin/AuditLogList.jsx";
+import { readSidebarCollapsed, writeSidebarCollapsed } from "./AdminConsole.logic.mjs";
 import {
+  advanceDraftQueue,
+  draftToEditorPayload,
   formatCurrency,
   formatNumber,
   isAdminEmailAllowed,
+  isContentDirty,
+  isEditorDirty,
   PROJECT_ADMIN_EMAILS,
   usageDashboard,
 } from "./AdminConsole.logic.mjs";
+import { formatDate } from "./AdminConsole.logic.mjs";
+import { EmptyState, MetricCard, PanelHeader, StatusBadge } from "./admin/AdminPrimitives.jsx";
 import "../styles/admin.css";
 
 const API_BASE = import.meta.env.VITE_API_URL || "http://44.201.62.0:8000";
@@ -63,14 +77,56 @@ export default function AdminConsole() {
   const [tab, setTab] = useState("overview");
   const [adminState, setAdminState] = useState({ loading: true, error: "", profile: null });
   const [overview, setOverview] = useState(null);
-  const [essays, setEssays] = useState({ items: [], total: 0, page: 1, page_size: 50 });
+  const [essays, setEssays] = useState({ items: [], total: 0, page: 1, page_size: 15 });
   const [filters, setFilters] = useState({ search: "", school: "", embedding_status: "", include_deleted: false });
+  const [essaySort, setEssaySort] = useState({ field: "updated_at", dir: "desc" });
   const [selectedEssay, setSelectedEssay] = useState(null);
   const [editor, setEditor] = useState(emptyEssay());
+  const [hardDeleteConfirmId, setHardDeleteConfirmId] = useState("");
+  const [importRunning, setImportRunning] = useState(false);
+  const [regeneratingStale, setRegeneratingStale] = useState(false);
   const [usage, setUsage] = useState(null);
   const [logs, setLogs] = useState({ items: [], error: "", configured: false });
   const [audit, setAudit] = useState([]);
   const [message, setMessage] = useState("");
+  const [messageTone, setMessageTone] = useState("success");
+
+  function showMessage(text, tone = "success") {
+    setMessage(text);
+    setMessageTone(tone);
+  }
+
+  useEffect(() => {
+    if (!message) return;
+    const timer = setTimeout(() => setMessage(""), 10000);
+    return () => clearTimeout(timer);
+  }, [message]);
+  const [essayView, setEssayView] = useState("list"); // "list" | "editor"
+  const [peekEssayId, setPeekEssayId] = useState(null);
+  const [regeneratingEmbeddingId, setRegeneratingEmbeddingId] = useState(null);
+  const [contentEditing, setContentEditing] = useState(false);
+  const [contentDraft, setContentDraft] = useState("");
+  const [savedEditorSnapshot, setSavedEditorSnapshot] = useState(null);
+  const [pendingNav, setPendingNav] = useState(null);
+  const [savingBeforeNav, setSavingBeforeNav] = useState(false);
+  const [uploadDrafts, setUploadDrafts] = useState([]);
+  const [uploadDraftIndex, setUploadDraftIndex] = useState(0);
+  const [uploadFailed, setUploadFailed] = useState([]);
+  const [uploading, setUploading] = useState(false);
+  const [uploadCreatedCount, setUploadCreatedCount] = useState(0);
+  const [uploadBatchComplete, setUploadBatchComplete] = useState(false);
+
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(() =>
+    readSidebarCollapsed(typeof window !== "undefined" ? window.localStorage : undefined)
+  );
+
+  function toggleSidebarCollapsed() {
+    setSidebarCollapsed((prev) => {
+      const next = !prev;
+      writeSidebarCollapsed(typeof window !== "undefined" ? window.localStorage : undefined, next);
+      return next;
+    });
+  }
 
   const email = user?.email?.toLowerCase();
   const configuredEmails = adminEmails();
@@ -100,13 +156,20 @@ export default function AdminConsole() {
   }, [headers]);
 
   async function loadOverview() {
-    setOverview(await api("/admin/overview"));
+    const [overviewData, usageData] = await Promise.all([
+      api("/admin/overview"),
+      api("/admin/openai/usage"),
+    ]);
+    setOverview(overviewData);
+    setUsage(usageData);
   }
 
   async function loadEssays(page = 1) {
     const params = new URLSearchParams({
       page: String(page),
-      page_size: String(essays.page_size || 50),
+      page_size: String(essays.page_size || 15),
+      sort: essaySort.field,
+      sort_dir: essaySort.dir,
     });
     Object.entries(filters).forEach(([key, value]) => {
       if (value !== "" && value !== false) params.set(key, String(value));
@@ -115,10 +178,18 @@ export default function AdminConsole() {
     setEssays(data);
   }
 
+  function toggleEssaySort(field) {
+    setEssaySort((current) =>
+      current.field === field
+        ? { field, dir: current.dir === "asc" ? "desc" : "asc" }
+        : { field, dir: "asc" }
+    );
+  }
+
   async function loadEssayDetail(id) {
     const data = await api(`/admin/essays/${id}`);
     setSelectedEssay(data);
-    setEditor({
+    const nextEditor = {
       topic: data.essay.topic || "",
       content: data.essay.content || "",
       type: data.essay.type || "",
@@ -126,7 +197,9 @@ export default function AdminConsole() {
       public: Boolean(data.essay.public),
       source_file: data.essay.source_file || "",
       metadata: data.essay.metadata || null,
-    });
+    };
+    setEditor(nextEditor);
+    setSavedEditorSnapshot(nextEditor);
   }
 
   async function loadUsage() {
@@ -143,6 +216,32 @@ export default function AdminConsole() {
     setAudit(data.items || []);
   }
 
+  function requestNavigation(action) {
+    const inEditor = essayView === "editor";
+    const fieldsDirty = inEditor && isEditorDirty(savedEditorSnapshot, editor);
+    const contentTextareaDirty = inEditor && contentEditing && isContentDirty(contentDraft, editor.content);
+    if (fieldsDirty || contentTextareaDirty) {
+      setPendingNav(() => action);
+      return;
+    }
+    action();
+  }
+
+  function closeEditor() {
+    setEssayView("list");
+    setContentEditing(false);
+    setContentDraft("");
+    setUploadDrafts([]);
+    setUploadDraftIndex(0);
+  }
+
+  function switchTab(id) {
+    requestNavigation(() => {
+      closeEditor();
+      setTab(id);
+    });
+  }
+
   async function refreshCurrent() {
     setMessage("");
     try {
@@ -151,20 +250,103 @@ export default function AdminConsole() {
       if (tab === "usage") await loadUsage();
       if (tab === "logs") await loadLogs();
       if (tab === "audit") await loadAudit();
-      setMessage("Updated");
+      showMessage("Updated");
     } catch (error) {
-      setMessage(error.message);
+      showMessage(error.message, "error");
     }
   }
 
   async function saveEssay() {
+    // Fold in an in-progress content-textarea draft even if its own "Done"
+    // wasn't clicked -- the top-level Save should save what's on screen, not
+    // silently drop unfinished typing in the content editor.
+    const payload = contentEditing && isContentDirty(editor.content, contentDraft) ? { ...editor, content: contentDraft } : editor;
     const path = selectedEssay?.essay?.id ? `/admin/essays/${selectedEssay.essay.id}` : "/admin/essays";
     const method = selectedEssay?.essay?.id ? "PATCH" : "POST";
-    const data = await api(path, { method, body: JSON.stringify(editor) });
+    const data = await api(path, { method, body: JSON.stringify(payload) });
     setSelectedEssay({ essay: data.essay, audit: selectedEssay?.audit || [] });
+    setSavedEditorSnapshot(payload);
+    setEditor(payload);
+    setContentDraft(payload.content || "");
+    setContentEditing(false);
     await loadEssays(essays.page || 1);
     await loadOverview();
-    setMessage("Essay saved");
+    showMessage("Essay saved");
+  }
+
+  function loadDraftIntoEditor(draft) {
+    setSelectedEssay(null);
+    const payload = draftToEditorPayload(draft);
+    setEditor(payload);
+    setSavedEditorSnapshot(payload);
+    setHardDeleteConfirmId("");
+  }
+
+  async function uploadEssayDrafts(files, fileMeta) {
+    if (!files.length) return;
+    setUploading(true);
+    try {
+      const formData = new FormData();
+      files.forEach((file) => formData.append("files", file));
+      formData.append("file_meta", JSON.stringify(fileMeta));
+      const response = await fetch(`${API_BASE}/admin/essays/upload-drafts`, {
+        method: "POST",
+        headers: { "X-Admin-Email": email || "" },
+        body: formData,
+      });
+      const data = await response.json().catch(() => ({}));
+      if (!response.ok) throw new Error(data.detail || "Upload failed");
+
+      setUploadFailed(data.failed || []);
+      setUploadCreatedCount(0);
+      setUploadBatchComplete(false);
+
+      if (data.drafts?.length) {
+        setUploadDrafts(data.drafts);
+        setUploadDraftIndex(0);
+        loadDraftIntoEditor(data.drafts[0]);
+        setEssayView("editor");
+      } else if (data.failed?.length) {
+        showMessage(`No files could be processed (${data.failed.length} failed).`, "error");
+      } else {
+        showMessage("No files selected.", "error");
+      }
+    } catch (error) {
+      showMessage(error.message, "error");
+    } finally {
+      setUploading(false);
+    }
+  }
+
+  function advanceOrFinishDraftQueue() {
+    const result = advanceDraftQueue(uploadDraftIndex, uploadDrafts.length);
+    if (result.done) {
+      setUploadDrafts([]);
+      setUploadDraftIndex(0);
+      setUploadBatchComplete(true);
+      setEssayView("upload");
+    } else {
+      setUploadDraftIndex(result.nextIndex);
+      loadDraftIntoEditor(uploadDrafts[result.nextIndex]);
+    }
+  }
+
+  async function saveUploadDraft() {
+    await saveEssay();
+    setUploadCreatedCount((count) => count + 1);
+    advanceOrFinishDraftQueue();
+  }
+
+  function skipUploadDraft() {
+    advanceOrFinishDraftQueue();
+  }
+
+  function startNewUpload() {
+    setUploadFailed([]);
+    setUploadCreatedCount(0);
+    setUploadBatchComplete(false);
+    setTab("essays");
+    setEssayView("upload");
   }
 
   async function deleteEssay() {
@@ -175,16 +357,82 @@ export default function AdminConsole() {
     setSelectedEssay({ essay: data.essay, audit: selectedEssay.audit || [] });
     await loadEssays(essays.page || 1);
     await loadOverview();
-    setMessage("Essay soft deleted");
+    showMessage("Essay soft deleted");
   }
 
-  async function queueEmbedding() {
+  async function restoreEssay() {
     if (!selectedEssay?.essay?.id) return;
-    const data = await api(`/admin/essays/${selectedEssay.essay.id}/regenerate-embedding`, { method: "POST" });
+    const data = await api(`/admin/essays/${selectedEssay.essay.id}/restore`, { method: "POST" });
     setSelectedEssay({ essay: data.essay, audit: selectedEssay.audit || [] });
     await loadEssays(essays.page || 1);
-    await loadOverview();
-    setMessage("Embedding regeneration queued");
+    showMessage("Essay restored");
+  }
+
+  async function hardDeleteEssay() {
+    if (!selectedEssay?.essay?.id) return;
+    await api(`/admin/essays/${selectedEssay.essay.id}/hard-delete`, { method: "POST" });
+    setSelectedEssay(null);
+    setHardDeleteConfirmId("");
+    await loadEssays(essays.page || 1);
+    showMessage("Essay permanently deleted");
+  }
+
+  async function handleRowClick(essay) {
+    if (peekEssayId === essay.id) {
+      setPeekEssayId(null);
+      return;
+    }
+    setPeekEssayId(essay.id);
+    await loadEssayDetail(essay.id);
+  }
+
+  async function regenerateEmbeddingFor(essayId) {
+    setRegeneratingEmbeddingId(essayId);
+    try {
+      const data = await api(`/admin/essays/${essayId}/regenerate-embedding`, { method: "POST" });
+      if (selectedEssay?.essay?.id === essayId) {
+        setSelectedEssay({ essay: data.essay, audit: selectedEssay.audit || [] });
+      }
+      await loadEssays(essays.page || 1);
+      await loadOverview();
+      if (data.embedding_job?.status === "current") {
+        showMessage("Embedding regenerated");
+      } else {
+        showMessage("Embedding regeneration failed to reach current status", "error");
+      }
+    } finally {
+      setRegeneratingEmbeddingId(null);
+    }
+  }
+
+  async function importNewEssays() {
+    setImportRunning(true);
+    try {
+      const result = await api("/admin/import-new-essays", { method: "POST" });
+      showMessage(
+        `Imported ${result.created} new essays, ${result.skipped_duplicates} duplicates skipped, ${result.invalid} invalid — ${result.embedded} embedded and searchable.`
+      );
+      await loadEssays(essays.page || 1);
+      await loadOverview();
+    } finally {
+      setImportRunning(false);
+    }
+  }
+
+  async function regenerateAllStale() {
+    setRegeneratingStale(true);
+    try {
+      const result = await api("/admin/essays/regenerate-stale-embeddings", { method: "POST" });
+      showMessage(
+        result.attempted === 0
+          ? "No stale essays to regenerate."
+          : `Regenerated ${result.succeeded} of ${result.attempted} stale essay(s)${result.failed ? ` (${result.failed} failed)` : ""}.`,
+        result.failed ? "error" : "success"
+      );
+      await loadOverview();
+    } finally {
+      setRegeneratingStale(false);
+    }
   }
 
   useEffect(() => {
@@ -222,11 +470,21 @@ export default function AdminConsole() {
     async function loadTab() {
       try {
         if (tab === "overview") {
-          const data = await api("/admin/overview");
-          if (!cancelled) setOverview(data);
+          const [overviewData, usageData, auditData] = await Promise.all([
+            api("/admin/overview"),
+            api("/admin/openai/usage"),
+            api("/admin/audit?limit=50"),
+          ]);
+          if (!cancelled) {
+            setOverview(overviewData);
+            setUsage(usageData);
+            setAudit(auditData.items || []);
+          }
         }
         if (tab === "essays") {
-          const data = await api(`/admin/essays?page=1&page_size=${essays.page_size || 50}`);
+          const data = await api(
+            `/admin/essays?page=1&page_size=${essays.page_size || 15}&sort=${essaySort.field}&sort_dir=${essaySort.dir}`
+          );
           if (!cancelled) setEssays(data);
         }
         if (tab === "usage") {
@@ -242,7 +500,7 @@ export default function AdminConsole() {
           if (!cancelled) setAudit(data.items || []);
         }
       } catch (error) {
-        if (!cancelled) setMessage(error.message);
+        if (!cancelled) showMessage(error.message, "error");
       }
     }
 
@@ -250,7 +508,7 @@ export default function AdminConsole() {
     return () => {
       cancelled = true;
     };
-  }, [adminState.profile, api, essays.page_size, tab]);
+  }, [adminState.profile, api, essays.page_size, essaySort, tab]);
 
   if (adminState.loading) {
     return <main className="admin-shell admin-loading">Loading admin access...</main>;
@@ -272,59 +530,118 @@ export default function AdminConsole() {
   }
 
   return (
-    <main className="admin-shell">
-      <aside className="admin-sidebar">
-        <div className="admin-brand">
-          <div className="admin-brand-mark">EA</div>
-          <div>
-            <strong>Essay Ops</strong>
-            <span>Developer console</span>
-          </div>
-        </div>
-        <nav className="admin-nav" aria-label="Admin sections">
-          {NAV_ITEMS.map(([id, label, iconComponent]) => (
-            <button key={id} className={tab === id ? "active" : ""} onClick={() => setTab(id)}>
-              {createElement(iconComponent, { size: 17 })}
-              <span>{label}</span>
-            </button>
-          ))}
-        </nav>
-        <div className="admin-sidebar-footer">
-          <span>API</span>
-          <strong>{API_BASE.replace(/^https?:\/\//, "")}</strong>
-        </div>
-      </aside>
+    <main className={`admin-shell${sidebarCollapsed ? " sidebar-collapsed" : ""}`}>
+      <AdminSidebar
+        navItems={NAV_ITEMS}
+        activeTab={tab}
+        onSelectTab={switchTab}
+        collapsed={sidebarCollapsed}
+        onToggleCollapsed={toggleSidebarCollapsed}
+        apiBase={API_BASE}
+      />
 
       <section className="admin-main">
         <header className="admin-topbar">
           <div>
             <p className="admin-kicker">Developer Operations</p>
             <h1>{NAV_ITEMS.find(([id]) => id === tab)?.[1] || "Admin Console"}</h1>
-            <span>{adminState.profile.email}</span>
           </div>
           <button className="admin-icon-button" onClick={refreshCurrent} title="Refresh" aria-label="Refresh">
             <RefreshCw size={18} />
           </button>
         </header>
 
-        {message && <div className="admin-message">{message}</div>}
-        {tab === "overview" && <Overview overview={overview} />}
-        {tab === "essays" && (
-          <Essays
+        {message && <div className={`admin-message admin-message-${messageTone}`}>{message}</div>}
+        {tab === "overview" && (
+          <OverviewDashboard
+            overview={overview}
+            usage={usage}
+            audit={audit}
+            user={adminState.profile ? user : null}
+            onOpenLog={() => switchTab("audit")}
+            onImport={startNewUpload}
+            onRegenerateStale={regenerateAllStale}
+            regeneratingStale={regeneratingStale}
+          />
+        )}
+        {tab === "essays" && essayView === "list" && (
+          <EssaysTab
             essays={essays}
             filters={filters}
             setFilters={setFilters}
             loadEssays={loadEssays}
-            selectedEssay={selectedEssay}
-            loadEssayDetail={loadEssayDetail}
+            essaySort={essaySort}
+            toggleEssaySort={toggleEssaySort}
+            peekEssayId={peekEssayId}
+            onRowClick={handleRowClick}
+            peekEssay={peekEssayId === selectedEssay?.essay?.id ? selectedEssay?.essay : null}
+            onCollapsePeek={() => setPeekEssayId(null)}
+            onOpenEditor={() => setEssayView("editor")}
+            onRegenerateEmbedding={regenerateEmbeddingFor}
+            regeneratingEmbeddingId={regeneratingEmbeddingId}
+            importNewEssays={importNewEssays}
+            importRunning={importRunning}
+            onOpenUpload={startNewUpload}
+          />
+        )}
+        {tab === "essays" && essayView === "upload" && (
+          <UploadEssaysPage
+            onBack={() => requestNavigation(closeEditor)}
+            onSubmit={uploadEssayDrafts}
+            uploading={uploading}
+            failed={uploadFailed}
+            createdCount={uploadCreatedCount}
+            batchComplete={uploadBatchComplete}
+            onStartNew={startNewUpload}
+          />
+        )}
+        {tab === "essays" && essayView === "editor" && (
+          <EssayEditorPage
+            key={editor.source_file}
+            essay={selectedEssay?.essay || null}
+            audit={selectedEssay?.audit || []}
             editor={editor}
             setEditor={setEditor}
-            saveEssay={saveEssay}
-            deleteEssay={deleteEssay}
-            queueEmbedding={queueEmbedding}
-            newEssay={() => {
-              setSelectedEssay(null);
-              setEditor(emptyEssay());
+            onBack={() => requestNavigation(closeEditor)}
+            onSave={uploadDrafts.length > 0 ? saveUploadDraft : saveEssay}
+            draftInfo={
+              uploadDrafts.length > 0
+                ? { current: uploadDraftIndex + 1, total: uploadDrafts.length, onSkip: skipUploadDraft }
+                : null
+            }
+            extractionWarning={uploadDrafts.length > 0 ? uploadDrafts[uploadDraftIndex]?.extraction_warning : null}
+            onSoftDelete={deleteEssay}
+            onRestore={restoreEssay}
+            onHardDelete={hardDeleteEssay}
+            onRegenerateEmbedding={() => selectedEssay?.essay?.id && regenerateEmbeddingFor(selectedEssay.essay.id)}
+            regeneratingEmbedding={Boolean(selectedEssay?.essay?.id) && regeneratingEmbeddingId === selectedEssay.essay.id}
+            hardDeleteConfirmId={hardDeleteConfirmId}
+            setHardDeleteConfirmId={setHardDeleteConfirmId}
+            onContentEditingChange={setContentEditing}
+            onContentDraftChange={setContentDraft}
+          />
+        )}
+        {pendingNav && (
+          <UnsavedChangesModal
+            saving={savingBeforeNav}
+            onLeave={() => {
+              const action = pendingNav;
+              setPendingNav(null);
+              action();
+            }}
+            onStay={() => setPendingNav(null)}
+            onSave={async () => {
+              setSavingBeforeNav(true);
+              try {
+                await saveEssay();
+                const action = pendingNav;
+                setPendingNav(null);
+                action();
+              } catch (error) {
+                showMessage(error.message, "error");
+              } finally {
+                setSavingBeforeNav(false);
+              }
             }}
           />
         )}
@@ -333,180 +650,6 @@ export default function AdminConsole() {
         {tab === "audit" && <Audit audit={audit} />}
       </section>
     </main>
-  );
-}
-
-function Overview({ overview }) {
-  if (!overview) return null;
-  const cards = [
-    ["Essays", overview.counts.essays, BookOpen],
-    ["Deleted", overview.counts.deleted_essays, Trash2],
-    ["Users", overview.counts.users, Shield],
-    ["Stale embeddings", overview.counts.stale_embeddings, Database],
-  ];
-  return (
-    <section className="admin-grid">
-      {cards.map(([label, value, iconComponent]) => (
-        <MetricCard key={label} label={label} value={formatNumber(value)} icon={iconComponent} />
-      ))}
-      <div className="admin-panel wide">
-        <PanelHeader title="Integrations" />
-        <div className="admin-integration-grid">
-          {Object.entries(overview.integrations || {}).map(([name, detail]) => (
-            <IntegrationCard key={name} name={name} detail={detail} />
-          ))}
-        </div>
-      </div>
-    </section>
-  );
-}
-
-function Essays(props) {
-  const {
-    essays,
-    filters,
-    setFilters,
-    loadEssays,
-    selectedEssay,
-    loadEssayDetail,
-    editor,
-    setEditor,
-    saveEssay,
-    deleteEssay,
-    queueEmbedding,
-    newEssay,
-  } = props;
-
-  return (
-    <section className="admin-essay-layout">
-      <div className="admin-panel admin-essay-list-panel">
-        <div className="admin-panel-header">
-          <div>
-            <h2>Essays</h2>
-            <span>{formatNumber(essays.total)} records</span>
-          </div>
-          <button onClick={newEssay}>New</button>
-        </div>
-        <div className="admin-filters">
-          <label className="admin-search-field">
-            <Search size={15} />
-            <input
-              placeholder="Search"
-              value={filters.search}
-              onChange={(e) => setFilters({ ...filters, search: e.target.value })}
-            />
-          </label>
-          <input
-            placeholder="School"
-            value={filters.school}
-            onChange={(e) => setFilters({ ...filters, school: e.target.value })}
-          />
-          <select
-            value={filters.embedding_status}
-            onChange={(e) => setFilters({ ...filters, embedding_status: e.target.value })}
-          >
-            <option value="">All embeddings</option>
-            <option value="current">Current</option>
-            <option value="stale">Stale</option>
-            <option value="queued">Queued</option>
-          </select>
-          <label className="checkbox-row">
-            <input
-              type="checkbox"
-              checked={filters.include_deleted}
-              onChange={(e) => setFilters({ ...filters, include_deleted: e.target.checked })}
-            />
-            Deleted
-          </label>
-          <button onClick={() => loadEssays(1)}>Apply</button>
-        </div>
-        <div className="admin-id-list">
-          {essays.items.map((essay) => (
-            <button
-              key={essay.id}
-              className={selectedEssay?.essay?.id === essay.id ? "active" : ""}
-              onClick={() => loadEssayDetail(essay.id)}
-              title={essay.topic || essay.id}
-            >
-              <strong>{essay.id}</strong>
-              <StatusBadge value={essay.embedding_status || "unknown"} />
-              {essay.public && <span className="admin-tiny-pill">Public</span>}
-            </button>
-          ))}
-        </div>
-      </div>
-
-      <div className="admin-panel admin-detail-panel">
-        <div className="admin-panel-header">
-          <div>
-            <h2>{selectedEssay?.essay?.id || "New Essay"}</h2>
-            <span>{selectedEssay?.essay?.topic || "Create or select an essay"}</span>
-          </div>
-          <div className="admin-actions">
-            {selectedEssay?.essay?.id && <button onClick={queueEmbedding}>Queue Embedding</button>}
-            {selectedEssay?.essay?.id && (
-              <button className="danger" onClick={deleteEssay} title="Soft delete" aria-label="Soft delete">
-                <Trash2 size={16} />
-              </button>
-            )}
-            <button onClick={saveEssay}>
-              <Save size={16} /> Save
-            </button>
-          </div>
-        </div>
-        {selectedEssay?.essay && <EssayReadPanel essay={selectedEssay.essay} audit={selectedEssay.audit || []} />}
-        <EssayEditor editor={editor} setEditor={setEditor} />
-      </div>
-    </section>
-  );
-}
-
-function EssayReadPanel({ essay, audit }) {
-  return (
-    <div className="admin-read-panel">
-      <div className="admin-meta-grid">
-        <MetaItem label="Public" value={essay.public ? "Yes" : "No"} />
-        <MetaItem label="Type" value={essay.type || "none"} />
-        <MetaItem label="School" value={essay.school || "none"} />
-        <MetaItem label="Words" value={formatNumber(essay.word_count)} />
-        <MetaItem label="Embedding" value={essay.embedding_status || "unknown"} />
-        <MetaItem label="Updated" value={formatDate(essay.updated_at)} />
-      </div>
-      <article className="admin-essay-content">{essay.content || "No content loaded."}</article>
-      <div className="admin-two-column">
-        <div>
-          <h3>Metadata</h3>
-          <pre>{JSON.stringify(essay.metadata || {}, null, 2)}</pre>
-        </div>
-        <div>
-          <h3>Recent audit</h3>
-          <div className="admin-audit-mini">
-            {audit.length ? audit.map((row) => (
-              <p key={row.id}>{formatDate(row.created_at)} | {row.actor_email} | {row.action}</p>
-            )) : <p>No audit entries.</p>}
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function EssayEditor({ editor, setEditor }) {
-  function update(field, value) {
-    setEditor({ ...editor, [field]: value });
-  }
-  return (
-    <div className="admin-form">
-      <label>Topic<input value={editor.topic} onChange={(e) => update("topic", e.target.value)} /></label>
-      <label>Type<input value={editor.type || ""} onChange={(e) => update("type", e.target.value)} /></label>
-      <label>School<input value={editor.school || ""} onChange={(e) => update("school", e.target.value)} /></label>
-      <label>Source<input value={editor.source_file || ""} onChange={(e) => update("source_file", e.target.value)} /></label>
-      <label className="checkbox-row">
-        <input type="checkbox" checked={Boolean(editor.public)} onChange={(e) => update("public", e.target.checked)} />
-        Public
-      </label>
-      <label className="wide">Content<textarea value={editor.content} onChange={(e) => update("content", e.target.value)} /></label>
-    </div>
   );
 }
 
@@ -607,90 +750,5 @@ function Logs({ logs }) {
 }
 
 function Audit({ audit }) {
-  return (
-    <section className="admin-panel">
-      <PanelHeader title="Audit" aside={`${formatNumber(audit.length)} recent entries`} />
-      <div className="admin-table">
-        {audit.map((row) => (
-          <button key={row.id}>
-            <span>{formatDate(row.created_at)}</span>
-            <strong>{row.action}</strong>
-            <em>{row.actor_email} | {row.entity_type}:{row.entity_id}</em>
-          </button>
-        ))}
-      </div>
-    </section>
-  );
-}
-
-function MetricCard({ label, value, icon: iconComponent }) {
-  return (
-    <div className="admin-stat">
-      <div>
-        <span>{label}</span>
-        <strong>{value}</strong>
-      </div>
-      {createElement(iconComponent, { size: 18 })}
-    </div>
-  );
-}
-
-function IntegrationCard({ name, detail }) {
-  const configured = Boolean(detail?.configured);
-  return (
-    <div className="admin-integration-card">
-      {configured ? <CheckCircle2 size={16} /> : <AlertCircle size={16} />}
-      <div>
-        <strong>{name.replaceAll("_", " ")}</strong>
-        <span>{configured ? "Configured" : "Needs setup"}</span>
-      </div>
-    </div>
-  );
-}
-
-function PanelHeader({ title, aside }) {
-  return (
-    <div className="admin-panel-header">
-      <h2>{title}</h2>
-      {aside && <span>{aside}</span>}
-    </div>
-  );
-}
-
-function StatusBadge({ value }) {
-  const normalized = String(value || "unknown").toLowerCase();
-  return <span className={`admin-status admin-status-${normalized}`}>{value}</span>;
-}
-
-function MetaItem({ label, value }) {
-  return (
-    <div className="admin-meta-item">
-      <span>{label}</span>
-      <strong>{value || "none"}</strong>
-    </div>
-  );
-}
-
-function EmptyState({ icon: iconComponent, title, detail }) {
-  return (
-    <div className="admin-empty">
-      {createElement(iconComponent, { size: 22 })}
-      <strong>{title}</strong>
-      <span>{detail}</span>
-    </div>
-  );
-}
-
-function formatDate(value) {
-  if (!value) return "none";
-  try {
-    return new Intl.DateTimeFormat("en-US", {
-      month: "short",
-      day: "2-digit",
-      hour: "2-digit",
-      minute: "2-digit",
-    }).format(new Date(value));
-  } catch {
-    return value;
-  }
+  return <AuditLogList audit={audit} />;
 }

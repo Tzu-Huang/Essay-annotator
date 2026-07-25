@@ -108,6 +108,7 @@ def make_essay_signature(topic: str, content: str, source_file: str | None = Non
     )
 
 # load the essay signatures in the database.jsonl (topic + content + source)
+<<<<<<< HEAD
 def load_existing_signatures():
     signatures = set()
 
@@ -116,6 +117,17 @@ def load_existing_signatures():
         return signatures
 
     with open(DATABASE_PATH, "r", encoding="utf-8") as f:
+=======
+def load_existing_signatures(database_path: Path = None):
+    database_path = database_path if database_path is not None else DATABASE_PATH
+    signatures = set()
+
+    if not database_path.exists():
+        print(f"  database.jsonl has not been created")
+        return signatures
+
+    with open(database_path, "r", encoding="utf-8") as f:
+>>>>>>> feature/admin
         for line in f:
             line = line.strip()
             if not line:
@@ -138,6 +150,7 @@ def load_existing_signatures():
 # =========================
 # Handle new input + move files
 # =========================
+<<<<<<< HEAD
 def load_new_input_essays(id_counter: count, existing_signatures=None) -> list[dict]:
     """
     Read all .txt files from NEW_INPUT_DIR and the type of the essay is detected by filename.
@@ -151,6 +164,23 @@ def load_new_input_essays(id_counter: count, existing_signatures=None) -> list[d
 
     moved_count = 0
     for file_path in sorted(NEW_INPUT_DIR.glob("*.txt")):
+=======
+def load_new_input_essays(id_counter: count, existing_signatures=None, new_input_dir: Path = None) -> list[dict]:
+    """
+    Read all .txt files from new_input_dir (defaults to NEW_INPUT_DIR) and the
+    type of the essay is detected by filename.
+    """
+    essays = []
+    existing_signatures = existing_signatures or set()
+    new_input_dir = new_input_dir if new_input_dir is not None else NEW_INPUT_DIR
+
+    if not new_input_dir.exists():
+        print(f"  [skip] new_input/ not found: {new_input_dir}")
+        return essays
+
+    moved_count = 0
+    for file_path in sorted(new_input_dir.glob("*.txt")):
+>>>>>>> feature/admin
 
         with file_path.open(encoding="utf-8-sig") as f:
             text = f.read()
@@ -262,6 +292,7 @@ def get_essay_type(path):
     else: 
         return "Supplemental", file_name.strip()
 
+<<<<<<< HEAD
 def get_next_id():
     """
     Read the last line of database.jsonl and return the next available ID number.
@@ -275,10 +306,32 @@ def get_next_id():
         for line in f:
             last_line = line
     
+=======
+def get_next_id(database_path: Path = None):
+    """
+    Read the last line of database.jsonl and return the next available ID number.
+    Returns -1 if the database doesn't exist. Returns 1 if it exists but has no
+    valid last line (e.g. empty file), matching the "build from scratch" start id.
+    """
+    database_path = database_path if database_path is not None else DATABASE_PATH
+    if not database_path.exists():
+        return -1
+
+    last_line = None
+    with open(database_path, "r", encoding = "utf-8") as f:
+        for line in f:
+            last_line = line
+
+>>>>>>> feature/admin
     if last_line:
         last_id = json.loads(last_line)["id"]
         return (int)(last_id.split("_")[1]) + 1
 
+<<<<<<< HEAD
+=======
+    return 1
+
+>>>>>>> feature/admin
 
 def get_client() -> OpenAI:
     return OpenAI(api_key=os.environ["OPENAI_API_KEY"])
@@ -306,17 +359,38 @@ def add_generated_titles(essays: list[dict], client) -> None:
 # Main
 # =========================
 def update_database():
+<<<<<<< HEAD
     if_database = (not DATABASE_PATH.exists()) or DATABASE_PATH.stat().st_size == 0
     existing_signatures = load_existing_signatures()
+=======
+    # Deferred import: service.ingest_service imports from this module, so
+    # importing it at module load time would create a circular import.
+    from service.ingest_service import scan_and_title_new_essays
+
+    if_database = (not DATABASE_PATH.exists()) or DATABASE_PATH.stat().st_size == 0
+    existing_signatures = load_existing_signatures(DATABASE_PATH)
+>>>>>>> feature/admin
 
     # if database.jsonl does not exist or nothing inside, add everything together
     if (if_database):
         print("\n===Building database.jsonl===\n")
         counter = count(1)
 
+<<<<<<< HEAD
         online_essays = load_online_essays(counter)
         collected_essays = load_collected_essays(counter)
         new_essays = load_new_input_essays(counter, existing_signatures)
+=======
+        # NOTE: this branch shares a single counter across three sources
+        # (online, collected, new_input) so IDs stay sequential without gaps,
+        # and titles are generated once for the combined list below. That
+        # doesn't map onto scan_and_title_new_essays's self-contained
+        # counter/titling, so this branch intentionally keeps the inline
+        # load_new_input_essays call rather than calling scan_and_title_new_essays.
+        online_essays = load_online_essays(counter)
+        collected_essays = load_collected_essays(counter)
+        new_essays = load_new_input_essays(counter, existing_signatures, NEW_INPUT_DIR)
+>>>>>>> feature/admin
         all_essays = online_essays + collected_essays + new_essays
 
         if not all_essays:
@@ -329,6 +403,7 @@ def update_database():
         with open(DATABASE_PATH, "w", encoding="utf-8") as f:
             for essay in all_essays:
                 f.write(json.dumps(essay, ensure_ascii=False) + '\n')
+<<<<<<< HEAD
             
         print(f"Done! Created database.jsonl file with {len(all_essays)} essays")
     
@@ -337,13 +412,25 @@ def update_database():
         # get next id and append
         counter = count(get_next_id())
         new_essays = load_new_input_essays(counter, existing_signatures)
+=======
+
+        print(f"Done! Created database.jsonl file with {len(all_essays)} essays")
+
+    # if database.jsonl does exist, just append the new ones inside
+    else:
+        # scan new_input/, dedupe, and generate titles via the shared ingest core
+        new_essays = scan_and_title_new_essays(NEW_INPUT_DIR, DATABASE_PATH, get_client())
+>>>>>>> feature/admin
 
         if not new_essays:
             print("  No new essays found in new_input/. Nothing appended.")
             return
 
+<<<<<<< HEAD
         add_generated_titles(new_essays, get_client())
 
+=======
+>>>>>>> feature/admin
         with open(DATABASE_PATH, "a", encoding="utf-8") as f:
             for essay in new_essays:
                 f.write(json.dumps(essay, ensure_ascii=False) + "\n")

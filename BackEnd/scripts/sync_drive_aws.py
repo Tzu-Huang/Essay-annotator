@@ -71,7 +71,11 @@ def sync_folder(service, folder_id, out_dir: Path):
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--folder_id", required=True, help="Google Drive folder ID to sync")
+<<<<<<< HEAD
     parser.add_argument("--out", default="drive_data", help="Local output directory")
+=======
+    parser.add_argument("--out", default="backend/data", help="Local output directory")
+>>>>>>> feature/admin
     args = parser.parse_args()
 
     creds = get_creds()
@@ -84,4 +88,8 @@ def main():
     print("✅ Sync complete.")
 
 if __name__ == "__main__":
+<<<<<<< HEAD
     main()
+=======
+    main()
+>>>>>>> feature/admin

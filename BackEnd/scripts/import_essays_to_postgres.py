@@ -30,7 +30,11 @@ def main(path: str | None = None):
 
     print(
         "Imported essays: "
+<<<<<<< HEAD
         f"seen={result.seen}, created={result.created}, updated={result.updated}, "
+=======
+        f"seen={result.seen}, created={result.created}, "
+>>>>>>> feature/admin
         f"skipped_duplicates={result.skipped_duplicates}, invalid={result.invalid}"
     )
 

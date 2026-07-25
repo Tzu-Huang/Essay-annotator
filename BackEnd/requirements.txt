@@ -9,3 +9,9 @@ tiktoken
 pydantic
 boto3
 requests
+<<<<<<< HEAD
+=======
+python-docx
+pypdf
+python-multipart
+>>>>>>> feature/admin

@@ -1,5 +1,9 @@
 import json
 import os
+<<<<<<< HEAD
+=======
+import threading
+>>>>>>> feature/admin
 import urllib.error
 import urllib.parse
 import urllib.request
@@ -8,28 +12,91 @@ from pathlib import Path
 from typing import Optional
 
 from dotenv import load_dotenv
+<<<<<<< HEAD
 from fastapi import APIRouter, Depends, Header, HTTPException, Query
+=======
+from fastapi import APIRouter, Depends, File, Form, Header, HTTPException, Query, UploadFile
+from openai import OpenAI
+>>>>>>> feature/admin
 from pydantic import BaseModel
 from sqlalchemy import func
 from sqlalchemy.orm import Session
 
+<<<<<<< HEAD
+=======
+from app.state import AppData
+from app.usage import record_openai_usage
+>>>>>>> feature/admin
 from database.create import AdminAuditLog, Essay, EssayEmbedding, OpenAIUsageEvent, User, get_db
 from database.essays import (
     audit_log,
     content_hash,
+<<<<<<< HEAD
     essay_to_dict,
+=======
+    daily_request_counts,
+    essay_to_dict,
+    import_essays_from_jsonl,
+>>>>>>> feature/admin
     next_essay_id,
     query_essays,
     summarize_usage,
     utcnow,
     validate_essay_payload,
 )
+<<<<<<< HEAD
+=======
+from scripts.add_to_database import DATABASE_PATH as DATABASE_JSONL_PATH, NEW_INPUT_DIR as NEW_INPUT_DIR_PATH
+from service.embed_store import append_records, remove_parent_ids, replace_parent_id
+from service.embedding_service import embed_essay
+from service.extract_essay import MODEL as EXTRACTION_MODEL, extract_prompt_and_content
+from service.file_extraction import NoTextExtracted, UnsupportedFileType, extract_text
+from service.generate_topic import MODEL as TITLE_GENERATION_MODEL
+from service.ingest_service import scan_and_title_new_essays
+>>>>>>> feature/admin
 
 
 load_dotenv(dotenv_path=Path(__file__).resolve().parent.parent / ".env")
 
 router = APIRouter(prefix="/admin", tags=["admin"])
 
+<<<<<<< HEAD
+=======
+def get_embedding_client() -> OpenAI:
+    return OpenAI(api_key=os.environ["OPENAI_API_KEY"])
+
+
+def _embed_jsonl_path() -> Path:
+    # Reuse app.main's EMBED_JSONL constant rather than recomputing the path
+    # string here; deferred import for the same circular-import reason as
+    # _current_app_data() below.
+    from app.main import EMBED_JSONL
+
+    return EMBED_JSONL
+
+
+def _current_app_data() -> AppData:
+    # admin.py must not import app.main at module load time: main.py imports
+    # this module (`from app.admin import ... router as admin_router`), so a
+    # top-level `from app.main import app` here would be a circular import.
+    # Deferring the import into this function call avoids that, since by the
+    # time this runs, app.admin has already finished loading. There's also no
+    # existing `Depends(get_app_data)`-style dependency in main.py to mirror,
+    # and unit tests call endpoint functions directly (bypassing FastAPI's DI
+    # container and any `Request` injection), so a plain helper that reaches
+    # into the running app singleton is the pattern that works both in
+    # production (uvicorn has run the lifespan, so app.state.data is a real
+    # AppData) and in tests (lifespan never runs, so we lazily create an
+    # empty AppData the first time this is called).
+    from app.main import app as _fastapi_app
+
+    data = getattr(_fastapi_app.state, "data", None)
+    if data is None:
+        data = AppData()
+        _fastapi_app.state.data = data
+    return data
+
+>>>>>>> feature/admin
 
 def _split_env(name: str) -> set[str]:
     return {
@@ -139,6 +206,11 @@ def list_essays(
     public: Optional[bool] = None,
     embedding_status: Optional[str] = None,
     include_deleted: bool = False,
+<<<<<<< HEAD
+=======
+    sort: Optional[str] = Query(default=None, pattern="^(id|topic|school|type|updated_at|embedding_status)$"),
+    sort_dir: str = Query(default="asc", pattern="^(asc|desc)$"),
+>>>>>>> feature/admin
     db: Session = Depends(get_db),
     actor: AdminActor = Depends(require_admin),
 ):
@@ -150,6 +222,7 @@ def list_essays(
         public=public,
         embedding_status=embedding_status,
         include_deleted=include_deleted,
+<<<<<<< HEAD
     )
     total = query.count()
     rows = (
@@ -158,6 +231,21 @@ def list_essays(
         .limit(page_size)
         .all()
     )
+=======
+        sort=sort,
+        sort_dir=sort_dir,
+    )
+    total = query.count()
+    if sort:
+        rows = query.offset((page - 1) * page_size).limit(page_size).all()
+    else:
+        rows = (
+            query.order_by(Essay.updated_at.desc(), Essay.id.asc())
+            .offset((page - 1) * page_size)
+            .limit(page_size)
+            .all()
+        )
+>>>>>>> feature/admin
     return {
         "items": [essay_to_dict(row, include_content=False) for row in rows],
         "page": page,
@@ -235,6 +323,11 @@ def update_essay(
     essay = db.query(Essay).filter(Essay.id == essay_id).first()
     if not essay:
         raise HTTPException(status_code=404, detail="Essay not found")
+<<<<<<< HEAD
+=======
+    if essay.deleted_at is not None:
+        raise HTTPException(status_code=409, detail="Cannot edit a soft-deleted essay; restore it first")
+>>>>>>> feature/admin
     before = essay_to_dict(essay, include_content=True)
     values = _model_data(payload, exclude_unset=True)
     if "metadata" in values:
@@ -275,6 +368,50 @@ def soft_delete_essay(essay_id: str, db: Session = Depends(get_db), actor: Admin
     return {"essay": after}
 
 
+<<<<<<< HEAD
+=======
+@router.post("/essays/{essay_id}/restore")
+def restore_essay(essay_id: str, db: Session = Depends(get_db), actor: AdminActor = Depends(require_admin_write)):
+    essay = db.query(Essay).filter(Essay.id == essay_id).first()
+    if not essay:
+        raise HTTPException(status_code=404, detail="Essay not found")
+    if essay.deleted_at is None:
+        raise HTTPException(status_code=409, detail="Essay is not deleted")
+    before = essay_to_dict(essay, include_content=True)
+    essay.deleted_at = None
+    essay.updated_at = utcnow()
+    db.flush()
+    after = essay_to_dict(essay, include_content=True)
+    audit_log(db, actor.email, "restore", "essay", essay.id, before, after)
+    db.commit()
+    return {"essay": after}
+
+
+@router.post("/essays/{essay_id}/hard-delete")
+def hard_delete_essay(essay_id: str, db: Session = Depends(get_db), actor: AdminActor = Depends(require_admin_write)):
+    essay = db.query(Essay).filter(Essay.id == essay_id).first()
+    if not essay:
+        raise HTTPException(status_code=404, detail="Essay not found")
+    if essay.deleted_at is None:
+        raise HTTPException(status_code=409, detail="Essay must be soft-deleted before it can be hard-deleted")
+
+    before = essay_to_dict(essay, include_content=True)
+
+    # EssayEmbedding.essay_id is a foreign key to Essay.id — delete embeddings first.
+    db.query(EssayEmbedding).filter(EssayEmbedding.essay_id == essay.id).delete()
+    db.delete(essay)
+    db.flush()
+
+    remove_parent_ids(_embed_jsonl_path(), {essay_id})
+    app_data: AppData = _current_app_data()
+    app_data.remove_essay_vectors(essay_id)
+
+    audit_log(db, actor.email, "hard_delete", "essay", essay_id, before, None)
+    db.commit()
+    return {"deleted": True, "essay_id": essay_id}
+
+
+>>>>>>> feature/admin
 @router.post("/essays/{essay_id}/regenerate-embedding")
 def trigger_embedding_regeneration(
     essay_id: str,
@@ -284,6 +421,7 @@ def trigger_embedding_regeneration(
     essay = db.query(Essay).filter(Essay.id == essay_id, Essay.deleted_at.is_(None)).first()
     if not essay:
         raise HTTPException(status_code=404, detail="Essay not found")
+<<<<<<< HEAD
     before = essay_to_dict(essay, include_content=True)
     essay.embedding_status = "queued"
     embedding = EssayEmbedding(
@@ -299,6 +437,346 @@ def trigger_embedding_regeneration(
     audit_log(db, actor.email, "queue_embedding_regeneration", "essay", essay.id, before, after)
     db.commit()
     return {"essay": after, "embedding_job": {"status": "queued", "content_hash": embedding.content_hash}}
+=======
+
+    current_hash = content_hash(essay.topic, essay.content)
+    existing_row = (
+        db.query(EssayEmbedding)
+        .filter_by(essay_id=essay.id)
+        .order_by(EssayEmbedding.generated_at.desc())
+        .first()
+    )
+    if essay.embedding_status == "current" and existing_row and existing_row.content_hash == current_hash:
+        # Short-circuit: no OpenAI call when the embedding is already current
+        # for this exact content, so repeated clicks don't burn spend.
+        return {
+            "essay": essay_to_dict(essay, include_content=True),
+            "embedding_job": {"status": "current", "skipped": True},
+        }
+
+    before = essay_to_dict(essay, include_content=True)
+    essay_dict = {
+        "id": essay.id,
+        "topic": essay.topic,
+        "content": essay.content,
+        "type": essay.type,
+        "school": essay.school,
+        "public": essay.public,
+        "source_file": essay.source_file,
+    }
+
+    client = get_embedding_client()
+    embedding_model = os.getenv("OPENAI_EMBEDDING_MODEL", "text-embedding-3-small")
+    try:
+        records = embed_essay(essay_dict, client)
+    except Exception as exc:
+        record_openai_usage(db, feature="embedding_regen", model=embedding_model, status="failed")
+        db.commit()
+        raise HTTPException(status_code=502, detail=f"Embedding generation failed: {exc}")
+    record_openai_usage(db, feature="embedding_regen", model=embedding_model, status="success")
+
+    replace_parent_id(_embed_jsonl_path(), essay.id, records)
+    rows = [
+        {
+            "id": r["id"],
+            "parent": r["parent_id"],
+            "preview": r["content"][:220],
+            "topic_text": r["topic"],
+            "type": r["type"],
+            "school": r["school"],
+            "topic_V": r["topic_embedding"],
+            "content_V": r["content_embedding"],
+        }
+        for r in records
+    ]
+    app_data = _current_app_data()
+    app_data.replace_essay_vectors(essay.id, rows)
+
+    # Re-check content_hash *after* the OpenAI call: an edit landing mid-flight
+    # must not be marked "current" over content that's now stale.
+    db.refresh(essay)
+    post_hash = content_hash(essay.topic, essay.content)
+    embedding_row = EssayEmbedding(
+        essay_id=essay.id,
+        model=embedding_model,
+        topic_embedding=records[0]["topic_embedding"] if records else None,
+        content_embedding=[r["content_embedding"] for r in records],
+        content_hash=post_hash,
+    )
+    db.add(embedding_row)
+    essay.embedding_status = "current" if post_hash == current_hash else "stale"
+    essay.updated_at = utcnow()
+    db.flush()
+    after = essay_to_dict(essay, include_content=True)
+    audit_log(db, actor.email, "regenerate_embedding", "essay", essay.id, before, after)
+    db.commit()
+    return {"essay": after, "embedding_job": {"status": essay.embedding_status}}
+
+
+@router.post("/essays/regenerate-stale-embeddings")
+def regenerate_stale_embeddings(
+    db: Session = Depends(get_db),
+    actor: AdminActor = Depends(require_admin_write),
+):
+    if not _import_lock.acquire(blocking=False):
+        raise HTTPException(status_code=409, detail="An import or regeneration run is already in progress")
+    try:
+        stale_essays = (
+            db.query(Essay)
+            .filter(Essay.embedding_status != "current", Essay.deleted_at.is_(None))
+            .all()
+        )
+        if not stale_essays:
+            return {"attempted": 0, "succeeded": 0, "failed": 0}
+
+        client = get_embedding_client()
+        embedding_model = os.getenv("OPENAI_EMBEDDING_MODEL", "text-embedding-3-small")
+        app_data: AppData = _current_app_data()
+        embed_path = _embed_jsonl_path()
+        succeeded = 0
+        failed = 0
+        for essay in stale_essays:
+            current_hash = content_hash(essay.topic, essay.content)
+            essay_dict = {
+                "id": essay.id,
+                "topic": essay.topic,
+                "content": essay.content,
+                "type": essay.type,
+                "school": essay.school,
+                "public": essay.public,
+                "source_file": essay.source_file,
+            }
+            try:
+                records = embed_essay(essay_dict, client)
+            except Exception:
+                record_openai_usage(db, feature="embedding_regen", model=embedding_model, status="failed")
+                failed += 1
+                continue  # leave embedding_status == "stale"; visible in the result, not silently dropped
+            record_openai_usage(db, feature="embedding_regen", model=embedding_model, status="success")
+
+            replace_parent_id(embed_path, essay.id, records)
+            rows = [
+                {
+                    "id": r["id"],
+                    "parent": r["parent_id"],
+                    "preview": r["content"][:220],
+                    "topic_text": r["topic"],
+                    "type": r["type"],
+                    "school": r["school"],
+                    "topic_V": r["topic_embedding"],
+                    "content_V": r["content_embedding"],
+                }
+                for r in records
+            ]
+            app_data.replace_essay_vectors(essay.id, rows)
+
+            db.refresh(essay)
+            post_hash = content_hash(essay.topic, essay.content)
+            db.add(
+                EssayEmbedding(
+                    essay_id=essay.id,
+                    model=embedding_model,
+                    topic_embedding=records[0]["topic_embedding"] if records else None,
+                    content_embedding=[r["content_embedding"] for r in records],
+                    content_hash=post_hash,
+                )
+            )
+            essay.embedding_status = "current" if post_hash == current_hash else "stale"
+            essay.updated_at = utcnow()
+            succeeded += 1
+
+        db.flush()
+        result = {"attempted": len(stale_essays), "succeeded": succeeded, "failed": failed}
+        audit_log(db, actor.email, "regenerate_stale_embeddings", "essay", None, None, result)
+        db.commit()
+        return result
+    finally:
+        _import_lock.release()
+
+
+_import_lock = threading.Lock()
+
+
+def append_to_database_jsonl(essays: list[dict]) -> None:
+    DATABASE_JSONL_PATH.parent.mkdir(parents=True, exist_ok=True)
+    with open(DATABASE_JSONL_PATH, "a", encoding="utf-8") as f:
+        for essay in essays:
+            f.write(json.dumps(essay, ensure_ascii=False) + "\n")
+
+
+@router.post("/import-new-essays")
+def import_new_essays(db: Session = Depends(get_db), actor: AdminActor = Depends(require_admin_write)):
+    if not _import_lock.acquire(blocking=False):
+        raise HTTPException(status_code=409, detail="An import is already running")
+    try:
+        client = get_embedding_client()
+        embedding_model = os.getenv("OPENAI_EMBEDDING_MODEL", "text-embedding-3-small")
+        new_essays = scan_and_title_new_essays(NEW_INPUT_DIR_PATH, DATABASE_JSONL_PATH, client)
+        if not new_essays:
+            return {"created": 0, "skipped_duplicates": 0, "invalid": 0, "embedded": 0}
+
+        # add_generated_titles() (called inside scan_and_title_new_essays) marks
+        # generated_title=None per-essay on an LLM failure -- mirror that here as
+        # one usage event per essay rather than reaching into scripts/add_to_database.py,
+        # which is shared with the standalone CLI import path that has no db session.
+        for essay in new_essays:
+            record_openai_usage(
+                db,
+                feature="title_generation",
+                model=TITLE_GENERATION_MODEL,
+                status="success" if essay.get("generated_title") else "failed",
+            )
+
+        for essay in new_essays:
+            essay["public"] = False  # imported essays unconditionally forced to non-public
+        append_to_database_jsonl(new_essays)
+
+        import_result = import_essays_from_jsonl(db, DATABASE_JSONL_PATH)
+
+        # Only embed essays this call actually just created -- not the whole
+        # DB-wide stale backlog (which may include essays made stale by an
+        # unrelated PATCH long before this import ran). A freshly imported
+        # essay should always be embedding_status == "stale", but the filter
+        # below double-checks that invariant rather than assuming it.
+        newly_imported = (
+            db.query(Essay)
+            .filter(
+                Essay.id.in_(import_result.created_ids),
+                Essay.embedding_status == "stale",
+                Essay.deleted_at.is_(None),
+            )
+            .all()
+            if import_result.created_ids
+            else []
+        )
+        embedded_count = 0
+        app_data: AppData = _current_app_data()
+        embed_path = _embed_jsonl_path()
+        all_records: list[dict] = []
+        all_rows: list[dict] = []
+        for essay in newly_imported:
+            essay_dict = {
+                "id": essay.id,
+                "topic": essay.topic,
+                "content": essay.content,
+                "type": essay.type,
+                "school": essay.school,
+                "public": essay.public,
+                "source_file": essay.source_file,
+            }
+            try:
+                records = embed_essay(essay_dict, client)
+            except Exception:
+                record_openai_usage(db, feature="embedding_regen", model=embedding_model, status="failed")
+                continue  # leave embedding_status == "stale"; visible failure, not silently marked current
+            record_openai_usage(db, feature="embedding_regen", model=embedding_model, status="success")
+            all_records.extend(records)
+            all_rows.extend(
+                {
+                    "id": r["id"],
+                    "parent": r["parent_id"],
+                    "preview": r["content"][:220],
+                    "topic_text": r["topic"],
+                    "type": r["type"],
+                    "school": r["school"],
+                    "topic_V": r["topic_embedding"],
+                    "content_V": r["content_embedding"],
+                }
+                for r in records
+            )
+            db.add(
+                EssayEmbedding(
+                    essay_id=essay.id,
+                    model=embedding_model,
+                    topic_embedding=records[0]["topic_embedding"] if records else None,
+                    content_embedding=[r["content_embedding"] for r in records],
+                    content_hash=content_hash(essay.topic, essay.content),
+                )
+            )
+            essay.embedding_status = "current"
+            embedded_count += 1
+
+        # These are freshly-imported essays that have never had embeddings
+        # before, so there's nothing to "replace" -- a single append is
+        # correct and avoids an unnecessary full read-modify-write of
+        # embed.jsonl (and of AppData's rows) per essay.
+        if all_records:
+            append_records(embed_path, all_records)
+        if all_rows:
+            app_data.add_essay_vectors(all_rows)
+        db.flush()
+
+        result = {
+            "created": import_result.created,
+            "skipped_duplicates": import_result.skipped_duplicates,
+            "invalid": import_result.invalid,
+            "embedded": embedded_count,
+        }
+        audit_log(db, actor.email, "import_essays", "essay", None, None, result)
+        db.commit()
+        return result
+    finally:
+        _import_lock.release()
+
+
+@router.post("/essays/upload-drafts")
+async def upload_essay_drafts(
+    files: list[UploadFile] = File(...),
+    file_meta: str = Form(...),
+    db: Session = Depends(get_db),
+    actor: AdminActor = Depends(require_admin_write),
+):
+    """
+    Pure extraction: for each uploaded file, extract its raw text and ask the
+    LLM to split it into {topic, content}. Writes zero Essay rows -- drafts
+    are returned to the caller for review; the existing POST /essays create
+    endpoint is what actually persists one once reviewed.
+    """
+    try:
+        meta_map = json.loads(file_meta)
+    except json.JSONDecodeError as exc:
+        raise HTTPException(status_code=400, detail="file_meta must be valid JSON") from exc
+
+    client = get_embedding_client()
+    drafts: list[dict] = []
+    failed: list[dict] = []
+
+    for upload in files:
+        filename = upload.filename or "unknown"
+        raw_bytes = await upload.read()
+
+        try:
+            raw_text = extract_text(filename, raw_bytes)
+        except (UnsupportedFileType, NoTextExtracted) as exc:
+            failed.append({"filename": filename, "error": str(exc)})
+            continue
+
+        try:
+            extracted = extract_prompt_and_content(raw_text, client)
+        except Exception as exc:
+            record_openai_usage(db, feature="essay_extraction", model=EXTRACTION_MODEL, status="failed")
+            failed.append({"filename": filename, "error": f"Extraction failed: {exc}"})
+            continue
+        record_openai_usage(db, feature="essay_extraction", model=EXTRACTION_MODEL, status="success")
+
+        file_meta_entry = meta_map.get(filename, {}) if isinstance(meta_map, dict) else {}
+        drafts.append(
+            {
+                "filename": filename,
+                "topic": extracted["topic"],
+                "content": extracted["content"],
+                "type": file_meta_entry.get("type") or "",
+                "school": file_meta_entry.get("school") or "",
+                "public": False,
+                "extraction_warning": (
+                    None if extracted["topic"] else "No prompt detected — please fill in the Topic field manually."
+                ),
+            }
+        )
+
+    db.commit()
+    return {"drafts": drafts, "failed": failed}
+>>>>>>> feature/admin
 
 
 @router.get("/audit")
@@ -344,9 +822,17 @@ def openai_usage(
     start_dt = _parse_timestamp(start) or (utcnow() - timedelta(days=30))
     end_dt = _parse_timestamp(end) or utcnow()
     local_summary = summarize_usage(db, start_dt, end_dt)
+<<<<<<< HEAD
     official = _fetch_openai_costs(start_dt, end_dt)
     return {
         "local": local_summary,
+=======
+    local_daily = daily_request_counts(db, start_dt, end_dt)
+    official = _fetch_openai_costs(start_dt, end_dt)
+    return {
+        "local": local_summary,
+        "local_daily": local_daily,
+>>>>>>> feature/admin
         "official": official,
         "range": {"start": start_dt.isoformat(), "end": end_dt.isoformat()},
     }

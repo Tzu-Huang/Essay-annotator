@@ -5,7 +5,11 @@
 import os
 import json
 
+<<<<<<< HEAD
 # =========================
+=======
+# ========================= 
+>>>>>>> feature/admin
 # Config
 # =========================
 INPUT_DIR = "drive_data/new_input"

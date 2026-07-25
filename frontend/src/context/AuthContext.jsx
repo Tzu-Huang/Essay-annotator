@@ -6,6 +6,7 @@ const STORAGE_KEY = "googleUser";
 const AuthContext = createContext(null);
 
 export function AuthProvider({ children }) {
+  const [accessToken, setAccessToken] = useState(null);
   const [user, setUser] = useState(() => {
     const storedUser = localStorage.getItem(STORAGE_KEY);
 
@@ -22,19 +23,21 @@ export function AuthProvider({ children }) {
     }
   });
 
-  const loginUser = (profile) => {
+  const loginUser = (profile, googleAccessToken = null) => {
     setUser(profile);
+    setAccessToken(googleAccessToken);
     localStorage.setItem(STORAGE_KEY, JSON.stringify(profile));
   };
 
   const logoutUser = () => {
     googleLogout();
     setUser(null);
+    setAccessToken(null);
     localStorage.removeItem(STORAGE_KEY);
   };
 
   return (
-    <AuthContext.Provider value={{ user, loginUser, logoutUser }}>
+    <AuthContext.Provider value={{ user, accessToken, loginUser, logoutUser }}>
       {children}
     </AuthContext.Provider>
   );

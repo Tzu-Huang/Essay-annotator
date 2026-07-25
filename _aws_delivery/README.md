@@ -6,18 +6,22 @@ Target directory: `/home/ubuntu/Essay-annotator`
 
 Backend service: `essay-api.service`
 
-## Delivery files
+## Local-only delivery files
 
 - `essay-annotator-app-20260715.tar.gz`
   - Application source and configuration files.
   - Includes the ignored, pre-built `frontend/dist` directory.
   - Does not contain Git metadata, dependencies, caches, runtime data, or secrets.
+  - Preserved outside Git and ignored by `_aws_delivery/*.tar.gz`.
 - `essay-annotator-data-20260715.tar.gz`
   - Contains the complete ignored `BackEnd/drive_data` tree, including the runtime database and embeddings.
+  - Preserved outside Git and ignored by `_aws_delivery/*.tar.gz`.
 - `SHA256SUMS.txt`
   - SHA-256 hashes for verifying the application and data archives after transfer.
 - `excluded-files.txt`
   - Local-only or reproducible content intentionally omitted.
+
+The archive binaries are not release-source artifacts and are no longer tracked. `SHA256SUMS.txt` remains as secret-safe verification evidence for an authorized local or external copy. The data archive is a dated point-in-time copy, not a current backup policy; verify or create a newer backup before deployment.
 
 ## Intentionally excluded
 
@@ -41,4 +45,4 @@ scp -i "C:\aws\Fb021451.pem" `
   ubuntu@44.201.62.0:/home/ubuntu/incoming-essay-annotator/
 ```
 
-Do not extract directly over production without first backing up the remote ignored data and checking the remote-only Git commits. The remote checkout and the local checkout both currently have commits ahead of `origin/frontend-base`, so their histories must be reconciled before a production update.
+Do not extract directly over production. A production update requires a current persistent-data backup, an explicitly selected commit from `main`, and a data-preserving rollback plan.

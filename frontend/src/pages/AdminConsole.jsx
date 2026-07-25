@@ -1,19 +1,15 @@
-import { createElement, useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import {
   Activity,
   AlertCircle,
   BarChart3,
   BookOpen,
-  CheckCircle2,
   ClipboardList,
   Cloud,
   Database,
   RefreshCw,
-  Save,
-  Search,
   Shield,
   Terminal,
-  Trash2,
   Wallet,
 } from "lucide-react";
 import { useAuth } from "../hooks/useAuth";
@@ -72,7 +68,7 @@ const NAV_ITEMS = [
 ];
 
 export default function AdminConsole() {
-  const { user } = useAuth();
+  const { user, accessToken } = useAuth();
   const googleSignIn = useGoogleSignIn();
   const [tab, setTab] = useState("overview");
   const [adminState, setAdminState] = useState({ loading: true, error: "", profile: null });
@@ -135,9 +131,9 @@ export default function AdminConsole() {
   const headers = useMemo(
     () => ({
       "Content-Type": "application/json",
-      "X-Admin-Email": email || "",
+      ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
     }),
-    [email]
+    [accessToken]
   );
 
   const api = useCallback(async (path, options = {}) => {
@@ -291,7 +287,7 @@ export default function AdminConsole() {
       formData.append("file_meta", JSON.stringify(fileMeta));
       const response = await fetch(`${API_BASE}/admin/essays/upload-drafts`, {
         method: "POST",
-        headers: { "X-Admin-Email": email || "" },
+        headers: accessToken ? { Authorization: `Bearer ${accessToken}` } : {},
         body: formData,
       });
       const data = await response.json().catch(() => ({}));
@@ -575,7 +571,6 @@ export default function AdminConsole() {
             peekEssayId={peekEssayId}
             onRowClick={handleRowClick}
             peekEssay={peekEssayId === selectedEssay?.essay?.id ? selectedEssay?.essay : null}
-            onCollapsePeek={() => setPeekEssayId(null)}
             onOpenEditor={() => setEssayView("editor")}
             onRegenerateEmbedding={regenerateEmbeddingFor}
             regeneratingEmbeddingId={regeneratingEmbeddingId}

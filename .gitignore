@@ -44,7 +44,9 @@ token.json
 openspec/
 template/
 .claude
-node_modules
+node_modules/
+frontend/dist/
+graphify-out/
 design-mockups/
 docs/
 CLAUDE.md
@@ -58,7 +60,13 @@ CLAUDE.md
 # Logs
 # ---------------------------------------------------------
 *.log
+*.db
+*.db-*
+*.sqlite
+*.sqlite3
 
-# Deployment secrets archives stay outside Git.
-_aws_delivery/*secrets*.tar.gz
+# Deployment and secrets archives stay outside Git.
+_aws_delivery/*.tar.gz
+*.pem
+*.key
 .superpowers/

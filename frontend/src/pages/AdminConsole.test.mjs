@@ -22,8 +22,9 @@ import {
 const source = readFileSync(new URL("./AdminConsole.jsx", import.meta.url), "utf8");
 const styles = readFileSync(new URL("../styles/admin.css", import.meta.url), "utf8");
 
-test("admin console sends the signed-in email through the admin header", () => {
-  assert.match(source, /"X-Admin-Email": email \|\| ""/);
+test("admin console sends the Google credential as a bearer token", () => {
+  assert.match(source, /Authorization: `Bearer \$\{accessToken\}`/);
+  assert.doesNotMatch(source, /X-Admin-Email/);
 });
 
 test("admin console supports wildcard local admin access", () => {

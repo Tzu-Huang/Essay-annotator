@@ -24,7 +24,7 @@ function Login() {
 
         // Google returns the profile data we want to reuse across the app.
         const profile = await response.json();
-        loginUser(profile);
+        loginUser(profile, tokenResponse.access_token);
         navigate("/editor");
       } catch (error) {
         console.error("Google login failed:", error);

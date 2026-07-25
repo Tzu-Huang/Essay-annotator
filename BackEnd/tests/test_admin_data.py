@@ -1,22 +1,15 @@
-<<<<<<< HEAD
-=======
 import asyncio
 import io
->>>>>>> feature/admin
 import json
 import os
 import tempfile
 import unittest
-<<<<<<< HEAD
-from pathlib import Path
-
-=======
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from unittest.mock import MagicMock, patch
 
-from fastapi import HTTPException, UploadFile
->>>>>>> feature/admin
+from fastapi import Depends, FastAPI, HTTPException, UploadFile
+from fastapi.testclient import TestClient
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
@@ -30,17 +23,6 @@ from app.admin import (
     cloudwatch_logs,
     create_essay,
     essay_detail,
-<<<<<<< HEAD
-    list_essays,
-    require_admin,
-    require_admin_write,
-    soft_delete_essay,
-    trigger_embedding_regeneration,
-    update_essay,
-)
-from database.create import AdminAuditLog, Base, Essay, EssayEmbedding, OpenAIUsageEvent
-from database.essays import audit_log, essay_to_dict, import_essays_from_jsonl, load_essays_from_db, query_essays, summarize_usage, utcnow
-=======
     hard_delete_essay,
     import_new_essays,
     list_essays,
@@ -66,7 +48,6 @@ from database.essays import (
     summarize_usage,
     utcnow,
 )
->>>>>>> feature/admin
 
 
 class AdminDataTests(unittest.TestCase):
@@ -80,6 +61,7 @@ class AdminDataTests(unittest.TestCase):
         self.db.close()
         os.environ.pop("ADMIN_EMAILS", None)
         os.environ.pop("ADMIN_WRITE_EMAILS", None)
+        os.environ.pop("GOOGLE_CLIENT_ID", None)
 
     def write_jsonl(self, records):
         handle = tempfile.NamedTemporaryFile("w", encoding="utf-8", suffix=".jsonl", delete=False)
@@ -151,70 +133,6 @@ class AdminDataTests(unittest.TestCase):
             {"custom": "value", "generated_title": "A Great Title"},
         )
 
-<<<<<<< HEAD
-    def test_import_essays_backfills_generated_title_on_existing_essay(self):
-        self.db.add(
-            Essay(
-                id="essay_0001",
-                topic="Prompt",
-                content="Essay body",
-                source_file="online",
-                metadata_json={"custom": "value"},
-            )
-        )
-        self.db.commit()
-        path = self.write_jsonl(
-            [
-                {
-                    "id": "essay_0001",
-                    "topic": "Prompt",
-                    "content": "Essay body",
-                    "source_file": "online",
-                    "generated_title": "A Great Title",
-                },
-            ]
-        )
-
-        result = import_essays_from_jsonl(self.db, path)
-        self.db.commit()
-
-        essay = self.db.query(Essay).filter_by(id="essay_0001").one()
-        self.assertEqual(result.created, 0)
-        self.assertEqual(result.updated, 1)
-        self.assertEqual(result.skipped_duplicates, 0)
-        self.assertEqual(
-            essay.metadata_json,
-            {"custom": "value", "generated_title": "A Great Title"},
-        )
-
-    def test_import_essays_does_not_reupdate_matching_generated_title(self):
-        self.db.add(
-            Essay(
-                id="essay_0001",
-                topic="Prompt",
-                content="Essay body",
-                metadata_json={"generated_title": "A Great Title"},
-            )
-        )
-        self.db.commit()
-        path = self.write_jsonl(
-            [
-                {
-                    "id": "essay_0001",
-                    "topic": "Prompt",
-                    "content": "Essay body",
-                    "generated_title": "A Great Title",
-                },
-            ]
-        )
-
-        result = import_essays_from_jsonl(self.db, path)
-
-        self.assertEqual(result.updated, 0)
-        self.assertEqual(result.skipped_duplicates, 1)
-
-=======
->>>>>>> feature/admin
     def test_essay_to_dict_flattens_generated_title_from_metadata_json(self):
         essay = Essay(
             id="essay_0099",
@@ -238,27 +156,113 @@ class AdminDataTests(unittest.TestCase):
     def test_admin_allowlist_and_write_role(self):
         os.environ["ADMIN_EMAILS"] = "owner@example.com,viewer@example.com"
         os.environ["ADMIN_WRITE_EMAILS"] = "owner@example.com"
+        os.environ["GOOGLE_CLIENT_ID"] = "client-id"
 
-        owner = require_admin("owner@example.com")
-        viewer = require_admin("viewer@example.com")
+        with patch(
+            "app.admin._google_token_info",
+            side_effect=[
+                {"aud": "client-id", "expires_in": "300", "email_verified": "true", "email": "owner@example.com"},
+                {"aud": "client-id", "expires_in": "300", "email_verified": "true", "email": "viewer@example.com"},
+                {"aud": "client-id", "expires_in": "300", "email_verified": "true", "email": "stranger@example.com"},
+            ],
+        ):
+            owner = require_admin("Bearer owner-token")
+            viewer = require_admin("Bearer viewer-token")
 
-        self.assertTrue(owner.can_write)
-        self.assertFalse(viewer.can_write)
-        self.assertEqual(require_admin_write(owner), owner)
-        with self.assertRaises(Exception):
-            require_admin_write(viewer)
-        with self.assertRaises(Exception):
-            require_admin("stranger@example.com")
+            self.assertTrue(owner.can_write)
+            self.assertFalse(viewer.can_write)
+            self.assertEqual(require_admin_write(owner), owner)
+            with self.assertRaises(HTTPException):
+                require_admin_write(viewer)
+            with self.assertRaises(HTTPException):
+                require_admin("Bearer stranger-token")
 
     def test_admin_wildcard_allows_local_development_access(self):
         os.environ["ADMIN_EMAILS"] = "*"
         os.environ["ADMIN_WRITE_EMAILS"] = "*"
+        os.environ["GOOGLE_CLIENT_ID"] = "client-id"
 
-        actor = require_admin("anyone@example.com")
+        with patch(
+            "app.admin._google_token_info",
+            return_value={
+                "aud": "client-id",
+                "expires_in": "300",
+                "email_verified": "true",
+                "email": "anyone@example.com",
+            },
+        ):
+            actor = require_admin("Bearer valid-token")
 
         self.assertEqual(actor.email, "anyone@example.com")
         self.assertTrue(actor.can_write)
         self.assertEqual(require_admin_write(actor), actor)
+
+    def test_admin_rejects_missing_or_invalid_google_credentials(self):
+        os.environ["ADMIN_EMAILS"] = "owner@example.com"
+        os.environ["GOOGLE_CLIENT_ID"] = "client-id"
+
+        with self.assertRaises(HTTPException) as missing:
+            require_admin(None)
+        self.assertEqual(missing.exception.status_code, 401)
+
+        invalid_cases = [
+            {"aud": "wrong-client", "expires_in": "300", "email_verified": "true", "email": "owner@example.com"},
+            {"aud": "client-id", "expires_in": "0", "email_verified": "true", "email": "owner@example.com"},
+            {"aud": "client-id", "expires_in": "300", "email_verified": "false", "email": "owner@example.com"},
+            {"aud": "client-id", "expires_in": "300", "email_verified": "true", "email": ""},
+        ]
+        for token_info in invalid_cases:
+            with self.subTest(token_info=token_info), patch(
+                "app.admin._google_token_info",
+                return_value=token_info,
+            ):
+                with self.assertRaises(HTTPException) as invalid:
+                    require_admin("Bearer invalid-token")
+                self.assertEqual(invalid.exception.status_code, 401)
+
+    def test_admin_dependency_enforces_verified_read_and_write_roles_at_endpoint(self):
+        os.environ["ADMIN_EMAILS"] = "owner@example.com,viewer@example.com"
+        os.environ["ADMIN_WRITE_EMAILS"] = "owner@example.com"
+        os.environ["GOOGLE_CLIENT_ID"] = "client-id"
+        test_app = FastAPI()
+
+        @test_app.get("/admin-read")
+        def admin_read(actor: AdminActor = Depends(require_admin)):
+            return {"email": actor.email, "can_write": actor.can_write}
+
+        @test_app.post("/admin-write")
+        def admin_write(actor: AdminActor = Depends(require_admin_write)):
+            return {"email": actor.email}
+
+        client = TestClient(test_app)
+        self.assertEqual(client.get("/admin-read").status_code, 401)
+
+        token_infos = {
+            "invalid": {"aud": "wrong-client", "expires_in": "300", "email_verified": "true", "email": "owner@example.com"},
+            "stranger": {"aud": "client-id", "expires_in": "300", "email_verified": "true", "email": "stranger@example.com"},
+            "viewer": {"aud": "client-id", "expires_in": "300", "email_verified": "true", "email": "viewer@example.com"},
+            "owner": {"aud": "client-id", "expires_in": "300", "email_verified": "true", "email": "owner@example.com"},
+        }
+
+        with patch("app.admin._google_token_info", side_effect=lambda token: token_infos[token]):
+            self.assertEqual(
+                client.get("/admin-read", headers={"Authorization": "Bearer invalid"}).status_code,
+                401,
+            )
+            self.assertEqual(
+                client.get("/admin-read", headers={"Authorization": "Bearer stranger"}).status_code,
+                403,
+            )
+            viewer = client.get("/admin-read", headers={"Authorization": "Bearer viewer"})
+            self.assertEqual(viewer.status_code, 200)
+            self.assertFalse(viewer.json()["can_write"])
+            self.assertEqual(
+                client.post("/admin-write", headers={"Authorization": "Bearer viewer"}).status_code,
+                403,
+            )
+            owner = client.post("/admin-write", headers={"Authorization": "Bearer owner"})
+            self.assertEqual(owner.status_code, 200)
+            self.assertEqual(owner.json()["email"], "owner@example.com")
 
     def test_integration_status_masks_secret_values(self):
         os.environ["ADMIN_EMAILS"] = "owner@example.com"
@@ -327,8 +331,6 @@ class AdminDataTests(unittest.TestCase):
         self.assertEqual(query_essays(self.db, school="Stanford").one().id, "essay_0001")
         self.assertEqual(query_essays(self.db, embedding_status="current", include_deleted=True).one().id, "essay_0002")
 
-<<<<<<< HEAD
-=======
     def test_backfill_current_embedding_status_marks_essays_present_in_embed_jsonl(self):
         present_in_index = Essay(id="essay_0001", topic="T1", content="C1", embedding_status="stale")
         not_in_index = Essay(id="essay_0002", topic="T2", content="C2", embedding_status="stale")
@@ -394,7 +396,6 @@ class AdminDataTests(unittest.TestCase):
 
         self.assertEqual(updated, 0)
 
->>>>>>> feature/admin
     def test_admin_essay_crud_and_embedding_queue(self):
         actor = AdminActor(email="owner@example.com", can_write=True)
 
@@ -421,10 +422,6 @@ class AdminDataTests(unittest.TestCase):
         self.assertEqual(updated["essay"]["content"], "Updated essay body")
         self.assertEqual(updated["essay"]["embedding_status"], "stale")
 
-<<<<<<< HEAD
-        queued = trigger_embedding_regeneration(essay_id, db=self.db, actor=actor)
-        self.assertEqual(queued["essay"]["embedding_status"], "queued")
-=======
         fake_client = MagicMock()
         fake_response = MagicMock()
         fake_response.data = [MagicMock(embedding=[0.1, 0.2])]
@@ -435,7 +432,6 @@ class AdminDataTests(unittest.TestCase):
         ):
             regenerated = trigger_embedding_regeneration(essay_id, db=self.db, actor=actor)
         self.assertEqual(regenerated["essay"]["embedding_status"], "current")
->>>>>>> feature/admin
         self.assertEqual(self.db.query(EssayEmbedding).count(), 1)
 
         deleted = soft_delete_essay(essay_id, db=self.db, actor=actor)
@@ -462,8 +458,6 @@ class AdminDataTests(unittest.TestCase):
         self.assertEqual(compare["output_tokens"], 27)
         self.assertEqual(search["status"], "failed")
 
-<<<<<<< HEAD
-=======
     def test_daily_request_counts_buckets_by_day_and_feature(self):
         base = datetime(2026, 7, 15, tzinfo=timezone.utc)
         self.db.add_all(
@@ -494,7 +488,6 @@ class AdminDataTests(unittest.TestCase):
 
         self.assertEqual(result, [])
 
->>>>>>> feature/admin
     def test_cloudwatch_missing_config_and_severity_mapping(self):
         os.environ.pop("AWS_REGION", None)
         os.environ.pop("AWS_CLOUDWATCH_LOG_GROUP", None)
@@ -508,8 +501,6 @@ class AdminDataTests(unittest.TestCase):
         self.assertEqual(_infer_severity("warn something"), "warn")
         self.assertEqual(_infer_severity("startup ok"), "info")
 
-<<<<<<< HEAD
-=======
     def test_list_essays_server_side_sort(self):
         actor = AdminActor(email="owner@example.com", can_write=True)
         create_essay(EssayCreate(topic="Zebra", content="B", type="PS", school="Alpha U"), db=self.db, actor=actor)
@@ -1020,7 +1011,6 @@ class AdminDataTests(unittest.TestCase):
             result = import_new_essays(db=self.db, actor=actor)
         self.assertEqual(result, {"created": 0, "skipped_duplicates": 0, "invalid": 0, "embedded": 0})
 
->>>>>>> feature/admin
 
 if __name__ == "__main__":
     unittest.main()

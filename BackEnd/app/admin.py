@@ -1,9 +1,6 @@
 import json
 import os
-<<<<<<< HEAD
-=======
 import threading
->>>>>>> feature/admin
 import urllib.error
 import urllib.parse
 import urllib.request
@@ -12,40 +9,27 @@ from pathlib import Path
 from typing import Optional
 
 from dotenv import load_dotenv
-<<<<<<< HEAD
-from fastapi import APIRouter, Depends, Header, HTTPException, Query
-=======
 from fastapi import APIRouter, Depends, File, Form, Header, HTTPException, Query, UploadFile
 from openai import OpenAI
->>>>>>> feature/admin
 from pydantic import BaseModel
 from sqlalchemy import func
 from sqlalchemy.orm import Session
 
-<<<<<<< HEAD
-=======
 from app.state import AppData
 from app.usage import record_openai_usage
->>>>>>> feature/admin
 from database.create import AdminAuditLog, Essay, EssayEmbedding, OpenAIUsageEvent, User, get_db
 from database.essays import (
     audit_log,
     content_hash,
-<<<<<<< HEAD
-    essay_to_dict,
-=======
     daily_request_counts,
     essay_to_dict,
     import_essays_from_jsonl,
->>>>>>> feature/admin
     next_essay_id,
     query_essays,
     summarize_usage,
     utcnow,
     validate_essay_payload,
 )
-<<<<<<< HEAD
-=======
 from scripts.add_to_database import DATABASE_PATH as DATABASE_JSONL_PATH, NEW_INPUT_DIR as NEW_INPUT_DIR_PATH
 from service.embed_store import append_records, remove_parent_ids, replace_parent_id
 from service.embedding_service import embed_essay
@@ -53,15 +37,12 @@ from service.extract_essay import MODEL as EXTRACTION_MODEL, extract_prompt_and_
 from service.file_extraction import NoTextExtracted, UnsupportedFileType, extract_text
 from service.generate_topic import MODEL as TITLE_GENERATION_MODEL
 from service.ingest_service import scan_and_title_new_essays
->>>>>>> feature/admin
 
 
 load_dotenv(dotenv_path=Path(__file__).resolve().parent.parent / ".env")
 
 router = APIRouter(prefix="/admin", tags=["admin"])
 
-<<<<<<< HEAD
-=======
 def get_embedding_client() -> OpenAI:
     return OpenAI(api_key=os.environ["OPENAI_API_KEY"])
 
@@ -96,7 +77,6 @@ def _current_app_data() -> AppData:
         _fastapi_app.state.data = data
     return data
 
->>>>>>> feature/admin
 
 def _split_env(name: str) -> set[str]:
     return {
@@ -206,11 +186,8 @@ def list_essays(
     public: Optional[bool] = None,
     embedding_status: Optional[str] = None,
     include_deleted: bool = False,
-<<<<<<< HEAD
-=======
     sort: Optional[str] = Query(default=None, pattern="^(id|topic|school|type|updated_at|embedding_status)$"),
     sort_dir: str = Query(default="asc", pattern="^(asc|desc)$"),
->>>>>>> feature/admin
     db: Session = Depends(get_db),
     actor: AdminActor = Depends(require_admin),
 ):
@@ -222,16 +199,6 @@ def list_essays(
         public=public,
         embedding_status=embedding_status,
         include_deleted=include_deleted,
-<<<<<<< HEAD
-    )
-    total = query.count()
-    rows = (
-        query.order_by(Essay.updated_at.desc(), Essay.id.asc())
-        .offset((page - 1) * page_size)
-        .limit(page_size)
-        .all()
-    )
-=======
         sort=sort,
         sort_dir=sort_dir,
     )
@@ -245,7 +212,6 @@ def list_essays(
             .limit(page_size)
             .all()
         )
->>>>>>> feature/admin
     return {
         "items": [essay_to_dict(row, include_content=False) for row in rows],
         "page": page,
@@ -323,11 +289,8 @@ def update_essay(
     essay = db.query(Essay).filter(Essay.id == essay_id).first()
     if not essay:
         raise HTTPException(status_code=404, detail="Essay not found")
-<<<<<<< HEAD
-=======
     if essay.deleted_at is not None:
         raise HTTPException(status_code=409, detail="Cannot edit a soft-deleted essay; restore it first")
->>>>>>> feature/admin
     before = essay_to_dict(essay, include_content=True)
     values = _model_data(payload, exclude_unset=True)
     if "metadata" in values:
@@ -368,8 +331,6 @@ def soft_delete_essay(essay_id: str, db: Session = Depends(get_db), actor: Admin
     return {"essay": after}
 
 
-<<<<<<< HEAD
-=======
 @router.post("/essays/{essay_id}/restore")
 def restore_essay(essay_id: str, db: Session = Depends(get_db), actor: AdminActor = Depends(require_admin_write)):
     essay = db.query(Essay).filter(Essay.id == essay_id).first()
@@ -411,7 +372,6 @@ def hard_delete_essay(essay_id: str, db: Session = Depends(get_db), actor: Admin
     return {"deleted": True, "essay_id": essay_id}
 
 
->>>>>>> feature/admin
 @router.post("/essays/{essay_id}/regenerate-embedding")
 def trigger_embedding_regeneration(
     essay_id: str,
@@ -421,23 +381,6 @@ def trigger_embedding_regeneration(
     essay = db.query(Essay).filter(Essay.id == essay_id, Essay.deleted_at.is_(None)).first()
     if not essay:
         raise HTTPException(status_code=404, detail="Essay not found")
-<<<<<<< HEAD
-    before = essay_to_dict(essay, include_content=True)
-    essay.embedding_status = "queued"
-    embedding = EssayEmbedding(
-        essay_id=essay.id,
-        model=os.getenv("OPENAI_EMBEDDING_MODEL", "text-embedding-3-small"),
-        topic_embedding=None,
-        content_embedding=None,
-        content_hash=content_hash(essay.topic, essay.content),
-    )
-    db.add(embedding)
-    db.flush()
-    after = essay_to_dict(essay, include_content=True)
-    audit_log(db, actor.email, "queue_embedding_regeneration", "essay", essay.id, before, after)
-    db.commit()
-    return {"essay": after, "embedding_job": {"status": "queued", "content_hash": embedding.content_hash}}
-=======
 
     current_hash = content_hash(essay.topic, essay.content)
     existing_row = (
@@ -776,7 +719,6 @@ async def upload_essay_drafts(
 
     db.commit()
     return {"drafts": drafts, "failed": failed}
->>>>>>> feature/admin
 
 
 @router.get("/audit")
@@ -822,17 +764,11 @@ def openai_usage(
     start_dt = _parse_timestamp(start) or (utcnow() - timedelta(days=30))
     end_dt = _parse_timestamp(end) or utcnow()
     local_summary = summarize_usage(db, start_dt, end_dt)
-<<<<<<< HEAD
-    official = _fetch_openai_costs(start_dt, end_dt)
-    return {
-        "local": local_summary,
-=======
     local_daily = daily_request_counts(db, start_dt, end_dt)
     official = _fetch_openai_costs(start_dt, end_dt)
     return {
         "local": local_summary,
         "local_daily": local_daily,
->>>>>>> feature/admin
         "official": official,
         "range": {"start": start_dt.isoformat(), "end": end_dt.isoformat()},
     }

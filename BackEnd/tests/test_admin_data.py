@@ -1,22 +1,14 @@
-<<<<<<< HEAD
-=======
 import asyncio
 import io
->>>>>>> feature/admin
 import json
 import os
 import tempfile
 import unittest
-<<<<<<< HEAD
-from pathlib import Path
-
-=======
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from unittest.mock import MagicMock, patch
 
 from fastapi import HTTPException, UploadFile
->>>>>>> feature/admin
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
@@ -30,17 +22,6 @@ from app.admin import (
     cloudwatch_logs,
     create_essay,
     essay_detail,
-<<<<<<< HEAD
-    list_essays,
-    require_admin,
-    require_admin_write,
-    soft_delete_essay,
-    trigger_embedding_regeneration,
-    update_essay,
-)
-from database.create import AdminAuditLog, Base, Essay, EssayEmbedding, OpenAIUsageEvent
-from database.essays import audit_log, essay_to_dict, import_essays_from_jsonl, load_essays_from_db, query_essays, summarize_usage, utcnow
-=======
     hard_delete_essay,
     import_new_essays,
     list_essays,
@@ -66,7 +47,6 @@ from database.essays import (
     summarize_usage,
     utcnow,
 )
->>>>>>> feature/admin
 
 
 class AdminDataTests(unittest.TestCase):
@@ -151,70 +131,6 @@ class AdminDataTests(unittest.TestCase):
             {"custom": "value", "generated_title": "A Great Title"},
         )
 
-<<<<<<< HEAD
-    def test_import_essays_backfills_generated_title_on_existing_essay(self):
-        self.db.add(
-            Essay(
-                id="essay_0001",
-                topic="Prompt",
-                content="Essay body",
-                source_file="online",
-                metadata_json={"custom": "value"},
-            )
-        )
-        self.db.commit()
-        path = self.write_jsonl(
-            [
-                {
-                    "id": "essay_0001",
-                    "topic": "Prompt",
-                    "content": "Essay body",
-                    "source_file": "online",
-                    "generated_title": "A Great Title",
-                },
-            ]
-        )
-
-        result = import_essays_from_jsonl(self.db, path)
-        self.db.commit()
-
-        essay = self.db.query(Essay).filter_by(id="essay_0001").one()
-        self.assertEqual(result.created, 0)
-        self.assertEqual(result.updated, 1)
-        self.assertEqual(result.skipped_duplicates, 0)
-        self.assertEqual(
-            essay.metadata_json,
-            {"custom": "value", "generated_title": "A Great Title"},
-        )
-
-    def test_import_essays_does_not_reupdate_matching_generated_title(self):
-        self.db.add(
-            Essay(
-                id="essay_0001",
-                topic="Prompt",
-                content="Essay body",
-                metadata_json={"generated_title": "A Great Title"},
-            )
-        )
-        self.db.commit()
-        path = self.write_jsonl(
-            [
-                {
-                    "id": "essay_0001",
-                    "topic": "Prompt",
-                    "content": "Essay body",
-                    "generated_title": "A Great Title",
-                },
-            ]
-        )
-
-        result = import_essays_from_jsonl(self.db, path)
-
-        self.assertEqual(result.updated, 0)
-        self.assertEqual(result.skipped_duplicates, 1)
-
-=======
->>>>>>> feature/admin
     def test_essay_to_dict_flattens_generated_title_from_metadata_json(self):
         essay = Essay(
             id="essay_0099",
@@ -327,8 +243,6 @@ class AdminDataTests(unittest.TestCase):
         self.assertEqual(query_essays(self.db, school="Stanford").one().id, "essay_0001")
         self.assertEqual(query_essays(self.db, embedding_status="current", include_deleted=True).one().id, "essay_0002")
 
-<<<<<<< HEAD
-=======
     def test_backfill_current_embedding_status_marks_essays_present_in_embed_jsonl(self):
         present_in_index = Essay(id="essay_0001", topic="T1", content="C1", embedding_status="stale")
         not_in_index = Essay(id="essay_0002", topic="T2", content="C2", embedding_status="stale")
@@ -394,7 +308,6 @@ class AdminDataTests(unittest.TestCase):
 
         self.assertEqual(updated, 0)
 
->>>>>>> feature/admin
     def test_admin_essay_crud_and_embedding_queue(self):
         actor = AdminActor(email="owner@example.com", can_write=True)
 
@@ -421,10 +334,6 @@ class AdminDataTests(unittest.TestCase):
         self.assertEqual(updated["essay"]["content"], "Updated essay body")
         self.assertEqual(updated["essay"]["embedding_status"], "stale")
 
-<<<<<<< HEAD
-        queued = trigger_embedding_regeneration(essay_id, db=self.db, actor=actor)
-        self.assertEqual(queued["essay"]["embedding_status"], "queued")
-=======
         fake_client = MagicMock()
         fake_response = MagicMock()
         fake_response.data = [MagicMock(embedding=[0.1, 0.2])]
@@ -435,7 +344,6 @@ class AdminDataTests(unittest.TestCase):
         ):
             regenerated = trigger_embedding_regeneration(essay_id, db=self.db, actor=actor)
         self.assertEqual(regenerated["essay"]["embedding_status"], "current")
->>>>>>> feature/admin
         self.assertEqual(self.db.query(EssayEmbedding).count(), 1)
 
         deleted = soft_delete_essay(essay_id, db=self.db, actor=actor)
@@ -462,8 +370,6 @@ class AdminDataTests(unittest.TestCase):
         self.assertEqual(compare["output_tokens"], 27)
         self.assertEqual(search["status"], "failed")
 
-<<<<<<< HEAD
-=======
     def test_daily_request_counts_buckets_by_day_and_feature(self):
         base = datetime(2026, 7, 15, tzinfo=timezone.utc)
         self.db.add_all(
@@ -494,7 +400,6 @@ class AdminDataTests(unittest.TestCase):
 
         self.assertEqual(result, [])
 
->>>>>>> feature/admin
     def test_cloudwatch_missing_config_and_severity_mapping(self):
         os.environ.pop("AWS_REGION", None)
         os.environ.pop("AWS_CLOUDWATCH_LOG_GROUP", None)
@@ -508,8 +413,6 @@ class AdminDataTests(unittest.TestCase):
         self.assertEqual(_infer_severity("warn something"), "warn")
         self.assertEqual(_infer_severity("startup ok"), "info")
 
-<<<<<<< HEAD
-=======
     def test_list_essays_server_side_sort(self):
         actor = AdminActor(email="owner@example.com", can_write=True)
         create_essay(EssayCreate(topic="Zebra", content="B", type="PS", school="Alpha U"), db=self.db, actor=actor)
@@ -1020,7 +923,6 @@ class AdminDataTests(unittest.TestCase):
             result = import_new_essays(db=self.db, actor=actor)
         self.assertEqual(result, {"created": 0, "skipped_duplicates": 0, "invalid": 0, "embedded": 0})
 
->>>>>>> feature/admin
 
 if __name__ == "__main__":
     unittest.main()

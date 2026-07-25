@@ -6,10 +6,10 @@
 
 ## 2. Backend Merge Repair
 
-- [ ] 2.1 Reconcile conflict markers in backend dependency declarations and application modules against both merge parents
-- [ ] 2.2 Reconcile conflict markers in database, embedding, ingestion, extraction, and import/synchronization scripts while preserving launch-v1 behavior
-- [ ] 2.3 Reconcile and extend backend tests to cover the selected admin, state, file-extraction, ingestion, and embedding behavior
-- [ ] 2.4 Run an automated tracked-file scan and confirm no unresolved merge-conflict markers remain
+- [x] 2.1 Reconcile conflict markers in backend dependency declarations and application modules against both merge parents
+- [x] 2.2 Reconcile conflict markers in database, embedding, ingestion, extraction, and import/synchronization scripts while preserving launch-v1 behavior
+- [x] 2.3 Reconcile and extend backend tests to cover the selected admin, state, file-extraction, ingestion, and embedding behavior
+- [x] 2.4 Run an automated tracked-file scan and confirm no unresolved merge-conflict markers remain
 
 ## 3. Frontend Baseline Reconciliation
 

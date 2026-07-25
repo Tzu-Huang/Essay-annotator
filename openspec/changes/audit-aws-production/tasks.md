@@ -1,8 +1,8 @@
 ## 1. Repository and Access Baseline
 
-- [ ] 1.1 Record the public GitHub repository, default branch, remote URL, current `main` commit, and local/remote branch relationships.
-- [ ] 1.2 Inspect GitHub branch rules and deployment references, recording unavailable evidence and authentication blockers without exposing credentials.
-- [ ] 1.3 Confirm the production authentication mechanism category and deployment authority without recording keys, tokens, or secret values.
+- [x] 1.1 Record the public GitHub repository, default branch, remote URL, current `main` commit, and local/remote branch relationships.
+- [x] 1.2 Inspect GitHub branch rules and deployment references, recording unavailable evidence and authentication blockers without exposing credentials.
+- [x] 1.3 Confirm the production authentication mechanism category and deployment authority without recording keys, tokens, or secret values.
 
 ## 2. AWS and Host Inventory
 
@@ -18,12 +18,12 @@
 
 ## 4. Operational Documentation
 
-- [ ] 4.1 Create `docs/operations/production-environment-baseline.md` with dated evidence, sources, confirmed facts, repository expectations, and unresolved items.
-- [ ] 4.2 Create `docs/operations/release-and-deployment-policy.md` defining `main` as the sole production truth, required checks, owner-authorized manual deployment, verification, rollback, and hotfix flow.
-- [ ] 4.3 Document the `frontend-base` freeze/removal prerequisites and confirm that IP-based HTTP is internal validation while domain plus HTTPS remains follow-up launch work.
+- [x] 4.1 Create `docs/operations/production-environment-baseline.md` with dated evidence, sources, confirmed facts, repository expectations, and unresolved items.
+- [x] 4.2 Create `docs/operations/release-and-deployment-policy.md` defining `main` as the sole production truth, required checks, owner-authorized manual deployment, verification, rollback, and hotfix flow.
+- [x] 4.3 Document the `frontend-base` freeze/removal prerequisites and confirm that IP-based HTTP is internal validation while domain plus HTTPS remains follow-up launch work.
 
 ## 5. Verification
 
 - [ ] 5.1 Cross-check documented startup commands, endpoints, repository state, and data paths against both live evidence and repository configuration.
-- [ ] 5.2 Scan the new operational documents for credentials, tokens, private-key material, environment values, or other secrets and remove any sensitive content.
-- [ ] 5.3 Verify every ZAC-82 acceptance criterion is either satisfied by linked evidence or explicitly recorded as unresolved follow-up.
+- [x] 5.2 Scan the new operational documents for credentials, tokens, private-key material, environment values, or other secrets and remove any sensitive content.
+- [x] 5.3 Verify every ZAC-82 acceptance criterion is either satisfied by linked evidence or explicitly recorded as unresolved follow-up.

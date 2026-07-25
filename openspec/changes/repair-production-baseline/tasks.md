@@ -13,9 +13,9 @@
 
 ## 3. Frontend Baseline Reconciliation
 
-- [ ] 3.1 Reconcile the admin console and related frontend behavior with the documented launch-v1 scope
-- [ ] 3.2 Restore or add targeted frontend tests for the selected admin-console behavior and explicitly record any deferred behavior
-- [ ] 3.3 Verify frontend dependency manifests and lockfile contain every dependency required by the release build
+- [x] 3.1 Reconcile the admin console and related frontend behavior with the documented launch-v1 scope
+- [x] 3.2 Restore or add targeted frontend tests for the selected admin-console behavior and explicitly record any deferred behavior
+- [x] 3.3 Verify frontend dependency manifests and lockfile contain every dependency required by the release build
 
 ## 4. Repository Hygiene and Data Safety
 

@@ -7,14 +7,14 @@
 ## 2. AWS and Host Inventory
 
 - [ ] 2.1 Use read-only AWS and instance evidence to record EC2 type, OS, region/AZ, storage, public IPv4, Elastic IP status, and Security Group ingress/egress.
-- [ ] 2.2 Use read-only host commands to inventory processes, listening ports, service units, web server or reverse proxy, installed runtimes, and startup/status commands.
-- [ ] 2.3 Inspect the production repository path, branch, commit, remote, working tree, and divergence from `origin/main`; stop and flag any reconciliation requirement.
+- [x] 2.2 Use read-only host commands to inventory processes, listening ports, service units, web server or reverse proxy, installed runtimes, and startup/status commands.
+- [x] 2.3 Inspect the production repository path, branch, commit, remote, working tree, and divergence from `origin/main`; stop and flag any reconciliation requirement.
 
 ## 3. Data and Logging Baseline
 
-- [ ] 3.1 Inventory the active PostgreSQL-or-SQLite configuration category and all production JSONL, embedding, upload, export, and other runtime-data paths.
-- [ ] 3.2 Record ownership, persistence classification, size or existence evidence, and backup status for each production data location.
-- [ ] 3.3 Record journald and optional CloudWatch logging configuration status without capturing log secrets or sensitive application content.
+- [x] 3.1 Inventory the active PostgreSQL-or-SQLite configuration category and all production JSONL, embedding, upload, export, and other runtime-data paths.
+- [x] 3.2 Record ownership, persistence classification, size or existence evidence, and backup status for each production data location.
+- [x] 3.3 Record journald and optional CloudWatch logging configuration status without capturing log secrets or sensitive application content.
 
 ## 4. Operational Documentation
 
@@ -24,6 +24,6 @@
 
 ## 5. Verification
 
-- [ ] 5.1 Cross-check documented startup commands, endpoints, repository state, and data paths against both live evidence and repository configuration.
+- [x] 5.1 Cross-check documented startup commands, endpoints, repository state, and data paths against both live evidence and repository configuration.
 - [x] 5.2 Scan the new operational documents for credentials, tokens, private-key material, environment values, or other secrets and remove any sensitive content.
 - [x] 5.3 Verify every ZAC-82 acceptance criterion is either satisfied by linked evidence or explicitly recorded as unresolved follow-up.

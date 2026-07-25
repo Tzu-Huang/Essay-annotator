@@ -1,7 +1,9 @@
 # Release and Deployment Policy
 
-Effective date: 2026-07-25  
-Owner and production deployment authority: project owner  
+Effective date: 2026-07-25
+
+Owner and production deployment authority: project owner
+
 Related issue: ZAC-82
 
 ## Source of truth
@@ -150,4 +152,3 @@ Deletion is not part of ZAC-82 implementation and must not occur while productio
 - It is not the intended public launch endpoint.
 - Domain registration, DNS, certificate issuance/renewal, HTTP-to-HTTPS redirect, and Google OAuth origin/redirect updates belong to separate follow-up work.
 - Public launch should wait for HTTPS because the application includes authentication and administrative functions.
-

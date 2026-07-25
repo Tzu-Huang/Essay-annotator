@@ -1,7 +1,9 @@
 # Production Environment Baseline
 
-Audit date: 2026-07-25 (Asia/Taipei)  
-Linear issue: ZAC-82  
+Audit date: 2026-07-25 (Asia/Taipei)
+
+Linear issue: ZAC-82
+
 Status: **Blocked — the recorded production address is not reachable from the audit workstation**
 
 ## Evidence labels
@@ -132,4 +134,3 @@ After AWS access is restored:
 | One release strategy explicitly chosen | Satisfied by `release-and-deployment-policy.md` |
 | GitHub branch protection/check policy documented | Satisfied as policy; current GitHub enforcement remains unresolved |
 | No credentials or secret values stored | Satisfied for committed audit artifacts |
-

@@ -12,6 +12,11 @@ openspec/
 template/
 admin-console-proposal-feedback.md
 _aws_delivery/
+graphify-out/
+frontend/dist/
+**/*.db
+**/*.sqlite
+**/*.sqlite3
 
 # Kept outside the repository and never packaged
 C:\aws\Fb021451.pem

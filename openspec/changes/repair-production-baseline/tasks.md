@@ -19,11 +19,11 @@
 
 ## 4. Repository Hygiene and Data Safety
 
-- [ ] 4.1 Remove tracked root dependencies, generated build/cache files, graph-analysis output, and other reproducible artifacts from release scope
-- [ ] 4.2 Remove binary delivery archives from Git while retaining only justified secret-safe operational documentation or manifests
-- [ ] 4.3 Update precise ignore rules for dependencies, generated output, archives, credentials, runtime databases, datasets, embeddings, uploads, and logs
-- [ ] 4.4 Verify required local and production data remains outside Git or in documented backup locations and that no cleanup step targets live host data
-- [ ] 4.5 Scan staged and tracked release content for credentials, private keys, tokens, passwords, and accidental runtime data
+- [x] 4.1 Remove tracked root dependencies, generated build/cache files, graph-analysis output, and other reproducible artifacts from release scope
+- [x] 4.2 Remove binary delivery archives from Git while retaining only justified secret-safe operational documentation or manifests
+- [x] 4.3 Update precise ignore rules for dependencies, generated output, archives, credentials, runtime databases, datasets, embeddings, uploads, and logs
+- [x] 4.4 Verify required local and production data remains outside Git or in documented backup locations and that no cleanup step targets live host data
+- [x] 4.5 Scan staged and tracked release content for credentials, private keys, tokens, passwords, and accidental runtime data
 
 ## 5. Clean Verification
 

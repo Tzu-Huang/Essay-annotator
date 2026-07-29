@@ -39,6 +39,13 @@ ZAC-83 repairs the broken `main` application baseline created by merge commit `1
 - Consider route-level code splitting for the current production bundle-size warning.
 - Perform production backup, deployment, readiness, and rollback checks only under separately authorized launch work.
 
+## Release Baseline Handoff
+
+- Closure review Round 3 approved candidate `928995c438981927c7b067c26c9792d5a2651515` with no blocking findings.
+- GitHub pull request #3 merged the approved candidate into `main`.
+- The merged and recorded `main` baseline is `71ad668065287a7eda713b7655bd5344c9aa6dba`.
+- This handoff did not deploy or modify production.
+
 ## Verification
 
 ### Round 1 (2026-07-25 16:41 Asia/Taipei)

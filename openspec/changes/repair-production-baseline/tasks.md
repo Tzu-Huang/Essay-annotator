@@ -34,7 +34,7 @@
 
 ## 6. Release Baseline Handoff
 
-- [ ] 6.1 Complete code review and address all blocking findings against the tested candidate commit
-- [ ] 6.2 Merge the approved change through a pull request to `main` without deploying or modifying production
-- [ ] 6.3 Record the merged `main` baseline SHA and link its verification evidence for the parent launch issue
+- [x] 6.1 Complete code review and address all blocking findings against the tested candidate commit
+- [x] 6.2 Merge the approved change through a pull request to `main` without deploying or modifying production
+- [x] 6.3 Record the merged `main` baseline SHA and link its verification evidence for the parent launch issue
 - [x] 6.4 Prepare the separately authorized deployment checklist with backup, readiness, and data-preserving rollback gates

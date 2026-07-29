@@ -17,6 +17,8 @@ This record contains paths, categories, and commit identifiers only. It does not
 | Rollback code SHA | `1d335dd2fd11f9a2d30bca24ffbf204ed8e8db76`; known non-starting, retained only as the pre-change code reference |
 | Candidate branch | `feature/ZAC-83_repair-production-baseline` |
 | Candidate release source | reviewed and tested commit from the candidate branch, merged through a pull request to `main` |
+| Approved candidate SHA | `928995c438981927c7b067c26c9792d5a2651515`; verification Round 3 passed and closure review Round 3 approved |
+| Merged `main` baseline | `71ad668065287a7eda713b7655bd5344c9aa6dba`; GitHub pull request #3 merge commit |
 
 `frontend-base` is identical to the recorded remote baseline. `feature/admin` is already an ancestor of the broken merge and is used only for read-only comparison; neither branch is a promotion source for this change.
 

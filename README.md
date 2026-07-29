@@ -140,12 +140,25 @@ pip install -r requirements.txt
 uvicorn app.main:app --reload
 ```
 
-Fronted Setup
+Frontend Setup
 ```bash
 cd frontend
-npm install
+npm ci
 npm run dev
 ```
+
+These are development commands. Production builds static frontend assets and
+starts FastAPI without reload:
+
+```bash
+make web-build
+make api-prod
+```
+
+Production configuration, Nginx routing, and systemd examples are documented
+in [`deploy/ENVIRONMENT.md`](deploy/ENVIRONMENT.md). Browser API requests use
+same-origin `/api` by default; changing a host or domain does not require source
+edits.
 --- 
 
 ### Tech Stack

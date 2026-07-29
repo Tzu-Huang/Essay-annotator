@@ -19,9 +19,9 @@
 
 ## 4. Production Operations
 
-- [ ] 4.1 Add secret-safe required/optional and build-time/runtime environment-variable documentation
-- [ ] 4.2 Add a production Nginx configuration example that serves built frontend assets and proxies `/api/*` to loopback FastAPI with the prefix stripped
-- [ ] 4.3 Separate documented development commands from production build/start commands and ensure production does not use Vite dev serving or Uvicorn reload
+- [x] 4.1 Add secret-safe required/optional and build-time/runtime environment-variable documentation
+- [x] 4.2 Add a production Nginx configuration example that serves built frontend assets and proxies `/api/*` to loopback FastAPI with the prefix stripped
+- [x] 4.3 Separate documented development commands from production build/start commands and ensure production does not use Vite dev serving or Uvicorn reload
 
 ## 5. Verification
 

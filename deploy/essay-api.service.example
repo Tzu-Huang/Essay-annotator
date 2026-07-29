@@ -1,0 +1,17 @@
+[Unit]
+Description=Essay Annotator FastAPI
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=essay-annotator
+Group=essay-annotator
+WorkingDirectory=/srv/essay-annotator/BackEnd
+EnvironmentFile=/etc/essay-annotator/api.env
+ExecStart=/srv/essay-annotator/.venv/bin/python -m uvicorn app.main:app --host 127.0.0.1 --port 8000
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

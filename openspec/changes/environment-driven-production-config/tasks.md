@@ -25,7 +25,7 @@
 
 ## 5. Verification
 
-- [ ] 5.1 Pass clean frontend install, lint, tests, and production build
-- [ ] 5.2 Pass isolated backend dependency install, complete tests, application import, configuration validation, and bounded health/readiness checks
-- [ ] 5.3 Verify no hard-coded deployment host/IP fallback or secret value remains in tracked application and operations files
-- [ ] 5.4 Run strict OpenSpec validation and record tested commands, results, limitations, and rollback considerations in the devlog
+- [x] 5.1 Pass clean frontend install, lint, tests, and production build
+- [x] 5.2 Pass isolated backend dependency install, complete tests, application import, configuration validation, and bounded health/readiness checks
+- [x] 5.3 Verify no hard-coded deployment host/IP fallback or secret value remains in tracked application and operations files
+- [x] 5.4 Run strict OpenSpec validation and record tested commands, results, limitations, and rollback considerations in the devlog

@@ -1,6 +1,7 @@
 import os
 import time
 from app.helpers import load_essays
+from app.config import load_settings
 from service.search_service import run_search
 from app.state import AppData
 from compare_results.analysis import compare
@@ -25,6 +26,7 @@ from compare_results.analysis import (
 )
 
 load_dotenv(dotenv_path=Path(__file__).parent / ".env")
+settings = load_settings()
 # print("OPENAI KEY: ", bool(os.environ.get("OPENAI_API_KEY")))
 
 BASE = Path(__file__).resolve().parent.parent
@@ -85,17 +87,11 @@ app = FastAPI(lifespan=lifespan)
 app.include_router(admin_router)
 
 # Allow frontend to make requests
-app.add_middleware(CORSMiddleware,
-    allow_origins=["http://44.201.62.0:8000",
-        "http://127.0.0.1:3000",
-        "http://localhost:5173",   # Vite 常見
-        "http://127.0.0.1:5173",
-        "http://localhost:5174",
-        "http://127.0.0.1:5174",
-    ],  # your frontend URL
-    
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=list(settings.cors_origins),
     allow_methods=["*"],
-    allow_headers=["*"]
+    allow_headers=["*"],
 )
 
 # -----------------------------

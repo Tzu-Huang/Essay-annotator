@@ -45,3 +45,11 @@ ZAC-84 replaces deployment-specific frontend API URLs and FastAPI CORS origins w
 - Checks: clean `npm ci` pass (204 packages); `npm run lint` pass; `npm test` pass (46/46); `npm run build` pass (Vite 7.3.6, 2,410 modules); isolated Python 3.11 requirements install pass; complete backend `unittest` pass (79/79); FastAPI development-mode import pass; production configuration validation tests pass; hard-coded deployment host/API fallback scan pass (0 matches); credential-pattern scan pass (0 matches); conflict-marker scan pass (0 matches); `openspec validate environment-driven-production-config --strict` pass; captured product HEAD unchanged.
 - Unresolved failures: none. Vite retains the known chunk larger than 500 kB warning.
 - Next action: `/dev-review`
+
+### Round 2 (2026-07-29 17:14 Asia/Taipei)
+
+- Tested head: `6d01c0a90c93520a8fb0df95475ba45e582c863a`
+- Status: `pass`
+- Checks: clean `npm ci` pass (204 packages); `npm run lint` pass; `npm test` pass (46/46); `npm run build` pass (Vite 7.3.6, 2,410 modules); isolated backend requirements remain installed from the committed manifest; complete backend `unittest` pass (79/79); FastAPI development-mode import pass; real production-mode import with required variables cleared fails before downstream imports and lists `POSTGRES_URL`, `OPENAI_API_KEY`, `GOOGLE_CLIENT_ID`, and `ADMIN_EMAILS`; hard-coded deployment host/API fallback scan pass (0 matches); credential-pattern scan pass (0 matches); conflict-marker scan pass (0 matches); `openspec validate environment-driven-production-config --strict` pass; post-check product HEAD unchanged.
+- Unresolved failures: none. Vite retains the known chunk larger than 500 kB warning.
+- Next action: `/dev-review`

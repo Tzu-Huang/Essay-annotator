@@ -35,9 +35,9 @@ import {
 } from "./AdminConsole.logic.mjs";
 import { formatDate } from "./AdminConsole.logic.mjs";
 import { EmptyState, MetricCard, PanelHeader, StatusBadge } from "./admin/AdminPrimitives.jsx";
+import { apiUrl } from "../config/api.js";
 import "../styles/admin.css";
 
-const API_BASE = import.meta.env.VITE_API_URL || "http://44.201.62.0:8000";
 const FALLBACK_ADMIN_EMAILS = PROJECT_ADMIN_EMAILS.join(",");
 
 function adminEmails() {
@@ -137,7 +137,7 @@ export default function AdminConsole() {
   );
 
   const api = useCallback(async (path, options = {}) => {
-    const response = await fetch(`${API_BASE}${path}`, {
+    const response = await fetch(apiUrl(path), {
       ...options,
       headers: { ...headers, ...(options.headers || {}) },
     });
@@ -285,7 +285,7 @@ export default function AdminConsole() {
       const formData = new FormData();
       files.forEach((file) => formData.append("files", file));
       formData.append("file_meta", JSON.stringify(fileMeta));
-      const response = await fetch(`${API_BASE}/admin/essays/upload-drafts`, {
+      const response = await fetch(apiUrl("/admin/essays/upload-drafts"), {
         method: "POST",
         headers: accessToken ? { Authorization: `Bearer ${accessToken}` } : {},
         body: formData,
@@ -533,7 +533,7 @@ export default function AdminConsole() {
         onSelectTab={switchTab}
         collapsed={sidebarCollapsed}
         onToggleCollapsed={toggleSidebarCollapsed}
-        apiBase={API_BASE}
+        apiBase={apiUrl()}
       />
 
       <section className="admin-main">

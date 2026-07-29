@@ -1,6 +1,7 @@
   import { useGoogleLogin } from "@react-oauth/google";
   import { useNavigate, useLocation } from "react-router-dom";
   import { useAuth } from "./useAuth";
+  import { apiUrl } from "../config/api.js";
 
   const GOOGLE_USERINFO_URL = "https://www.googleapis.com/oauth2/v3/userinfo";
 
@@ -8,7 +9,7 @@
 
   async function saveUser(profile) {
     const params = new URLSearchParams({ email: profile.email, name: profile.name });
-    const res = await fetch(`${import.meta.env.VITE_API_URL}/api/users?${params}`, { method: "POST" });
+    const res = await fetch(apiUrl(`/users?${params}`), { method: "POST" });
 
     if (!res.ok) {
       throw new Error("Failed to save user to database");

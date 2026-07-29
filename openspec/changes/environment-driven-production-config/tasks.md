@@ -6,9 +6,9 @@
 
 ## 2. Frontend Request Standardization
 
-- [ ] 2.1 Migrate all public, login, essay, comparison, and readiness requests to the shared API-base helper
-- [ ] 2.2 Migrate all admin requests and upload flows to the shared API-base helper while preserving authorization headers and request bodies
-- [ ] 2.3 Update frontend tests to prove user and admin calls use same-origin `/api` without hard-coded AWS host/IP fallbacks
+- [x] 2.1 Migrate all public, login, essay, comparison, and readiness requests to the shared API-base helper
+- [x] 2.2 Migrate all admin requests and upload flows to the shared API-base helper while preserving authorization headers and request bodies
+- [x] 2.3 Update frontend tests to prove user and admin calls use same-origin `/api` without hard-coded AWS host/IP fallbacks
 
 ## 3. Proxy and Backend Runtime Behavior
 

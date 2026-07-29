@@ -2,10 +2,10 @@ import { useEffect, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 
 import { useAuth } from "../hooks/useAuth";
+import { apiUrl } from "../config/api.js";
 import styles from "../styles/home.module.css";
 
 const FALLBACK_ESSAY_COUNT = 219;
-const API_BASE = import.meta.env.VITE_API_URL;
 
 const ESSAYS = [
   {
@@ -68,13 +68,11 @@ function Home({ onOpenSignIn }) {
   }, []);
 
   useEffect(() => {
-    if (!API_BASE) return undefined;
-
     const controller = new AbortController();
 
     async function fetchEssayCount() {
       try {
-        const response = await fetch(`${API_BASE}/ready`, {
+        const response = await fetch(apiUrl("/ready"), {
           signal: controller.signal,
         });
 

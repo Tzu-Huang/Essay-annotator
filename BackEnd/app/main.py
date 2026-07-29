@@ -151,7 +151,7 @@ def ready():
 
 
 # Handling saving user info into our database
-@app.post("/api/users")
+@app.post("/users")
 def save_user(email: str, name: str, db: Session = Depends(get_db)):
     existing = db.query(User).filter(User.email == email).first()
     if existing:

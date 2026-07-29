@@ -12,10 +12,10 @@
 
 ## 3. Proxy and Backend Runtime Behavior
 
-- [ ] 3.1 Configure the Vite development proxy to strip `/api` consistently before forwarding to existing FastAPI routes
+- [x] 3.1 Configure the Vite development proxy to strip `/api` consistently before forwarding to existing FastAPI routes
 - [x] 3.2 Replace hard-coded FastAPI CORS origins with the centralized environment-driven allowlist
-- [ ] 3.3 Add route-contract tests for representative public, user, admin, health, and readiness proxy paths
-- [ ] 3.4 Preserve dependency-free `/health` and `/ready` behavior with tests proving no paid or external request is invoked
+- [x] 3.3 Add route-contract tests for representative public, user, admin, health, and readiness proxy paths
+- [x] 3.4 Preserve dependency-free `/health` and `/ready` behavior with tests proving no paid or external request is invoked
 
 ## 4. Production Operations
 

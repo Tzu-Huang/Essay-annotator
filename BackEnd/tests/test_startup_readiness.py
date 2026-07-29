@@ -13,6 +13,19 @@ from database.create import Base, Essay
 
 
 class StartupReadinessTests(unittest.TestCase):
+    def test_route_contract_matches_api_prefix_stripping_proxy(self):
+        paths = main.app.openapi()["paths"]
+
+        for path, method in {
+            "/search": "post",
+            "/users": "post",
+            "/admin/essays": "get",
+            "/health": "get",
+            "/ready": "get",
+        }.items():
+            self.assertIn(path, paths)
+            self.assertIn(method, paths[path])
+
     def test_real_lifespan_initializes_health_and_readiness(self):
         with tempfile.TemporaryDirectory() as temp_dir:
             temp_path = Path(temp_dir)
@@ -83,6 +96,9 @@ class StartupReadinessTests(unittest.TestCase):
     def test_real_lifespan_exposes_startup_failure_as_not_ready(self):
         with (
             patch.object(main, "create_tables", side_effect=RuntimeError("isolated startup failure")),
+            patch.object(main, "run_search") as search,
+            patch.object(main, "compare") as compare,
+            patch.object(main, "record_openai_usage") as usage,
             TestClient(main.app) as client,
         ):
             health = client.get("/health")
@@ -99,6 +115,9 @@ class StartupReadinessTests(unittest.TestCase):
                 "startup_error": "isolated startup failure",
             },
         )
+        search.assert_not_called()
+        compare.assert_not_called()
+        usage.assert_not_called()
 
 
 if __name__ == "__main__":

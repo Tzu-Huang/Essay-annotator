@@ -1,11 +1,17 @@
 import os
 import time
-from app.helpers import load_essays
+from pathlib import Path
+
+from dotenv import load_dotenv
 from app.config import load_settings
+
+load_dotenv(dotenv_path=Path(__file__).parent / ".env")
+settings = load_settings()
+
+from app.helpers import load_essays
 from service.search_service import run_search
 from app.state import AppData
 from compare_results.analysis import compare
-from dotenv import load_dotenv
 from embedding.search_similar import load_db_embeddings
 from database.create import get_db, User, create_tables, SessionLocal
 from database.essays import load_essays_from_db
@@ -15,7 +21,6 @@ from sqlalchemy.orm import Session
 from datetime import datetime, timezone
 from fastapi import FastAPI, HTTPException, Query, Request, Depends
 from fastapi.middleware.cors import CORSMiddleware
-from pathlib import Path
 from pydantic import BaseModel
 from typing import Optional
 from compare_results.analysis import (
@@ -25,8 +30,6 @@ from compare_results.analysis import (
     finalize_compare_result,
 )
 
-load_dotenv(dotenv_path=Path(__file__).parent / ".env")
-settings = load_settings()
 # print("OPENAI KEY: ", bool(os.environ.get("OPENAI_API_KEY")))
 
 BASE = Path(__file__).resolve().parent.parent

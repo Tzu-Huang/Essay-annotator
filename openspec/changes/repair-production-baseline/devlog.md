@@ -72,6 +72,14 @@ ZAC-83 repairs the broken `main` application baseline created by merge commit `1
 - Unresolved failures: none. Non-blocking follow-ups remain seven npm high advisories requiring breaking force-fix analysis and a Vite bundle-size warning.
 - Next action: `/dev-review`
 
+### Round 4 (2026-07-29 16:25 Asia/Taipei)
+
+- Tested head: `08967451a2b41a9079e410aeeb4f9f7c2e227cca`
+- Status: `pass`
+- Checks: clean tracked-source `npm ci` pass; `npm run lint` pass; `npm test` pass (35/35); `npm run build` pass (Vite 7.3.6, 2,409 modules); isolated Python 3.11 requirements install pass; complete backend `unittest` pass (73/73), including actual lifespan readiness success/failure semantics; FastAPI import pass; tracked conflict-marker scan pass (0 matches); tracked generated/runtime scan pass (0 matches); tracked credential-pattern scan pass (0 matches); `openspec validate repair-production-baseline --strict` pass; captured product HEAD unchanged.
+- Unresolved failures: none. The build retains the known chunk-size warning; `.tmp-verification-zac83/` is an untracked verification-only copy created after the original frontend `esbuild.exe` was found locked by an existing process.
+- Next action: `/dev-review`
+
 ## Code Review
 
 ### Round 1 (2026-07-25 16:44 Asia/Taipei)
@@ -106,3 +114,14 @@ ZAC-83 repairs the broken `main` application baseline created by merge commit `1
 - Open blockers: `none`
 - Follow-ups: seven npm high advisories; Vite bundle-size warning; temporary verification environments remain outside Git
 - Next action: commit only the review and devlog workflow records, then run `/dev-done`
+
+### Round 4 (2026-07-29 16:28 Asia/Taipei)
+
+- Source: `openspec/changes/repair-production-baseline/review/2026-07-29_main_codex-review-r4.md`
+- Mode: `closure`
+- Verdict: `approved`
+- Reviewed head: `08967451a2b41a9079e410aeeb4f9f7c2e227cca`
+- Transitions: `REV-001 resolved; REV-002 resolved; REV-003 resolved`
+- Open blockers: `none`
+- Follow-ups: Vite chunk-size warning; untracked verification-only `.tmp-verification-zac83/` copy
+- Next action: commit only the Round 4 review and devlog workflow records, then run `/dev-done`

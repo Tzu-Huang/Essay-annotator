@@ -53,3 +53,16 @@ ZAC-84 replaces deployment-specific frontend API URLs and FastAPI CORS origins w
 - Checks: clean `npm ci` pass (204 packages); `npm run lint` pass; `npm test` pass (46/46); `npm run build` pass (Vite 7.3.6, 2,410 modules); isolated backend requirements remain installed from the committed manifest; complete backend `unittest` pass (79/79); FastAPI development-mode import pass; real production-mode import with required variables cleared fails before downstream imports and lists `POSTGRES_URL`, `OPENAI_API_KEY`, `GOOGLE_CLIENT_ID`, and `ADMIN_EMAILS`; hard-coded deployment host/API fallback scan pass (0 matches); credential-pattern scan pass (0 matches); conflict-marker scan pass (0 matches); `openspec validate environment-driven-production-config --strict` pass; post-check product HEAD unchanged.
 - Unresolved failures: none. Vite retains the known chunk larger than 500 kB warning.
 - Next action: `/dev-review`
+
+## Code Review
+
+### Round 1 (2026-07-29 17:19 Asia/Taipei)
+
+- Source: `openspec/changes/environment-driven-production-config/review/2026-07-29_feature-ZAC-84_environment-driven-production-config_codex-review-r1.md`
+- Mode: `initial`
+- Verdict: `approved`
+- Reviewed head: `934e60a3525c7efc007326aca1c1c40f1942499d`
+- Transitions: `none`
+- Open blockers: `none`
+- Follow-ups: existing Vite production chunk-size warning
+- Next action: commit only the review and devlog workflow records, then run `/dev-done`

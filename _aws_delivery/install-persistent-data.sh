@@ -39,4 +39,12 @@ grep -q '^ESSAY_DATA_ROOT=' /etc/essay-annotator/production.env ||
     >> /etc/essay-annotator/production.env
 
 systemctl start "${service_name}"
-curl --fail --silent --show-error http://127.0.0.1:8000/ready >/dev/null
+for attempt in {1..30}; do
+  if curl --fail --silent http://127.0.0.1:8000/ready >/dev/null; then
+    exit 0
+  fi
+  sleep 1
+done
+
+echo "service did not become ready within 30 seconds" >&2
+exit 1

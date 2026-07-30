@@ -288,6 +288,29 @@ embeddings have a documented rebuild procedure instead. Credentials are
 recovered or rotated through their owning secret system, not copied into data
 backups.
 
+The current production baseline uses
+`essay-authoritative-backup.timer` to run
+`/usr/local/sbin/essay-authoritative-backup` daily. The service archives only
+the authoritative subtrees under `/var/lib/essay-annotator/drive_data`, uploads
+the archive and SHA-256 sidecar to a private S3 bucket using the EC2 instance
+role, and requests server-side encryption. The bucket has public access
+blocked, default encryption, versioning, and lifecycle expiry for current and
+noncurrent versions after 30 days. The service reads only the non-secret bucket
+alias and Region from `/etc/essay-annotator/backup.env`.
+
+Install the committed units and scripts as root, run one immediate backup, and
+verify the timer before considering this control active:
+
+```text
+install -o root -g root -m 0750 backup-authoritative-files.sh /usr/local/sbin/essay-authoritative-backup
+install -o root -g root -m 0750 verify-authoritative-backup.sh /usr/local/sbin/essay-authoritative-backup-verify
+install -o root -g root -m 0644 essay-authoritative-backup.service /etc/systemd/system/
+install -o root -g root -m 0644 essay-authoritative-backup.timer /etc/systemd/system/
+systemctl daemon-reload
+systemctl enable --now essay-authoritative-backup.timer
+systemctl start essay-authoritative-backup.service
+```
+
 For each authoritative path:
 
 - Schedule at least daily encrypted backups so the oldest acceptable recovery

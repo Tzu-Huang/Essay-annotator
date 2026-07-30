@@ -1,0 +1,11 @@
+[Unit]
+Description=Daily Essay Annotator authoritative host-file backup
+
+[Timer]
+OnCalendar=*-*-* 02:15:00 UTC
+Persistent=true
+RandomizedDelaySec=900
+Unit=essay-authoritative-backup.service
+
+[Install]
+WantedBy=timers.target

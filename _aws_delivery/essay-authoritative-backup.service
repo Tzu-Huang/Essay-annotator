@@ -1,0 +1,10 @@
+[Unit]
+Description=Back up Essay Annotator authoritative host files
+
+[Service]
+Type=oneshot
+EnvironmentFile=/etc/essay-annotator/backup.env
+ExecStart=/usr/local/sbin/essay-authoritative-backup
+User=root
+PrivateTmp=true
+NoNewPrivileges=true

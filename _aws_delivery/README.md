@@ -12,6 +12,8 @@ Production persistence and recovery controls:
   reproducible outputs and assigns release-independent runtime paths.
 - `production-recovery-runbook.md` defines the RDS, secret provisioning,
   migration, backup, rollback, and quarterly restore-drill gates.
+- `restore-drill-evidence-2026-07-30.md` records the first secret-safe production
+  cutover and isolated PITR restore result.
 
 ## Local-only delivery files
 

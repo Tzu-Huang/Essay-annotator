@@ -27,7 +27,7 @@
 ## 5. Restore Drill and Verification
 
 - [x] 5.1 Create a secret-safe runbook for restoring an eligible RDS recovery point into an isolated non-production instance
-- [ ] 5.2 Validate restored schema, row counts, representative records, backend connectivity, and representative read operations
-- [ ] 5.3 Time the complete recovery procedure and record evidence that the recovery point is no older than 24 hours and recovery completes within four hours
+- [x] 5.2 Validate restored schema, row counts, representative records, backend connectivity, and representative read operations
+- [x] 5.3 Time the complete recovery procedure and record evidence that the recovery point is no older than 24 hours and recovery completes within four hours
 - [x] 5.4 Document quarterly drill ownership, failure handling, cleanup of isolated resources, and escalation to Multi-AZ if recovery objectives tighten
 - [x] 5.5 Run repository tests and OpenSpec validation, recording any operational steps that require execution against the real AWS environment

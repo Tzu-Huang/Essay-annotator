@@ -6,6 +6,7 @@ import os
 import re
 from io import BytesIO
 from pathlib import Path
+from runtime_paths import runtime_path
 
 import docx
 from dotenv import load_dotenv
@@ -27,9 +28,9 @@ DRIVE_FOLDER_ID = os.getenv("DRIVE_FOLDER_ID", "")
 DOC_MIME = "application/vnd.google-apps.document"
 DOCX_MIME = "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
 ALLOWED_MIME_TYPE = {DOCX_MIME, DOC_MIME}
-NEW_DOCS_DIR = BACKEND_DIR / "drive_data/new_input"
-OUT_DIR = BACKEND_DIR / "drive_data/organized_data/new_input"
-STATE_DIR = BACKEND_DIR / "drive_data/organized_data/export_state"
+NEW_DOCS_DIR = runtime_path("new_input")
+OUT_DIR = runtime_path("organized_data/new_input")
+STATE_DIR = runtime_path("organized_data/export_state")
 STATE_PREFIX = "exported_ids_part_"
 STATE_GLOB = f"{STATE_PREFIX}*.json"
 

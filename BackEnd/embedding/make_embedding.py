@@ -18,6 +18,7 @@ import numpy as np
 import tiktoken
 from openai import OpenAI
 from dotenv import load_dotenv
+from runtime_paths import runtime_path
 
 # =========================
 # Config
@@ -26,8 +27,8 @@ BACKEND_DIR = Path(__file__).resolve().parents[1]
 load_dotenv(BACKEND_DIR / ".env")
 
 # Input JSONL file (finalized schema)
-Input_file = BACKEND_DIR / "drive_data" / "finalized_data_jsonl" / "database.jsonl"
-Output_file = BACKEND_DIR / "drive_data" / "embed_output" / "embed.jsonl"
+Input_file = runtime_path("finalized_data_jsonl/database.jsonl")
+Output_file = runtime_path("embed_output/embed.jsonl")
 
 Batch_size = 64 # This is the size that you want to embed and store at once
 

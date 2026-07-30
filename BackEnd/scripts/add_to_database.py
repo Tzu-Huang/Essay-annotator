@@ -14,6 +14,7 @@ import shutil
 import sys
 from itertools import count
 from pathlib import Path
+from runtime_paths import runtime_path
 
 # =========================
 # Config
@@ -26,11 +27,11 @@ if str(ROOT) not in sys.path:
 from openai import OpenAI
 from service.generate_topic import get_topic
 
-ONLINE_INPUT_DIR = script_dir / "../drive_data/essays_jsonl/online_essays"
-COLLECTED_JSONL = script_dir / "../drive_data/essays_jsonl/collected_essays.jsonl"
-NEW_INPUT_DIR = script_dir / "../drive_data/organized_data/new_input"
+ONLINE_INPUT_DIR = runtime_path("essays_jsonl/online_essays")
+COLLECTED_JSONL = runtime_path("essays_jsonl/collected_essays.jsonl")
+NEW_INPUT_DIR = runtime_path("organized_data/new_input")
 PROCESSED_INPUT_DIR = NEW_INPUT_DIR / "processed"
-DATABASE_PATH = script_dir / "../drive_data/finalized_data_jsonl/database.jsonl"
+DATABASE_PATH = runtime_path("finalized_data_jsonl/database.jsonl")
 
 
 def load_online_essays(id_counter: count) -> list[dict]:

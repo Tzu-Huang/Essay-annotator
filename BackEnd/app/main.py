@@ -29,14 +29,15 @@ from compare_results.analysis import (
     prepare_compare_context,
     finalize_compare_result,
 )
+from runtime_paths import runtime_path
 
 if os.getenv("APP_ENV", "development").strip().lower() != "production":
     load_dotenv(dotenv_path=Path(__file__).parent / ".env")
 # print("OPENAI KEY: ", bool(os.environ.get("OPENAI_API_KEY")))
 
 BASE = Path(__file__).resolve().parent.parent
-DB_JSONL = BASE / "drive_data/finalized_data_jsonl/database.jsonl"
-EMBED_JSONL = BASE / "drive_data/embed_output/embed.jsonl"
+DB_JSONL = runtime_path("finalized_data_jsonl/database.jsonl")
+EMBED_JSONL = runtime_path("embed_output/embed.jsonl")
 
 # -----------------------------
 # Request/Response Schemas

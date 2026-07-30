@@ -11,6 +11,7 @@ Usage (from BackEnd/, with .venv activated):
 """
 import sys
 from pathlib import Path
+from runtime_paths import runtime_path
 
 script_dir = Path(__file__).parent
 ROOT = script_dir.resolve().parent
@@ -20,7 +21,7 @@ if str(ROOT) not in sys.path:
 from database.create import SessionLocal
 from database.essays import backfill_current_embedding_status
 
-EMBED_JSONL = ROOT / "drive_data/embed_output/embed.jsonl"
+EMBED_JSONL = runtime_path("embed_output/embed.jsonl")
 
 
 def main() -> None:

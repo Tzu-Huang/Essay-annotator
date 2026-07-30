@@ -1,4 +1,5 @@
 from pathlib import Path
+from runtime_paths import runtime_path
 import sys
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -9,7 +10,7 @@ from database.create import SessionLocal, create_tables
 from database.essays import import_essays_from_jsonl
 
 
-DEFAULT_JSONL = ROOT / "drive_data" / "finalized_data_jsonl" / "database.jsonl"
+DEFAULT_JSONL = runtime_path("finalized_data_jsonl/database.jsonl")
 
 
 def main(path: str | None = None):

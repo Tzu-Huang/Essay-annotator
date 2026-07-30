@@ -6,6 +6,7 @@ exist in the other scripts.
 """
 
 from pathlib import Path
+from runtime_paths import runtime_path
 import os
 import sys
 from dotenv import load_dotenv
@@ -22,8 +23,8 @@ from embedding.make_embedding import update_embeddings
 
 SCRIPT_DIR = Path(__file__).resolve().parent
 BACKEND_DIR = SCRIPT_DIR.parent
-DATABASE_JSONL = BACKEND_DIR / "drive_data/finalized_data_jsonl/database.jsonl"
-EMBED_JSONL = BACKEND_DIR / "drive_data/embed_output/embed.jsonl"
+DATABASE_JSONL = runtime_path("finalized_data_jsonl/database.jsonl")
+EMBED_JSONL = runtime_path("embed_output/embed.jsonl")
 
 load_dotenv()
 DRIVE_FOLDER_ID = os.getenv("DRIVE_FOLDER_ID", "")

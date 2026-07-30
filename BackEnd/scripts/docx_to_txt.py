@@ -1,13 +1,14 @@
 # This is a general program that converts docx files to txt files.
 
 from pathlib import Path
+from runtime_paths import runtime_path
 
 from docx import Document
 
 
 BACKEND_DIR = Path(__file__).resolve().parents[1]
-INPUT_FILE = BACKEND_DIR / "drive_data" / "new_input"
-OUTPUT_FILE = BACKEND_DIR / "drive_data" / "organized_data" / "new_input"
+INPUT_FILE = runtime_path("new_input")
+OUTPUT_FILE = runtime_path("organized_data/new_input")
 
 
 def docx_to_txt(docx_path: Path, txt_path: Path) -> None:

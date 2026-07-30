@@ -5,6 +5,8 @@ bucket=${ESSAY_BACKUP_BUCKET:?ESSAY_BACKUP_BUCKET is required}
 archive_key=${1:?archive key is required}
 digest_key=${2:-${archive_key}.sha256}
 region=${AWS_REGION:-us-east-1}
+backend_root=${ESSAY_BACKEND_ROOT:-/home/ubuntu/Essay-annotator/BackEnd}
+python_bin=${ESSAY_BACKEND_PYTHON:-${backend_root}/.venv/bin/python3}
 work_dir=$(mktemp -d)
 trap 'rm -rf -- "${work_dir}"' EXIT
 
@@ -36,3 +38,5 @@ database_rows=$(wc -l < "${restore_root}/finalized_data_jsonl/database.jsonl")
 embedding_rows=$(wc -l < "${restore_root}/embed_output/embed.jsonl")
 printf 'restore_validation=pass files=%s bytes=%s database_rows=%s embedding_rows=%s\n' \
   "${file_count}" "${total_bytes}" "${database_rows}" "${embedding_rows}"
+"${python_bin}" "${backend_root}/scripts/validate_restored_files.py" \
+  --data-root "${restore_root}"

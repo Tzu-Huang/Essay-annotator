@@ -38,7 +38,10 @@ for backup_path in "${backup_paths[@]}"; do
 done
 
 tar --create --gzip --file "${archive}" --directory "${data_root}" "${present_paths[@]}"
-sha256sum "${archive}" > "${digest}"
+(
+  cd "${work_dir}"
+  sha256sum "$(basename "${archive}")" > "$(basename "${digest}")"
+)
 aws s3 cp "${archive}" "s3://${bucket}/daily/${day}/$(basename "${archive}")" \
   --region "${region}" --sse AES256 --only-show-errors
 aws s3 cp "${digest}" "s3://${bucket}/daily/${day}/$(basename "${digest}")" \

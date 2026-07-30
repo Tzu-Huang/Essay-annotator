@@ -1,9 +1,11 @@
 import json
+import subprocess
+import sys
 import tempfile
 import unittest
 from pathlib import Path
 
-from scripts.validate_restored_files import validate_restored_files
+from scripts.validate_restored_files import BACKEND_ROOT, validate_restored_files
 
 
 class RestoredFileValidationTests(unittest.TestCase):
@@ -55,6 +57,29 @@ class RestoredFileValidationTests(unittest.TestCase):
             self.write_restore(root, parent_id="missing")
             with self.assertRaisesRegex(RuntimeError, "missing essays"):
                 validate_restored_files(root)
+
+    def test_cli_runs_outside_backend_working_directory(self):
+        with (
+            tempfile.TemporaryDirectory() as temporary_directory,
+            tempfile.TemporaryDirectory() as unrelated_working_directory,
+        ):
+            root = Path(temporary_directory)
+            self.write_restore(root)
+            result = subprocess.run(
+                [
+                    sys.executable,
+                    str(BACKEND_ROOT / "scripts" / "validate_restored_files.py"),
+                    "--data-root",
+                    str(root),
+                ],
+                cwd=unrelated_working_directory,
+                check=False,
+                capture_output=True,
+                text=True,
+            )
+
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertIn("application_read=pass", result.stdout)
 
 
 if __name__ == "__main__":

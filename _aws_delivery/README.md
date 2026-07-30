@@ -6,6 +6,13 @@ Target directory: `/home/ubuntu/Essay-annotator`
 
 Backend service: `essay-api.service`
 
+Production persistence and recovery controls:
+
+- `runtime-data-inventory.md` classifies mutable data, credentials, and
+  reproducible outputs and assigns release-independent runtime paths.
+- `production-recovery-runbook.md` defines the RDS, secret provisioning,
+  migration, backup, rollback, and quarterly restore-drill gates.
+
 ## Local-only delivery files
 
 - `essay-annotator-app-20260715.tar.gz`

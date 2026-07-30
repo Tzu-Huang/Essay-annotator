@@ -1,8 +1,5 @@
-# production-release-baseline Specification
+## ADDED Requirements
 
-## Purpose
-TBD - created by archiving change repair-production-baseline. Update Purpose after archive.
-## Requirements
 ### Requirement: Explicit launch-v1 scope
 
 The production baseline SHALL define the frontend and backend behavior included in launch v1 and SHALL explicitly record any deferred behavior or known limitation.

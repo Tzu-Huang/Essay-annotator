@@ -17,6 +17,31 @@ records, public IP addresses, DB resource identifiers, snapshot identifiers, or
 security-group identifiers into this document, tickets, command history, logs,
 or recovery evidence.
 
+## Approved Initial Baseline
+
+The initial cost-constrained production baseline is:
+
+| Setting | Approved value |
+| --- | --- |
+| AWS Region | `us-east-1` |
+| Preferred Single-AZ placement | `us-east-1a`, matching the application EC2 placement |
+| PostgreSQL | Major version 17; use the latest RDS-supported minor release and enable automatic minor-version upgrades |
+| DB instance class | `db.t4g.micro` (2 vCPU, 1 GiB RAM, burstable) |
+| Storage | 20 GiB General Purpose SSD (`gp3`), encrypted, with autoscaling capped initially at 100 GiB |
+| Encryption | AWS-managed RDS key initially; migrate to a customer-managed key only when policy requires it |
+| Network | Private DB subnet group spanning at least two Availability Zones; no public access; TCP 5432 inbound only from the application security group |
+| Availability | Single-AZ, with RPO 24 hours and RTO 4 hours |
+| Backup | Automated backups/PITR retained 30 days; manual encrypted snapshot before migrations |
+| Cost guard | AWS Budget alert at USD 18/month against the approved USD 20/month RDS budget |
+| Operations owner | Essay Annotator project owner, acting as the AWS account operator until a separate operations role is assigned |
+| Application owner | Essay Annotator project owner |
+
+The operator must confirm current AWS Pricing Calculator output before
+provisioning. Burstable CPU surplus credits, backup storage beyond included
+allowances, data transfer, monitoring, storage autoscaling, and taxes can exceed
+the USD 20 monthly budget. If the estimate exceeds the budget, stop rather than
+weakening encryption, private networking, backups, or retention.
+
 ## 1. Execution Gate and Required Values
 
 An operator must resolve and record the following values in the approved
@@ -25,18 +50,18 @@ Do not replace these placeholders in this repository file.
 
 | Placeholder | Required decision |
 | --- | --- |
-| `<AWS_REGION>` | Approved AWS Region |
-| `<PG_MAJOR_VERSION>` | PostgreSQL major version currently in standard RDS support and supported by the application |
-| `<RDS_INSTANCE_CLASS>` | Instance class sized from measured production load |
-| `<RDS_STORAGE_TYPE>` / `<RDS_STORAGE_GIB>` | Encrypted storage type and initial capacity |
-| `<KMS_KEY_REFERENCE>` | Approved customer-managed or AWS-managed encryption key reference |
+| `<AWS_REGION>` | `us-east-1`; confirm before execution |
+| `<PG_MAJOR_VERSION>` | PostgreSQL 17; confirm the selected minor remains available and supported |
+| `<RDS_INSTANCE_CLASS>` | `db.t4g.micro`; confirm measured load remains within its capacity |
+| `<RDS_STORAGE_TYPE>` / `<RDS_STORAGE_GIB>` | `gp3` / 20 GiB, encrypted; maximum autoscaling 100 GiB |
+| `<KMS_KEY_REFERENCE>` | AWS-managed RDS key initially |
 | `<DB_SUBNET_GROUP>` | Private DB subnet group spanning the approved VPC |
 | `<DB_SECURITY_GROUP>` | Security group allowing PostgreSQL only from the application security group |
 | `<APP_SECURITY_GROUP>` | EC2 application security group; never use a public CIDR |
 | `<PRODUCTION_DB_ALIAS>` | Non-secret internal alias used by operations |
 | `<BACKUP_BUCKET_ALIAS>` | Private encrypted destination for authoritative non-database backups |
-| `<OPERATIONS_OWNER>` | Named role/team accountable for backup and recovery |
-| `<APPLICATION_OWNER>` | Named role/team accountable for application validation |
+| `<OPERATIONS_OWNER>` | Essay Annotator project owner until delegated |
+| `<APPLICATION_OWNER>` | Essay Annotator project owner |
 | `<EVIDENCE_LOCATION>` | Restricted, access-controlled evidence system |
 | `<SERVICE_ACCOUNT>` | Least-privilege Linux account running the backend |
 | `<SERVICE_UNIT>` | Service-manager unit name |

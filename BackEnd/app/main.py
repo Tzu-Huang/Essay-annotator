@@ -6,7 +6,13 @@ from app.state import AppData
 from compare_results.analysis import compare
 from dotenv import load_dotenv
 from embedding.search_similar import load_db_embeddings
-from database.create import get_db, User, create_tables, SessionLocal
+from database.create import (
+    get_db,
+    User,
+    create_tables,
+    SessionLocal,
+    validate_production_database_configuration,
+)
 from database.essays import load_essays_from_db
 from app.admin import require_admin_write, router as admin_router
 from app.usage import record_openai_usage
@@ -24,7 +30,8 @@ from compare_results.analysis import (
     finalize_compare_result,
 )
 
-load_dotenv(dotenv_path=Path(__file__).parent / ".env")
+if os.getenv("APP_ENV", "development").strip().lower() != "production":
+    load_dotenv(dotenv_path=Path(__file__).parent / ".env")
 # print("OPENAI KEY: ", bool(os.environ.get("OPENAI_API_KEY")))
 
 BASE = Path(__file__).resolve().parent.parent
@@ -42,6 +49,7 @@ async def lifespan(app: FastAPI):
     )
     
     try:
+        validate_production_database_configuration()
         create_tables()
         db = SessionLocal()
         try:

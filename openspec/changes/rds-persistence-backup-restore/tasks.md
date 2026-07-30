@@ -8,7 +8,7 @@
 
 - [ ] 2.1 Record the AWS Region, supported PostgreSQL version, Single-AZ instance class, encrypted storage settings, networking rules, and operational owner
 - [ ] 2.2 Provision or document the encrypted private RDS PostgreSQL Single-AZ configuration with automated backups and point-in-time recovery retained for 30 days
-- [ ] 2.3 Add production startup configuration and tests that require PostgreSQL and prevent silent SQLite fallback while preserving SQLite for local development and tests
+- [x] 2.3 Add production startup configuration and tests that require PostgreSQL and prevent silent SQLite fallback while preserving SQLite for local development and tests
 - [ ] 2.4 Define release-independent host paths and least-privilege service permissions for authoritative non-database runtime files
 
 ## 3. Secret Provisioning

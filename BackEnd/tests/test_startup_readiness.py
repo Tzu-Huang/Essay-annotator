@@ -100,6 +100,21 @@ class StartupReadinessTests(unittest.TestCase):
             },
         )
 
+    def test_production_without_postgres_is_not_ready_and_skips_table_creation(self):
+        with (
+            patch.dict("os.environ", {"APP_ENV": "production"}, clear=True),
+            patch.object(main, "create_tables") as create_tables,
+            TestClient(main.app) as client,
+        ):
+            health = client.get("/health")
+            ready = client.get("/ready")
+
+        create_tables.assert_not_called()
+        self.assertEqual(health.status_code, 200)
+        self.assertFalse(health.json()["ready"])
+        self.assertIn("POSTGRES_URL is required", health.json()["startup_error"])
+        self.assertEqual(ready.status_code, 503)
+
 
 if __name__ == "__main__":
     unittest.main()

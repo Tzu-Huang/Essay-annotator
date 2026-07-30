@@ -20,7 +20,15 @@ from pathlib import Path
 import uuid
 import os
 
-load_dotenv(dotenv_path=Path(__file__).resolve().parent.parent / ".env")
+_ALLOWED_APP_ENVIRONMENTS = {"development", "test", "production"}
+
+
+def runtime_environment() -> str:
+    return os.getenv("APP_ENV", "development").strip().lower()
+
+
+if runtime_environment() != "production":
+    load_dotenv(dotenv_path=Path(__file__).resolve().parent.parent / ".env")
 
 POSTGRES_URL = os.getenv("POSTGRES_URL")
 DATABASE_URL = POSTGRES_URL or f"sqlite:///{Path(__file__).resolve().parent.parent / 'app_data.db'}"
@@ -32,6 +40,28 @@ engine = create_engine(DATABASE_URL, connect_args=connect_args)
 SessionLocal = sessionmaker(bind=engine)
 
 Base = declarative_base()
+
+def validate_production_database_configuration() -> None:
+    """Reject the local SQLite fallback when the service runs in production."""
+    app_env = runtime_environment()
+    if app_env not in _ALLOWED_APP_ENVIRONMENTS:
+        raise RuntimeError(
+            "APP_ENV must be one of: development, test, production"
+        )
+    if app_env != "production":
+        return
+
+    postgres_url = os.getenv("POSTGRES_URL", "").strip()
+    if not postgres_url:
+        raise RuntimeError(
+            "POSTGRES_URL is required when APP_ENV=production; "
+            "the SQLite fallback is disabled"
+        )
+    if not postgres_url.lower().startswith(("postgresql://", "postgresql+")):
+        raise RuntimeError(
+            "POSTGRES_URL must use a PostgreSQL connection URL when "
+            "APP_ENV=production"
+        )
 
 class User(Base):
     __tablename__ = "users"

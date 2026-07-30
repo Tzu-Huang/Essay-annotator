@@ -3,6 +3,7 @@
 ## Result
 
 - Drill reference: `ZAC-85-2026-07-30`
+- Responsible operator: Zackery
 - Overall result: **PASS**
 - Region: `us-east-1`
 - Engine: Amazon RDS for PostgreSQL `17.10`
@@ -38,6 +39,30 @@ secret references, and raw production rows.
 | Production isolation | Production service configuration was not pointed at the drill target | PASS |
 | Cleanup | Drill env, scripts, RDS instance, and security group removed | PASS |
 
+## Authoritative host-file restore validation
+
+The recovery drill was extended after review to cover the non-database state
+that remains authoritative.
+
+| Check | Evidence | Result |
+| --- | --- | --- |
+| Backup completed UTC | `2026-07-30T05:35:24Z` | recorded |
+| Isolated restore start UTC | `2026-07-30T05:36:16Z` | recorded |
+| Isolated validation complete UTC | `2026-07-30T05:36:19Z` | recorded |
+| File RPO | approximately 52 seconds | PASS (`<= 24 hours`) |
+| File restore duration | approximately 3 seconds | PASS (`<= 4 hours`) |
+| Destination controls | Private S3, public access blocked, default AES-256 encryption, versioning enabled | PASS |
+| Retention | Current and noncurrent daily backup versions expire after 30 days | PASS |
+| Integrity | Downloaded SHA-256 sidecar verified the archive | PASS |
+| Archive validation | Archive parsed and extracted into a mode `0700` isolated temporary directory | PASS |
+| Restored inventory | 194 files, 42,449,309 bytes | PASS |
+| Authoritative JSONL | `database.jsonl` 219 rows; `embed.jsonl` 514 rows | PASS |
+| Restored permissions | Directories normalized to `0750`; files normalized to `0640` | PASS |
+| Cleanup | Isolated restore directory removed automatically after validation | PASS |
+
+The complete recovery objective remains governed by the slower RDS drill:
+approximately 4 minutes 28 seconds RPO and 1 hour 5 minutes 4 seconds RTO.
+
 ## Production cutover evidence
 
 - Source PostgreSQL remained unchanged during the initial copy.
@@ -51,6 +76,12 @@ secret references, and raw production rows.
 - Production `/health` reported ready with 219 essays and no startup error.
 - Production `/ready` returned HTTP 200 with 219 essays.
 - Production database schema, counts, and representative read validation passed.
+- Production `ESSAY_DATA_ROOT` points to
+  `/var/lib/essay-annotator/drive_data`, outside the release checkout.
+- The checkout `BackEnd/drive_data` path is a compatibility symlink to the
+  stable root; stable directories are `0750` and files are `0640`.
+- The authoritative-file backup timer is enabled and active, and its immediate
+  first run plus isolated restore validation passed.
 
 ## Follow-up
 

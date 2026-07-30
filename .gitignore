@@ -35,6 +35,7 @@ Thumbs.db
 # ---------------------------------------------------------
 BackEnd/data/
 BackEnd/drive_data/
+BackEnd/drive_data
 BackEnd/**/*.jsonl
 client_secret*.json
 token.json

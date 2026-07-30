@@ -298,6 +298,16 @@ blocked, default encryption, versioning, and lifecycle expiry for current and
 noncurrent versions after 30 days. The service reads only the non-secret bucket
 alias and Region from `/etc/essay-annotator/backup.env`.
 
+Every backup exit publishes `AuthoritativeBackupSuccess` with value `1` or `0`
+to the `EssayAnnotator/Backups` CloudWatch namespace. The
+`EssayAnnotatorAuthoritativeBackupMissingOrFailed` alarm treats a missing daily
+metric as breaching and notifies the operations owner through the
+`EssayAnnotatorBackupAlerts` SNS topic. The email subscription must show
+`PendingConfirmation=false` and `ConfirmationWasAuthenticated=true`; this
+prevents unauthenticated email-link scanners from cancelling the subscription.
+Test the notification path after setup and inspect the alarm/action state during
+every release preflight.
+
 Install the committed units and scripts as root, run one immediate backup, and
 verify the timer before considering this control active:
 
@@ -331,6 +341,12 @@ At least quarterly, restore these files to a new isolated directory, verify the
 manifest/digests, counts, permissions, and representative application reads,
 then securely remove the drill copy. A successful upload alone is not proof of
 recoverability.
+
+The committed restore verifier calls the production `load_essays` and
+`load_db_embeddings` loaders against the isolated extracted paths. It fails if
+essays or embeddings are empty, embedding parents are absent from the restored
+essay set, vector matrix shapes disagree, or representative vectors are not
+finite.
 
 ## 6. Quarterly Isolated RDS PITR Drill
 

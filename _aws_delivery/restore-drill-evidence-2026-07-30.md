@@ -57,8 +57,20 @@ that remains authoritative.
 | Archive validation | Archive parsed and extracted into a mode `0700` isolated temporary directory | PASS |
 | Restored inventory | 194 files, 42,449,309 bytes | PASS |
 | Authoritative JSONL | `database.jsonl` 219 rows; `embed.jsonl` 514 rows | PASS |
+| Application loaders | Production essay and embedding loaders read 219 essays and 514 embeddings with 1,536 dimensions | PASS |
+| Representative relationships | Restored embedding parents resolved to restored essays and representative vectors were finite | PASS |
 | Restored permissions | Directories normalized to `0750`; files normalized to `0640` | PASS |
 | Cleanup | Isolated restore directory removed automatically after validation | PASS |
+
+## Backup monitoring validation
+
+| Check | Evidence | Result |
+| --- | --- | --- |
+| Health metric | Successful production backup published value `1` to the dedicated CloudWatch namespace | PASS |
+| Missing/failure detection | Daily alarm uses minimum below `1` and treats missing data as breaching | PASS |
+| Operator action | Alarm actions target the dedicated backup-alert SNS topic | PASS |
+| Email subscription | Operations-owner endpoint is confirmed with authenticated unsubscribe required | PASS |
+| Delivery test | A message clearly marked `TEST ONLY` was accepted by SNS and the subscription remained confirmed | PASS |
 
 The complete recovery objective remains governed by the slower RDS drill:
 approximately 4 minutes 28 seconds RPO and 1 hour 5 minutes 4 seconds RTO.

@@ -8,7 +8,22 @@ region=${AWS_REGION:-us-east-1}
 timestamp=$(date -u +%Y%m%dT%H%M%SZ)
 day=$(date -u +%Y-%m-%d)
 work_dir=$(mktemp -d)
-trap 'rm -rf -- "${work_dir}"' EXIT
+
+finish() {
+  exit_code=$?
+  trap - EXIT
+  metric_value=0
+  [[ ${exit_code} -eq 0 ]] && metric_value=1
+  if ! aws cloudwatch put-metric-data \
+    --namespace EssayAnnotator/Backups \
+    --metric-data "MetricName=AuthoritativeBackupSuccess,Dimensions=[{Name=BackupName,Value=authoritative-files}],Value=${metric_value},Unit=Count" \
+    --region "${region}"; then
+    [[ ${exit_code} -ne 0 ]] || exit_code=1
+  fi
+  rm -rf -- "${work_dir}"
+  exit "${exit_code}"
+}
+trap finish EXIT
 
 archive="${work_dir}/authoritative-files-${timestamp}.tar.gz"
 digest="${archive}.sha256"

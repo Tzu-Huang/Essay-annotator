@@ -18,6 +18,17 @@
         "s3:PutObject"
       ],
       "Resource": "arn:aws:s3:::essay-annotator-authoritative-backups-zac85-20260730/*"
+    },
+    {
+      "Sid": "PublishBackupHealth",
+      "Effect": "Allow",
+      "Action": "cloudwatch:PutMetricData",
+      "Resource": "*",
+      "Condition": {
+        "StringEquals": {
+          "cloudwatch:namespace": "EssayAnnotator/Backups"
+        }
+      }
     }
   ]
 }

@@ -1,10 +1,6 @@
 import hashlib
 import json
-<<<<<<< HEAD
-from dataclasses import dataclass
-=======
 from dataclasses import dataclass, field
->>>>>>> feature/admin
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Iterable
@@ -12,11 +8,7 @@ from typing import Iterable
 from sqlalchemy import func, or_
 from sqlalchemy.orm import Session
 
-<<<<<<< HEAD
-from database.create import AdminAuditLog, Essay, EssayEmbedding, OpenAIUsageEvent
-=======
 from database.create import AdminAuditLog, Essay, OpenAIUsageEvent
->>>>>>> feature/admin
 
 
 EDITABLE_ESSAY_FIELDS = {"topic", "content", "type", "school", "public", "source_file", "metadata_json"}
@@ -27,15 +19,9 @@ EMBEDDING_RELEVANT_FIELDS = {"topic", "content", "type", "school"}
 class ImportResult:
     seen: int = 0
     created: int = 0
-<<<<<<< HEAD
-    updated: int = 0
-    skipped_duplicates: int = 0
-    invalid: int = 0
-=======
     skipped_duplicates: int = 0
     invalid: int = 0
     created_ids: list[str] = field(default_factory=list)
->>>>>>> feature/admin
 
 
 def utcnow():
@@ -137,17 +123,6 @@ def validate_essay_payload(payload: dict) -> dict:
 
 def import_essays_from_jsonl(db: Session, path: Path) -> ImportResult:
     result = ImportResult()
-<<<<<<< HEAD
-    existing_essays = db.query(Essay).all()
-    essays_by_id = {essay.id: essay for essay in existing_essays}
-    essays_by_signature = {
-        (
-            (essay.topic or "").strip().lower(),
-            (essay.content or "").strip().lower(),
-            (essay.source_file or "").strip().lower(),
-        ): essay
-        for essay in existing_essays
-=======
     existing_ids = {row[0] for row in db.query(Essay.id).all()}
     signatures = {
         (
@@ -156,7 +131,6 @@ def import_essays_from_jsonl(db: Session, path: Path) -> ImportResult:
             (row[2] or "").strip().lower(),
         )
         for row in db.query(Essay.topic, Essay.content, Essay.source_file).all()
->>>>>>> feature/admin
     }
 
     with path.open("r", encoding="utf-8-sig") as f:
@@ -184,22 +158,8 @@ def import_essays_from_jsonl(db: Session, path: Path) -> ImportResult:
                 payload["content"].lower(),
                 (payload["source_file"] or "").lower(),
             )
-<<<<<<< HEAD
-            duplicate = essays_by_id.get(payload["id"]) or essays_by_signature.get(signature)
-            if duplicate:
-                existing_metadata = duplicate.metadata_json or {}
-                if generated_title and existing_metadata.get("generated_title") != generated_title:
-                    duplicate.metadata_json = {
-                        **existing_metadata,
-                        "generated_title": generated_title,
-                    }
-                    result.updated += 1
-                else:
-                    result.skipped_duplicates += 1
-=======
             if payload["id"] in existing_ids or signature in signatures:
                 result.skipped_duplicates += 1
->>>>>>> feature/admin
                 continue
 
             essay = Essay(
@@ -214,16 +174,10 @@ def import_essays_from_jsonl(db: Session, path: Path) -> ImportResult:
                 embedding_status="stale",
             )
             db.add(essay)
-<<<<<<< HEAD
-            essays_by_id[essay.id] = essay
-            essays_by_signature[signature] = essay
-            result.created += 1
-=======
             existing_ids.add(essay.id)
             signatures.add(signature)
             result.created += 1
             result.created_ids.append(essay.id)
->>>>>>> feature/admin
 
     return result
 
@@ -243,8 +197,6 @@ def export_essays_to_jsonl(db: Session, path: Path, include_deleted: bool = Fals
     return count
 
 
-<<<<<<< HEAD
-=======
 _SORTABLE_FIELDS = {
     "id": Essay.id,
     "topic": Essay.topic,
@@ -255,7 +207,6 @@ _SORTABLE_FIELDS = {
 }
 
 
->>>>>>> feature/admin
 def query_essays(
     db: Session,
     *,
@@ -265,11 +216,8 @@ def query_essays(
     public: bool | None = None,
     embedding_status: str | None = None,
     include_deleted: bool = False,
-<<<<<<< HEAD
-=======
     sort: str | None = None,
     sort_dir: str = "asc",
->>>>>>> feature/admin
 ):
     query = db.query(Essay)
     if not include_deleted:
@@ -292,11 +240,6 @@ def query_essays(
         query = query.filter(Essay.public == public)
     if embedding_status:
         query = query.filter(Essay.embedding_status == embedding_status)
-<<<<<<< HEAD
-    return query
-
-
-=======
     if sort:
         column = _SORTABLE_FIELDS.get(sort)
         if column is not None:
@@ -337,7 +280,6 @@ def backfill_current_embedding_status(db: Session, embed_jsonl_path: Path) -> in
     )
 
 
->>>>>>> feature/admin
 def usage_event_to_dict(event: OpenAIUsageEvent) -> dict:
     return {
         "id": event.id,
@@ -380,8 +322,6 @@ def summarize_usage(db: Session, start: datetime | None = None, end: datetime | 
         }
         for row in rows
     ]
-<<<<<<< HEAD
-=======
 
 
 def daily_request_counts(db: Session, start: datetime | None = None, end: datetime | None = None) -> list[dict]:
@@ -412,4 +352,3 @@ def daily_request_counts(db: Session, start: datetime | None = None, end: dateti
         {"date": day, "requests": count, "by_feature": by_feature.get(day, {})}
         for day, count in sorted(counts.items())
     ]
->>>>>>> feature/admin

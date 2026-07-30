@@ -22,7 +22,6 @@ export default function EssaysTab({
   peekEssayId,
   onRowClick,
   peekEssay,
-  onCollapsePeek,
   onOpenEditor,
   onRegenerateEmbedding,
   regeneratingEmbeddingId,
@@ -110,7 +109,6 @@ export default function EssaysTab({
               peekEssayId={peekEssayId}
               onRowClick={onRowClick}
               peekEssay={peekEssay}
-              onCollapsePeek={onCollapsePeek}
               onOpenEditor={onOpenEditor}
               onRegenerateEmbedding={onRegenerateEmbedding}
               regeneratingEmbeddingId={regeneratingEmbeddingId}
@@ -140,7 +138,6 @@ function RowWithPeek({
   peekEssayId,
   onRowClick,
   peekEssay,
-  onCollapsePeek,
   onOpenEditor,
   onRegenerateEmbedding,
   regeneratingEmbeddingId,

@@ -11,6 +11,7 @@ Recorded: 2026-07-31
 | Maximum upload size | `25M` |
 | Proxy timeout | `120` seconds |
 | Backend production origin | `https://essayannotator.com` |
+| TLS operations email | `tzuhuangliu@gmail.com` |
 
 The SSH source is the operator's public IP at the time of approval. If the
 operator network changes, update the Security Group through an authenticated AWS

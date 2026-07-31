@@ -21,7 +21,7 @@
 ## 4. EC2 Runtime Provisioning
 
 - [x] 4.1 Provision the non-login `essay-api` account and the `/opt`, `/etc`, `/var/lib`, and log ownership/permission boundaries
-- [ ] 4.2 Install the first release artifact and its release-local Python environment without installing Node on EC2
+- [x] 4.2 Install the first release artifact and its release-local Python environment without installing Node on EC2
 - [ ] 4.3 Install and enable systemd so Uvicorn runs as `essay-api` on `127.0.0.1:8000` without `--reload`
 - [ ] 4.4 Install and enable Nginx with SPA fallback, `/api` proxying, forwarded headers, body limits, timeouts, and bounded logs
 

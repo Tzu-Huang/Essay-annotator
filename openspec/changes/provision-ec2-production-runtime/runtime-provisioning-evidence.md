@@ -35,6 +35,11 @@ Recorded: 2026-07-31
 
 - Production still runs source commit `abb78dd49770e29ce45017a29acdc4d461bb9b85`
   from the legacy checkout and legacy systemd unit.
+- Candidate release `4208db0` is installed but not active at
+  `/opt/essay-annotator/releases/4208db0`; its artifact scan, release-local
+  dependency installation, and production-environment import check passed.
+- The candidate contains the built frontend artifact, and Node/npm is not
+  installed on the EC2 host.
 - The exact Security Group rule inventory could not be queried through the EC2
   instance role. External checks show SSH, HTTP, HTTPS, and legacy port 8000
   reachable during migration.

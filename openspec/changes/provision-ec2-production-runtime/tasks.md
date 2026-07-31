@@ -1,6 +1,6 @@
 ## 1. Cutover Inputs and Safety Gates
 
-- [ ] 1.1 Record the approved production hostname, DNS zone/provider, administrator SSH CIDR, upload-size limit, and proxy timeout values without recording secrets
+- [x] 1.1 Record the approved production hostname, DNS zone/provider, administrator SSH CIDR, upload-size limit, and proxy timeout values without recording secrets
 - [ ] 1.2 Rotate the exposed OpenAI API key and PostgreSQL password, verify `/health` and `/ready`, and capture secret-safe evidence
 - [ ] 1.3 Record the current production commit/release, Security Group rules, service state, and tested rollback target
 

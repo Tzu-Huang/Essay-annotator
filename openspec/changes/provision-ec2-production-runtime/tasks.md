@@ -20,14 +20,14 @@
 
 ## 4. EC2 Runtime Provisioning
 
-- [ ] 4.1 Provision the non-login `essay-api` account and the `/opt`, `/etc`, `/var/lib`, and log ownership/permission boundaries
+- [x] 4.1 Provision the non-login `essay-api` account and the `/opt`, `/etc`, `/var/lib`, and log ownership/permission boundaries
 - [ ] 4.2 Install the first release artifact and its release-local Python environment without installing Node on EC2
 - [ ] 4.3 Install and enable systemd so Uvicorn runs as `essay-api` on `127.0.0.1:8000` without `--reload`
 - [ ] 4.4 Install and enable Nginx with SPA fallback, `/api` proxying, forwarded headers, body limits, timeouts, and bounded logs
 
 ## 5. Secure Cutover and Verification
 
-- [ ] 5.1 Point the production hostname to the stable EC2 address, obtain the TLS certificate, and verify automatic renewal
+- [x] 5.1 Point the production hostname to the stable EC2 address, obtain the TLS certificate, and verify automatic renewal
 - [ ] 5.2 Verify HTTPS redirect, direct SPA refresh, API proxying, allowed and oversized uploads, timeout behavior, health, and readiness through Nginx
 - [ ] 5.3 Remove public Security Group ingress for port 8000, restrict SSH to the approved CIDR, and confirm only required ports remain reachable
 - [ ] 5.4 Exercise process-failure restart, release rollback, and an authorized EC2 reboot; record recovery evidence and the active/previous release identities

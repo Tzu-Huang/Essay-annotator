@@ -18,6 +18,7 @@ getent passwd essay-api >/dev/null || useradd --system --home-dir /nonexistent -
 install -d -o root -g root -m 0755 /opt/essay-annotator/releases /etc/essay-annotator
 install -d -o essay-api -g essay-api -m 0750 /var/lib/essay-annotator
 install -d -o www-data -g www-data -m 0755 /var/www/letsencrypt
+install -d -o root -g root -m 0755 /etc/letsencrypt/renewal-hooks/deploy
 [[ -f /etc/essay-annotator/production.env ]] || install -o root -g root -m 0600 /dev/null /etc/essay-annotator/production.env
 
 install -o root -g root -m 0644 deploy/systemd/essay-api.service /etc/systemd/system/essay-api.service

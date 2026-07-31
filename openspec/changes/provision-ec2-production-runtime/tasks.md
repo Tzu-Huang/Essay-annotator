@@ -13,10 +13,10 @@
 
 ## 3. Reproducible Release Artifact
 
-- [ ] 3.1 Add production deployment manifests for release directories, shared paths, service ownership, systemd, Nginx, and certificate renewal
-- [ ] 3.2 Add a GitHub Actions workflow that installs from lockfiles, runs frontend checks, builds `frontend/dist`, and packages a commit-addressed release artifact
-- [ ] 3.3 Add artifact checks that reject secrets, runtime data, Git metadata, dependencies, and environment-specific credential files
-- [ ] 3.4 Add bounded activation and rollback tooling with preflight, loopback readiness, previous-release retention, and failure restoration
+- [x] 3.1 Add production deployment manifests for release directories, shared paths, service ownership, systemd, Nginx, and certificate renewal
+- [x] 3.2 Add a GitHub Actions workflow that installs from lockfiles, runs frontend checks, builds `frontend/dist`, and packages a commit-addressed release artifact
+- [x] 3.3 Add artifact checks that reject secrets, runtime data, Git metadata, dependencies, and environment-specific credential files
+- [x] 3.4 Add bounded activation and rollback tooling with preflight, loopback readiness, previous-release retention, and failure restoration
 
 ## 4. EC2 Runtime Provisioning
 

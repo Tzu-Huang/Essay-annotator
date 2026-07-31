@@ -84,16 +84,25 @@ async def lifespan(app: FastAPI):
 app = FastAPI(lifespan=lifespan)
 app.include_router(admin_router)
 
-# Allow frontend to make requests
-app.add_middleware(CORSMiddleware,
-    allow_origins=["http://44.201.62.0:8000",
+
+def cors_allowed_origins() -> list[str]:
+    origins = [
         "http://127.0.0.1:3000",
-        "http://localhost:5173",   # Vite 常見
+        "http://localhost:5173",
         "http://127.0.0.1:5173",
         "http://localhost:5174",
         "http://127.0.0.1:5174",
-    ],  # your frontend URL
-    
+    ]
+    production_origin = os.getenv("PRODUCTION_ORIGIN", "").strip().rstrip("/")
+    if production_origin:
+        if not production_origin.startswith("https://"):
+            raise ValueError("PRODUCTION_ORIGIN must use https://")
+        origins.append(production_origin)
+    return origins
+
+# Allow frontend to make requests
+app.add_middleware(CORSMiddleware,
+    allow_origins=cors_allowed_origins(),
     allow_methods=["*"],
     allow_headers=["*"]
 )
@@ -101,11 +110,11 @@ app.add_middleware(CORSMiddleware,
 # -----------------------------
 # Routes
 # ----------------------------
-@app.get("/")
+@app.get("/api")
 def read_root():
     return {"message": "EssayLens API is running"}
 
-@app.get("/health")
+@app.get("/api/health")
 def health():
     """
     Liveness: service process is running.
@@ -122,7 +131,7 @@ def health():
         "startup_error": data.startup_error,
     }
 
-@app.post("/admin/reload-data")
+@app.post("/api/admin/reload-data")
 def reload_runtime_data(db: Session = Depends(get_db), _actor=Depends(require_admin_write)):
     """
     Reload in-memory essay records from PostgreSQL after migration or admin edits.
@@ -136,7 +145,7 @@ def reload_runtime_data(db: Session = Depends(get_db), _actor=Depends(require_ad
     data.startup_error = None if essays else "No essays found in PostgreSQL"
     return {"status": "reloaded", "essay_count": len(essays)}
 
-@app.get("/ready")
+@app.get("/api/ready")
 def ready():
     """
     Readiness: Ready: 200, or else: 503
@@ -184,7 +193,7 @@ def save_user(email: str, name: str, db: Session = Depends(get_db)):
 DEFAULT_FIELDS = ["id", "topic", "type", "school", "public"]
 ALLOWED_FIELDS = set(DEFAULT_FIELDS + ["content", "source_file", "metadata"])
 
-@app.get("/essays/{essay_id}")
+@app.get("/api/essays/{essay_id}")
 def get_essay(
     essay_id: str,
     fields: Optional[str] = Query(default=None, description="Comma-separated fields, e.g. topic,school,content"),
@@ -230,7 +239,7 @@ class Search(BaseModel):
     topic: str
     content: str
     
-@app.post("/search")
+@app.post("/api/search")
 def search(req: Search, request: Request):
     """
     Search for similar essays based on topic/content input.
@@ -268,7 +277,7 @@ class CompareRequest(BaseModel):
     user_input: str
 
 # req: automatically change to the right format for backend
-@app.post("/compare/{essay_id}")
+@app.post("/api/compare/{essay_id}")
 def compare_api(essay_id: str, req: CompareRequest):
     # Load essays from app.state
     data = app.state.data

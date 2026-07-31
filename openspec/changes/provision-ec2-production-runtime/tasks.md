@@ -6,10 +6,10 @@
 
 ## 2. Same-Origin Application Contract
 
-- [ ] 2.1 Move public backend endpoints under `/api`, including health, readiness, search, compare, essays, users, and admin routes
-- [ ] 2.2 Replace frontend backend-host configuration and hard-coded IP fallbacks with same-origin `/api` requests
-- [ ] 2.3 Restrict production CORS to the approved HTTPS origin while preserving explicit local development origins
-- [ ] 2.4 Add backend and frontend tests covering the migrated routes and absence of the legacy public `:8000` endpoint
+- [x] 2.1 Move public backend endpoints under `/api`, including health, readiness, search, compare, essays, users, and admin routes
+- [x] 2.2 Replace frontend backend-host configuration and hard-coded IP fallbacks with same-origin `/api` requests
+- [x] 2.3 Restrict production CORS to the approved HTTPS origin while preserving explicit local development origins
+- [x] 2.4 Add backend and frontend tests covering the migrated routes and absence of the legacy public `:8000` endpoint
 
 ## 3. Reproducible Release Artifact
 

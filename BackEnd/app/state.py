@@ -16,6 +16,8 @@ class AppData:
     topics: list[str] = field(default_factory=list)
     types: list[str] = field(default_factory=list)
     schools: list[str] = field(default_factory=list)
+    public: list[bool] = field(default_factory=list)
+    deleted: list[bool] = field(default_factory=list)
     topic_V: Any = None
     content_V: Any = None
     essay_count: int = 0
@@ -35,6 +37,8 @@ class AppData:
                 "topic_text": self.topic_texts[i],
                 "type": self.types[i],
                 "school": self.schools[i],
+                "public": self.public[i] if i < len(self.public) else False,
+                "deleted": self.deleted[i] if i < len(self.deleted) else False,
                 "topic_V": self.topic_V[i],
                 "content_V": self.content_V[i],
             }
@@ -48,6 +52,8 @@ class AppData:
         new_topic_texts = [row["topic_text"] for row in rows]
         new_types = [row["type"] for row in rows]
         new_schools = [row["school"] for row in rows]
+        new_public = [bool(row.get("public", False)) for row in rows]
+        new_deleted = [bool(row.get("deleted", False)) for row in rows]
         if rows:
             new_topic_V = np.array([row["topic_V"] for row in rows])
             new_content_V = np.array([row["content_V"] for row in rows])
@@ -63,6 +69,8 @@ class AppData:
             self.topic_texts,
             self.types,
             self.schools,
+            self.public,
+            self.deleted,
             self.topic_V,
             self.content_V,
         ) = (
@@ -72,6 +80,8 @@ class AppData:
             new_topic_texts,
             new_types,
             new_schools,
+            new_public,
+            new_deleted,
             new_topic_V,
             new_content_V,
         )
@@ -90,3 +100,24 @@ class AppData:
         with self._lock:
             rows = self._rows() + new_rows
             self._apply_rows(rows)
+
+    def set_essay_visibility(
+        self,
+        essay_id: str,
+        *,
+        public: Optional[bool] = None,
+        deleted: Optional[bool] = None,
+    ) -> None:
+        """Update visibility flags for every chunk of one essay, in place.
+
+        Cheaper than rebuilding the vector arrays: the embeddings are unchanged,
+        only eligibility is. Unknown essay_id is a no-op.
+        """
+        with self._lock:
+            for i, pid in enumerate(self.parent):
+                if pid != essay_id:
+                    continue
+                if public is not None:
+                    self.public[i] = bool(public)
+                if deleted is not None:
+                    self.deleted[i] = bool(deleted)

@@ -1,13 +1,13 @@
 # Production Cutover Inputs
 
-Recorded: 2026-07-31
+Recorded: 2026-07-31; SSH source refreshed 2026-08-03
 
 | Input | Approved value |
 | --- | --- |
 | Production hostname | `essayannotator.com` |
 | DNS provider / hosted zone | Amazon Route 53 public hosted zone `essayannotator.com` |
 | Apex A record | `3.81.244.70` (Elastic IP allocation `eipalloc-0bdd9967cbd3c097d`) |
-| Administrator SSH source | `60.251.43.140/32` |
+| Administrator SSH source | `36.228.96.187/32` |
 | Maximum upload size | `25M` |
 | Proxy timeout | `120` seconds |
 | Backend production origin | `https://essayannotator.com` |

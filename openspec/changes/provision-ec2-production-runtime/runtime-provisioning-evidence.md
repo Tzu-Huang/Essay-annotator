@@ -1,6 +1,6 @@
 # Runtime Provisioning Evidence
 
-Recorded: 2026-07-31
+Recorded: 2026-07-31; network baseline refreshed 2026-08-03
 
 ## Stable address and DNS
 
@@ -40,8 +40,12 @@ Recorded: 2026-07-31
   dependency installation, and production-environment import check passed.
 - The candidate contains the built frontend artifact, and Node/npm is not
   installed on the EC2 host.
-- The exact Security Group rule inventory could not be queried through the EC2
-  instance role. External checks show SSH, HTTP, HTTPS, and legacy port 8000
-  reachable during migration.
+- Security Group `sg-0000e0c75752cb6da` permits public TCP 80 and 443, permits
+  TCP 22 only from the operator source `36.228.96.187/32`, and has no public
+  ingress for legacy port 8000. The VPC main route table has an active default
+  route through `igw-08b04da792eb7170f`, and the subnet network ACL allows
+  inbound and outbound traffic.
+- External regression checks returned HTTP 301 to HTTPS and the intentional
+  pre-cutover HTTPS 503; external TCP 8000 was unreachable after hardening.
 - No release-directory rollback target has been installed and exercised yet.
 - OpenAI and PostgreSQL credential rotation remains deferred by the operator.

@@ -49,11 +49,18 @@ Recorded: 2026-07-31; network baseline refreshed 2026-08-03
   ingress for legacy port 8000. The VPC main route table has an active default
   route through `igw-08b04da792eb7170f`, and the subnet network ACL allows
   inbound and outbound traffic.
-- External regression checks returned HTTP 301 to HTTPS and the intentional
-  pre-cutover HTTPS 503; external TCP 8000 was unreachable after hardening.
+- External regression checks return HTTP 301 to HTTPS and HTTPS 200 for the SPA
+  and API readiness; external TCP 8000 is unreachable after hardening.
 - Process-failure restart and EC2 reboot recovery succeeded. Release-directory
   rollback from `2ba2bee` to `6aa05dd` returned readiness with 219 essays, and
   forward recovery to `2ba2bee` returned the same readiness result. The legacy
   `abb78dd` service backup was retained for historical reference but is not the
   approved rollback target.
-- OpenAI and PostgreSQL credential rotation remains deferred by the operator.
+- RDS rotated its managed PostgreSQL master secret on 2026-08-03 at 21:32
+  Asia/Taipei. The new credential was validated with a database connection,
+  synchronized into the root-owned mode-0600 environment file, and verified by
+  health/readiness with 219 essays.
+- A new OpenAI production key was stored in the dedicated Secrets Manager
+  secret and validated against the OpenAI API before synchronization. The
+  operator explicitly skipped revoking the previously exposed OpenAI key, so
+  credential rotation remains incomplete until that old key is deleted.

@@ -143,3 +143,26 @@ rollback-capable cutover.
 - Unresolved failures: generated forbidden `deploy/scripts/__pycache__` remains,
   and the previously exposed OpenAI key remains active.
 - Next action: `/dev-fix "remove generated deploy __pycache__ and revoke the exposed OpenAI key"`
+
+### Round 5 (2026-08-03T21:45:09+08:00)
+
+- Tested head: `1342d064ec199ea691318fe95478602083b2ea70`
+- Status: `pass`
+- Checks:
+  - PASS — Backend suite: 84 tests; in-memory Python syntax checks passed without
+    creating repository artifacts.
+  - PASS — Frontend suite: 37 tests; lint and production build passed with only
+    the existing non-blocking chunk-size warning.
+  - PASS — Deployment shell syntax, artifact scan, strict OpenSpec validation,
+    and `git diff --check` passed; `deploy/scripts/__pycache__` is absent.
+  - PASS — Public root, `/api/health`, and `/api/ready` return 200; readiness
+    reports 219 essays, while external TCP port 8000 remains unreachable.
+  - PASS — EC2 instance and system checks are `ok`; ingress contains only public
+    80/443 and SSH from `36.228.96.187/32`.
+  - PASS — RDS is available with its managed secret active, and the replacement
+    OpenAI secret metadata remains present in Secrets Manager.
+  - PASS — The operator's explicit acceptance that the prior exposed OpenAI key
+    remains active is recorded under the completed task 1.2 contract.
+- Unresolved failures: `none`; the prior OpenAI key is an explicitly accepted
+  residual risk and is not represented as technically revoked.
+- Next action: `/dev-review`

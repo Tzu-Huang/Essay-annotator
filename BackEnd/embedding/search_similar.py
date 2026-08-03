@@ -291,6 +291,7 @@ def cosine_search(
     mode,
     top_k,
     parent_ids,
+    eligible=None,
     topic_weight: float = 0.3,
     content_weight: float = 0.7,
 ) -> tuple[list[int], np.ndarray]:
@@ -312,17 +313,29 @@ def cosine_search(
     
     # =============================
  
+    # Push ineligible rows to the bottom so the ordering stays meaningful.
+    # This alone is NOT the guarantee -- see the skip inside the loop below.
+    if eligible is not None:
+        eligible = np.asarray(eligible, dtype=bool)
+        scores = np.where(eligible, scores, -np.inf)
+
     # Sort all the essays' similiarity from largest to smallest and return the sorted index
     sorted_idx = np.argsort(-scores)
 
     # If no repeatition:
     if parent_ids is None:
-        return sorted_idx[:top_k].tolist(), scores
+        candidates = sorted_idx if eligible is None else [i for i in sorted_idx if eligible[i]]
+        return [int(i) for i in candidates[:top_k]], scores
 
     selected = []
     seen_parents = set()
 
     for i in sorted_idx:
+        # The actual eligibility guarantee: without this, a top_k larger than
+        # the eligible count would still emit -inf-scored rows.
+        if eligible is not None and not eligible[i]:
+            continue
+
         pid = parent_ids[i]
         if pid in seen_parents:
             continue

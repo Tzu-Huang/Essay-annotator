@@ -97,3 +97,26 @@ rollback-capable cutover.
 - Unresolved failures: required credential rotation and live production cutover
   acceptance criteria are incomplete.
 - Next action: `/dev-fix "complete credential rotation and activate and verify the production release"`
+
+### Round 3 (2026-08-03T21:21:23+08:00)
+
+- Tested head: `0bb310c83d31e60ec4056403841a8ddfe6e90743`
+- Status: `incomplete`
+- Checks:
+  - PASS — Backend unit suite: 80 tests, including shared production data-root regression coverage.
+  - PASS — Frontend suite: 37 tests; lint and production build passed with only
+    the existing non-blocking chunk-size warning.
+  - PASS — Deployment shell syntax and artifact scan, OpenSpec validation, and
+    `git diff --check` passed.
+  - PASS — Public HTTP redirects to HTTPS; root and direct SPA refresh return
+    200; health/readiness return 200 with 219 essays.
+  - PASS — Small multipart input reaches API authentication (401), while a
+    26 MiB request is rejected by Nginx (413).
+  - PASS — EC2 instance/system checks are `ok`; ingress contains only public
+    80/443 and SSH from `36.228.96.187/32`.
+  - PASS — Persisted cutover evidence records process restart, reboot recovery,
+    and healthy `2ba2bee` to `6aa05dd` rollback and forward recovery.
+  - SKIP (required) — OpenAI API key and PostgreSQL password rotation was
+    explicitly deferred by the operator.
+- Unresolved failures: required production credential rotation remains incomplete.
+- Next action: `/dev-fix "rotate the exposed OpenAI API key and PostgreSQL password"`

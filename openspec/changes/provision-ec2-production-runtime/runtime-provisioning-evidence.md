@@ -33,7 +33,7 @@ Recorded: 2026-07-31; network baseline refreshed 2026-08-03
 
 ## Remaining baseline gaps
 
-- Release `6aa05dd` is active through `/opt/essay-annotator/current`. Its
+- Release `2ba2bee` is active through `/opt/essay-annotator/current`. Its
   release-local virtual environment and built frontend artifact are installed;
   Node/npm is not installed on the EC2 host.
 - Systemd runs the API as `essay-api` from the active release, without reload,
@@ -51,7 +51,9 @@ Recorded: 2026-07-31; network baseline refreshed 2026-08-03
   inbound and outbound traffic.
 - External regression checks returned HTTP 301 to HTTPS and the intentional
   pre-cutover HTTPS 503; external TCP 8000 was unreachable after hardening.
-- Process-failure restart and EC2 reboot recovery succeeded. The legacy
-  `abb78dd` service was not ready when exercised as a rollback target, so a
-  release-directory rollback target still needs to be verified.
+- Process-failure restart and EC2 reboot recovery succeeded. Release-directory
+  rollback from `2ba2bee` to `6aa05dd` returned readiness with 219 essays, and
+  forward recovery to `2ba2bee` returned the same readiness result. The legacy
+  `abb78dd` service backup was retained for historical reference but is not the
+  approved rollback target.
 - OpenAI and PostgreSQL credential rotation remains deferred by the operator.

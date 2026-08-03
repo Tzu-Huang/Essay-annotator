@@ -2,7 +2,7 @@
 
 - [x] 1.1 Record the approved production hostname, DNS zone/provider, administrator SSH CIDR, upload-size limit, and proxy timeout values without recording secrets
 - [ ] 1.2 Rotate the exposed OpenAI API key and PostgreSQL password, verify `/health` and `/ready`, and capture secret-safe evidence
-- [ ] 1.3 Record the current production commit/release, Security Group rules, service state, and tested rollback target
+- [x] 1.3 Record the current production commit/release, Security Group rules, service state, and tested rollback target
 
 ## 2. Same-Origin Application Contract
 
@@ -30,4 +30,4 @@
 - [x] 5.1 Point the production hostname to the stable EC2 address, obtain the TLS certificate, and verify automatic renewal
 - [x] 5.2 Verify HTTPS redirect, direct SPA refresh, API proxying, allowed and oversized uploads, timeout behavior, health, and readiness through Nginx
 - [x] 5.3 Remove public Security Group ingress for port 8000, restrict SSH to the approved CIDR, and confirm only required ports remain reachable
-- [ ] 5.4 Exercise process-failure restart, release rollback, and an authorized EC2 reboot; record recovery evidence and the active/previous release identities
+- [x] 5.4 Exercise process-failure restart, release rollback, and an authorized EC2 reboot; record recovery evidence and the active/previous release identities

@@ -1,7 +1,8 @@
 import unittest
 from pathlib import Path
 
-from app.paths import BACKEND_ROOT, resolve_data_root
+from app.paths import BACKEND_ROOT, DATABASE_JSONL, EMBED_JSONL, resolve_data_root
+from embedding.make_embedding import Input_file, Output_file
 
 
 class RuntimePathTests(unittest.TestCase):
@@ -16,6 +17,10 @@ class RuntimePathTests(unittest.TestCase):
 
     def test_ignores_blank_override(self):
         self.assertEqual(resolve_data_root({"ESSAY_DATA_ROOT": "  "}), BACKEND_ROOT / "drive_data")
+
+    def test_embedding_input_and_output_use_resolved_data_paths(self):
+        self.assertEqual(Input_file, DATABASE_JSONL)
+        self.assertEqual(Output_file, EMBED_JSONL)
 
 
 if __name__ == "__main__":

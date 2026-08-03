@@ -22,13 +22,13 @@ from dotenv import load_dotenv
 # =========================
 # Config
 # =========================
-from app.paths import BACKEND_ROOT, EMBED_JSONL
+from app.paths import BACKEND_ROOT, DATABASE_JSONL, EMBED_JSONL
 
 BACKEND_DIR = BACKEND_ROOT
 load_dotenv(BACKEND_DIR / ".env")
 
 # Input JSONL file (finalized schema)
-Input_file = BACKEND_DIR / "drive_data" / "finalized_data_jsonl" / "database.jsonl"
+Input_file = DATABASE_JSONL
 Output_file = EMBED_JSONL
 
 Batch_size = 64 # This is the size that you want to embed and store at once

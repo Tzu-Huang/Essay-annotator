@@ -366,6 +366,9 @@ def soft_delete_essay(essay_id: str, db: Session = Depends(get_db), actor: Admin
     after = essay_to_dict(essay, include_content=True)
     audit_log(db, actor.email, "soft_delete", "essay", essay.id, before, after)
     db.commit()
+    # Only after the DB write succeeds -- a failed transaction must leave the
+    # runtime index untouched (ZAC-105).
+    _current_app_data().set_essay_visibility(essay.id, deleted=True)
     return {"essay": after}
 
 
@@ -383,6 +386,11 @@ def restore_essay(essay_id: str, db: Session = Depends(get_db), actor: AdminActo
     after = essay_to_dict(essay, include_content=True)
     audit_log(db, actor.email, "restore", "essay", essay.id, before, after)
     db.commit()
+    # An essay only becomes searchable again if it is published AND its
+    # embedding matches current content. Stale vectors would rank the essay
+    # against text it no longer contains (see ZAC-108).
+    searchable = bool(essay.public) and essay.embedding_status == "current"
+    _current_app_data().set_essay_visibility(essay.id, deleted=False, public=searchable)
     return {"essay": after}
 
 
@@ -465,6 +473,8 @@ def trigger_embedding_regeneration(
             "topic_text": r["topic"],
             "type": r["type"],
             "school": r["school"],
+            "public": bool(essay.public),
+            "deleted": essay.deleted_at is not None,
             "topic_V": r["topic_embedding"],
             "content_V": r["content_embedding"],
         }
@@ -544,6 +554,8 @@ def regenerate_stale_embeddings(
                     "topic_text": r["topic"],
                     "type": r["type"],
                     "school": r["school"],
+                    "public": bool(essay.public),
+                    "deleted": essay.deleted_at is not None,
                     "topic_V": r["topic_embedding"],
                     "content_V": r["content_embedding"],
                 }
@@ -660,6 +672,8 @@ def import_new_essays(db: Session = Depends(get_db), actor: AdminActor = Depends
                     "topic_text": r["topic"],
                     "type": r["type"],
                     "school": r["school"],
+                    "public": bool(essay.public),
+                    "deleted": essay.deleted_at is not None,
                     "topic_V": r["topic_embedding"],
                     "content_V": r["content_embedding"],
                 }

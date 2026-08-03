@@ -33,13 +33,17 @@ Recorded: 2026-07-31; network baseline refreshed 2026-08-03
 
 ## Remaining baseline gaps
 
-- Production still runs source commit `abb78dd49770e29ce45017a29acdc4d461bb9b85`
-  from the legacy checkout and legacy systemd unit.
-- Candidate release `4208db0` is installed but not active at
-  `/opt/essay-annotator/releases/4208db0`; its artifact scan, release-local
-  dependency installation, and production-environment import check passed.
-- The candidate contains the built frontend artifact, and Node/npm is not
-  installed on the EC2 host.
+- Release `6aa05dd` is active through `/opt/essay-annotator/current`. Its
+  release-local virtual environment and built frontend artifact are installed;
+  Node/npm is not installed on the EC2 host.
+- Systemd runs the API as `essay-api` from the active release, without reload,
+  on `127.0.0.1:8000`. The shared data tree is owned by `essay-api` and the
+  readiness endpoint reports 219 essays.
+- Nginx serves the SPA with direct-route fallback and proxies `/api` with a
+  25M body limit and 120-second send/read timeouts. Public root and SPA refresh
+  returned 200; health and readiness returned 200; a small unauthenticated
+  multipart request reached API authentication (401) and a 26 MiB request was
+  rejected by Nginx (413).
 - Security Group `sg-0000e0c75752cb6da` permits public TCP 80 and 443, permits
   TCP 22 only from the operator source `36.228.96.187/32`, and has no public
   ingress for legacy port 8000. The VPC main route table has an active default
@@ -47,5 +51,7 @@ Recorded: 2026-07-31; network baseline refreshed 2026-08-03
   inbound and outbound traffic.
 - External regression checks returned HTTP 301 to HTTPS and the intentional
   pre-cutover HTTPS 503; external TCP 8000 was unreachable after hardening.
-- No release-directory rollback target has been installed and exercised yet.
+- Process-failure restart and EC2 reboot recovery succeeded. The legacy
+  `abb78dd` service was not ready when exercised as a rollback target, so a
+  release-directory rollback target still needs to be verified.
 - OpenAI and PostgreSQL credential rotation remains deferred by the operator.

@@ -62,8 +62,8 @@ class StartupReadinessTests(unittest.TestCase):
                 patch.object(main, "EMBED_JSONL", embedding_path),
                 TestClient(main.app) as client,
             ):
-                health = client.get("/health")
-                ready = client.get("/ready")
+                health = client.get("/api/health")
+                ready = client.get("/api/ready")
                 runtime_data = main.app.state.data
 
             engine.dispose()
@@ -85,8 +85,8 @@ class StartupReadinessTests(unittest.TestCase):
             patch.object(main, "create_tables", side_effect=RuntimeError("isolated startup failure")),
             TestClient(main.app) as client,
         ):
-            health = client.get("/health")
-            ready = client.get("/ready")
+            health = client.get("/api/health")
+            ready = client.get("/api/ready")
 
         self.assertEqual(health.status_code, 200)
         self.assertFalse(health.json()["ready"])

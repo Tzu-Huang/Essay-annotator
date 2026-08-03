@@ -1,6 +1,7 @@
 import { useParams, useNavigate } from "react-router-dom";
 import { useEffect, useState, useRef } from "react";
 import styles from "../styles/EssayPage.module.css";
+import { apiUrl } from "../api.mjs";
 
 const PLACEHOLDER_IMAGES = [
   "https://images.unsplash.com/photo-1455390582262-044cdead277a?q=80&w=1200&auto=format&fit=crop",
@@ -52,7 +53,7 @@ function EssayPage() {
 
         // generate_title=true triggers OpenAI title generation for the main essay <h1>
         const response = await fetch(
-          `${import.meta.env.VITE_API_URL}/essays/${id}?include_content=true`,
+          apiUrl(`/essays/${id}?include_content=true`),
         );
 
         if (!response.ok) {
@@ -63,7 +64,7 @@ function EssayPage() {
         setEssay(data);
 
         // Find related essays
-        const searchResponse = await fetch(`${import.meta.env.VITE_API_URL}/search`, {
+        const searchResponse = await fetch(apiUrl("/search"), {
           method: "POST",
           headers: {
             "Content-Type": "application/json",

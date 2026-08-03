@@ -37,14 +37,15 @@ test("admin console exposes required operational tabs", () => {
   }
 });
 
-test("admin console has the project admin allowlist and AWS API fallback", () => {
+test("admin console has the project admin allowlist and same-origin API routing", () => {
   assert.deepEqual(PROJECT_ADMIN_EMAILS, [
     "zackeryliu98@gmail.com",
     "zackery032895@gmail.com",
     "tzuhuangliu@gmail.com",
     "amanda.tsai11@gmail.com",
   ]);
-  assert.match(source, /http:\/\/44\.201\.62\.0:8000/);
+  assert.match(source, /apiUrl\(path\)/);
+  assert.doesNotMatch(source, /http:\/\/44\.201\.62\.0:8000/);
   assert.match(source, /FALLBACK_ADMIN_EMAILS/);
 });
 

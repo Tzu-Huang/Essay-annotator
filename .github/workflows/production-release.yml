@@ -1,0 +1,46 @@
+name: Production release artifact
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - name: Install frontend dependencies
+        working-directory: frontend
+        run: npm ci
+      - name: Frontend checks
+        working-directory: frontend
+        run: |
+          npm run lint
+          npm test
+          npm run build
+      - name: Assemble commit-addressed artifact
+        shell: bash
+        run: |
+          set -euo pipefail
+          stage="$RUNNER_TEMP/essay-annotator-${GITHUB_SHA}"
+          mkdir -p "$stage/frontend" "$stage/BackEnd"
+          cp -a frontend/dist "$stage/frontend/dist"
+          rsync -a --exclude='tests/' --exclude='__pycache__/' --exclude='*.pyc' --exclude='.env*' --exclude='*.jsonl' BackEnd/ "$stage/BackEnd/"
+          cp -a deploy "$stage/deploy"
+          bash "$stage/deploy/scripts/scan-artifact.sh" "$stage"
+          tar -C "$stage" -czf "essay-annotator-${GITHUB_SHA}.tgz" .
+      - uses: actions/upload-artifact@v4
+        with:
+          name: essay-annotator-${{ github.sha }}
+          path: essay-annotator-${{ github.sha }}.tgz
+          if-no-files-found: error
+          retention-days: 30

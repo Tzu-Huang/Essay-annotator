@@ -41,7 +41,7 @@ from service.ingest_service import scan_and_title_new_essays
 
 load_dotenv(dotenv_path=Path(__file__).resolve().parent.parent / ".env")
 
-router = APIRouter(prefix="/admin", tags=["admin"])
+router = APIRouter(prefix="/api/admin", tags=["admin"])
 
 def get_embedding_client() -> OpenAI:
     return OpenAI(api_key=os.environ["OPENAI_API_KEY"])

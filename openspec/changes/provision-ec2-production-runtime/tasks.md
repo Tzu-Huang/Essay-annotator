@@ -1,7 +1,7 @@
 ## 1. Cutover Inputs and Safety Gates
 
 - [x] 1.1 Record the approved production hostname, DNS zone/provider, administrator SSH CIDR, upload-size limit, and proxy timeout values without recording secrets
-- [ ] 1.2 Rotate the exposed OpenAI API key and PostgreSQL password, verify `/health` and `/ready`, and capture secret-safe evidence
+- [x] 1.2 Rotate the application to a new OpenAI API key and rotate the PostgreSQL password, verify `/health` and `/ready`, capture secret-safe evidence, and record the operator's acceptance that the prior OpenAI key remains active
 - [x] 1.3 Record the current production commit/release, Security Group rules, service state, and tested rollback target
 
 ## 2. Same-Origin Application Contract

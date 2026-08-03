@@ -1,0 +1,12 @@
+{
+  "exceptions": [
+    {
+      "advisory": "GHSA-qwww-vcr4-c8h2",
+      "package": "react-router",
+      "owner": "ZAC-87",
+      "reason": "No non-breaking patched release is available; npm currently recommends a forced breaking downgrade.",
+      "followUpIssue": "ZAC-87",
+      "expires": "2026-08-17"
+    }
+  ]
+}

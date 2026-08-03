@@ -1,9 +1,11 @@
 import importlib.util
+import json
 import unittest
 from pathlib import Path
 
 
 SCRIPT = Path(__file__).resolve().parents[2] / "deploy" / "scripts" / "sync-production-secrets.py"
+POLICY = SCRIPT.parents[1] / "iam" / "read-production-secrets.json"
 SPEC = importlib.util.spec_from_file_location("sync_production_secrets", SCRIPT)
 MODULE = importlib.util.module_from_spec(SPEC)
 assert SPEC.loader is not None
@@ -11,6 +13,16 @@ SPEC.loader.exec_module(MODULE)
 
 
 class SyncProductionSecretsTests(unittest.TestCase):
+    def test_iam_policy_covers_both_required_production_secrets(self):
+        policy = json.loads(POLICY.read_text(encoding="utf-8"))
+        statement = policy["Statement"][0]
+        resources = set(statement["Resource"])
+
+        self.assertIn("secretsmanager:DescribeSecret", statement["Action"])
+        self.assertIn("secretsmanager:GetSecretValue", statement["Action"])
+        self.assertTrue(any(":secret:essay-annotator/production/openai-api-key-" in arn for arn in resources))
+        self.assertTrue(any(":secret:rds!db-aedefd5c-dc92-4450-8aac-8869769ddc82-" in arn for arn in resources))
+
     def test_replaces_existing_values_without_exposing_old_values(self):
         lines, values = MODULE.parse_env("OPENAI_API_KEY=old\nPOSTGRES_URL=postgresql://old@host/db\nKEEP=yes\n")
         rendered = MODULE.replace_env_values(

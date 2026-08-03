@@ -10,6 +10,7 @@ from database.create import get_db, User, create_tables, SessionLocal
 from database.essays import load_essays_from_db
 from app.admin import require_admin_write, router as admin_router
 from app.usage import record_openai_usage
+from app.paths import DATABASE_JSONL, EMBED_JSONL
 from sqlalchemy.orm import Session
 from datetime import datetime, timezone
 from fastapi import FastAPI, HTTPException, Query, Request, Depends
@@ -27,9 +28,7 @@ from compare_results.analysis import (
 load_dotenv(dotenv_path=Path(__file__).parent / ".env")
 # print("OPENAI KEY: ", bool(os.environ.get("OPENAI_API_KEY")))
 
-BASE = Path(__file__).resolve().parent.parent
-DB_JSONL = BASE / "drive_data/finalized_data_jsonl/database.jsonl"
-EMBED_JSONL = BASE / "drive_data/embed_output/embed.jsonl"
+DB_JSONL = DATABASE_JSONL
 
 # -----------------------------
 # Request/Response Schemas

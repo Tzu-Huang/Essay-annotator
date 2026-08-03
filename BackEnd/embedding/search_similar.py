@@ -169,6 +169,7 @@ def load_db_embeddings(db_path: str):
       - parent: list[str | None]
       - previews: list[str]
         - topic_texts: list[str]
+      - public: list[bool]
       - topic_V: np.ndarray shape (N, d)
       - content_V: np.ndarray shape (N, d)
     """
@@ -177,6 +178,7 @@ def load_db_embeddings(db_path: str):
     parent = []
     previews = []
     topic_texts = []
+    public = []
     topic_vecs = []
     content_vecs = []
 
@@ -224,16 +226,17 @@ def load_db_embeddings(db_path: str):
         parent.append(pid)
         previews.append(preview_text(obj.get("content", "")))
         topic_texts.append((obj.get("topic") or "").strip())
+        public.append(bool(obj.get("public", False)))
         topic_vecs.append(topic_emb)
         content_vecs.append(content_emb)
 
     if len(topic_vecs) == 0 or len(content_vecs) == 0:
-        return ids, parent, previews, topic_texts, None, None
+        return ids, parent, previews, topic_texts, public, None, None
 
     topic_V = np.array(topic_vecs, dtype=np.float32)
     content_V = np.array(content_vecs, dtype=np.float32)
 
-    return ids, parent, previews, topic_texts, topic_V, content_V
+    return ids, parent, previews, topic_texts, public, topic_V, content_V
 
 def check_shape(topic_V, content_V, topic_q_V, content_q_V):
     if topic_V is None or content_V is None:
@@ -333,7 +336,7 @@ def cosine_search(
     return selected, scores
 
 def main():
-    ids, parent, previews, topic_texts, topic_V, content_V = (load_db_embeddings(DB_JSONL))
+    ids, parent, previews, topic_texts, public, topic_V, content_V = (load_db_embeddings(DB_JSONL))
     queries, topic_q_V, content_q_V = (load_query_embeddings(QUERY_JSONL))
 
     if not check_shape(topic_V, content_V, topic_q_V, content_q_V):

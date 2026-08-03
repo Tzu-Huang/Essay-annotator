@@ -40,6 +40,13 @@ class SyncProductionSecretsTests(unittest.TestCase):
                 {"username": "essayadmin", "host": "db.example", "port": 5432},
             )
 
+    def test_preserves_current_host_and_port_for_rds_managed_secret(self):
+        result = MODULE.build_postgres_url(
+            "postgresql://old:old@db.example:5433/essays",
+            {"username": "essayadmin", "password": "new-password"},
+        )
+        self.assertEqual(result, "postgresql://essayadmin:new-password@db.example:5433/essays")
+
 
 if __name__ == "__main__":
     unittest.main()

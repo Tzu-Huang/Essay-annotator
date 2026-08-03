@@ -34,14 +34,16 @@ def replace_env_values(lines: list[str], replacements: dict[str, str]) -> str:
 
 def build_postgres_url(current_url: str, secret: dict[str, object]) -> str:
     parsed = urlsplit(current_url)
-    required = ("username", "password", "host", "port")
+    required = ("username", "password")
     missing = [key for key in required if secret.get(key) in (None, "")]
     if missing:
         raise ValueError(f"RDS secret is missing fields: {', '.join(missing)}")
     username = quote(str(secret["username"]), safe="")
     password = quote(str(secret["password"]), safe="")
-    host = str(secret["host"])
-    port = int(secret["port"])
+    host = str(secret.get("host") or parsed.hostname or "")
+    port = int(secret.get("port") or parsed.port or 5432)
+    if not host:
+        raise ValueError("PostgreSQL host is missing from both the current URL and RDS secret")
     return urlunsplit((parsed.scheme, f"{username}:{password}@{host}:{port}", parsed.path, parsed.query, parsed.fragment))
 
 

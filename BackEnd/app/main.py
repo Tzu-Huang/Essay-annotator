@@ -51,7 +51,7 @@ async def lifespan(app: FastAPI):
         if not essays:
             essays = load_essays(DB_JSONL)
 
-        ids, parent, previews, topic_texts, topic_V, content_V = load_db_embeddings(EMBED_JSONL)
+        ids, parent, previews, topic_texts, public, topic_V, content_V = load_db_embeddings(EMBED_JSONL)
         types = [essays[pid]["type"] if pid in essays else "unknown" for pid in parent]
         schools = [essays[pid].get("school", "Unknown") if pid in essays else "none" for pid in parent]
         
@@ -64,6 +64,11 @@ async def lifespan(app: FastAPI):
         data.topic_texts = topic_texts       
         data.types = types
         data.schools = schools
+        data.public = public
+        # load_essays_from_db() excludes soft-deleted rows, so any parent_id in
+        # the vector index that has no essay is either deleted or orphaned.
+        # Both must be ineligible for search.
+        data.deleted = [pid not in essays for pid in parent]
         data.topic_V = topic_V
         data.content_V = content_V
         data.ready = True

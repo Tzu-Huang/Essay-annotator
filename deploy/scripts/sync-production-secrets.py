@@ -76,6 +76,8 @@ def main() -> None:
     args = parser.parse_args()
 
     import boto3
+    import psycopg2
+    from openai import OpenAI
 
     env_path = Path(args.env_file)
     lines, current = parse_env(env_path.read_text(encoding="utf-8"))
@@ -89,11 +91,15 @@ def main() -> None:
     rds_secret = json.loads(fetch_secret(client, args.rds_secret))
     postgres_url = build_postgres_url(current["POSTGRES_URL"], rds_secret)
 
+    with psycopg2.connect(postgres_url, connect_timeout=10):
+        pass
+    OpenAI(api_key=openai_key).models.list()
+
     atomic_write(
         env_path,
         replace_env_values(lines, {"OPENAI_API_KEY": openai_key, "POSTGRES_URL": postgres_url}),
     )
-    print("production credentials synchronized from Secrets Manager")
+    print("production credentials validated and synchronized from Secrets Manager")
 
 
 if __name__ == "__main__":

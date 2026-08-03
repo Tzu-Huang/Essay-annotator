@@ -166,3 +166,50 @@ rollback-capable cutover.
 - Unresolved failures: `none`; the prior OpenAI key is an explicitly accepted
   residual risk and is not represented as technically revoked.
 - Next action: `/dev-review`
+
+## Code Review
+
+### Round 1 (2026-08-03T21:52:00+08:00)
+
+- Source: `openspec/changes/provision-ec2-production-runtime/review/2026-08-03_feature-ZAC-86_provision-ec2-production-runtime_codex-review-r1.md`
+- Mode: `initial`
+- Verdict: `changes-requested`
+- Reviewed head: `c5e67b3b36b0d7f1c7f5c181243ff715daf5bf7d`
+- Transitions: `REV-001 open; REV-002 open`
+- Open blockers: `REV-001, REV-002`
+- Follow-ups: `none`
+- Next action: `/dev-fix --review "openspec/changes/provision-ec2-production-runtime/review/2026-08-03_feature-ZAC-86_provision-ec2-production-runtime_codex-review-r1.md"`
+
+## Verification
+
+### Round 6 (2026-08-03T21:54:30+08:00)
+
+- Tested head: `b5871232f81cc118582cd94970dd0ddf3d78943b`
+- Status: `pass`
+- Checks:
+  - PASS — Backend suite: 86 tests, including IAM resource coverage and shared
+    embedding input/output path regressions.
+  - PASS — Frontend suite: 37 tests; lint and production build passed with only
+    the existing non-blocking chunk-size warning.
+  - PASS — All tracked deployment shell scripts passed syntax checks; the
+    artifact scanner, strict OpenSpec validation, and `git diff --check` passed.
+  - PASS — Public root, `/api/health`, and `/api/ready` return 200; readiness
+    reports 219 essays and no startup error.
+  - PASS — Post-check worktree contains only the pre-existing workflow devlog
+    modification and unrelated `.worktrees/ZAC-87`; no product files changed
+    and `deploy/scripts/__pycache__` is absent.
+- Unresolved failures: `none`.
+- Next action: `/dev-review`
+
+## Code Review
+
+### Round 2 (2026-08-03T21:58:00+08:00)
+
+- Source: `openspec/changes/provision-ec2-production-runtime/review/2026-08-03_feature-ZAC-86_provision-ec2-production-runtime_codex-review-r2.md`
+- Mode: `closure`
+- Verdict: `approved`
+- Reviewed head: `b5871232f81cc118582cd94970dd0ddf3d78943b`
+- Transitions: `REV-001 resolved; REV-002 resolved`
+- Open blockers: `none`
+- Follow-ups: `none`
+- Next action: `/dev-done`

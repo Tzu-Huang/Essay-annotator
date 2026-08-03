@@ -115,15 +115,15 @@ function Home({ onOpenSignIn }) {
           <section className={styles.hero}>
             <div className={styles.wrap}>
               <h1>
-                Real essays.
+                RELEVANT essays
                 <br />
-                Real <span className={styles.accent}>improvement.</span>
+                not <span className={styles.accent}>impressive</span> ones.
               </h1>
 
               <p className={styles.dek}>
-                Most essay tools show you standout examples. We show you
-                relevant ones. Find accepted essays similar to your draft and
-                learn from improvements that actually apply to your writing.
+                Paste your draft. We'll find the accepted essays closest to
+                yours — matched by what you're actually writing about, not by
+                keyword.
               </p>
 
               <div className={styles.heroActions}>
@@ -368,51 +368,9 @@ function Home({ onOpenSignIn }) {
 
       <section className={styles.section}>
         <div className={styles.wrap}>
-          <SectionHead
-            eyebrow="Committee Notes"
-            title="Why this review is different"
-            copy="Generic AI advice versus feedback grounded in real admitted outcomes."
-          />
+          <SectionHead eyebrow="Committee Notes" title="Why Essay Annotator?" />
 
-          <div className={styles.compareGrid}>
-            <div className={styles.compareCol}>
-              <span className={styles.compareLabel}>The Old Way</span>
-              <h3>Generic AI Advice</h3>
-              <ul>
-                <li>
-                  <span className={styles.bad}>x</span> Vague, one-size-fits-all tips
-                </li>
-                <li>
-                  <span className={styles.bad}>x</span> Not based on real admissions outcomes
-                </li>
-                <li>
-                  <span className={styles.bad}>x</span> Doesn't show proven examples
-                </li>
-                <li>
-                  <span className={styles.bad}>x</span> Hard to know what actually works
-                </li>
-              </ul>
-            </div>
-
-            <div className={`${styles.compareCol} ${styles.good}`}>
-              <span className={styles.compareLabel}>The Essay Annotator Way</span>
-              <h3>Learn From Real Accepted Essays</h3>
-              <ul>
-                <li>
-                  <span className={styles.check}>✓</span> Based on essays that got students in
-                </li>
-                <li>
-                  <span className={styles.check}>✓</span> See real responses to real prompts
-                </li>
-                <li>
-                  <span className={styles.check}>✓</span> Discover what makes essays effective
-                </li>
-                <li>
-                  <span className={styles.check}>✓</span> Strengthen your own unique voice
-                </li>
-              </ul>
-            </div>
-          </div>
+          <HonestScale essayCount={essayCount} />
         </div>
       </section>
 
@@ -466,7 +424,164 @@ function SectionHead({ eyebrow, title, copy, titleClassName }) {
     <div className={styles.sectionHead}>
       <p>{eyebrow}</p>
       <h2 className={titleClassName}>{title}</h2>
-      <span>{copy}</span>
+      {copy ? <span>{copy}</span> : null}
+    </div>
+  );
+}
+
+const SCALE_ROWS = [
+  { label: "Sourced from essays that were actually accepted", generic: 1, us: 7 },
+  { label: "Specific to the draft you actually wrote", generic: 2, us: 7 },
+  { label: "Shows you the whole essay, not an excerpt", generic: 1, us: 6 },
+  { label: "Answers instantly, at any hour", generic: 7, us: 7 },
+];
+
+const SCALE_NOTES = [
+  {
+    row: 0,
+    num: "1",
+    lead: (count) => `${count} essays, every one from a student who got in.`,
+    rest: " Not scraped samples — real files, with the outcome attached.",
+  },
+  {
+    row: 3,
+    num: "2",
+    lead: () => "A genuine tie.",
+    rest: " Your draft is read the moment you paste it; the archive was read long before. The matching itself is arithmetic.",
+  },
+];
+
+const SCALE_DOTS = 7;
+
+function ScaleDots({ filled, isUs }) {
+  return (
+    <div className={`${styles.nsDots} ${isUs ? styles.us : ""}`}>
+      {Array.from({ length: SCALE_DOTS }, (_, index) => (
+        <span
+          key={index}
+          className={`${styles.nsDot} ${index < filled ? styles.filled : ""}`}
+          style={{ transitionDelay: `${index * 45}ms` }}
+        />
+      ))}
+    </div>
+  );
+}
+
+function HonestScale({ essayCount }) {
+  const docRef = useRef(null);
+  const margRef = useRef(null);
+  const [isRevealed, setIsRevealed] = useState(false);
+
+  useEffect(() => {
+    const doc = docRef.current;
+    const marg = margRef.current;
+    if (!doc || !marg) return undefined;
+
+    // Each margin note sits level with the row it annotates; when the layout
+    // collapses to one column the notes flow inline instead.
+    const align = () => {
+      const isStacked = getComputedStyle(marg).position === "static";
+      const margTop = marg.getBoundingClientRect().top;
+
+      marg.querySelectorAll(`.${styles.nsNote}`).forEach((note) => {
+        if (isStacked) {
+          note.style.top = "";
+          return;
+        }
+
+        const row = doc.querySelector(
+          `.${styles.nsRow}[data-row="${note.dataset.row}"]`,
+        );
+        if (row) {
+          note.style.top = `${row.getBoundingClientRect().top - margTop + 18}px`;
+        }
+      });
+    };
+
+    const frameId = requestAnimationFrame(align);
+    window.addEventListener("resize", align);
+    if (document.fonts) document.fonts.ready.then(align);
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (!entry.isIntersecting) return;
+          align();
+          setIsRevealed(true);
+          observer.unobserve(entry.target);
+        });
+      },
+      { threshold: 0.15 },
+    );
+
+    observer.observe(doc);
+
+    return () => {
+      cancelAnimationFrame(frameId);
+      window.removeEventListener("resize", align);
+      observer.disconnect();
+    };
+  }, []);
+
+  return (
+    <div
+      ref={docRef}
+      className={`${styles.nsDoc} ${isRevealed ? styles.on : ""}`}
+    >
+      <div>
+        <div className={styles.nsHead}>
+          <span>&nbsp;</span>
+          <span>Generic AI</span>
+          <span className={styles.nsUs}>Essay Annotator</span>
+        </div>
+
+        <div>
+          {SCALE_ROWS.map((row, index) => {
+            const noteIndex = SCALE_NOTES.findIndex((item) => item.row === index);
+            const note = noteIndex === -1 ? null : SCALE_NOTES[noteIndex];
+            const isTie = row.generic === row.us;
+
+            return (
+              <div
+                key={row.label}
+                data-row={index}
+                className={`${styles.nsRow} ${isTie ? styles.nsTie : ""}`}
+              >
+                <b>
+                  {row.label}
+                  {note ? (
+                    <span
+                      className={styles.nsMk}
+                      style={{ transitionDelay: `${480 + noteIndex * 220}ms` }}
+                    >
+                      {note.num}
+                    </span>
+                  ) : null}
+                </b>
+                <ScaleDots filled={row.generic} isUs={false} />
+                <ScaleDots filled={row.us} isUs />
+              </div>
+            );
+          })}
+        </div>
+      </div>
+
+      <div ref={margRef} className={styles.nsMarg}>
+        {SCALE_NOTES.map((note, index) => (
+          <div
+            key={note.num}
+            data-row={note.row}
+            className={styles.nsNote}
+            style={{ transitionDelay: `${560 + index * 220}ms` }}
+          >
+            <span className={styles.nsNum}>{note.num}</span>
+            <span className={styles.nsTxt}>
+              <b>{note.lead(essayCount)}</b>
+              {note.rest}
+            </span>
+          </div>
+        ))}
+      </div>
     </div>
   );
 }

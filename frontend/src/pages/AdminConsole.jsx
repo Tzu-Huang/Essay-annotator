@@ -1,19 +1,15 @@
-import { createElement, useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import {
   Activity,
   AlertCircle,
   BarChart3,
   BookOpen,
-  CheckCircle2,
   ClipboardList,
   Cloud,
   Database,
   RefreshCw,
-  Save,
-  Search,
   Shield,
   Terminal,
-  Trash2,
   Wallet,
 } from "lucide-react";
 import { useAuth } from "../hooks/useAuth";

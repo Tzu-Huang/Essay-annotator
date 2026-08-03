@@ -1,8 +1,3 @@
-<<<<<<< HEAD
-from dataclasses import dataclass, field
-from typing import Any, Optional
-
-=======
 import threading
 from dataclasses import dataclass, field
 from typing import Any, Optional
@@ -10,7 +5,6 @@ from typing import Any, Optional
 import numpy as np
 
 
->>>>>>> feature/admin
 @dataclass
 class AppData:
     essays: dict[str, dict] = field(default_factory=dict)
@@ -29,8 +23,6 @@ class AppData:
     ready: bool = False
     startup_error: Optional[str] = None
     started_at: float = 0.0
-<<<<<<< HEAD
-=======
     _lock: threading.Lock = field(default_factory=threading.Lock, repr=False, compare=False)
     # _lock is a single-process lock — see plan Global Constraints re: multi-worker deployments.
     # _apply_rows() below combines its field assignments into a single tuple-assignment
@@ -90,4 +82,3 @@ class AppData:
         with self._lock:
             rows = self._rows() + new_rows
             self._apply_rows(rows)
->>>>>>> feature/admin

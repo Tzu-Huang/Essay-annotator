@@ -1,4 +1,4 @@
-@import url("https://fonts.googleapis.com/css2?family=Changa:wght@400;500;600;700;800&family=Kalam:wght@400;700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Changa:wght@200..800&family=Kalam:wght@400;700&display=swap");
 
 .home {
   --navy: #0e1a2b;
@@ -24,6 +24,9 @@
   --cp-green-text: #2f7650;
   --cp-purple-bg: #f3effc;
   --cp-purple-text: #6c4bb0;
+  --royal: #00238a;
+  --edge: #b9c6e8;
+  --score: #14918a;
 
   min-height: 100vh;
   background: linear-gradient(180deg, #f8fafd 0%, #eef4fb 45%, #e7f0fa 100%);
@@ -147,15 +150,29 @@
 
 .primaryButton {
   border: 0;
-  background: var(--navy);
+  background: var(--royal);
   color: #ffffff;
   padding: 14px 32px;
-  box-shadow: 0 14px 28px rgba(16, 25, 45, 0.16);
+  box-shadow: 0 5px 0 var(--edge);
+  transition:
+    transform 0.06s ease,
+    box-shadow 0.06s ease;
 }
 
+/* A key that floats can't be pressed — hold it flat, then push. */
 .primaryButton:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 18px 32px rgba(16, 25, 45, 0.22);
+  transform: none;
+  box-shadow: 0 5px 0 var(--edge);
+}
+
+.primaryButton:active {
+  transform: translateY(4px);
+  box-shadow: 0 1px 0 var(--edge);
+}
+
+.cta .primaryButton {
+  background: #ffffff;
+  color: var(--royal);
 }
 
 .outlineButton {
@@ -1012,67 +1029,162 @@
   opacity: 1;
 }
 
-.compareGrid {
+.nsDoc {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 22px;
+  grid-template-columns: minmax(0, 1fr) 268px;
+  gap: 44px;
+  align-items: start;
 }
 
-.compareCol {
-  padding: 34px;
-  border: 1px solid #f0d9d4;
-  border-radius: 14px;
-  background: #fdf4f2;
+.nsMarg {
+  position: relative;
 }
 
-.compareCol.good {
-  border-color: var(--forest);
-  background: #eafaf7;
+.nsHead,
+.nsRow {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 132px 132px;
+  gap: 24px;
+  align-items: center;
 }
 
-.compareLabel {
-  display: block;
-  margin-bottom: 14px;
+.nsHead {
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--line);
+}
+
+.nsHead span {
+  font-family: "Futura", "Century Gothic", "Segoe UI", sans-serif;
+  text-transform: uppercase;
+  font-size: 11px;
+  letter-spacing: 0.12em;
   color: var(--muted);
-  font-size: 10.5px;
-  letter-spacing: 0.1em;
+  text-align: center;
 }
 
-.compareCol h3 {
-  margin: 0 0 18px;
-  font-size: 21px;
-  font-weight: 600;
+.nsHead span:first-child {
+  text-align: left;
 }
 
-.compareCol ul {
+.nsHead .nsUs {
+  color: var(--score);
+  font-weight: 700;
+}
+
+.nsRow {
+  padding: 22px 0;
+  border-bottom: 1px solid #eef2f7;
+}
+
+.nsRow > b {
+  font-size: 20px;
+  font-weight: 530;
+  font-variation-settings: "wght" 530;
+  line-height: 1.4;
+}
+
+.nsRow.nsTie {
+  background: linear-gradient(90deg, rgba(20, 145, 138, 0.05), transparent 72%);
+}
+
+.nsDots {
   display: flex;
-  flex-direction: column;
-  gap: 12px;
-  margin: 0;
-  padding: 0;
-  list-style: none;
+  gap: 7px;
+  justify-content: center;
 }
 
-.compareCol li {
-  display: flex;
-  gap: 10px;
-  color: #1f2937;
-  font-size: 14.5px;
+.nsDot {
+  width: 13px;
+  height: 13px;
+  border-radius: 50%;
+  border: 1.5px solid var(--line);
+  background: #ffffff;
+  transform: scale(0.5);
+  opacity: 0;
+  transition:
+    transform 0.3s cubic-bezier(0.16, 1, 0.3, 1),
+    opacity 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.bad {
-  color: var(--seal);
-  font-weight: 800;
+.on .nsDot {
+  transform: none;
+  opacity: 1;
 }
 
-.check {
-  color: var(--forest);
-  font-weight: 800;
+.nsDot.filled {
+  background: var(--muted);
+  border-color: var(--muted);
 }
 
+.nsDots.us .nsDot.filled {
+  background: var(--score);
+  border-color: var(--score);
+}
+
+.nsMk {
+  display: inline-block;
+  vertical-align: super;
+  margin-left: 4px;
+  font-family: "Futura", "Century Gothic", "Segoe UI", sans-serif;
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--score);
+  opacity: 0;
+  transform: scale(0.3);
+  transition:
+    transform 0.4s cubic-bezier(0.18, 1.25, 0.4, 1),
+    opacity 0.22s ease;
+}
+
+.on .nsMk {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.nsNote {
+  position: absolute;
+  left: 0;
+  right: 0;
+  padding-left: 16px;
+  border-left: 2px solid var(--score);
+  opacity: 0;
+  transform: translateX(26px) scale(0.94);
+  transition:
+    transform 0.55s cubic-bezier(0.18, 1.25, 0.4, 1),
+    opacity 0.3s ease;
+}
+
+.on .nsNote {
+  opacity: 1;
+  transform: none;
+}
+
+.nsNote .nsNum {
+  display: block;
+  margin-bottom: 6px;
+  font-family: "Futura", "Century Gothic", "Segoe UI", sans-serif;
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--score);
+}
+
+.nsNote .nsTxt {
+  font-family: "Kalam", cursive;
+  font-size: 16px;
+  line-height: 1.5;
+  color: #334155;
+}
+
+.nsNote .nsTxt b {
+  font-weight: 700;
+}
+
+/* The scale runs straight into the CTA with no divider between them, so the
+   rounded navy slab needs more clearance than a hairline rule would. */
 .cta {
-  margin: 0 40px 72px;
-  padding: 72px 40px;
+  max-width: 1320px;
+  margin: 52px auto 72px;
+  padding: 72px 80px;
   border-radius: 28px;
   background: linear-gradient(135deg, var(--navy) 0%, #1b2947 100%);
   color: var(--parchment-2);
@@ -1207,8 +1319,7 @@
 
 @media (max-width: 820px) {
   .steps,
-  .certBody,
-  .compareGrid {
+  .certBody {
     grid-template-columns: 1fr;
   }
 
@@ -1273,8 +1384,7 @@
   }
 
   .peekBody,
-  .peekComments,
-  .compareGrid {
+  .peekComments {
     grid-template-columns: 1fr;
   }
 
@@ -1329,7 +1439,51 @@
   }
 
   .cta {
-    margin: 0 16px 56px;
+    margin: 56px 16px 56px;
     padding: 56px 24px;
+  }
+}
+
+@media (max-width: 1080px) {
+  .nsDoc {
+    grid-template-columns: 1fr;
+    gap: 0;
+  }
+
+  .nsMarg {
+    position: static;
+    padding-top: 20px;
+    display: grid;
+    gap: 20px;
+  }
+
+  .nsNote {
+    position: static !important;
+    top: auto !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
+}
+
+@media (max-width: 900px) {
+  .nsHead,
+  .nsRow {
+    grid-template-columns: 1fr 88px 88px;
+    gap: 12px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .nsDot,
+  .nsMk,
+  .nsNote {
+    transition-duration: 0.01ms !important;
+    transition-delay: 0ms !important;
+  }
+
+  .nsMk,
+  .nsNote {
+    opacity: 1 !important;
+    transform: none !important;
   }
 }

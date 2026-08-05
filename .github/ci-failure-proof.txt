@@ -1,0 +1,2 @@
+Synthetic AWS access-key identifier for ZAC-87 rejection testing only:
+AKIAZAC87PROOF123456

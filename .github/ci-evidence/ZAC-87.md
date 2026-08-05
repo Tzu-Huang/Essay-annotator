@@ -15,7 +15,7 @@ Record GitHub-hosted evidence here during `/dev-test`. Do not paste credentials 
 
 - Ruleset URL or settings screenshot: [repository branch settings](https://github.com/Tzu-Huang/Essay-annotator/settings/branches)
 - Required check names match workflow job names: `Frontend quality gate`, `Backend quality gate`, and `Security quality gate`; strict status checks are enabled.
-- Pull request, approval, stale-review, conversation, force-push, deletion, and bypass settings verified: pull requests required; zero approving reviews required for the single-maintainer repository; stale reviews dismissed if present; conversation resolution required; force pushes and deletion disabled; protection enforced for administrators.
+- Pull request, approval, stale-review, conversation, force-push, deletion, and bypass settings verified: pull requests and one approving review required; stale reviews dismissed; conversation resolution required; force pushes and deletion disabled; protection enforced for administrators.
 
 ## Temporary proof pull requests
 

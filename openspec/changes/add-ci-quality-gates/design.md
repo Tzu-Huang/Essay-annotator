@@ -1,6 +1,6 @@
 ## Context
 
-The repository has repeatable frontend and backend verification commands but no GitHub Actions workflow or protected-branch enforcement. The frontend has a committed npm lockfile and scripts for lint, Node tests, and a Vite production build. The backend has an unpinned requirements file, a `unittest` suite, FastAPI import coverage, and readiness tests designed to use temporary state and mocks. Production uses Python 3.12, while earlier baseline evidence also used Python 3.11.
+The repository has repeatable frontend and backend verification commands but no GitHub Actions workflow or protected-branch enforcement. The frontend has a committed npm lockfile and scripts for lint, Node tests, and a Vite production build. The backend uses `requirements.txt` as its direct-dependency input and a Python 3.12-generated `requirements.lock.txt` as the deterministic CI/audit artifact; it also has a `unittest` suite, FastAPI import coverage, and readiness tests designed to use temporary state and mocks. Production uses Python 3.12, while earlier baseline evidence also used Python 3.11.
 
 The CI contract must be stable enough for GitHub branch protection, safe to run on untrusted pull requests, and diagnosable without access to production credentials or data.
 
@@ -31,13 +31,15 @@ An all-in-one job was rejected because it is slower and obscures which quality g
 
 ### Match CI runtimes to production and supported build tooling
 
-Backend validation will use Python 3.12, matching the documented production host. Frontend validation will use a pinned supported Node.js 22 release line and `npm ci`. Runtime versions will be declared in the workflow rather than inferred from a developer machine.
+Backend validation will use Python 3.12, matching the documented production host, and install the committed transitive lock compiled for that runtime. Frontend validation will use a pinned supported Node.js 22 release line and `npm ci`. Runtime versions will be declared in the workflow rather than inferred from a developer machine.
 
 A Python 3.11/3.12 matrix was rejected for the required gate because the launch contract targets Python 3.12; broader compatibility can be added later as a non-blocking check. Floating Node versions were rejected because they make build results less reproducible.
 
 ### Reuse existing validation commands and add a bounded startup smoke check
 
-Frontend CI will run `npm ci`, `npm run lint`, `npm test`, and `npm run build`. Backend CI will install `BackEnd/requirements.txt`, run `python -m unittest discover -s BackEnd/tests -v`, import the FastAPI application, and start it only long enough to exercise local health/readiness behavior with isolated test configuration.
+Frontend CI will run `npm ci`, `npm run lint`, `npm test`, and `npm run build`. Backend CI will install `BackEnd/requirements.lock.txt`, run `python -m unittest discover -s BackEnd/tests -v`, import the FastAPI application, and start it only long enough to exercise local health/readiness behavior with isolated test configuration. `BackEnd/requirements.txt` remains the human-maintained direct-dependency input used to regenerate the lock under Python 3.12.
+
+Regenerate the backend lock in a clean Python 3.12 environment with `pip-tools==7.5.1` and `pip-compile --strip-extras --resolver=backtracking --output-file=BackEnd/requirements.lock.txt BackEnd/requirements.txt`, then review the complete transitive-version diff before committing it.
 
 The workflow will not run the development server or `--reload`. It will not call production databases, AWS, Google, or OpenAI.
 
@@ -55,7 +57,7 @@ Branch protection is an external repository setting and cannot be proven by work
 
 ## Risks / Trade-offs
 
-- [Unpinned Python dependencies can change between CI runs] → Record the risk now and add deterministic dependency locking if clean installs prove unstable or audits cannot be reproduced.
+- [The backend lock can drift from its direct-dependency input] → Regenerate `BackEnd/requirements.lock.txt` under Python 3.12 whenever `BackEnd/requirements.txt` changes, and review the resulting transitive-version diff.
 - [Security scanners can produce false positives or transient advisory failures] → Pin scanner/action versions, set an explicit blocking threshold, and document narrowly scoped exceptions with expiry or follow-up.
 - [Fork pull requests do not receive secrets] → Design every required PR job to pass with no secrets and read-only token permissions.
 - [Branch protection can reference stale job names] → Treat job names as a compatibility contract and update protection settings whenever names change.

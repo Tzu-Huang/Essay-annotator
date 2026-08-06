@@ -33,7 +33,8 @@ class ProductionDeploymentWorkflowTests(unittest.TestCase):
 
     def test_transport_is_immutable_and_uses_ssm(self):
         self.assertIn('key="${RELEASE_PREFIX%/}/${RELEASE_SHA}/', WORKFLOW)
-        self.assertIn("aws s3 cp", WORKFLOW)
+        self.assertIn("aws s3api put-object", WORKFLOW)
+        self.assertIn("--if-none-match '*'", WORKFLOW)
         self.assertIn("aws ssm send-command", WORKFLOW)
         self.assertIn("PRODUCTION_SSM_DOCUMENT_NAME", WORKFLOW)
         self.assertIn('--document-name "$SSM_DOCUMENT_NAME"', WORKFLOW)

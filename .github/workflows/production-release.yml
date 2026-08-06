@@ -177,8 +177,12 @@ jobs:
         run: |
           set -euo pipefail
           key="${RELEASE_PREFIX%/}/${RELEASE_SHA}/essay-annotator-${RELEASE_SHA}.tgz"
-          aws s3 cp "essay-annotator-${RELEASE_SHA}.tgz" "s3://${RELEASE_BUCKET}/${key}" --only-show-errors
-          aws s3 cp "essay-annotator-${RELEASE_SHA}.tgz.sha256" "s3://${RELEASE_BUCKET}/${key}.sha256" --only-show-errors
+          aws s3api put-object --bucket "$RELEASE_BUCKET" --key "$key" \
+            --body "essay-annotator-${RELEASE_SHA}.tgz" --if-none-match '*' \
+            --server-side-encryption AES256 >/dev/null
+          aws s3api put-object --bucket "$RELEASE_BUCKET" --key "${key}.sha256" \
+            --body "essay-annotator-${RELEASE_SHA}.tgz.sha256" --if-none-match '*' \
+            --server-side-encryption AES256 >/dev/null
       - name: Invoke fixed host operation through Systems Manager
         id: host
         env:

@@ -24,13 +24,14 @@ if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 from openai import OpenAI
+from app.paths import DATA_ROOT
 from service.generate_topic import get_topic
 
-ONLINE_INPUT_DIR = script_dir / "../drive_data/essays_jsonl/online_essays"
-COLLECTED_JSONL = script_dir / "../drive_data/essays_jsonl/collected_essays.jsonl"
-NEW_INPUT_DIR = script_dir / "../drive_data/organized_data/new_input"
+ONLINE_INPUT_DIR = DATA_ROOT / "essays_jsonl" / "online_essays"
+COLLECTED_JSONL = DATA_ROOT / "essays_jsonl" / "collected_essays.jsonl"
+NEW_INPUT_DIR = DATA_ROOT / "organized_data" / "new_input"
 PROCESSED_INPUT_DIR = NEW_INPUT_DIR / "processed"
-DATABASE_PATH = script_dir / "../drive_data/finalized_data_jsonl/database.jsonl"
+DATABASE_PATH = DATA_ROOT / "finalized_data_jsonl" / "database.jsonl"
 
 
 def load_online_essays(id_counter: count) -> list[dict]:

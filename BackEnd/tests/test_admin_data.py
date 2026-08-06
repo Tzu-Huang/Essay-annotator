@@ -1012,5 +1012,98 @@ class AdminDataTests(unittest.TestCase):
         self.assertEqual(result, {"created": 0, "skipped_duplicates": 0, "invalid": 0, "embedded": 0})
 
 
+class SoftDeleteRouteRuntimeSyncTests(AdminDataTests):
+    """The DB write and the in-memory index must move together (ZAC-105)."""
+
+    def _runtime(self, essay_id, *, public=True):
+        import numpy as np
+
+        from app.state import AppData
+
+        return AppData(
+            ids=[f"{essay_id}_00"], parent=[essay_id], previews=["p"],
+            topic_texts=["t"], types=["PS"], schools=["A"],
+            public=[public], deleted=[False],
+            topic_V=np.array([[1.0, 0.0]]), content_V=np.array([[1.0, 0.0]]),
+        )
+
+    @patch("app.admin._current_app_data")
+    def test_soft_delete_route_marks_runtime_deleted(self, mock_app_data):
+        essay = Essay(id="essay_0001", topic="T", content="C", public=True,
+                      embedding_status="current")
+        self.db.add(essay)
+        self.db.commit()
+        runtime = self._runtime("essay_0001")
+        mock_app_data.return_value = runtime
+
+        soft_delete_essay("essay_0001", db=self.db, actor=AdminActor(email="owner@example.com", can_write=True))
+
+        self.assertEqual(runtime.deleted, [True])
+
+    @patch("app.admin._current_app_data")
+    def test_restore_route_requires_public_and_current_embedding(self, mock_app_data):
+        essay = Essay(id="essay_0002", topic="T", content="C", public=True,
+                      embedding_status="stale")
+        self.db.add(essay)
+        self.db.commit()
+        runtime = self._runtime("essay_0002")
+        mock_app_data.return_value = runtime
+
+        soft_delete_essay("essay_0002", db=self.db, actor=AdminActor(email="owner@example.com", can_write=True))
+        restore_essay("essay_0002", db=self.db, actor=AdminActor(email="owner@example.com", can_write=True))
+
+        # Restored in the DB, but stale embeddings keep it out of search.
+        self.assertEqual(runtime.deleted, [False])
+        self.assertEqual(runtime.public, [False])
+
+    @patch("app.admin._current_app_data")
+    def test_restore_route_makes_public_current_essay_searchable(self, mock_app_data):
+        essay = Essay(id="essay_0003", topic="T", content="C", public=True,
+                      embedding_status="current")
+        self.db.add(essay)
+        self.db.commit()
+        runtime = self._runtime("essay_0003")
+        mock_app_data.return_value = runtime
+
+        soft_delete_essay("essay_0003", db=self.db, actor=AdminActor(email="owner@example.com", can_write=True))
+        restore_essay("essay_0003", db=self.db, actor=AdminActor(email="owner@example.com", can_write=True))
+
+        self.assertEqual(runtime.deleted, [False])
+        self.assertEqual(runtime.public, [True])
+
+
+class SoftDeleteRuntimeSyncTests(unittest.TestCase):
+    def _data(self):
+        import numpy as np
+
+        from app.state import AppData
+
+        return AppData(
+            ids=["e1_00"], parent=["e1"], previews=["p"], topic_texts=["t"],
+            types=["PS"], schools=["A"], public=[True], deleted=[False],
+            topic_V=np.array([[1.0, 0.0]]), content_V=np.array([[1.0, 0.0]]),
+        )
+
+    def test_soft_delete_marks_rows_deleted(self):
+        data = self._data()
+        data.set_essay_visibility("e1", deleted=True)
+        self.assertEqual(data.deleted, [True])
+        self.assertEqual(data.public, [True])  # publication state is unchanged
+
+    def test_restore_of_public_current_essay_is_searchable(self):
+        data = self._data()
+        data.set_essay_visibility("e1", deleted=True)
+        data.set_essay_visibility("e1", deleted=False, public=True)
+        self.assertEqual(data.deleted, [False])
+        self.assertEqual(data.public, [True])
+
+    def test_restore_of_stale_essay_stays_ineligible(self):
+        data = self._data()
+        data.set_essay_visibility("e1", deleted=True)
+        # embedding_status != "current" -> must not become searchable
+        data.set_essay_visibility("e1", deleted=False, public=False)
+        self.assertEqual(data.public, [False])
+
+
 if __name__ == "__main__":
     unittest.main()

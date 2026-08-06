@@ -4,6 +4,7 @@ import numpy as np
 import os
 
 from service.build_results import build_results
+from service.eligibility import build_eligibility_mask
 from embedding.search_similar import cosine_search, classify_query_input
 from embedding.make_embedding import get_query_embedding
 
@@ -33,9 +34,6 @@ def run_search(req, app_state):
         detail="Need topic or content",
     )
 
-    if essay_types == "":
-        print("no essay type found")
-    
     # dimension
     dim = app_state.topic_V.shape[1] # Both topic and content can use this dim because they are from the same model
 
@@ -45,6 +43,15 @@ def run_search(req, app_state):
     # content_vec
     content_vec = get_optional_query_embedding(content, client, dim)
 
+    # Eligibility is decided BEFORE ranking. Filtering afterwards let private,
+    # deleted, or wrong-type essays consume Top-K slots (ZAC-102, ZAC-104).
+    eligible = build_eligibility_mask(
+        public=getattr(app_state, "public", []),
+        deleted=getattr(app_state, "deleted", []),
+        types=app_state.types,
+        essay_types=essay_types,
+    )
+
     # cosine_search
     indices, scores = cosine_search(
         topic_V=app_state.topic_V,
@@ -53,14 +60,10 @@ def run_search(req, app_state):
         content_vec=content_vec,
         mode=mode,
         top_k=topK,
-        parent_ids =app_state.parent
+        parent_ids =app_state.parent,
+        eligible=eligible,
     )
-    print("essay_types:", essay_types, type(essay_types))
     results = build_results(indices, scores, app_state)
-    
-    # essay_types filter 
-    if essay_types and "all" not in essay_types:
-        results = [r for r in results if r["type"] in essay_types]
 
     for result in results:
         essay = app_state.essays.get(result["parent_id"], {})

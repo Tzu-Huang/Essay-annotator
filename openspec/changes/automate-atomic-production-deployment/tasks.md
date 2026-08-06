@@ -15,17 +15,17 @@
 
 ## 3. GitHub Production Workflow
 
-- [ ] 3.1 Extend the workflow to retain the exact `main` artifact and checksum and reject manually selected commits not reachable from `main`
-- [ ] 3.2 Add a protected production deployment job using GitHub OIDC, commit-addressed S3 upload, and Systems Manager invocation without SSH or long-lived cloud credentials
-- [ ] 3.3 Configure one non-cancelling production concurrency group and propagate run ID, trigger, actor, commit SHA, and artifact digest to the host entry point
-- [ ] 3.4 Add bounded public HTTPS smoke checks for the SPA and `/api/ready`, automatic rollback invocation on post-switch failure, and a deployment job summary with the host outcome
+- [x] 3.1 Extend the workflow to retain the exact `main` artifact and checksum and reject manually selected commits not reachable from `main`
+- [x] 3.2 Add a protected production deployment job using GitHub OIDC, commit-addressed S3 upload, and Systems Manager invocation without SSH or long-lived cloud credentials
+- [x] 3.3 Configure one non-cancelling production concurrency group and propagate run ID, trigger, actor, commit SHA, and artifact digest to the host entry point
+- [x] 3.4 Add bounded public HTTPS smoke checks for the SPA and `/api/ready`, automatic rollback invocation on post-switch failure, and a deployment job summary with the host outcome
 
 ## 4. Rollback Drill and Automated Coverage
 
 - [x] 4.1 Add a separately approved manual rollback-drill mode that requires two distinct retained known-good releases, exercises the real rollback path, restores the initial release, and verifies both transitions
 - [x] 4.2 Add isolated host-script tests for unsafe identifiers and paths, checksum mismatch, lock contention, preparation cleanup, idempotent retry, health failure, successful rollback, and failed rollback
-- [ ] 4.3 Add workflow/static tests for main-only selection, environment approval, OIDC permissions, concurrency, immutable artifact identity, SSM transport, public smoke checks, and secret-safe output
-- [ ] 4.4 Run shell syntax/static checks, backend and frontend regression suites, clean artifact build/scan, and strict OpenSpec validation
+- [x] 4.3 Add workflow/static tests for main-only selection, environment approval, OIDC permissions, concurrency, immutable artifact identity, SSM transport, public smoke checks, and secret-safe output
+- [x] 4.4 Run shell syntax/static checks, backend and frontend regression suites, clean artifact build/scan, and strict OpenSpec validation
 
 ## 5. Controlled Production Proof
 

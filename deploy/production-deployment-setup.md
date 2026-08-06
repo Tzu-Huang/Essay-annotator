@@ -8,17 +8,17 @@ Replace every `CHANGE_ME` before enabling the deployment job. Store these as Git
 
 | Variable | Value | Purpose |
 | --- | --- | --- |
-| `AWS_ACCOUNT_ID` | `CHANGE_ME` | Twelve-digit production AWS account ID |
-| `AWS_REGION` | `CHANGE_ME` | Region containing the release bucket and EC2 instance |
-| `RELEASE_BUCKET` | `CHANGE_ME` | Private S3 bucket for release artifacts |
-| `RELEASE_PREFIX` | `essay-annotator/production/releases` | Prefix containing commit-addressed artifacts and checksums |
-| `EC2_INSTANCE_ID` | `CHANGE_ME` | One managed production EC2 instance |
-| `PRODUCTION_HOSTNAME` | `CHANGE_ME` | Public hostname used by HTTPS smoke checks |
-| `AWS_DEPLOY_ROLE_ARN` | `CHANGE_ME` | GitHub OIDC deployment role ARN |
-| `SSM_DOCUMENT_NAME` | `EssayAnnotatorDeploy` | Fixed custom SSM document allowed by the deploy policy |
+| `AWS_ACCOUNT_ID` | `814322375571` | Twelve-digit production AWS account ID (record only; not a workflow variable) |
+| `PRODUCTION_AWS_REGION` | `us-east-1` | Region containing the release bucket and EC2 instance |
+| `PRODUCTION_RELEASE_BUCKET` | `essay-annotator-production-releases-814322375571` | Private S3 bucket for release artifacts |
+| `PRODUCTION_RELEASE_PREFIX` | `essay-annotator/production/releases` | Prefix containing commit-addressed artifacts and checksums |
+| `PRODUCTION_INSTANCE_ID` | `i-02872a5190a894a64` | One managed production EC2 instance |
+| `PRODUCTION_PUBLIC_BASE_URL` | `https://essayannotator.com` | Public HTTPS origin used by smoke checks |
+| `PRODUCTION_DEPLOY_ROLE_ARN` | `arn:aws:iam::814322375571:role/EssayAnnotatorGitHubProductionDeploy` | GitHub OIDC deployment role ARN |
+| `PRODUCTION_SSM_DOCUMENT_NAME` | `EssayAnnotatorDeploy` | Fixed custom SSM document allowed by the deploy policy |
 | `SSM_COMMAND_PATH` | `/usr/local/sbin/essay-annotator-deploy` | Fixed root-managed command invoked by the SSM document |
 | `GITHUB_REQUIRED_REVIEWERS` | `CHANGE_ME` | GitHub users or team permitted to approve production |
-| `HOST_AUDIT_RETENTION_DAYS` | `CHANGE_ME` | Required retention for host JSONL audit records |
+| `HOST_AUDIT_RETENTION_DAYS` | `90` | Required retention for host JSONL audit records |
 | `GITHUB_ARTIFACT_RETENTION_DAYS` | `30` | Workflow artifact/evidence retention |
 
 The repository and environment identity are fixed as `Tzu-Huang/Essay-annotator` and `production`. Release object keys must remain beneath `${RELEASE_PREFIX}/<full-lowercase-commit-sha>/`; the artifact and checksum use that same immutable SHA identity.

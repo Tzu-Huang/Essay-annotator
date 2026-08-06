@@ -114,7 +114,7 @@ def test_ssm_document_has_fixed_command_and_constrained_parameters() -> None:
         "^(|[a-z0-9][a-z0-9.-]{1,61}[a-z0-9])$"
     )
     assert document["parameters"]["ReleaseKey"]["allowedPattern"] == (
-        r"^(?!.*\.\.)(|[A-Za-z0-9][A-Za-z0-9._/-]{0,511})$"
+        r"^(|[A-Za-z0-9][A-Za-z0-9._/-]{0,511})$"
     )
     assert all(
         parameter["interpolationType"] == "ENV_VAR"

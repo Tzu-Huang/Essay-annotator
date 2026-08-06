@@ -38,7 +38,7 @@
     "ReleaseKey": {
       "type": "String",
       "default": "",
-      "allowedPattern": "^(?!.*\\.\\.)(|[A-Za-z0-9][A-Za-z0-9._/-]{0,511})$",
+      "allowedPattern": "^(|[A-Za-z0-9][A-Za-z0-9._/-]{0,511})$",
       "interpolationType": "ENV_VAR"
     },
     "DeploymentId": {

@@ -46,13 +46,20 @@ The backend baseline SHALL install from committed dependency declarations in a c
 
 The release record SHALL identify the tested source commit, merged `main`
 commit, deployed artifact identity, active release directory, previous
-production rollback commit/release, activation and readiness evidence, rollback
-verification, and known limitations.
+production rollback commit/release, successful required CI evidence, activation
+and readiness evidence, rollback verification, and known limitations. A `main`
+commit SHALL NOT be eligible for production deployment while any required CI
+check is failing, incomplete, or absent.
 
 #### Scenario: Accept baseline on main
 
-- **WHEN** the approved change is merged into `main` and prepared for production activation
-- **THEN** the exact baseline, artifact, active and rollback releases, and associated verification results SHALL be recorded before the deployment is declared successful
+- **WHEN** the approved change is merged into `main` and all required CI checks have succeeded for the production candidate
+- **THEN** the exact baseline, artifact, active and rollback releases, required CI results, and associated verification results SHALL be recorded before the deployment is declared successful
+
+#### Scenario: Reject unvalidated main commit
+
+- **WHEN** a `main` commit lacks successful evidence for any required CI check
+- **THEN** the commit SHALL NOT be selected as a production baseline
 
 ### Requirement: Secret-safe release tree
 

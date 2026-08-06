@@ -1,8 +1,8 @@
 ## 1. Deployment Configuration and AWS Trust
 
 - [ ] 1.1 Record the production AWS account, region, release bucket/prefix, EC2 instance ID, hostname, GitHub Environment reviewers, and evidence-retention policy without recording secrets
-- [ ] 1.2 Add least-privilege GitHub OIDC trust and deployment-role policies for the repository, production environment, release prefix, and fixed Systems Manager command path
-- [ ] 1.3 Add EC2 role permissions and installation checks for Systems Manager management and read-only access to the release artifact prefix
+- [x] 1.2 Add least-privilege GitHub OIDC trust and deployment-role policies for the repository, production environment, release prefix, and fixed Systems Manager command path
+- [x] 1.3 Add EC2 role permissions and installation checks for Systems Manager management and read-only access to the release artifact prefix
 - [ ] 1.4 Document and verify the protected GitHub `production` Environment, required-reviewer gate, and non-secret configuration contract
 
 ## 2. Retryable and Serialized Host Deployment

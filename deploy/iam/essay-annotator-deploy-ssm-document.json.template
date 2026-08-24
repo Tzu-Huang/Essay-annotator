@@ -1,0 +1,84 @@
+{
+  "schemaVersion": "2.2",
+  "description": "Invoke the fixed Essay Annotator production deployment entry point",
+  "parameters": {
+    "Operation": {
+      "type": "String",
+      "allowedValues": [
+        "deploy",
+        "rollback",
+        "rollback-drill"
+      ],
+      "interpolationType": "ENV_VAR"
+    },
+    "CommitSha": {
+      "type": "String",
+      "default": "",
+      "allowedPattern": "^(|[0-9a-f]{40})$",
+      "interpolationType": "ENV_VAR"
+    },
+    "TargetSha": {
+      "type": "String",
+      "default": "",
+      "allowedPattern": "^(|[0-9a-f]{40})$",
+      "interpolationType": "ENV_VAR"
+    },
+    "ArtifactDigest": {
+      "type": "String",
+      "default": "",
+      "allowedPattern": "^(|[0-9a-f]{64})$",
+      "interpolationType": "ENV_VAR"
+    },
+    "ReleaseBucket": {
+      "type": "String",
+      "default": "",
+      "allowedPattern": "^(|[a-z0-9][a-z0-9.-]{1,61}[a-z0-9])$",
+      "interpolationType": "ENV_VAR"
+    },
+    "ReleaseKey": {
+      "type": "String",
+      "default": "",
+      "allowedPattern": "^(|[A-Za-z0-9][A-Za-z0-9._/-]{0,511})$",
+      "interpolationType": "ENV_VAR"
+    },
+    "DeploymentId": {
+      "type": "String",
+      "allowedPattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$",
+      "interpolationType": "ENV_VAR"
+    },
+    "Actor": {
+      "type": "String",
+      "allowedPattern": "^[A-Za-z0-9][A-Za-z0-9_-]{0,38}$",
+      "interpolationType": "ENV_VAR"
+    },
+    "Trigger": {
+      "type": "String",
+      "allowedValues": [
+        "push",
+        "workflow_dispatch"
+      ],
+      "interpolationType": "ENV_VAR"
+    },
+    "Reason": {
+      "type": "String",
+      "default": "public_health_failed",
+      "allowedValues": [
+        "public_health_failed",
+        "operator_requested"
+      ],
+      "interpolationType": "ENV_VAR"
+    }
+  },
+  "mainSteps": [
+    {
+      "action": "aws:runShellScript",
+      "name": "DeployRelease",
+      "inputs": {
+        "timeoutSeconds": "900",
+        "runCommand": [
+          "case \"$SSM_Operation\" in deploy) exec /usr/local/sbin/essay-annotator-deploy deploy --sha \"$SSM_CommitSha\" --digest \"$SSM_ArtifactDigest\" --bucket \"$SSM_ReleaseBucket\" --key \"$SSM_ReleaseKey\" --deployment-id \"$SSM_DeploymentId\" --actor \"$SSM_Actor\" --trigger \"$SSM_Trigger\" ;; rollback) exec /usr/local/sbin/essay-annotator-deploy rollback --deployment-id \"$SSM_DeploymentId\" --actor \"$SSM_Actor\" --trigger \"$SSM_Trigger\" --reason \"$SSM_Reason\" ;; rollback-drill) exec /usr/local/sbin/essay-annotator-deploy rollback-drill --sha \"$SSM_CommitSha\" --target-sha \"$SSM_TargetSha\" --deployment-id \"$SSM_DeploymentId\" --actor \"$SSM_Actor\" --trigger \"$SSM_Trigger\" ;; *) echo \"invalid operation\" >&2; exit 64 ;; esac"
+        ]
+      }
+    }
+  ]
+}

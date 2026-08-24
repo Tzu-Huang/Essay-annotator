@@ -1,0 +1,43 @@
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "ListProductionReleasePrefix",
+      "Effect": "Allow",
+      "Action": "s3:ListBucket",
+      "Resource": "arn:aws:s3:::${RELEASE_BUCKET}",
+      "Condition": {
+        "StringLike": {
+          "s3:prefix": "${RELEASE_PREFIX}/*"
+        }
+      }
+    },
+    {
+      "Sid": "PublishImmutableProductionReleaseObjects",
+      "Effect": "Allow",
+      "Action": [
+        "s3:GetObject",
+        "s3:PutObject"
+      ],
+      "Resource": "arn:aws:s3:::${RELEASE_BUCKET}/${RELEASE_PREFIX}/*"
+    },
+    {
+      "Sid": "InvokeFixedProductionDeploymentDocument",
+      "Effect": "Allow",
+      "Action": "ssm:SendCommand",
+      "Resource": [
+        "arn:aws:ssm:${AWS_REGION}:${AWS_ACCOUNT_ID}:document/${SSM_DOCUMENT_NAME}",
+        "arn:aws:ec2:${AWS_REGION}:${AWS_ACCOUNT_ID}:instance/${EC2_INSTANCE_ID}"
+      ]
+    },
+    {
+      "Sid": "ReadDeploymentCommandResult",
+      "Effect": "Allow",
+      "Action": [
+        "ssm:GetCommandInvocation",
+        "ssm:ListCommandInvocations"
+      ],
+      "Resource": "*"
+    }
+  ]
+}

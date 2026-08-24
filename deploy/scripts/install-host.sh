@@ -16,7 +16,9 @@ done
 
 getent passwd essay-api >/dev/null || useradd --system --home-dir /nonexistent --no-create-home --shell /usr/sbin/nologin essay-api
 install -d -o root -g root -m 0755 /opt/essay-annotator/releases /etc/essay-annotator
+install -d -o root -g root -m 0750 /var/log/essay-annotator
 install -d -o essay-api -g essay-api -m 0750 /var/lib/essay-annotator
+install -d -o root -g root -m 0700 /var/lib/essay-annotator/deploy-state
 install -d -o www-data -g www-data -m 0755 /var/www/letsencrypt
 install -d -o root -g root -m 0755 /etc/letsencrypt/renewal-hooks/deploy
 [[ -f /etc/essay-annotator/production.env ]] || install -o root -g root -m 0600 /dev/null /etc/essay-annotator/production.env
@@ -26,6 +28,8 @@ sed -e "s/\${PRODUCTION_HOSTNAME}/$PRODUCTION_HOSTNAME/g" \
     deploy/nginx/essay-annotator-bootstrap.conf.template >/etc/nginx/sites-available/essay-annotator.conf
 ln -sfn /etc/nginx/sites-available/essay-annotator.conf /etc/nginx/sites-enabled/essay-annotator.conf
 install -o root -g root -m 0755 deploy/certbot/renewal-deploy-hook.sh /etc/letsencrypt/renewal-hooks/deploy/essay-annotator-nginx
+install -o root -g root -m 0755 deploy/scripts/deployctl.sh /usr/local/sbin/essay-annotator-deploy
+install -o root -g root -m 0755 deploy/scripts/activate-release.sh deploy/scripts/rollback-release.sh /usr/local/sbin/
 systemctl daemon-reload
 nginx -t
 

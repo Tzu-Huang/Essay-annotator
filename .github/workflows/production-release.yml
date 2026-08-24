@@ -171,22 +171,45 @@ jobs:
         with:
           role-to-assume: ${{ env.DEPLOY_ROLE_ARN }}
           aws-region: ${{ env.AWS_REGION }}
-      - name: Upload immutable artifact to S3
+      - name: Publish or verify immutable artifact in S3
         if: env.OPERATION_MODE == 'deploy'
+        id: published
         working-directory: release
+        env:
+          LOCAL_DIGEST: ${{ steps.digest.outputs.value }}
         run: |
           set -euo pipefail
           key="${RELEASE_PREFIX%/}/${RELEASE_SHA}/essay-annotator-${RELEASE_SHA}.tgz"
-          aws s3api put-object --bucket "$RELEASE_BUCKET" --key "$key" \
-            --body "essay-annotator-${RELEASE_SHA}.tgz" --if-none-match '*' \
-            --server-side-encryption AES256 >/dev/null
-          aws s3api put-object --bucket "$RELEASE_BUCKET" --key "${key}.sha256" \
-            --body "essay-annotator-${RELEASE_SHA}.tgz.sha256" --if-none-match '*' \
-            --server-side-encryption AES256 >/dev/null
+          artifact_exists=false
+          checksum_exists=false
+          aws s3api head-object --bucket "$RELEASE_BUCKET" --key "$key" >/dev/null 2>&1 && artifact_exists=true
+          aws s3api head-object --bucket "$RELEASE_BUCKET" --key "${key}.sha256" >/dev/null 2>&1 && checksum_exists=true
+          if [[ "$artifact_exists" == false && "$checksum_exists" == false ]]; then
+            aws s3api put-object --bucket "$RELEASE_BUCKET" --key "$key" \
+              --body "essay-annotator-${RELEASE_SHA}.tgz" --if-none-match '*' \
+              --server-side-encryption AES256 >/dev/null
+            aws s3api put-object --bucket "$RELEASE_BUCKET" --key "${key}.sha256" \
+              --body "essay-annotator-${RELEASE_SHA}.tgz.sha256" --if-none-match '*' \
+              --server-side-encryption AES256 >/dev/null
+            effective_digest="$LOCAL_DIGEST"
+          elif [[ "$artifact_exists" == true && "$checksum_exists" == true ]]; then
+            aws s3 cp "s3://${RELEASE_BUCKET}/${key}.sha256" existing.sha256 --only-show-errors
+            remote_digest="$(awk '{print $1}' existing.sha256)"
+            remote_name="$(awk '{print $2}' existing.sha256)"
+            [[ "$remote_digest" =~ ^[0-9a-f]{64}$ ]]
+            [[ "$remote_name" == "essay-annotator-${RELEASE_SHA}.tgz" ]]
+            aws s3 cp "s3://${RELEASE_BUCKET}/${key}" existing.tgz --only-show-errors
+            printf '%s  %s\n' "$remote_digest" existing.tgz | sha256sum --check --status
+            effective_digest="$remote_digest"
+          else
+            echo 'immutable release is partially published' >&2
+            exit 1
+          fi
+          echo "value=$effective_digest" >> "$GITHUB_OUTPUT"
       - name: Invoke fixed host operation through Systems Manager
         id: host
         env:
-          ARTIFACT_DIGEST: ${{ steps.digest.outputs.value }}
+          ARTIFACT_DIGEST: ${{ steps.published.outputs.value }}
           ACTOR: ${{ github.actor }}
           TRIGGER: ${{ github.event_name }}
         run: |
@@ -241,7 +264,7 @@ jobs:
           HOST_OUTCOME: ${{ steps.host.outcome }}
           SMOKE_OUTCOME: ${{ steps.smoke.outcome }}
           ROLLBACK_OUTCOME: ${{ steps.rollback.outcome }}
-          ARTIFACT_DIGEST: ${{ steps.digest.outputs.value }}
+          ARTIFACT_DIGEST: ${{ steps.published.outputs.value }}
         run: |
           {
             echo '## Production operation'

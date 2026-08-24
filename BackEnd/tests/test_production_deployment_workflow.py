@@ -49,6 +49,15 @@ class ProductionDeploymentWorkflowTests(unittest.TestCase):
         self.assertNotIn("presign", WORKFLOW.lower())
         self.assertNotIn("ssh ", WORKFLOW.lower())
 
+    def test_immutable_artifact_retry_reuses_only_a_complete_verified_pair(self):
+        self.assertIn("id: published", WORKFLOW)
+        self.assertGreaterEqual(WORKFLOW.count("aws s3api head-object"), 2)
+        self.assertIn("immutable release is partially published", WORKFLOW)
+        self.assertIn("aws s3 cp \"s3://${RELEASE_BUCKET}/${key}.sha256\"", WORKFLOW)
+        self.assertIn("aws s3 cp \"s3://${RELEASE_BUCKET}/${key}\" existing.tgz", WORKFLOW)
+        self.assertIn("sha256sum --check --status", WORKFLOW)
+        self.assertIn("steps.published.outputs.value", WORKFLOW)
+
     def test_metadata_and_rollback_are_propagated(self):
         for parameter in ("Operation", "CommitSha", "ArtifactDigest", "ReleaseBucket", "ReleaseKey", "DeploymentId", "Actor", "Trigger"):
             self.assertIn(parameter, WORKFLOW)

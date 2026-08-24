@@ -103,7 +103,7 @@ jobs:
           mkdir -p "$stage/frontend" "$stage/BackEnd"
           cp -a frontend/dist "$stage/frontend/dist"
           rsync -a --exclude='tests/' --exclude='__pycache__/' --exclude='*.pyc' --exclude='.env*' --exclude='*.jsonl' BackEnd/ "$stage/BackEnd/"
-          cp -a deploy "$stage/deploy"
+          rsync -a --exclude='__pycache__/' --exclude='*.pyc' deploy/ "$stage/deploy/"
           bash "$stage/deploy/scripts/scan-artifact.sh" "$stage"
           tar -C "$stage" -czf "essay-annotator-${RELEASE_SHA}.tgz" .
           sha256sum "essay-annotator-${RELEASE_SHA}.tgz" > "essay-annotator-${RELEASE_SHA}.tgz.sha256"

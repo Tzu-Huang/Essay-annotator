@@ -31,6 +31,13 @@ class ProductionDeploymentWorkflowTests(unittest.TestCase):
         self.assertIn("from app.main import app", WORKFLOW)
         self.assertIn("test_startup_readiness.py", WORKFLOW)
 
+    def test_artifact_excludes_generated_python_cache_from_deploy_tree(self):
+        self.assertIn(
+            "rsync -a --exclude='__pycache__/' --exclude='*.pyc' deploy/ \"$stage/deploy/\"",
+            WORKFLOW,
+        )
+        self.assertNotIn('cp -a deploy "$stage/deploy"', WORKFLOW)
+
     def test_transport_is_immutable_and_uses_ssm(self):
         self.assertIn('key="${RELEASE_PREFIX%/}/${RELEASE_SHA}/', WORKFLOW)
         self.assertIn("aws s3api put-object", WORKFLOW)

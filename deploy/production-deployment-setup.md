@@ -16,6 +16,7 @@ Replace every `CHANGE_ME` before enabling the deployment job. Store these as Git
 | `PRODUCTION_PUBLIC_BASE_URL` | `https://essayannotator.com` | Public HTTPS origin used by smoke checks |
 | `PRODUCTION_DEPLOY_ROLE_ARN` | `arn:aws:iam::814322375571:role/EssayAnnotatorGitHubProductionDeploy` | GitHub OIDC deployment role ARN |
 | `PRODUCTION_SSM_DOCUMENT_NAME` | `EssayAnnotatorDeploy` | Fixed custom SSM document allowed by the deploy policy |
+| `VITE_GOOGLE_LOGIN_ID` | `388331799253-n0pang3tlaremkka4f4n3t1v03sl5nen.apps.googleusercontent.com` | Public Google OAuth web client ID embedded by the frontend production build |
 | `SSM_COMMAND_PATH` | `/usr/local/sbin/essay-annotator-deploy` | Fixed root-managed command invoked by the SSM document |
 | `PRODUCTION_AWS_REGION` | `us-east-1` | Region used by the host credential refresh timer |
 | `OPENAI_SECRET_ARN` | `arn:aws:secretsmanager:us-east-1:814322375571:secret:essay-annotator/production/openai-api-key-WRp699` | OpenAI secret read by the host refresh timer |
@@ -25,6 +26,8 @@ Replace every `CHANGE_ME` before enabling the deployment job. Store these as Git
 | `GITHUB_ARTIFACT_RETENTION_DAYS` | `30` | Workflow artifact/evidence retention |
 
 The repository and environment identity are fixed as `Tzu-Huang/Essay-annotator` and `production`. Release object keys must remain beneath `${RELEASE_PREFIX}/<full-lowercase-commit-sha>/`; the artifact and checksum use that same immutable SHA identity.
+
+`VITE_GOOGLE_LOGIN_ID` is a public OAuth client identifier rather than a credential. The production workflow pins it directly in the build job because Vite replaces this value at build time and the untracked `frontend/.env` file is not present on GitHub-hosted runners. The workflow also rejects a bundle that does not contain the expected client ID.
 
 ## AWS trust installation
 

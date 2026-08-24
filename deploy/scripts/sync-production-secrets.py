@@ -95,13 +95,15 @@ def main() -> None:
 
     with psycopg2.connect(postgres_url, connect_timeout=10):
         pass
-    OpenAI(api_key=openai_key).models.list()
+    if current["OPENAI_API_KEY"] != openai_key:
+        OpenAI(api_key=openai_key).models.list()
 
-    atomic_write(
-        env_path,
-        replace_env_values(lines, {"OPENAI_API_KEY": openai_key, "POSTGRES_URL": postgres_url}),
-    )
-    print("production credentials validated and synchronized from Secrets Manager")
+    replacements = {"OPENAI_API_KEY": openai_key, "POSTGRES_URL": postgres_url}
+    if any(current[key] != value for key, value in replacements.items()):
+        atomic_write(env_path, replace_env_values(lines, replacements))
+        print("production credentials validated and synchronized from Secrets Manager")
+    else:
+        print("production credentials validated; no changes required")
 
 
 if __name__ == "__main__":

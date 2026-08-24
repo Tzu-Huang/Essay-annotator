@@ -6,7 +6,7 @@ config=${1:-/etc/essay-annotator/deploy.conf}
 [[ -f "$config" ]] || { echo "missing $config" >&2; exit 1; }
 # shellcheck disable=SC1090
 source "$config"
-for name in PRODUCTION_HOSTNAME ADMIN_EMAIL MAX_UPLOAD_SIZE PROXY_TIMEOUT_SECONDS; do
+for name in PRODUCTION_HOSTNAME ADMIN_EMAIL MAX_UPLOAD_SIZE PROXY_TIMEOUT_SECONDS PRODUCTION_AWS_REGION OPENAI_SECRET_ARN RDS_SECRET_ARN; do
   value=${!name:-}
   [[ -n "$value" && "$value" != CHANGE_ME ]] || { echo "$name is not configured" >&2; exit 1; }
 done
@@ -24,13 +24,16 @@ install -d -o root -g root -m 0755 /etc/letsencrypt/renewal-hooks/deploy
 [[ -f /etc/essay-annotator/production.env ]] || install -o root -g root -m 0600 /dev/null /etc/essay-annotator/production.env
 
 install -o root -g root -m 0644 deploy/systemd/essay-api.service /etc/systemd/system/essay-api.service
+install -o root -g root -m 0644 deploy/systemd/essay-secrets-refresh.service deploy/systemd/essay-secrets-refresh.timer /etc/systemd/system/
 sed -e "s/\${PRODUCTION_HOSTNAME}/$PRODUCTION_HOSTNAME/g" \
     deploy/nginx/essay-annotator-bootstrap.conf.template >/etc/nginx/sites-available/essay-annotator.conf
 ln -sfn /etc/nginx/sites-available/essay-annotator.conf /etc/nginx/sites-enabled/essay-annotator.conf
 install -o root -g root -m 0755 deploy/certbot/renewal-deploy-hook.sh /etc/letsencrypt/renewal-hooks/deploy/essay-annotator-nginx
 install -o root -g root -m 0755 deploy/scripts/deployctl.sh /usr/local/sbin/essay-annotator-deploy
 install -o root -g root -m 0755 deploy/scripts/activate-release.sh deploy/scripts/rollback-release.sh /usr/local/sbin/
+install -o root -g root -m 0755 deploy/scripts/refresh-production-secrets.sh /usr/local/sbin/essay-annotator-refresh-secrets
 systemctl daemon-reload
+systemctl enable --now essay-secrets-refresh.timer
 nginx -t
 
 echo "Host manifests installed. Obtain the certificate, then run deploy/scripts/enable-tls.sh:"

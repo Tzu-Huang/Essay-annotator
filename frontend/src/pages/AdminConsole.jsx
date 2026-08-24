@@ -445,6 +445,14 @@ export default function AdminConsole() {
         setAdminState({ loading: false, error: "This Google account is not in VITE_ADMIN_EMAILS.", profile: null });
         return;
       }
+      if (!accessToken) {
+        setAdminState({
+          loading: false,
+          error: "Your Google session has expired. Sign in again to access the Admin Console.",
+          profile: null,
+        });
+        return;
+      }
       try {
         const profile = await api("/admin/me");
         if (!cancelled) setAdminState({ loading: false, error: "", profile });
@@ -457,7 +465,7 @@ export default function AdminConsole() {
     return () => {
       cancelled = true;
     };
-  }, [api, email, locallyAllowed]);
+  }, [accessToken, api, email, locallyAllowed]);
 
   useEffect(() => {
     if (!adminState.profile) return;
@@ -516,7 +524,7 @@ export default function AdminConsole() {
         <Shield size={36} />
         <h1>Admin access required</h1>
         <p>{adminState.error}</p>
-        {!email && (
+        {!accessToken && (
           <button className="admin-icon-button" onClick={googleSignIn}>
             Sign in with Google
           </button>

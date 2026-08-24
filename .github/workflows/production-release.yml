@@ -1,0 +1,255 @@
+name: Production release
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      target_sha:
+        description: Full commit SHA reachable from main (defaults to main HEAD)
+        required: false
+        type: string
+      mode:
+        description: Production operation
+        required: true
+        default: deploy
+        type: choice
+        options: [deploy, rollback-drill]
+      drill_target_sha:
+        description: Distinct retained main SHA for rollback-drill
+        required: false
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: essay-annotator-production
+  cancel-in-progress: false
+
+jobs:
+  select:
+    name: Select exact main commit
+    runs-on: ubuntu-24.04
+    outputs:
+      sha: ${{ steps.select.outputs.sha }}
+      mode: ${{ steps.select.outputs.mode }}
+      drill_target_sha: ${{ steps.select.outputs.drill_target_sha }}
+    steps:
+      - name: Check out main history
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          ref: main
+          fetch-depth: 0
+      - name: Reject commits outside main
+        id: select
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          PUSH_SHA: ${{ github.sha }}
+          REQUESTED_SHA: ${{ inputs.target_sha }}
+          REQUESTED_MODE: ${{ inputs.mode }}
+          DRILL_TARGET_SHA: ${{ inputs.drill_target_sha }}
+        run: .github/scripts/select-production-sha.sh
+
+  build:
+    name: Build immutable release
+    needs: select
+    if: needs.select.outputs.mode == 'deploy'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    env:
+      OPENAI_API_KEY: test-only
+      POSTGRES_URL: sqlite:////tmp/essay-annotator-${{ github.run_id }}-${{ github.run_attempt }}.db
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          ref: ${{ needs.select.outputs.sha }}
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: 22.12.0
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - name: Verify and build frontend
+        working-directory: frontend
+        run: |
+          npm ci --ignore-scripts
+          npm run lint
+          npm test
+          npm run build
+      - name: Set up Python
+        uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: BackEnd/requirements.lock.txt
+      - name: Install locked backend dependencies
+        working-directory: BackEnd
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements.lock.txt
+      - name: Verify backend
+        working-directory: BackEnd
+        run: |
+          python -m unittest discover -s tests -v
+          python -c "from app.main import app; assert app.title == 'FastAPI'"
+          timeout --signal=TERM --kill-after=5s 60s python -m unittest discover -s tests -p 'test_startup_readiness.py' -v
+      - name: Assemble commit-addressed artifact and checksum
+        env:
+          RELEASE_SHA: ${{ needs.select.outputs.sha }}
+        run: |
+          set -euo pipefail
+          stage="$RUNNER_TEMP/essay-annotator-${RELEASE_SHA}"
+          mkdir -p "$stage/frontend" "$stage/BackEnd"
+          cp -a frontend/dist "$stage/frontend/dist"
+          rsync -a --exclude='tests/' --exclude='__pycache__/' --exclude='*.pyc' --exclude='.env*' --exclude='*.jsonl' BackEnd/ "$stage/BackEnd/"
+          cp -a deploy "$stage/deploy"
+          bash "$stage/deploy/scripts/scan-artifact.sh" "$stage"
+          tar -C "$stage" -czf "essay-annotator-${RELEASE_SHA}.tgz" .
+          sha256sum "essay-annotator-${RELEASE_SHA}.tgz" > "essay-annotator-${RELEASE_SHA}.tgz.sha256"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: essay-annotator-${{ needs.select.outputs.sha }}
+          path: |
+            essay-annotator-${{ needs.select.outputs.sha }}.tgz
+            essay-annotator-${{ needs.select.outputs.sha }}.tgz.sha256
+          if-no-files-found: error
+          retention-days: 30
+
+  production:
+    name: Approved production operation
+    needs: [select, build]
+    if: always() && needs.select.result == 'success' && (needs.select.outputs.mode == 'rollback-drill' || needs.build.result == 'success')
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    environment: production
+    permissions:
+      contents: read
+      id-token: write
+    env:
+      RELEASE_SHA: ${{ needs.select.outputs.sha }}
+      DRILL_TARGET_SHA: ${{ needs.select.outputs.drill_target_sha }}
+      OPERATION_MODE: ${{ needs.select.outputs.mode }}
+      AWS_REGION: ${{ vars.PRODUCTION_AWS_REGION }}
+      RELEASE_BUCKET: ${{ vars.PRODUCTION_RELEASE_BUCKET }}
+      RELEASE_PREFIX: ${{ vars.PRODUCTION_RELEASE_PREFIX }}
+      INSTANCE_ID: ${{ vars.PRODUCTION_INSTANCE_ID }}
+      SSM_DOCUMENT_NAME: ${{ vars.PRODUCTION_SSM_DOCUMENT_NAME }}
+      PUBLIC_BASE_URL: ${{ vars.PRODUCTION_PUBLIC_BASE_URL }}
+      DEPLOY_ROLE_ARN: ${{ vars.PRODUCTION_DEPLOY_ROLE_ARN }}
+      DEPLOYMENT_ID: gha-${{ github.run_id }}-${{ github.run_attempt }}
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          ref: main
+          persist-credentials: false
+      - name: Validate non-secret production configuration
+        run: |
+          set -euo pipefail
+          for name in AWS_REGION RELEASE_BUCKET RELEASE_PREFIX INSTANCE_ID SSM_DOCUMENT_NAME PUBLIC_BASE_URL DEPLOY_ROLE_ARN; do
+            test -n "${!name}" || { echo "Missing required production variable: $name" >&2; exit 1; }
+          done
+          [[ "$PUBLIC_BASE_URL" == https://* ]] || { echo 'PUBLIC_BASE_URL must use HTTPS' >&2; exit 1; }
+      - name: Download retained release
+        if: env.OPERATION_MODE == 'deploy'
+        uses: actions/download-artifact@v4
+        with:
+          name: essay-annotator-${{ needs.select.outputs.sha }}
+          path: release
+      - name: Verify retained checksum
+        if: env.OPERATION_MODE == 'deploy'
+        id: digest
+        working-directory: release
+        run: |
+          set -euo pipefail
+          sha256sum --check "essay-annotator-${RELEASE_SHA}.tgz.sha256"
+          digest="$(cut -d ' ' -f1 "essay-annotator-${RELEASE_SHA}.tgz.sha256")"
+          [[ "$digest" =~ ^[0-9a-f]{64}$ ]]
+          echo "value=$digest" >> "$GITHUB_OUTPUT"
+      - name: Configure short-lived AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ env.DEPLOY_ROLE_ARN }}
+          aws-region: ${{ env.AWS_REGION }}
+      - name: Upload immutable artifact to S3
+        if: env.OPERATION_MODE == 'deploy'
+        working-directory: release
+        run: |
+          set -euo pipefail
+          key="${RELEASE_PREFIX%/}/${RELEASE_SHA}/essay-annotator-${RELEASE_SHA}.tgz"
+          aws s3api put-object --bucket "$RELEASE_BUCKET" --key "$key" \
+            --body "essay-annotator-${RELEASE_SHA}.tgz" --if-none-match '*' \
+            --server-side-encryption AES256 >/dev/null
+          aws s3api put-object --bucket "$RELEASE_BUCKET" --key "${key}.sha256" \
+            --body "essay-annotator-${RELEASE_SHA}.tgz.sha256" --if-none-match '*' \
+            --server-side-encryption AES256 >/dev/null
+      - name: Invoke fixed host operation through Systems Manager
+        id: host
+        env:
+          ARTIFACT_DIGEST: ${{ steps.digest.outputs.value }}
+          ACTOR: ${{ github.actor }}
+          TRIGGER: ${{ github.event_name }}
+        run: |
+          set -euo pipefail
+          if [[ "$OPERATION_MODE" == deploy ]]; then
+            key="${RELEASE_PREFIX%/}/${RELEASE_SHA}/essay-annotator-${RELEASE_SHA}.tgz"
+            parameters="$(jq -cn \
+              --arg operation deploy --arg sha "$RELEASE_SHA" \
+              --arg digest "$ARTIFACT_DIGEST" --arg bucket "$RELEASE_BUCKET" --arg key "$key" \
+              --arg deployment_id "$DEPLOYMENT_ID" --arg actor "$ACTOR" --arg trigger "$TRIGGER" \
+              '{Operation:[$operation],CommitSha:[$sha],ArtifactDigest:[$digest],ReleaseBucket:[$bucket],ReleaseKey:[$key],DeploymentId:[$deployment_id],Actor:[$actor],Trigger:[$trigger]}')"
+          else
+            parameters="$(jq -cn \
+              --arg operation rollback-drill --arg sha "$RELEASE_SHA" --arg target_sha "$DRILL_TARGET_SHA" \
+              --arg deployment_id "$DEPLOYMENT_ID" --arg actor "$ACTOR" --arg trigger "$TRIGGER" \
+              '{Operation:[$operation],CommitSha:[$sha],TargetSha:[$target_sha],DeploymentId:[$deployment_id],Actor:[$actor],Trigger:[$trigger]}')"
+          fi
+          command_id="$(aws ssm send-command --instance-ids "$INSTANCE_ID" --document-name "$SSM_DOCUMENT_NAME" --parameters "$parameters" --comment "$DEPLOYMENT_ID" --query Command.CommandId --output text)"
+          echo "command_id=$command_id" >> "$GITHUB_OUTPUT"
+          aws ssm wait command-executed --command-id "$command_id" --instance-id "$INSTANCE_ID"
+          status="$(aws ssm get-command-invocation --command-id "$command_id" --instance-id "$INSTANCE_ID" --query Status --output text)"
+          echo "status=$status" >> "$GITHUB_OUTPUT"
+          [[ "$status" == Success ]]
+      - name: Bounded public HTTPS smoke checks
+        id: smoke
+        if: steps.host.outcome == 'success'
+        env:
+          ATTEMPTS: "10"
+          CONNECT_TIMEOUT_SECONDS: "5"
+          MAX_TIME_SECONDS: "10"
+        run: .github/scripts/smoke-production.sh "$PUBLIC_BASE_URL"
+      - name: Roll back after public health failure
+        id: rollback
+        if: failure() && steps.host.outcome == 'success' && steps.smoke.outcome == 'failure' && env.OPERATION_MODE == 'deploy'
+        env:
+          ACTOR: ${{ github.actor }}
+          TRIGGER: ${{ github.event_name }}
+        run: |
+          set -euo pipefail
+          parameters="$(jq -cn \
+            --arg operation rollback --arg deployment_id "$DEPLOYMENT_ID" \
+            --arg actor "$ACTOR" --arg trigger "$TRIGGER" --arg reason public_health_failed \
+            '{Operation:[$operation],DeploymentId:[$deployment_id],Actor:[$actor],Trigger:[$trigger],Reason:[$reason]}')"
+          command_id="$(aws ssm send-command --instance-ids "$INSTANCE_ID" --document-name "$SSM_DOCUMENT_NAME" --parameters "$parameters" --comment "rollback-${DEPLOYMENT_ID}" --query Command.CommandId --output text)"
+          aws ssm wait command-executed --command-id "$command_id" --instance-id "$INSTANCE_ID"
+          status="$(aws ssm get-command-invocation --command-id "$command_id" --instance-id "$INSTANCE_ID" --query Status --output text)"
+          [[ "$status" == Success ]]
+      - name: Write secret-safe deployment summary
+        if: always()
+        env:
+          HOST_STATUS: ${{ steps.host.outputs.status }}
+          HOST_OUTCOME: ${{ steps.host.outcome }}
+          SMOKE_OUTCOME: ${{ steps.smoke.outcome }}
+          ROLLBACK_OUTCOME: ${{ steps.rollback.outcome }}
+          ARTIFACT_DIGEST: ${{ steps.digest.outputs.value }}
+        run: |
+          {
+            echo '## Production operation'
+            echo "- Deployment ID: \`$DEPLOYMENT_ID\`"
+            echo "- Mode: \`$OPERATION_MODE\`"
+            echo "- Commit: \`$RELEASE_SHA\`"
+            [[ -z "$ARTIFACT_DIGEST" ]] || echo "- Artifact SHA-256: \`$ARTIFACT_DIGEST\`"
+            echo "- Host outcome: \`${HOST_STATUS:-$HOST_OUTCOME}\`"
+            echo "- Public smoke checks: \`${SMOKE_OUTCOME:-skipped}\`"
+            echo "- Automatic rollback: \`${ROLLBACK_OUTCOME:-not-required}\`"
+          } >> "$GITHUB_STEP_SUMMARY"

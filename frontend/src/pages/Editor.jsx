@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { apiUrl } from "../api.mjs";
 import "../styles/editor.css";
 
 const ESSAY_TYPES = [
@@ -195,7 +196,7 @@ function Editor() {
         essayTypes.includes("all") ? ["all"] : essayTypes,
       );
 
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/search`, {
+      const response = await fetch(apiUrl("/search"), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

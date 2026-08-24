@@ -3,8 +3,7 @@ import Navbar from "../components/Navbar/Navbar";
 import { useEffect, useMemo, useState } from "react";
 import { useParams } from "react-router-dom";
 import styles from "../styles/compare.module.css";
-
-const API_BASE = import.meta.env.VITE_API_URL;
+import { apiUrl } from "../api.mjs";
 
 const DEFAULT_LEFT_RATIO = 50;
 const MIN_LEFT_RATIO = 35;
@@ -82,7 +81,7 @@ function ComparePage() {
         setLoading(true);
         setPageError("");
 
-        const res = await fetch(`${API_BASE}/essays/${id}?include_content=true`);
+        const res = await fetch(apiUrl(`/essays/${id}?include_content=true`));
 
         if (!res.ok) {
           throw new Error("Failed to fetch essay.");
@@ -228,7 +227,7 @@ function ComparePage() {
       const currentInput = userInput;
       setSubmittedUserInput(currentInput);
 
-      const res = await fetch(`${API_BASE}/compare/${id}`, {
+      const res = await fetch(apiUrl(`/compare/${id}`), {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

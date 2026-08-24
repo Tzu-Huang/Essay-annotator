@@ -60,6 +60,9 @@ jobs:
     env:
       OPENAI_API_KEY: test-only
       POSTGRES_URL: sqlite:////tmp/essay-annotator-${{ github.run_id }}-${{ github.run_attempt }}.db
+      # OAuth web client IDs are public identifiers. Keep the production build
+      # deterministic instead of relying on an untracked frontend/.env file.
+      VITE_GOOGLE_LOGIN_ID: 388331799253-n0pang3tlaremkka4f4n3t1v03sl5nen.apps.googleusercontent.com
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:
@@ -77,6 +80,10 @@ jobs:
           npm run lint
           npm test
           npm run build
+          grep -Fq "$VITE_GOOGLE_LOGIN_ID" dist/assets/*.js || {
+            echo 'Production bundle is missing VITE_GOOGLE_LOGIN_ID' >&2
+            exit 1
+          }
       - name: Set up Python
         uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5
         with:

@@ -128,10 +128,11 @@ def _verified_google_email(authorization: Optional[str]) -> str:
         expires_in = int(token_info.get("expires_in", "0"))
     except (TypeError, ValueError):
         expires_in = 0
+    audience = token_info.get("aud") or token_info.get("audience") or token_info.get("issued_to")
     verified_email = str(token_info.get("email_verified", token_info.get("verified_email", ""))).lower()
     email = str(token_info.get("email", "")).strip().lower()
     if (
-        token_info.get("aud") != client_id
+        audience != client_id
         or expires_in <= 0
         or verified_email != "true"
         or not email

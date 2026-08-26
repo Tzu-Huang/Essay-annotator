@@ -16,12 +16,18 @@ Replace every `CHANGE_ME` before enabling the deployment job. Store these as Git
 | `PRODUCTION_PUBLIC_BASE_URL` | `https://essayannotator.com` | Public HTTPS origin used by smoke checks |
 | `PRODUCTION_DEPLOY_ROLE_ARN` | `arn:aws:iam::814322375571:role/EssayAnnotatorGitHubProductionDeploy` | GitHub OIDC deployment role ARN |
 | `PRODUCTION_SSM_DOCUMENT_NAME` | `EssayAnnotatorDeploy` | Fixed custom SSM document allowed by the deploy policy |
+| `VITE_GOOGLE_LOGIN_ID` | `388331799253-n0pang3tlaremkka4f4n3t1v03sl5nen.apps.googleusercontent.com` | Public Google OAuth web client ID embedded by the frontend production build |
 | `SSM_COMMAND_PATH` | `/usr/local/sbin/essay-annotator-deploy` | Fixed root-managed command invoked by the SSM document |
+| `PRODUCTION_AWS_REGION` | `us-east-1` | Region used by the host credential refresh timer |
+| `OPENAI_SECRET_ARN` | `arn:aws:secretsmanager:us-east-1:814322375571:secret:essay-annotator/production/openai-api-key-WRp699` | OpenAI secret read by the host refresh timer |
+| `RDS_SECRET_ARN` | `arn:aws:secretsmanager:us-east-1:814322375571:secret:rds!db-aedefd5c-dc92-4450-8aac-8869769ddc82-TNpsbv` | RDS-managed secret read by the host refresh timer |
 | `GITHUB_REQUIRED_REVIEWERS` | `CHANGE_ME` | GitHub users or team permitted to approve production |
 | `HOST_AUDIT_RETENTION_DAYS` | `90` | Required retention for host JSONL audit records |
 | `GITHUB_ARTIFACT_RETENTION_DAYS` | `30` | Workflow artifact/evidence retention |
 
 The repository and environment identity are fixed as `Tzu-Huang/Essay-annotator` and `production`. Release object keys must remain beneath `${RELEASE_PREFIX}/<full-lowercase-commit-sha>/`; the artifact and checksum use that same immutable SHA identity.
+
+`VITE_GOOGLE_LOGIN_ID` is a public OAuth client identifier rather than a credential. The production workflow pins it directly in the build job because Vite replaces this value at build time and the untracked `frontend/.env` file is not present on GitHub-hosted runners. The workflow also rejects a bundle that does not contain the expected client ID.
 
 ## AWS trust installation
 
@@ -30,6 +36,7 @@ The repository and environment identity are fixed as `Tzu-Huang/Essay-annotator`
 3. Attach the rendered `deploy/iam/github-production-deploy-policy.json.template` to that role. It permits release-prefix object transfer and invocation of only the named SSM document on the named instance. The command-result read actions use `Resource: *` because those Systems Manager actions do not support resource-level permissions.
 4. Attach AWS managed policy `arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore` and the rendered `deploy/iam/ec2-production-release-read-policy.json.template` to the EC2 instance role. Do not grant the instance `s3:PutObject` or bucket-wide object reads.
 5. Render and install `deploy/iam/essay-annotator-deploy-ssm-document.json.template` under `SSM_DOCUMENT_NAME`. Its only deployment action executes `SSM_COMMAND_PATH`; it does not accept a caller-supplied executable path or arbitrary shell command. Parameters carry only constrained deployment identifiers, artifact identity, digest, actor, and trigger metadata.
+6. Set `PRODUCTION_AWS_REGION`, `OPENAI_SECRET_ARN`, and `RDS_SECRET_ARN` in `/etc/essay-annotator/deploy.conf`, then run `deploy/scripts/install-host.sh`. The installed `essay-secrets-refresh.timer` checks Secrets Manager hourly, shares the deployment lock, and restarts the API only when validated credentials changed.
 
 If the S3 bucket uses a customer-managed KMS key, separately grant both roles only the required key operations for this bucket. No KMS grant is required for SSE-S3.
 

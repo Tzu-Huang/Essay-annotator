@@ -52,6 +52,9 @@ test("admin console has the project admin allowlist and same-origin API routing"
 test("admin console provides a direct sign-in action on denied admin access", () => {
   assert.match(source, /useGoogleSignIn/);
   assert.match(source, /Sign in with Google/);
+  assert.match(source, /if \(!accessToken\)/);
+  assert.match(source, /Your Google session has expired/);
+  assert.match(source, /\{!accessToken && \(/);
 });
 
 test("admin console explains when the AWS admin API is not deployed", () => {

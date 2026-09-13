@@ -122,15 +122,16 @@ function Home({ onOpenSignIn }) {
           <section className={styles.hero}>
             <div className={styles.wrap}>
               <h1>
-                Real essays.
+                College essay examples.
                 <br />
                 Real <span className={styles.accent}>improvement.</span>
               </h1>
 
               <p className={styles.dek}>
-                Most essay tools show you standout examples. We show you
-                relevant ones. Find accepted essays similar to your draft and
-                learn from improvements that actually apply to your writing.
+                Explore college application essays and personal statement examples
+                with Essay Annotator. Find accepted essays similar to your draft,
+                compare them side by side, and learn how to improve your structure,
+                storytelling, and reflection.
               </p>
 
               <div className={styles.heroActions}>
@@ -354,8 +355,8 @@ function Home({ onOpenSignIn }) {
         <div className={styles.wrap}>
           <SectionHead
             eyebrow="The Archive"
-            title="Explore real accepted essays"
-            copy="Essays from students admitted to top universities."
+            title="Explore accepted college essay examples"
+            copy="Study personal statements and supplemental essays from students admitted to top universities."
           />
 
           <div className={styles.libraryGrid}>

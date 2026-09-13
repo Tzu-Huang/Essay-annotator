@@ -2,7 +2,6 @@ import { useEffect, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 
 import { useAuth } from "../hooks/useAuth";
-import { useSeo } from "../hooks/useSeo";
 import { apiUrl } from "../api.mjs";
 import styles from "../styles/home.module.css";
 
@@ -57,14 +56,6 @@ function Home({ onOpenSignIn }) {
   const navigate = useNavigate();
   const { user } = useAuth();
   const [essayCount, setEssayCount] = useState(FALLBACK_ESSAY_COUNT);
-
-  // Restores the homepage's metadata when arriving here from another route.
-  useSeo({
-    title: "Essay Annotator — Search 200+ Real College Application Essays",
-    description:
-      "Study the essays that got students into U.S. colleges. Search 200 real college application essays by theme, prompt or approach, and compare any two side by side.",
-    path: "/",
-  });
 
   useEffect(() => {
     document.documentElement.classList.add("homepage-scrollbar-hidden");

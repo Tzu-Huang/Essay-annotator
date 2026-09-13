@@ -197,6 +197,24 @@ class AdminDataTests(unittest.TestCase):
         self.assertTrue(actor.can_write)
         self.assertEqual(require_admin_write(actor), actor)
 
+    def test_admin_accepts_google_access_token_audience_fields(self):
+        os.environ["ADMIN_EMAILS"] = "owner@example.com"
+        os.environ["GOOGLE_CLIENT_ID"] = "client-id"
+
+        for audience_field in ("audience", "issued_to"):
+            with self.subTest(audience_field=audience_field), patch(
+                "app.admin._google_token_info",
+                return_value={
+                    audience_field: "client-id",
+                    "expires_in": "300",
+                    "verified_email": True,
+                    "email": "owner@example.com",
+                },
+            ):
+                actor = require_admin("Bearer valid-access-token")
+
+            self.assertEqual(actor.email, "owner@example.com")
+
     def test_admin_rejects_missing_or_invalid_google_credentials(self):
         os.environ["ADMIN_EMAILS"] = "owner@example.com"
         os.environ["GOOGLE_CLIENT_ID"] = "client-id"

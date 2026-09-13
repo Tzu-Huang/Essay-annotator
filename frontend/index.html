@@ -13,7 +13,38 @@
     <!-- Browser tab icon -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <!-- Makes layout responsive on mobile -->
-    <title>frontend</title>
+
+    <!--
+      Crawler metadata. This shell is served for every route, so these are the
+      homepage's values and the fallback for everything else; each route
+      overwrites them on render via src/hooks/useSeo.js.
+    -->
+    <title>Essay Annotator — Search 200+ Real College Application Essays</title>
+    <meta
+      name="description"
+      content="Study the essays that got students into U.S. colleges. Search 200 real college application essays by theme, prompt or approach, and compare any two side by side."
+    />
+    <link rel="canonical" href="https://essayannotator.com/" />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Essay Annotator" />
+    <meta property="og:url" content="https://essayannotator.com/" />
+    <meta property="og:title" content="Essay Annotator — Search 200+ Real College Application Essays" />
+    <meta
+      property="og:description"
+      content="Study the essays that got students into U.S. colleges. Search 200 real college application essays by theme, prompt or approach, and compare any two side by side."
+    />
+    <meta name="twitter:card" content="summary_large_image" />
+
+    <!-- Lets Google show "Essay Annotator" as the site name above the URL. -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "WebSite",
+        "name": "Essay Annotator",
+        "url": "https://essayannotator.com/"
+      }
+    </script>
   </head>
   <body>
     <div id="root"></div>

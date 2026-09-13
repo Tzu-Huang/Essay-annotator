@@ -48,7 +48,8 @@ node_modules/
 frontend/dist/
 graphify-out/
 design-mockups/
-docs/
+docs/*
+!docs/current-architecture-and-database-workflow.md
 CLAUDE.md
 COLLABORATION_GUIDE.md
 

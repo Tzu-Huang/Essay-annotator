@@ -2,7 +2,6 @@ import { useEffect, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 
 import { useAuth } from "../hooks/useAuth";
-import { useSeo } from "../hooks/useSeo";
 import { apiUrl } from "../api.mjs";
 import styles from "../styles/home.module.css";
 
@@ -57,14 +56,6 @@ function Home({ onOpenSignIn }) {
   const navigate = useNavigate();
   const { user } = useAuth();
   const [essayCount, setEssayCount] = useState(FALLBACK_ESSAY_COUNT);
-
-  // Restores the homepage's metadata when arriving here from another route.
-  useSeo({
-    title: "Essay Annotator — Search 200+ Real College Application Essays",
-    description:
-      "Study the essays that got students into U.S. colleges. Search 200 real college application essays by theme, prompt or approach, and compare any two side by side.",
-    path: "/",
-  });
 
   useEffect(() => {
     document.documentElement.classList.add("homepage-scrollbar-hidden");
@@ -122,15 +113,16 @@ function Home({ onOpenSignIn }) {
           <section className={styles.hero}>
             <div className={styles.wrap}>
               <h1>
-                Real essays.
+                College essay examples.
                 <br />
                 Real <span className={styles.accent}>improvement.</span>
               </h1>
 
               <p className={styles.dek}>
-                Most essay tools show you standout examples. We show you
-                relevant ones. Find accepted essays similar to your draft and
-                learn from improvements that actually apply to your writing.
+                Explore college application essays and personal statement examples
+                with Essay Annotator. Find accepted essays similar to your draft,
+                compare them side by side, and learn how to improve your structure,
+                storytelling, and reflection.
               </p>
 
               <div className={styles.heroActions}>
@@ -354,8 +346,8 @@ function Home({ onOpenSignIn }) {
         <div className={styles.wrap}>
           <SectionHead
             eyebrow="The Archive"
-            title="Explore real accepted essays"
-            copy="Essays from students admitted to top universities."
+            title="Explore accepted college essay examples"
+            copy="Study personal statements and supplemental essays from students admitted to top universities."
           />
 
           <div className={styles.libraryGrid}>

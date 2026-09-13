@@ -2,11 +2,12 @@ import { useState, createContext } from "react";
 import { googleLogout } from "@react-oauth/google";
 
 const STORAGE_KEY = "googleUser";
+const ACCESS_TOKEN_KEY = "googleAccessToken";
 
 const AuthContext = createContext(null);
 
 export function AuthProvider({ children }) {
-  const [accessToken, setAccessToken] = useState(null);
+  const [accessToken, setAccessToken] = useState(() => sessionStorage.getItem(ACCESS_TOKEN_KEY));
   const [user, setUser] = useState(() => {
     const storedUser = localStorage.getItem(STORAGE_KEY);
 
@@ -27,6 +28,11 @@ export function AuthProvider({ children }) {
     setUser(profile);
     setAccessToken(googleAccessToken);
     localStorage.setItem(STORAGE_KEY, JSON.stringify(profile));
+    if (googleAccessToken) {
+      sessionStorage.setItem(ACCESS_TOKEN_KEY, googleAccessToken);
+    } else {
+      sessionStorage.removeItem(ACCESS_TOKEN_KEY);
+    }
   };
 
   const logoutUser = () => {
@@ -34,6 +40,7 @@ export function AuthProvider({ children }) {
     setUser(null);
     setAccessToken(null);
     localStorage.removeItem(STORAGE_KEY);
+    sessionStorage.removeItem(ACCESS_TOKEN_KEY);
   };
 
   return (

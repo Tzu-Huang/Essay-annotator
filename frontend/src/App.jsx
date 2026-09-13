@@ -10,6 +10,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Navbar from "./components/Navbar/Navbar";
 import SignInModal from "./components/SignInModal";
 import Footer from "./components/Footer/Footer";
+import SearchMetadata from "./components/SearchMetadata";
 
 import Home from "./pages/Home";
 import Login from "./pages/Login";
@@ -48,6 +49,7 @@ function App() {
 
   return (
     <BrowserRouter>
+      <SearchMetadata />
       <div className="app-shell">
         <Routes>
           <Route

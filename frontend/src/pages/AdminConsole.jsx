@@ -11,6 +11,7 @@ import {
   Shield,
   Terminal,
   Wallet,
+  Users,
 } from "lucide-react";
 import { useAuth } from "../hooks/useAuth";
 import { useGoogleSignIn } from "../hooks/useGoogleSignIn";
@@ -18,6 +19,7 @@ import { API_BASE, apiUrl } from "../api.mjs";
 import AdminSidebar from "./admin/AdminSidebar.jsx";
 import OverviewDashboard from "./admin/OverviewDashboard.jsx";
 import EssaysTab from "./admin/EssaysTab.jsx";
+import UsersTab from "./admin/UsersTab.jsx";
 import EssayEditorPage from "./admin/EssayEditorPage.jsx";
 import UploadEssaysPage from "./admin/UploadEssaysPage.jsx";
 import UnsavedChangesModal from "./admin/UnsavedChangesModal.jsx";
@@ -62,6 +64,7 @@ function emptyEssay() {
 const NAV_ITEMS = [
   ["overview", "Overview", Activity],
   ["essays", "Essays", BookOpen],
+  ["users", "Users", Users],
   ["usage", "Usage", BarChart3],
   ["logs", "Logs", Cloud],
   ["audit", "Audit", ClipboardList],
@@ -71,6 +74,7 @@ export default function AdminConsole() {
   const { user, accessToken } = useAuth();
   const googleSignIn = useGoogleSignIn();
   const [tab, setTab] = useState("overview");
+  const [usersRevision, setUsersRevision] = useState(0);
   const [adminState, setAdminState] = useState({ loading: true, error: "", profile: null });
   const [overview, setOverview] = useState(null);
   const [essays, setEssays] = useState({ items: [], total: 0, page: 1, page_size: 15 });
@@ -242,6 +246,7 @@ export default function AdminConsole() {
     setMessage("");
     try {
       if (tab === "overview") await loadOverview();
+      if (tab === "users") { setUsersRevision(value => value + 1); return; }
       if (tab === "essays") await loadEssays(essays.page || 1);
       if (tab === "usage") await loadUsage();
       if (tab === "logs") await loadLogs();
@@ -648,6 +653,7 @@ export default function AdminConsole() {
             }}
           />
         )}
+        {tab === "users" && <UsersTab key={usersRevision} api={api} />}
         {tab === "usage" && <Usage usage={usage} />}
         {tab === "logs" && <Logs logs={logs} />}
         {tab === "audit" && <Audit audit={audit} />}

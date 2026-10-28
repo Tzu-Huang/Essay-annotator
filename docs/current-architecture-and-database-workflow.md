@@ -347,6 +347,8 @@ Admin URL
 
 ### 7.1 Production Admin 的定位
 
+2026-10-27：程式新增 Users 唯讀頁面與 `GET /api/admin/users`，沿用 `require_admin` 驗證，提供姓名、Email、建立時間、登入次數及最後登入時間，支援搜尋與分頁。資料來源仍由 Backend 的 `POSTGRES_URL` 決定；部署到 Production 後才會顯示 RDS 使用者，Local 使用 Supabase。本次不變更 schema；正式部署狀態需另行確認。
+
 目前共識是 Production Admin 主要作為 AWS Production 與 RDS 的管理／檢查入口，優先提供：
 
 - 網站與 Backend 健康狀態

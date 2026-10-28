@@ -12,7 +12,7 @@ from dotenv import load_dotenv
 from fastapi import APIRouter, Depends, File, Form, Header, HTTPException, Query, UploadFile
 from openai import OpenAI
 from pydantic import BaseModel
-from sqlalchemy import func
+from sqlalchemy import func, or_
 from sqlalchemy.orm import Session
 
 from app.state import AppData
@@ -212,6 +212,35 @@ def overview(db: Session = Depends(get_db), actor: AdminActor = Depends(require_
         },
         "integrations": _integration_status(),
         "generated_at": utcnow().isoformat(),
+    }
+
+
+@router.get("/users")
+def list_users(
+    page: int = Query(default=1, ge=1),
+    page_size: int = Query(default=15, ge=1, le=100),
+    search: str = Query(default="", max_length=200),
+    db: Session = Depends(get_db),
+    actor: AdminActor = Depends(require_admin),
+):
+    query = db.query(User)
+    if search.strip():
+        term = search.strip()
+        query = query.filter(or_(
+            User.name.icontains(term, autoescape=True),
+            User.email.icontains(term, autoescape=True),
+        ))
+    total = query.count()
+    rows = (query.order_by(User.last_login.desc().nullslast(), User.id.asc())
+            .offset((page - 1) * page_size).limit(page_size).all())
+    return {
+        "items": [{
+            "id": row.id, "name": row.name, "email": row.email,
+            "created_at": row.created_at.isoformat() if row.created_at else None,
+            "login_count": row.login_count,
+            "last_login": row.last_login.isoformat() if row.last_login else None,
+        } for row in rows],
+        "total": total, "page": page, "page_size": page_size,
     }
 
 
